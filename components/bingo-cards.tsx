@@ -132,6 +132,31 @@ export function BingoCards() {
   const [isListening, setIsListening] = useState(false)
   const [speechSupported, setSpeechSupported] = useState(false)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const [bingoCards, setBingoCards] = useState<Set<string>>(new Set()) // Track cards that have bingo'd
+
+  // Speak "Bingo" announcement
+  const speakBingo = useCallback((cardName: string) => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return
+
+    const langMap: Record<string, string> = {
+      zh: "zh-CN",
+      en: "en-US",
+      th: "th-TH",
+    }
+
+    const bingoText: Record<string, string> = {
+      zh: `${cardName} Bingo!`,
+      en: `${cardName} Bingo!`,
+      th: `${cardName} บิงโก!`,
+    }
+
+    const utterance = new SpeechSynthesisUtterance(bingoText[locale] || bingoText.en)
+    utterance.lang = langMap[locale] || "en-US"
+    utterance.rate = 0.9
+    utterance.volume = 1
+    window.speechSynthesis.cancel()
+    window.speechSynthesis.speak(utterance)
+  }, [locale])
 
   // Check speech recognition support
   useEffect(() => {
@@ -285,6 +310,32 @@ export function BingoCards() {
       handleInputNumber()
     }
   }, [handleInputNumber])
+
+  // Check for new Bingo and announce
+  useEffect(() => {
+    cards.forEach(card => {
+      const hasBingo = checkBingo(card.numbers, drawnNumbers)
+      if (hasBingo && !bingoCards.has(card.id)) {
+        // New bingo detected!
+        setBingoCards(prev => new Set([...prev, card.id]))
+        speakBingo(card.name)
+      } else if (!hasBingo && bingoCards.has(card.id)) {
+        // Bingo was lost (e.g., after reset)
+        setBingoCards(prev => {
+          const newSet = new Set(prev)
+          newSet.delete(card.id)
+          return newSet
+        })
+      }
+    })
+  }, [cards, drawnNumbers, bingoCards, speakBingo])
+
+  // Reset bingoCards when all marks are reset
+  useEffect(() => {
+    if (drawnNumbers.size === 0) {
+      setBingoCards(new Set())
+    }
+  }, [drawnNumbers.size])
 
   const bingoLetters = ["B", "I", "N", "G", "O"]
   const letterColors = [
