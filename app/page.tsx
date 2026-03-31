@@ -45,6 +45,29 @@ export default function Home() {
               </CardContent>
             </Card>
           </Link>
+
+          <Link href="/bingo-cards" className="block">
+            <Card className="h-full border-slate-700 bg-slate-800/50 transition-all hover:border-slate-500 hover:bg-slate-800">
+              <CardHeader>
+                <CardTitle className="text-white">
+                  <span className="text-red-500">B</span>
+                  <span className="text-orange-500">I</span>
+                  <span className="text-yellow-500">N</span>
+                  <span className="text-green-500">G</span>
+                  <span className="text-blue-500">O</span>
+                  <span className="ml-2 text-slate-300">{t("bingoCards")}</span>
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  {t("bingoCardsGame")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-400">
+                  {t("bingoCardsDescription")}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </main>
     </div>
