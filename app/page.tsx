@@ -104,6 +104,24 @@ export default function Home() {
               </CardContent>
             </Card>
           </Link>
+
+          <Link href="/anime-tracker" className="block">
+            <Card className="h-full border-slate-700 bg-slate-800/50 transition-all hover:border-slate-500 hover:bg-slate-800">
+              <CardHeader>
+                <CardTitle className="text-pink-400">
+                  {t("animeTracker")}
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  {t("animeTrackerShort")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-400">
+                  {t("animeTrackerDescription")}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </main>
     </div>
