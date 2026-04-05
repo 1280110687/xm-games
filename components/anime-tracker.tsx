@@ -388,56 +388,74 @@ export function AnimeTracker() {
                     </DialogDescription>
                   </DialogHeader>
                   <div className="grid gap-4 py-4">
-                    {/* Title with Search */}
-                    <div className="grid gap-2">
-                      <Label htmlFor="title">{t("animeTitle")} *</Label>
-                      <div className="relative">
-                        <Input
-                          id="title"
-                          value={formTitle}
-                          onChange={(e) => setFormTitle(e.target.value)}
-                          placeholder={t("animeTitlePlaceholder")}
-                          className="border-slate-600 bg-slate-700 pr-10"
-                        />
-                        {isSearching && (
-                          <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-slate-400" />
-                        )}
-                        {!isSearching && formType === "anime" && (
-                          <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                        )}
-                      </div>
-                      {/* Search Results Dropdown */}
-                      {showSearchResults && searchResults.length > 0 && (
-                        <div className="absolute z-50 mt-16 max-h-60 w-full overflow-y-auto rounded-md border border-slate-600 bg-slate-700">
-                          {searchResults.map((anime) => (
-                            <button
-                              key={anime.mal_id}
-                              onClick={() => selectSearchResult(anime)}
-                              className="flex w-full items-center gap-3 p-2 text-left hover:bg-slate-600"
-                            >
-                              {anime.images?.jpg?.image_url ? (
-                                <img 
-                                  src={anime.images.jpg.image_url} 
-                                  alt={anime.title}
-                                  className="h-12 w-9 rounded object-cover"
-                                />
-                              ) : (
-                                <div className="flex h-12 w-9 items-center justify-center rounded bg-slate-600">
-                                  <ImageIcon className="h-4 w-4 text-slate-400" />
-                                </div>
-                              )}
-                              <div className="flex-1 overflow-hidden">
-                                <p className="truncate text-sm font-medium text-white">{anime.title}</p>
-                                <p className="text-xs text-slate-400">
-                                  {anime.episodes ? `${anime.episodes} ${t("episodesUnit")}` : t("ongoing")}
-                                  {anime.score && ` · ${anime.score}`}
-                                </p>
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      )}
-                    </div>
+{/* Title with Search */}
+                                    <div className="relative grid gap-2">
+                                      <Label htmlFor="title">{t("animeTitle")} *</Label>
+                                      <div className="relative">
+                                        <Input
+                                          id="title"
+                                          value={formTitle}
+                                          onChange={(e) => {
+                                            setFormTitle(e.target.value)
+                                            if (e.target.value.length >= 2 && formType === "anime") {
+                                              setShowSearchResults(true)
+                                            }
+                                          }}
+                                          onFocus={() => {
+                                            if (searchResults.length > 0 && formType === "anime") {
+                                              setShowSearchResults(true)
+                                            }
+                                          }}
+                                          onBlur={() => {
+                                            // Delay hiding to allow click on results
+                                            setTimeout(() => setShowSearchResults(false), 200)
+                                          }}
+                                          placeholder={t("animeTitlePlaceholder")}
+                                          className="border-slate-600 bg-slate-700 pr-10"
+                                        />
+                                        {isSearching && (
+                                          <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-slate-400" />
+                                        )}
+                                        {!isSearching && formType === "anime" && (
+                                          <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                                        )}
+                                      </div>
+                                      {/* Search Results Dropdown */}
+                                      {showSearchResults && searchResults.length > 0 && (
+                                        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-y-auto rounded-md border border-slate-600 bg-slate-700 shadow-lg">
+                                          {searchResults.map((anime) => (
+                                            <button
+                                              key={anime.mal_id}
+                                              type="button"
+                                              onMouseDown={(e) => {
+                                                e.preventDefault()
+                                                selectSearchResult(anime)
+                                              }}
+                                              className="flex w-full items-center gap-3 p-2 text-left hover:bg-slate-600"
+                                            >
+                                              {anime.images?.jpg?.image_url ? (
+                                                <img 
+                                                  src={anime.images.jpg.image_url} 
+                                                  alt={anime.title}
+                                                  className="h-12 w-9 rounded object-cover"
+                                                />
+                                              ) : (
+                                                <div className="flex h-12 w-9 items-center justify-center rounded bg-slate-600">
+                                                  <ImageIcon className="h-4 w-4 text-slate-400" />
+                                                </div>
+                                              )}
+                                              <div className="flex-1 overflow-hidden">
+                                                <p className="truncate text-sm font-medium text-white">{anime.title}</p>
+                                                <p className="text-xs text-slate-400">
+                                                  {anime.episodes ? `${anime.episodes} ${t("episodesUnit")}` : t("ongoing")}
+                                                  {anime.score && ` · ${anime.score}`}
+                                                </p>
+                                              </div>
+                                            </button>
+                                          ))}
+                                        </div>
+                                      )}
+                                    </div>
 
                     <div className="grid grid-cols-2 gap-3 sm:gap-4">
                       <div className="grid gap-2">
