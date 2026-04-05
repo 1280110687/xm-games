@@ -110,6 +110,8 @@ export const translations = {
     notesPlaceholder: "添加备注...",
     progress: "进度",
     episode: "第",
+    episodesUnit: "集",
+    autoSearchHint: "输入动漫名称会自动搜索封面",
   },
   en: {
     // Common
@@ -212,6 +214,8 @@ export const translations = {
     notesPlaceholder: "Add notes...",
     progress: "Progress",
     episode: "Ep.",
+    episodesUnit: "eps",
+    autoSearchHint: "Auto search cover when entering anime title",
   },
   th: {
     // Common
@@ -225,7 +229,7 @@ export const translations = {
     gameOver: "จบเกม",
     score: "คะแนน",
     highScore: "คะแนนสูงสุด",
-    finalScore: "คะแนนสุดท้าย",
+    finalScore: "คะแนนสุ���ท้าย",
     level: "ระดับ",
     lines: "เส้น",
     nextPiece: "ถัดไป",
@@ -314,6 +318,8 @@ export const translations = {
     notesPlaceholder: "เพิ่มบันทึก...",
     progress: "ความคืบหน้า",
     episode: "ตอนที่",
+    episodesUnit: "ตอน",
+    autoSearchHint: "ค้นหาภาพปกอัตโนมัติเมื่อพิมพ์ชื่ออนิเมะ",
   },
 } as const
 
