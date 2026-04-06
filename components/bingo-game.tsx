@@ -90,8 +90,22 @@ const thaiNumbers: { [key: number]: string } = {
   75: "เจ็ดสิบห้า",
 }
 
+// Chinese number mappings
+const chineseNumbers: { [key: number]: string } = {
+  0: "零", 1: "一", 2: "二", 3: "三", 4: "四", 5: "五",
+  6: "六", 7: "七", 8: "八", 9: "九", 10: "十",
+}
+
+function getChineseNumber(num: number): string {
+  if (num <= 10) return chineseNumbers[num]
+  if (num < 20) return `十${num === 10 ? "" : chineseNumbers[num - 10]}`
+  const tens = Math.floor(num / 10)
+  const ones = num % 10
+  return `${chineseNumbers[tens]}十${ones === 0 ? "" : chineseNumbers[ones]}`
+}
+
 export function BingoGame() {
-  const { t } = useLocale()
+  const { t, locale } = useLocale()
   const [drawnNumbers, setDrawnNumbers] = useState<number[]>([])
   const [currentNumber, setCurrentNumber] = useState<number | null>(null)
   const [isAutoMode, setIsAutoMode] = useState(false)
@@ -104,24 +118,41 @@ export function BingoGame() {
   const allNumbers = Array.from({ length: 75 }, (_, i) => i + 1)
   const remainingNumbers = allNumbers.filter((n) => !drawnNumbers.includes(n))
 
-  // 泰语语音播报
-  const speakThai = useCallback((number: number) => {
+  // 多语言语音播报
+  const speakNumber = useCallback((number: number) => {
     if (!isSoundEnabled) return
-    
-    const thaiText = thaiNumbers[number]
-    if (!thaiText) return
+    if (typeof window === "undefined" || !window.speechSynthesis) return
 
     // 取消之前的语音
     window.speechSynthesis.cancel()
 
-    const utterance = new SpeechSynthesisUtterance(thaiText)
-    utterance.lang = "th-TH"
+    let text: string
+    let lang: string
+
+    switch (locale) {
+      case "th":
+        text = thaiNumbers[number] || String(number)
+        lang = "th-TH"
+        break
+      case "zh":
+        text = getChineseNumber(number)
+        lang = "zh-CN"
+        break
+      case "en":
+      default:
+        text = String(number)
+        lang = "en-US"
+        break
+    }
+
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = lang
     utterance.rate = 0.9
     utterance.pitch = 1
     utterance.volume = 1
 
     window.speechSynthesis.speak(utterance)
-  }, [isSoundEnabled])
+  }, [isSoundEnabled, locale])
 
   // 抽取数字
   const drawNumber = useCallback(() => {
@@ -135,8 +166,8 @@ export function BingoGame() {
 
     setCurrentNumber(newNumber)
     setDrawnNumbers((prev) => [...prev, newNumber])
-    speakThai(newNumber)
-  }, [remainingNumbers, speakThai])
+    speakNumber(newNumber)
+  }, [remainingNumbers, speakNumber])
 
   // 自动抽取逻辑
   useEffect(() => {

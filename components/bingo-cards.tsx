@@ -166,7 +166,7 @@ export function BingoCards() {
     }
   }, [])
 
-  // Initialize speech recognition
+  // Initialize speech recognition (only once, update language separately)
   useEffect(() => {
     if (typeof window === "undefined") return
 
@@ -177,6 +177,19 @@ export function BingoCards() {
     recognition.continuous = true
     recognition.interimResults = false
 
+    recognitionRef.current = recognition
+
+    return () => {
+      recognition.stop()
+    }
+  }, [])
+
+  // Update language and handlers when locale changes
+  useEffect(() => {
+    if (!recognitionRef.current) return
+
+    const recognition = recognitionRef.current
+    
     // Set language based on locale
     const langMap: Record<string, string> = {
       zh: "zh-CN",
@@ -185,7 +198,7 @@ export function BingoCards() {
     }
     recognition.lang = langMap[locale] || "en-US"
 
-    recognition.onresult = (event) => {
+    const handleResult = (event: SpeechRecognitionEvent) => {
       const last = event.results.length - 1
       const transcript = event.results[last][0].transcript.trim()
       
@@ -200,24 +213,28 @@ export function BingoCards() {
       }
     }
 
-    recognition.onerror = (event) => {
+    const handleError = (event: SpeechRecognitionErrorEvent) => {
       console.log("[v0] Speech recognition error:", event.error)
-      if (event.error === "not-allowed") {
+      if (event.error === "not-allowed" || event.error === "aborted") {
         setIsListening(false)
       }
     }
 
-    recognition.onend = () => {
-      if (isListening) {
-        recognition.start()
+    const handleEnd = () => {
+      // Check if we should restart (use a ref to avoid stale closure)
+      if (isListening && recognitionRef.current) {
+        try {
+          recognitionRef.current.start()
+        } catch (e) {
+          // Already started, ignore
+        }
       }
     }
 
-    recognitionRef.current = recognition
+    recognition.onresult = handleResult
+    recognition.onerror = handleError
+    recognition.onend = handleEnd
 
-    return () => {
-      recognition.stop()
-    }
   }, [locale, isListening])
 
   // Extract numbers from speech in different languages
@@ -265,20 +282,46 @@ export function BingoCards() {
   }
 
   const toggleListening = useCallback(() => {
-    if (!recognitionRef.current) return
+    if (!recognitionRef.current) {
+      console.log("[v0] Speech recognition not initialized")
+      return
+    }
 
     if (isListening) {
-      recognitionRef.current.stop()
+      try {
+        recognitionRef.current.stop()
+      } catch (e) {
+        // Ignore stop errors
+      }
       setIsListening(false)
     } else {
       try {
+        // Update language before starting
+        const langMap: Record<string, string> = {
+          zh: "zh-CN",
+          en: "en-US",
+          th: "th-TH",
+        }
+        recognitionRef.current.lang = langMap[locale] || "en-US"
         recognitionRef.current.start()
         setIsListening(true)
       } catch (error) {
         console.log("[v0] Failed to start speech recognition:", error)
+        // Try to stop and restart
+        try {
+          recognitionRef.current.stop()
+          setTimeout(() => {
+            if (recognitionRef.current) {
+              recognitionRef.current.start()
+              setIsListening(true)
+            }
+          }, 100)
+        } catch (e) {
+          console.log("[v0] Failed to restart speech recognition:", e)
+        }
       }
     }
-  }, [isListening])
+  }, [isListening, locale])
 
   const addCard = useCallback(() => {
     const newCard: BingoCard = {
