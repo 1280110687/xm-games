@@ -122,6 +122,24 @@ export default function Home() {
               </CardContent>
             </Card>
           </Link>
+
+          <Link href="/chinese-chess" className="block">
+            <Card className="h-full border-slate-700 bg-slate-800/50 transition-all hover:border-slate-500 hover:bg-slate-800">
+              <CardHeader>
+                <CardTitle className="text-amber-400">
+                  {t("chineseChess")}
+                </CardTitle>
+                <CardDescription className="text-slate-400">
+                  {t("chineseChess")}
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-sm text-slate-400">
+                  {t("chineseChessDescription")}
+                </p>
+              </CardContent>
+            </Card>
+          </Link>
         </div>
       </main>
     </div>

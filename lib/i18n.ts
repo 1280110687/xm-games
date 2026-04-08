@@ -112,6 +112,17 @@ export const translations = {
     episode: "第",
     episodesUnit: "集",
     autoSearchHint: "输入动漫名称会自动搜索封面",
+
+    // Chinese Chess
+    chineseChess: "中国象棋",
+    chineseChessDescription: "经典中国象棋双人对弈游戏",
+    redTurn: "红方回合",
+    blackTurn: "黑方回合",
+    check: "将军！",
+    redWins: "红方胜利！",
+    blackWins: "黑方胜利！",
+    newGame: "新游戏",
+    chessInstructions: "点击棋子选中，再点击目标位置移动。红方先行。",
   },
   en: {
     // Common
@@ -216,6 +227,17 @@ export const translations = {
     episode: "Ep.",
     episodesUnit: "eps",
     autoSearchHint: "Auto search cover when entering anime title",
+
+    // Chinese Chess
+    chineseChess: "Chinese Chess",
+    chineseChessDescription: "Classic Chinese Chess (Xiangqi) two-player game",
+    redTurn: "Red's Turn",
+    blackTurn: "Black's Turn",
+    check: "Check!",
+    redWins: "Red Wins!",
+    blackWins: "Black Wins!",
+    newGame: "New Game",
+    chessInstructions: "Click a piece to select, then click target to move. Red moves first.",
   },
   th: {
     // Common
@@ -312,7 +334,7 @@ export const translations = {
     totalEpisodes: "จำนวนตอนทั้งหมด",
     ongoing: "ยังไม่จบ",
     rating: "คะแนน",
-    ratingPlaceholder: "คะแนนเสริม",
+    ratingPlaceholder: "คะแนนเส��ิม",
     coverImage: "ภาพปก",
     notes: "บันทึก",
     notesPlaceholder: "เพิ่มบันทึก...",
@@ -320,6 +342,17 @@ export const translations = {
     episode: "ตอนที่",
     episodesUnit: "ตอน",
     autoSearchHint: "ค้นหาภาพปกอัตโนมัติเมื่อพิมพ์ชื่ออนิเมะ",
+
+    // Chinese Chess
+    chineseChess: "หมากรุกจีน",
+    chineseChessDescription: "เกมหมากรุกจีนคลาสสิกสำหรับผู้เล่นสองคน",
+    redTurn: "ตาฝ่ายแดง",
+    blackTurn: "ตาฝ่ายดำ",
+    check: "รุกฆาต!",
+    redWins: "ฝ่ายแดงชนะ!",
+    blackWins: "ฝ่ายดำชนะ!",
+    newGame: "เกมใหม่",
+    chessInstructions: "คลิกหมากเพื่อเลือก แล้วคลิกตำแหน่งเป้าหมายเพื่อเดิน ฝ่ายแดงเดินก่อน",
   },
 } as const
 
