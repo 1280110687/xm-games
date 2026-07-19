@@ -82,7 +82,10 @@ export function GameHeader({
     />
   )
   const languageAndActions = (
-    <div className="flex items-center gap-1 sm:gap-2">
+    <div
+      data-slot="game-header-controls"
+      className="flex shrink-0 items-center gap-1.5 sm:gap-2"
+    >
       <LanguageSwitcher />
       {actions}
     </div>
@@ -91,7 +94,7 @@ export function GameHeader({
   if (layout === "hero") {
     return (
       <header className={cn("game-header mb-8 p-3 sm:p-4", className)}>
-        <div className="mb-6 flex items-center justify-between">
+        <div className="mb-6 flex min-w-0 items-center justify-between gap-3">
           {home}
           {languageAndActions}
         </div>
@@ -105,12 +108,12 @@ export function GameHeader({
 
   if (layout === "tool") {
     return (
-      <header className={cn("game-header flex items-center justify-between gap-2 p-3 sm:p-4", className)}>
-        <div className="flex min-w-0 items-center gap-2 sm:gap-4">
+      <header className={cn("game-header flex min-w-0 items-center justify-between gap-2 p-3 sm:gap-4 sm:p-4", className)}>
+        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
           {home}
           <div className="min-w-0">
-            {title && <h1 className={titleClassName}>{title}</h1>}
-            {description && <p className={descriptionClassName}>{description}</p>}
+            {title && <h1 className={cn("truncate", titleClassName)}>{title}</h1>}
+            {description && <p className={cn("truncate", descriptionClassName)}>{description}</p>}
           </div>
         </div>
         {languageAndActions}
@@ -122,13 +125,13 @@ export function GameHeader({
     return (
       <header
         className={cn(
-          "game-header grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 p-3 sm:p-4",
+          "game-header grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 p-3 sm:gap-2 sm:p-4",
           className,
         )}
       >
-        <div className="justify-self-start">{home}</div>
-        {title && <h1 className={titleClassName}>{title}</h1>}
-        <div className="justify-self-end">{languageAndActions}</div>
+        <div className="min-w-0 justify-self-start">{home}</div>
+        {title && <h1 className={cn("max-w-full truncate text-center", titleClassName)}>{title}</h1>}
+        <div className="min-w-0 justify-self-end">{languageAndActions}</div>
       </header>
     )
   }

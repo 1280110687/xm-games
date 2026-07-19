@@ -116,7 +116,7 @@ export function GomokuGame() {
         homeLabel={t("appName")}
         homeLabelMode="desktop"
         title={t("gomoku")}
-        className="mb-4 [&_[data-slot=select-trigger]]:w-14 [&_[data-slot=select-trigger]]:px-1 sm:[&_[data-slot=select-trigger]]:w-[122px] sm:[&_[data-slot=select-trigger]]:px-3"
+        className="mb-4"
         homeButtonClassName="text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
         titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />

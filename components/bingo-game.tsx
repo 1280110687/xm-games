@@ -222,69 +222,81 @@ export function BingoGame() {
 
   return (
     <div className="game-page">
-      <div className="mx-auto max-w-6xl">
+      <div className="mx-auto w-full max-w-6xl">
         <GameHeader
-          layout="hero"
+          layout="centered"
           homeIcon="back"
           homeLabel={t("appName")}
+          homeLabelMode="desktop"
           homeButtonClassName="text-muted-foreground hover:text-foreground"
-          titleClassName="text-4xl font-bold text-foreground md:text-6xl"
-          description={t("bingoSubtitle")}
-          descriptionClassName="text-muted-foreground"
+          className="mb-4 sm:mb-6"
+          titleClassName="text-xl font-bold tracking-wide text-foreground sm:text-2xl"
           title={
             <>
-            <span className="text-red-500">B</span>
-            <span className="text-orange-500">I</span>
-            <span className="text-yellow-500">N</span>
-            <span className="text-green-500">G</span>
-            <span className="text-blue-500">O</span>
+              <span className="text-red-500">B</span>
+              <span className="text-orange-500">I</span>
+              <span className="text-yellow-500">N</span>
+              <span className="text-green-500">G</span>
+              <span className="text-blue-500">O</span>
             </>
           }
         />
 
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-4 lg:grid-cols-3 lg:gap-6">
           {/* 当前抽到的数字 */}
-          <Card className="border-white/10 bg-card/70 lg:col-span-2">
-            <CardHeader>
-              <CardTitle className="text-white">{t("currentNumber")}</CardTitle>
+          <Card className="gap-0 overflow-hidden border-white/10 bg-card/70 py-0 lg:col-span-2">
+            <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-white/[0.07] px-4 py-4 sm:px-6">
+              <CardTitle className="text-base text-white sm:text-lg">{t("currentNumber")}</CardTitle>
+              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground sm:gap-2 sm:text-sm">
+                <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-1 sm:px-2.5">
+                  {t("drawn")} <strong className="font-semibold text-foreground">{drawnNumbers.length}</strong>
+                </span>
+                <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-1 sm:px-2.5">
+                  {t("remaining")} <strong className="font-semibold text-foreground">{remainingNumbers.length}</strong>
+                </span>
+              </div>
             </CardHeader>
-            <CardContent>
-              <div className="flex flex-col items-center justify-center gap-6">
+            <CardContent className="px-4 py-5 sm:px-6 sm:py-6">
+              <div className="flex flex-col items-center justify-center gap-4 sm:gap-5">
                 {currentNumber ? (
-                  <div className="flex flex-col items-center gap-4">
+                  <div className="flex flex-col items-center gap-2.5">
                     <div
                       role="status"
                       aria-live="assertive"
                       aria-atomic="true"
-                      className={`flex h-40 w-40 items-center justify-center rounded-full ${getLetterColor(currentNumber)} text-white shadow-2xl transition-all duration-300 md:h-56 md:w-56`}
+                      className={`flex h-36 w-36 items-center justify-center rounded-full ${getLetterColor(currentNumber)} text-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] ring-4 ring-white/10 transition-all duration-300 sm:h-44 sm:w-44 md:h-52 md:w-52`}
                     >
-                      <div className="text-center">
-                        <div className="text-2xl font-bold md:text-4xl">
+                      <div className="text-center leading-none">
+                        <div className="text-xl font-bold sm:text-2xl md:text-3xl">
                           {getLetter(currentNumber)}
                         </div>
-                        <div className="text-5xl font-bold md:text-8xl">
+                        <div className="mt-1 text-5xl font-bold tabular-nums sm:text-6xl md:text-7xl">
                           {currentNumber}
                         </div>
                       </div>
                     </div>
-                    <div className="text-2xl font-medium text-slate-300">
-                      {thaiNumbers[currentNumber]}
-                    </div>
+                    {locale !== "en" && (
+                      <div className="text-base font-medium text-slate-300 sm:text-lg">
+                        {locale === "th"
+                          ? thaiNumbers[currentNumber]
+                          : getChineseNumber(currentNumber)}
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <div className="flex h-40 w-40 items-center justify-center rounded-full bg-slate-700 text-slate-400 md:h-56 md:w-56">
-                    <span className="text-xl">{t("clickToDraw")}</span>
+                  <div className="flex h-36 w-36 items-center justify-center rounded-full border border-white/[0.08] bg-gradient-to-br from-slate-700 to-slate-800 text-center text-slate-300 shadow-inner ring-4 ring-white/[0.025] sm:h-44 sm:w-44 md:h-52 md:w-52">
+                    <span className="max-w-24 text-base font-medium sm:text-lg">{t("clickToDraw")}</span>
                   </div>
                 )}
 
                 {/* 操作按钮 */}
-                <div className="flex flex-wrap justify-center gap-4">
+                <div className="grid w-full max-w-sm grid-cols-2 gap-2.5 sm:gap-3">
                   {!isAutoMode ? (
                     <Button
                       size="lg"
                       onClick={drawNumber}
                       disabled={remainingNumbers.length === 0}
-                      className="text-lg"
+                      className="w-full px-3 text-base sm:text-lg"
                     >
                       {t("drawNumber")}
                     </Button>
@@ -293,7 +305,7 @@ export function BingoGame() {
                       size="lg"
                       onClick={toggleAutoPlay}
                       disabled={remainingNumbers.length === 0}
-                      className={`text-lg ${
+                      className={`w-full px-3 text-base sm:text-lg ${
                         isPlaying
                           ? "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800"
                           : "bg-primary hover:bg-primary/90"
@@ -301,11 +313,11 @@ export function BingoGame() {
                     >
                       {isPlaying ? (
                         <>
-                          <Pause className="mr-2 h-5 w-5" aria-hidden="true" /> {t("pause")}
+                          <Pause className="h-5 w-5" aria-hidden="true" /> {t("pause")}
                         </>
                       ) : (
                         <>
-                          <Play className="mr-2 h-5 w-5" aria-hidden="true" /> {t("start")}
+                          <Play className="h-5 w-5" aria-hidden="true" /> {t("start")}
                         </>
                       )}
                     </Button>
@@ -314,36 +326,27 @@ export function BingoGame() {
                     size="lg"
                     variant="outline"
                     onClick={resetGame}
-                    className="border-white/10 bg-white/[0.035] text-lg text-foreground"
+                    className="w-full border-white/10 bg-white/[0.035] px-3 text-base text-foreground sm:text-lg"
                   >
-                    <RotateCcw className="mr-2 h-5 w-5" aria-hidden="true" /> {t("reset")}
+                    <RotateCcw className="h-5 w-5" aria-hidden="true" /> {t("reset")}
                   </Button>
-                </div>
-
-                {/* 统计 */}
-                <div className="text-center text-slate-400" role="status" aria-live="polite">
-                  <p>
-                    {t("drawn")}: {drawnNumbers.length} / 75 | {t("remaining")}:{" "}
-                    {remainingNumbers.length}
-                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           {/* 设置面板 */}
-          <Card className="border-white/10 bg-card/70">
-            <CardHeader>
-              <CardTitle className="text-white">{t("settings")}</CardTitle>
+          <Card className="gap-0 overflow-hidden border-white/10 bg-card/70 py-0">
+            <CardHeader className="border-b border-white/[0.07] px-4 py-4 sm:px-6">
+              <CardTitle className="text-base text-white sm:text-lg">{t("settings")}</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-6">
-              {/* 语音开关 */}
-              <div className="flex items-center justify-between">
-                <Label htmlFor="sound" className="flex items-center gap-2 text-slate-300">
+            <CardContent className="space-y-4 px-4 py-4 sm:px-6 sm:py-5">
+              <div className="flex min-h-11 items-center justify-between gap-4">
+                <Label htmlFor="sound" className="flex min-h-11 flex-1 cursor-pointer items-center gap-2.5 text-sm text-slate-300 sm:text-base">
                   {isSoundEnabled ? (
-                    <Volume2 className="h-5 w-5" aria-hidden="true" />
+                    <Volume2 className="h-5 w-5 text-primary" aria-hidden="true" />
                   ) : (
-                    <VolumeX className="h-5 w-5" aria-hidden="true" />
+                    <VolumeX className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
                   )}
                   {t("voiceBroadcast")}
                 </Label>
@@ -351,12 +354,12 @@ export function BingoGame() {
                   id="sound"
                   checked={isSoundEnabled}
                   onCheckedChange={setIsSoundEnabled}
+                  className="h-6 w-11 [&_[data-slot=switch-thumb]]:size-5"
                 />
               </div>
 
-              {/* 自动抽取开关 */}
-              <div className="flex items-center justify-between">
-                <Label htmlFor="auto" className="text-slate-300">
+              <div className="flex min-h-11 items-center justify-between gap-4 border-t border-white/[0.06] pt-3">
+                <Label htmlFor="auto" className="flex min-h-11 flex-1 cursor-pointer items-center text-sm text-slate-300 sm:text-base">
                   {t("autoDrawMode")}
                 </Label>
                 <Switch
@@ -366,15 +369,20 @@ export function BingoGame() {
                     setIsAutoMode(checked)
                     if (!checked) setIsPlaying(false)
                   }}
+                  className="h-6 w-11 [&_[data-slot=switch-thumb]]:size-5"
                 />
               </div>
 
-              {/* 自动抽取间隔 */}
               {isAutoMode && (
-                <div className="space-y-3">
-                  <Label htmlFor="auto-interval" className="text-slate-300">
-                    {t("drawInterval")}: {autoInterval} {t("seconds")}
-                  </Label>
+                <div className="space-y-3 rounded-xl border border-primary/15 bg-primary/[0.055] p-3.5">
+                  <div className="flex items-center justify-between gap-3">
+                    <Label htmlFor="auto-interval" className="text-sm text-slate-300">
+                      {t("drawInterval")}
+                    </Label>
+                    <span className="rounded-md bg-white/[0.06] px-2 py-1 text-xs font-semibold tabular-nums text-foreground">
+                      {autoInterval} {t("seconds")}
+                    </span>
+                  </div>
                   <Slider
                     id="auto-interval"
                     aria-label={`${t("drawInterval")}: ${autoInterval} ${t("seconds")}`}
@@ -383,40 +391,44 @@ export function BingoGame() {
                     min={1}
                     max={20}
                     step={1}
-                    className="w-full"
+                    className="h-7 w-full"
                   />
                 </div>
               )}
 
-              {/* 最近抽取的数字 */}
-              <div className="space-y-3">
-                <Label className="text-slate-300">{t("recentDraws")}</Label>
-                <div className="flex flex-wrap gap-2" role="list">
-                  {drawnNumbers.slice(-10).reverse().map((num, index) => (
-                    <div
-                      key={`recent-${num}`}
-                      role="listitem"
-                      className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${getLetterColor(num)} ${
-                        index === 0 ? "ring-2 ring-white" : "opacity-70"
-                      }`}
-                    >
-                      {num}
-                    </div>
-                  ))}
+              {drawnNumbers.length > 0 && (
+                <div className="space-y-3 border-t border-white/[0.06] pt-4">
+                  <Label className="text-sm text-slate-300">{t("recentDraws")}</Label>
+                  <div className="flex flex-wrap gap-2" role="list">
+                    {drawnNumbers.slice(-10).reverse().map((num, index) => (
+                      <div
+                        key={`recent-${num}`}
+                        role="listitem"
+                        className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white ${getLetterColor(num)} ${
+                          index === 0 ? "ring-2 ring-white" : "opacity-70"
+                        }`}
+                      >
+                        {num}
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
+              )}
             </CardContent>
           </Card>
         </div>
 
+        <div className="sr-only" role="status" aria-live="polite">
+          {t("drawn")}: {drawnNumbers.length} / 75. {t("remaining")}: {remainingNumbers.length}
+        </div>
+
         {/* 所有数字网格 */}
-        <Card className="mt-6 border-white/10 bg-card/70">
+        <Card className="mt-4 border-white/10 bg-card/70 sm:mt-6">
           <CardHeader>
             <CardTitle className="text-white">{t("numberBoard")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-5 gap-2" role="group" aria-label={t("numberBoard")}>
-              {/* BINGO 字母标题 */}
               {["B", "I", "N", "G", "O"].map((letter, idx) => (
                 <div
                   key={letter}
@@ -435,7 +447,6 @@ export function BingoGame() {
                   {letter}
                 </div>
               ))}
-              {/* 数字网格 */}
               {Array.from({ length: 15 }, (_, row) =>
                 [1, 2, 3, 4, 5].map((col) => {
                   const num = row + 1 + (col - 1) * 15
