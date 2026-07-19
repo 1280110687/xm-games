@@ -4,9 +4,9 @@ import { useState, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useLocale } from "@/lib/locale-context"
-import { LanguageSwitcher } from "@/components/language-switcher"
-import { Home, RotateCcw, HelpCircle, X, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
-import Link from "next/link"
+import { GameHeader } from "@/components/game-header"
+import { GameRulesDialog } from "@/components/game-rules-dialog"
+import { RotateCcw, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
 
 type Board = (number | null)[][]
 
@@ -34,10 +34,17 @@ function addRandomTile(board: Board): Board {
   return newBoard
 }
 
-function initBoard(): Board {
+function createRandomBoard(): Board {
   let board = createEmptyBoard()
   board = addRandomTile(board)
   board = addRandomTile(board)
+  return board
+}
+
+function createInitialBoard(): Board {
+  const board = createEmptyBoard()
+  board[1][1] = 2
+  board[2][2] = 2
   return board
 }
 
@@ -153,13 +160,17 @@ const TILE_COLORS: Record<number, string> = {
 }
 
 export function Game2048() {
-  const { t } = useLocale()
-  const [board, setBoard] = useState<Board>(initBoard)
+  const { t, locale } = useLocale()
+  const directionLabels = locale === "zh"
+    ? { up: "向上移动", down: "向下移动", left: "向左移动", right: "向右移动", empty: "空白" }
+    : locale === "th"
+      ? { up: "เลื่อนขึ้น", down: "เลื่อนลง", left: "เลื่อนไปซ้าย", right: "เลื่อนไปขวา", empty: "ว่าง" }
+      : { up: "Move up", down: "Move down", left: "Move left", right: "Move right", empty: "empty" }
+  const [board, setBoard] = useState<Board>(createInitialBoard)
   const [score, setScore] = useState(0)
   const [bestScore, setBestScore] = useState(0)
   const [gameOver, setGameOver] = useState(false)
   const [won, setWon] = useState(false)
-  const [showRules, setShowRules] = useState(false)
 
   useEffect(() => {
     const saved = localStorage.getItem("2048-best")
@@ -213,7 +224,7 @@ export function Game2048() {
   }, [handleMove])
 
   const resetGame = () => {
-    setBoard(initBoard())
+    setBoard(createRandomBoard())
     setScore(0)
     setGameOver(false)
     setWon(false)
@@ -221,21 +232,16 @@ export function Game2048() {
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-amber-900 via-amber-800 to-orange-900 p-4">
-      <div className="flex items-center justify-between">
-        <Link href="/">
-          <Button variant="ghost" size="sm" className="text-amber-200 hover:text-white">
-            <Home className="mr-2 h-4 w-4" />
-            {t("appName")}
-          </Button>
-        </Link>
-        <LanguageSwitcher />
-      </div>
+      <GameHeader
+        homeLabel={t("appName")}
+        homeButtonClassName="text-amber-200 hover:text-white"
+      />
 
       <main className="flex flex-1 flex-col items-center gap-4 py-4">
         <h1 className="text-4xl font-bold text-white">2048</h1>
 
         {/* Score cards */}
-        <div className="flex gap-4">
+        <div className="flex gap-4" role="status" aria-live="polite">
           <Card className="border-amber-600 bg-amber-700/50 px-4 py-2 text-center">
             <div className="text-xs text-amber-200">{t("score")}</div>
             <div className="text-2xl font-bold text-white">{score}</div>
@@ -248,7 +254,7 @@ export function Game2048() {
 
         {/* Game status */}
         {(gameOver || won) && (
-          <div className={`rounded-lg px-4 py-2 text-lg font-bold ${
+          <div role="status" aria-live="assertive" className={`rounded-lg px-4 py-2 text-lg font-bold ${
             won ? "bg-yellow-500/20 text-yellow-300" : "bg-red-500/20 text-red-300"
           }`}>
             {won ? t("youWin") : t("gameOver")}
@@ -257,11 +263,13 @@ export function Game2048() {
 
         {/* Game board */}
         <div className="rounded-lg bg-amber-700 p-3">
-          <div className="grid grid-cols-4 gap-2">
+          <div className="grid grid-cols-4 gap-2" role="group" aria-label="2048">
             {board.map((row, rowIndex) =>
               row.map((cell, colIndex) => (
                 <div
                   key={`${rowIndex}-${colIndex}`}
+                  role="img"
+                  aria-label={`${rowIndex + 1}, ${colIndex + 1}, ${cell || directionLabels.empty}`}
                   className={`
                     flex h-16 w-16 items-center justify-center rounded-md font-bold transition-all
                     sm:h-20 sm:w-20
@@ -282,36 +290,40 @@ export function Game2048() {
           <div />
           <Button
             onClick={() => handleMove("up")}
+            aria-label={directionLabels.up}
             variant="outline"
             size="lg"
             className="border-amber-600 bg-amber-700/50 text-white"
           >
-            <ChevronUp className="h-6 w-6" />
+            <ChevronUp className="h-6 w-6" aria-hidden="true" />
           </Button>
           <div />
           <Button
             onClick={() => handleMove("left")}
+            aria-label={directionLabels.left}
             variant="outline"
             size="lg"
             className="border-amber-600 bg-amber-700/50 text-white"
           >
-            <ChevronLeft className="h-6 w-6" />
+            <ChevronLeft className="h-6 w-6" aria-hidden="true" />
           </Button>
           <Button
             onClick={() => handleMove("down")}
+            aria-label={directionLabels.down}
             variant="outline"
             size="lg"
             className="border-amber-600 bg-amber-700/50 text-white"
           >
-            <ChevronDown className="h-6 w-6" />
+            <ChevronDown className="h-6 w-6" aria-hidden="true" />
           </Button>
           <Button
             onClick={() => handleMove("right")}
+            aria-label={directionLabels.right}
             variant="outline"
             size="lg"
             className="border-amber-600 bg-amber-700/50 text-white"
           >
-            <ChevronRight className="h-6 w-6" />
+            <ChevronRight className="h-6 w-6" aria-hidden="true" />
           </Button>
         </div>
 
@@ -322,44 +334,29 @@ export function Game2048() {
             variant="outline"
             className="border-amber-600 bg-amber-700/50 text-amber-100 hover:bg-amber-600"
           >
-            <RotateCcw className="mr-2 h-4 w-4" />
+            <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
             {t("restart")}
           </Button>
-          <Button
-            onClick={() => setShowRules(true)}
-            variant="outline"
-            className="border-amber-600 bg-amber-700/50 text-amber-100 hover:bg-amber-600"
+          <GameRulesDialog
+            triggerLabel={t("howToPlay")}
+            closeLabel={t("close")}
+            triggerClassName="border-amber-600 bg-amber-700/50 text-amber-100 hover:bg-amber-600"
+            contentClassName="border-amber-600 bg-amber-800 p-4 text-white sm:p-6"
+            titleClassName="text-lg font-bold text-white"
+            closeButtonClassName="text-amber-200 hover:text-white"
           >
-            <HelpCircle className="mr-2 h-4 w-4" />
-            {t("howToPlay")}
-          </Button>
+            <ul className="space-y-2 text-sm text-amber-100">
+              <li>{t("game2048Rule1")}</li>
+              <li>{t("game2048Rule2")}</li>
+              <li>{t("game2048Rule3")}</li>
+            </ul>
+          </GameRulesDialog>
         </div>
 
         <p className="max-w-md text-center text-xs text-amber-200/70">
           {t("game2048Instructions")}
         </p>
 
-        {/* Rules Modal */}
-        {showRules && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowRules(false)}>
-            <Card 
-              className="max-h-[80vh] w-full max-w-md overflow-y-auto border-amber-600 bg-amber-800 p-4 sm:p-6"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-bold text-white">{t("howToPlay")}</h2>
-                <Button variant="ghost" size="sm" onClick={() => setShowRules(false)} className="text-amber-200 hover:text-white">
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-              <ul className="space-y-2 text-sm text-amber-100">
-                <li>{t("game2048Rule1")}</li>
-                <li>{t("game2048Rule2")}</li>
-                <li>{t("game2048Rule3")}</li>
-              </ul>
-            </Card>
-          </div>
-        )}
       </main>
     </div>
   )

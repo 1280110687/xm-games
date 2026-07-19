@@ -4,9 +4,9 @@ import { useState, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useLocale } from "@/lib/locale-context"
-import { LanguageSwitcher } from "@/components/language-switcher"
-import { Home, RotateCcw, HelpCircle, X } from "lucide-react"
-import Link from "next/link"
+import { GameHeader } from "@/components/game-header"
+import { GameRulesDialog } from "@/components/game-rules-dialog"
+import { RotateCcw } from "lucide-react"
 
 type Stone = "black" | "white" | null
 type Board = Stone[][]
@@ -79,12 +79,13 @@ function countStones(board: Board): { black: number; white: number } {
 
 export function ReversiGame() {
   const { t, locale } = useLocale()
+  const emptyLabel = locale === "zh" ? "空位" : locale === "th" ? "ช่องว่าง" : "empty"
+  const validLabel = locale === "zh" ? "可落子" : locale === "th" ? "ลงหมากได้" : "valid move"
   const [board, setBoard] = useState<Board>(createInitialBoard)
   const [currentPlayer, setCurrentPlayer] = useState<"black" | "white">("black")
   const [validMoves, setValidMoves] = useState<[number, number][]>([])
   const [gameOver, setGameOver] = useState(false)
   const [winner, setWinner] = useState<"black" | "white" | "tie" | null>(null)
-  const [showRules, setShowRules] = useState(false)
   const [passCount, setPassCount] = useState(0)
 
   useEffect(() => {
@@ -143,21 +144,16 @@ export function ReversiGame() {
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-green-900 via-green-800 to-emerald-900 p-4">
-      <div className="flex items-center justify-between">
-        <Link href="/">
-          <Button variant="ghost" size="sm" className="text-green-200 hover:text-white">
-            <Home className="mr-2 h-4 w-4" />
-            {t("appName")}
-          </Button>
-        </Link>
-        <LanguageSwitcher />
-      </div>
+      <GameHeader
+        homeLabel={t("appName")}
+        homeButtonClassName="text-green-200 hover:text-white"
+      />
 
       <main className="flex flex-1 flex-col items-center gap-4 py-4">
         <h1 className="text-2xl font-bold text-white sm:text-3xl">{t("reversi")}</h1>
 
         {/* Game status */}
-        <Card className="border-green-600 bg-green-800/50 px-4 py-2">
+        <Card className="border-green-600 bg-green-800/50 px-4 py-2" role="status" aria-live="polite">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
               <div className={`flex h-6 w-6 items-center justify-center rounded-full ${currentPlayer === "black" ? "ring-2 ring-yellow-400" : ""} bg-slate-900`}>
@@ -180,7 +176,7 @@ export function ReversiGame() {
         </Card>
 
         {gameOver && (
-          <div className="rounded-lg bg-yellow-500/20 px-4 py-2 text-lg font-bold text-yellow-300">
+          <div className="rounded-lg bg-yellow-500/20 px-4 py-2 text-lg font-bold text-yellow-300" role="status" aria-live="assertive">
             {winner === "tie" 
               ? t("tie") 
               : winner === "black" 
@@ -192,7 +188,7 @@ export function ReversiGame() {
 
         {/* Game board */}
         <div className="rounded-lg border-4 border-green-700 bg-green-600 p-1">
-          <div className="grid grid-cols-8 gap-px bg-green-800">
+          <div className="grid grid-cols-8 gap-px bg-green-800" role="group" aria-label={t("reversi")}>
             {board.map((row, rowIndex) =>
               row.map((cell, colIndex) => {
                 const isValid = isValidMove(rowIndex, colIndex)
@@ -201,6 +197,7 @@ export function ReversiGame() {
                     key={`${rowIndex}-${colIndex}`}
                     onClick={() => handleCellClick(rowIndex, colIndex)}
                     disabled={gameOver || !isValid}
+                    aria-label={`${rowIndex + 1}, ${colIndex + 1}, ${cell === "black" ? t("blackStone") : cell === "white" ? t("whiteStone") : emptyLabel}${isValid ? `, ${validLabel}` : ""}`}
                     className={`
                       flex h-9 w-9 items-center justify-center bg-green-600
                       sm:h-11 sm:w-11
@@ -209,6 +206,7 @@ export function ReversiGame() {
                   >
                     {cell ? (
                       <div
+                        aria-hidden="true"
                         className={`h-7 w-7 rounded-full shadow-md transition-all sm:h-9 sm:w-9 ${
                           cell === "black"
                             ? "bg-gradient-to-br from-slate-700 to-slate-900"
@@ -216,7 +214,7 @@ export function ReversiGame() {
                         }`}
                       />
                     ) : isValid ? (
-                      <div className="h-3 w-3 rounded-full bg-green-400/50" />
+                      <div className="h-3 w-3 rounded-full bg-green-400/50" aria-hidden="true" />
                     ) : null}
                   </button>
                 )
@@ -232,45 +230,30 @@ export function ReversiGame() {
             variant="outline"
             className="border-green-600 bg-green-800/50 text-green-100 hover:bg-green-700"
           >
-            <RotateCcw className="mr-2 h-4 w-4" />
+            <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
             {t("restart")}
           </Button>
-          <Button
-            onClick={() => setShowRules(true)}
-            variant="outline"
-            className="border-green-600 bg-green-800/50 text-green-100 hover:bg-green-700"
+          <GameRulesDialog
+            triggerLabel={t("howToPlay")}
+            closeLabel={t("close")}
+            triggerClassName="border-green-600 bg-green-800/50 text-green-100 hover:bg-green-700"
+            contentClassName="border-green-600 bg-green-800 p-4 text-white sm:p-6"
+            titleClassName="text-lg font-bold text-white"
+            closeButtonClassName="text-green-200 hover:text-white"
           >
-            <HelpCircle className="mr-2 h-4 w-4" />
-            {t("howToPlay")}
-          </Button>
+            <ul className="space-y-2 text-sm text-green-100">
+              <li>{t("reversiRule1")}</li>
+              <li>{t("reversiRule2")}</li>
+              <li>{t("reversiRule3")}</li>
+              <li>{t("reversiRule4")}</li>
+            </ul>
+          </GameRulesDialog>
         </div>
 
         <p className="max-w-md text-center text-xs text-green-200/70">
           {t("reversiInstructions")}
         </p>
 
-        {/* Rules Modal */}
-        {showRules && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowRules(false)}>
-            <Card 
-              className="max-h-[80vh] w-full max-w-md overflow-y-auto border-green-600 bg-green-800 p-4 sm:p-6"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-bold text-white">{t("howToPlay")}</h2>
-                <Button variant="ghost" size="sm" onClick={() => setShowRules(false)} className="text-green-200 hover:text-white">
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-              <ul className="space-y-2 text-sm text-green-100">
-                <li>{t("reversiRule1")}</li>
-                <li>{t("reversiRule2")}</li>
-                <li>{t("reversiRule3")}</li>
-                <li>{t("reversiRule4")}</li>
-              </ul>
-            </Card>
-          </div>
-        )}
       </main>
     </div>
   )

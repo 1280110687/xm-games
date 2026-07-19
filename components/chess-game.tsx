@@ -1,268 +1,49 @@
 "use client"
 
 import { useState, useCallback } from "react"
-import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { LanguageSwitcher } from "@/components/language-switcher"
+import { GameHeader } from "@/components/game-header"
+import { GameRulesDialog } from "@/components/game-rules-dialog"
 import { useLocale } from "@/lib/locale-context"
-import { RotateCcw, Home, Undo2, HelpCircle, X, Flag } from "lucide-react"
-
-type PieceType = "king" | "queen" | "rook" | "bishop" | "knight" | "pawn"
-type Color = "white" | "black"
-type Piece = { type: PieceType; color: Color } | null
-type Position = { row: number; col: number }
+import {
+  INITIAL_CASTLING_RIGHTS,
+  applyMove,
+  createInitialBoard,
+  getValidMoves,
+  hasLegalMoves,
+  isInCheck,
+  type CastlingRights,
+  type ChessBoard,
+  type Color,
+  type PieceType,
+  type Position,
+} from "@/features/chess/engine"
+import { RotateCcw, Undo2 } from "lucide-react"
 
 const pieceSymbols: Record<Color, Record<PieceType, string>> = {
   white: { king: "♔", queen: "♕", rook: "♖", bishop: "♗", knight: "♘", pawn: "♙" },
   black: { king: "♚", queen: "♛", rook: "♜", bishop: "♝", knight: "♞", pawn: "♟" }
 }
 
-function createInitialBoard(): Piece[][] {
-  const board: Piece[][] = Array(8).fill(null).map(() => Array(8).fill(null))
-  
-  // Black pieces (top)
-  board[0] = [
-    { type: "rook", color: "black" }, { type: "knight", color: "black" },
-    { type: "bishop", color: "black" }, { type: "queen", color: "black" },
-    { type: "king", color: "black" }, { type: "bishop", color: "black" },
-    { type: "knight", color: "black" }, { type: "rook", color: "black" }
-  ]
-  board[1] = Array(8).fill(null).map(() => ({ type: "pawn" as PieceType, color: "black" as Color }))
-  
-  // White pieces (bottom)
-  board[6] = Array(8).fill(null).map(() => ({ type: "pawn" as PieceType, color: "white" as Color }))
-  board[7] = [
-    { type: "rook", color: "white" }, { type: "knight", color: "white" },
-    { type: "bishop", color: "white" }, { type: "queen", color: "white" },
-    { type: "king", color: "white" }, { type: "bishop", color: "white" },
-    { type: "knight", color: "white" }, { type: "rook", color: "white" }
-  ]
-  
-  return board
-}
-
-function isValidMove(
-  board: Piece[][],
-  from: Position,
-  to: Position,
-  piece: Piece,
-  enPassantTarget: Position | null,
-  castlingRights: { whiteKing: boolean; whiteQueen: boolean; blackKing: boolean; blackQueen: boolean }
-): boolean {
-  if (!piece) return false
-  
-  const dx = to.col - from.col
-  const dy = to.row - from.row
-  const absDx = Math.abs(dx)
-  const absDy = Math.abs(dy)
-  const target = board[to.row][to.col]
-  
-  // Can't capture own piece
-  if (target && target.color === piece.color) return false
-  
-  switch (piece.type) {
-    case "pawn": {
-      const direction = piece.color === "white" ? -1 : 1
-      const startRow = piece.color === "white" ? 6 : 1
-      
-      // Forward move
-      if (dx === 0 && !target) {
-        if (dy === direction) return true
-        if (from.row === startRow && dy === 2 * direction && !board[from.row + direction][from.col]) return true
-      }
-      
-      // Capture
-      if (absDx === 1 && dy === direction) {
-        if (target) return true
-        // En passant
-        if (enPassantTarget && to.row === enPassantTarget.row && to.col === enPassantTarget.col) return true
-      }
-      
-      return false
-    }
-    
-    case "knight":
-      return (absDx === 2 && absDy === 1) || (absDx === 1 && absDy === 2)
-    
-    case "bishop": {
-      if (absDx !== absDy) return false
-      const stepX = dx > 0 ? 1 : -1
-      const stepY = dy > 0 ? 1 : -1
-      for (let i = 1; i < absDx; i++) {
-        if (board[from.row + i * stepY][from.col + i * stepX]) return false
-      }
-      return true
-    }
-    
-    case "rook": {
-      if (dx !== 0 && dy !== 0) return false
-      const stepX = dx === 0 ? 0 : dx > 0 ? 1 : -1
-      const stepY = dy === 0 ? 0 : dy > 0 ? 1 : -1
-      const steps = Math.max(absDx, absDy)
-      for (let i = 1; i < steps; i++) {
-        if (board[from.row + i * stepY][from.col + i * stepX]) return false
-      }
-      return true
-    }
-    
-    case "queen": {
-      const isStraight = dx === 0 || dy === 0
-      const isDiagonal = absDx === absDy
-      if (!isStraight && !isDiagonal) return false
-      
-      const stepX = dx === 0 ? 0 : dx > 0 ? 1 : -1
-      const stepY = dy === 0 ? 0 : dy > 0 ? 1 : -1
-      const steps = Math.max(absDx, absDy)
-      for (let i = 1; i < steps; i++) {
-        if (board[from.row + i * stepY][from.col + i * stepX]) return false
-      }
-      return true
-    }
-    
-    case "king": {
-      // Normal move
-      if (absDx <= 1 && absDy <= 1) return true
-      
-      // Castling
-      if (dy === 0 && absDx === 2) {
-        const row = piece.color === "white" ? 7 : 0
-        if (from.row !== row || from.col !== 4) return false
-        
-        // Kingside
-        if (dx === 2) {
-          const canCastle = piece.color === "white" ? castlingRights.whiteKing : castlingRights.blackKing
-          if (!canCastle) return false
-          if (board[row][5] || board[row][6]) return false
-          return true
-        }
-        
-        // Queenside
-        if (dx === -2) {
-          const canCastle = piece.color === "white" ? castlingRights.whiteQueen : castlingRights.blackQueen
-          if (!canCastle) return false
-          if (board[row][1] || board[row][2] || board[row][3]) return false
-          return true
-        }
-      }
-      
-      return false
-    }
-  }
-  
-  return false
-}
-
-function findKing(board: Piece[][], color: Color): Position | null {
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      const piece = board[row][col]
-      if (piece && piece.type === "king" && piece.color === color) {
-        return { row, col }
-      }
-    }
-  }
-  return null
-}
-
-function isInCheck(board: Piece[][], color: Color): boolean {
-  const kingPos = findKing(board, color)
-  if (!kingPos) return false
-  
-  const opponent = color === "white" ? "black" : "white"
-  
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      const piece = board[row][col]
-      if (piece && piece.color === opponent) {
-        if (isValidMove(board, { row, col }, kingPos, piece, null, { whiteKing: false, whiteQueen: false, blackKing: false, blackQueen: false })) {
-          return true
-        }
-      }
-    }
-  }
-  
-  return false
-}
-
-function hasLegalMoves(
-  board: Piece[][],
-  color: Color,
-  enPassantTarget: Position | null,
-  castlingRights: { whiteKing: boolean; whiteQueen: boolean; blackKing: boolean; blackQueen: boolean }
-): boolean {
-  for (let fromRow = 0; fromRow < 8; fromRow++) {
-    for (let fromCol = 0; fromCol < 8; fromCol++) {
-      const piece = board[fromRow][fromCol]
-      if (!piece || piece.color !== color) continue
-      
-      for (let toRow = 0; toRow < 8; toRow++) {
-        for (let toCol = 0; toCol < 8; toCol++) {
-          if (isValidMove(board, { row: fromRow, col: fromCol }, { row: toRow, col: toCol }, piece, enPassantTarget, castlingRights)) {
-            // Try the move
-            const newBoard = board.map(r => [...r])
-            newBoard[toRow][toCol] = piece
-            newBoard[fromRow][fromCol] = null
-            
-            // Check if still in check
-            if (!isInCheck(newBoard, color)) {
-              return true
-            }
-          }
-        }
-      }
-    }
-  }
-  
-  return false
-}
-
-function getValidMoves(
-  board: Piece[][],
-  pos: Position,
-  enPassantTarget: Position | null,
-  castlingRights: { whiteKing: boolean; whiteQueen: boolean; blackKing: boolean; blackQueen: boolean }
-): Position[] {
-  const piece = board[pos.row][pos.col]
-  if (!piece) return []
-  
-  const moves: Position[] = []
-  
-  for (let row = 0; row < 8; row++) {
-    for (let col = 0; col < 8; col++) {
-      if (isValidMove(board, pos, { row, col }, piece, enPassantTarget, castlingRights)) {
-        // Try the move
-        const newBoard = board.map(r => [...r])
-        newBoard[row][col] = piece
-        newBoard[pos.row][pos.col] = null
-        
-        // Check if still in check
-        if (!isInCheck(newBoard, piece.color)) {
-          moves.push({ row, col })
-        }
-      }
-    }
-  }
-  
-  return moves
-}
-
 export function ChessGame() {
   const { t } = useLocale()
 
-  const [board, setBoard] = useState<Piece[][]>(createInitialBoard())
+  const [board, setBoard] = useState<ChessBoard>(() => createInitialBoard())
   const [currentTurn, setCurrentTurn] = useState<Color>("white")
   const [selectedPos, setSelectedPos] = useState<Position | null>(null)
   const [validMoves, setValidMoves] = useState<Position[]>([])
   const [gameStatus, setGameStatus] = useState<"playing" | "check" | "checkmate" | "stalemate">("playing")
   const [winner, setWinner] = useState<Color | null>(null)
-  const [history, setHistory] = useState<{ board: Piece[][]; turn: Color; castling: typeof castlingRights; enPassant: Position | null }[]>([])
+  const [history, setHistory] = useState<{
+    board: ChessBoard
+    turn: Color
+    castling: CastlingRights
+    enPassant: Position | null
+  }[]>([])
   const [enPassantTarget, setEnPassantTarget] = useState<Position | null>(null)
-  const [castlingRights, setCastlingRights] = useState({
-    whiteKing: true, whiteQueen: true, blackKing: true, blackQueen: true
-  })
+  const [castlingRights, setCastlingRights] = useState<CastlingRights>(() => ({ ...INITIAL_CASTLING_RIGHTS }))
   const [lastMove, setLastMove] = useState<{ from: Position; to: Position } | null>(null)
-  const [showRules, setShowRules] = useState(false)
   const [whiteUndoUsed, setWhiteUndoUsed] = useState(false)
   const [blackUndoUsed, setBlackUndoUsed] = useState(false)
 
@@ -275,7 +56,7 @@ export function ChessGame() {
     setWinner(null)
     setHistory([])
     setEnPassantTarget(null)
-    setCastlingRights({ whiteKing: true, whiteQueen: true, blackKing: true, blackQueen: true })
+    setCastlingRights({ ...INITIAL_CASTLING_RIGHTS })
     setLastMove(null)
     setWhiteUndoUsed(false)
     setBlackUndoUsed(false)
@@ -289,7 +70,7 @@ export function ChessGame() {
     // Select own piece
     if (clickedPiece && clickedPiece.color === currentTurn) {
       setSelectedPos({ row, col })
-      setValidMoves(getValidMoves(board, { row, col }, enPassantTarget, castlingRights))
+      setValidMoves(getValidMoves({ board, enPassantTarget, castlingRights }, { row, col }))
       return
     }
 
@@ -313,55 +94,15 @@ export function ChessGame() {
         enPassant: enPassantTarget
       }])
 
-      const newBoard = board.map(r => [...r])
-      const newCastling = { ...castlingRights }
-      let newEnPassant: Position | null = null
-
-      // Handle castling
-      if (movingPiece.type === "king" && Math.abs(col - selectedPos.col) === 2) {
-        const rookCol = col > selectedPos.col ? 7 : 0
-        const newRookCol = col > selectedPos.col ? col - 1 : col + 1
-        newBoard[row][newRookCol] = newBoard[row][rookCol]
-        newBoard[row][rookCol] = null
-      }
-
-      // Handle en passant capture
-      if (movingPiece.type === "pawn" && enPassantTarget && row === enPassantTarget.row && col === enPassantTarget.col) {
-        const capturedRow = currentTurn === "white" ? row + 1 : row - 1
-        newBoard[capturedRow][col] = null
-      }
-
-      // Handle pawn double move (set en passant target)
-      if (movingPiece.type === "pawn" && Math.abs(row - selectedPos.row) === 2) {
-        newEnPassant = { row: (row + selectedPos.row) / 2, col }
-      }
-
-      // Handle pawn promotion
-      let promotedPiece: Piece = movingPiece
-      if (movingPiece.type === "pawn" && (row === 0 || row === 7)) {
-        promotedPiece = { type: "queen", color: movingPiece.color }
-      }
-
-      // Update castling rights
-      if (movingPiece.type === "king") {
-        if (movingPiece.color === "white") {
-          newCastling.whiteKing = false
-          newCastling.whiteQueen = false
-        } else {
-          newCastling.blackKing = false
-          newCastling.blackQueen = false
-        }
-      }
-      if (movingPiece.type === "rook") {
-        if (selectedPos.row === 7 && selectedPos.col === 0) newCastling.whiteQueen = false
-        if (selectedPos.row === 7 && selectedPos.col === 7) newCastling.whiteKing = false
-        if (selectedPos.row === 0 && selectedPos.col === 0) newCastling.blackQueen = false
-        if (selectedPos.row === 0 && selectedPos.col === 7) newCastling.blackKing = false
-      }
-
-      // Move piece
-      newBoard[row][col] = promotedPiece
-      newBoard[selectedPos.row][selectedPos.col] = null
+      const {
+        board: newBoard,
+        castlingRights: newCastling,
+        enPassantTarget: newEnPassant,
+      } = applyMove(
+        { board, castlingRights, enPassantTarget },
+        selectedPos,
+        { row, col },
+      )
 
       setBoard(newBoard)
       setCastlingRights(newCastling)
@@ -373,7 +114,11 @@ export function ChessGame() {
       // Check game status
       const opponent = currentTurn === "white" ? "black" : "white"
       const inCheck = isInCheck(newBoard, opponent)
-      const hasLegal = hasLegalMoves(newBoard, opponent, newEnPassant, newCastling)
+      const hasLegal = hasLegalMoves({
+        board: newBoard,
+        castlingRights: newCastling,
+        enPassantTarget: newEnPassant,
+      }, opponent)
 
       if (!hasLegal) {
         if (inCheck) {
@@ -408,7 +153,8 @@ export function ChessGame() {
     setHistory(prev => prev.slice(0, -1))
     setSelectedPos(null)
     setValidMoves([])
-    setGameStatus("playing")
+    setGameStatus(isInCheck(lastState.board, lastState.turn) ? "check" : "playing")
+    setWinner(null)
     setLastMove(null)
 
     if (undoingPlayer === "white") {
@@ -422,20 +168,21 @@ export function ChessGame() {
 
   return (
     <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
-      {/* Header */}
-      <div className="mb-4 flex w-full max-w-lg items-center justify-between">
-        <Link href="/">
-          <Button variant="ghost" size="sm" className="text-slate-100 hover:bg-slate-700">
-            <Home className="mr-2 h-4 w-4" />
-            {t("appName")}
-          </Button>
-        </Link>
-        <h1 className="text-xl font-bold text-slate-100 sm:text-2xl">{t("chess")}</h1>
-        <LanguageSwitcher />
-      </div>
+      <GameHeader
+        layout="centered"
+        homeLabel={t("appName")}
+        title={t("chess")}
+        className="mb-4 w-full max-w-lg"
+        homeButtonClassName="text-slate-100 hover:bg-slate-700"
+        titleClassName="text-xl font-bold text-slate-100 sm:text-2xl"
+      />
 
       {/* Game Status */}
-      <Card className="mb-4 w-full max-w-lg border-slate-600 bg-slate-800/50 p-3">
+      <Card
+        className="mb-4 w-full max-w-lg border-slate-600 bg-slate-800/50 p-3"
+        role="status"
+        aria-live="polite"
+      >
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-center gap-4">
             <div className="flex items-center gap-2">
@@ -489,7 +236,7 @@ export function ChessGame() {
 
       {/* Board */}
       <div className="rounded-lg border-4 border-amber-900 shadow-xl">
-        <div className="grid grid-cols-8">
+        <div className="grid grid-cols-8" role="group" aria-label={t("chess")}>
           {board.map((row, rowIndex) =>
             row.map((piece, colIndex) => {
               const isLight = (rowIndex + colIndex) % 2 === 0
@@ -497,11 +244,15 @@ export function ChessGame() {
               const isValid = isValidTarget(rowIndex, colIndex)
               const isLastFrom = lastMove?.from.row === rowIndex && lastMove?.from.col === colIndex
               const isLastTo = lastMove?.to.row === rowIndex && lastMove?.to.col === colIndex
+              const square = `${String.fromCharCode(97 + colIndex)}${8 - rowIndex}`
+              const cellContent = piece ? `${piece.color} ${piece.type}` : "empty"
 
               return (
                 <button
                   key={`${rowIndex}-${colIndex}`}
                   onClick={() => handleCellClick(rowIndex, colIndex)}
+                  aria-label={`${square}, ${cellContent}${isValid ? ", valid move" : ""}`}
+                  aria-pressed={isSelected}
                   className={`
                     relative flex h-9 w-9 items-center justify-center text-2xl transition-all
                     sm:h-11 sm:w-11 sm:text-3xl
@@ -511,10 +262,10 @@ export function ChessGame() {
                   `}
                 >
                   {isValid && !piece && (
-                    <div className="absolute h-3 w-3 rounded-full bg-green-500/50" />
+                    <div className="absolute h-3 w-3 rounded-full bg-green-500/50" aria-hidden="true" />
                   )}
                   {piece && (
-                    <span className={`${isValid ? "ring-2 ring-green-400 rounded-full" : ""} ${piece.color === "white" ? "text-amber-50 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" : "text-slate-900"}`}>
+                    <span aria-hidden="true" className={`${isValid ? "ring-2 ring-green-400 rounded-full" : ""} ${piece.color === "white" ? "text-amber-50 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" : "text-slate-900"}`}>
                       {pieceSymbols[piece.color][piece.type]}
                     </span>
                   )}
@@ -536,7 +287,7 @@ export function ChessGame() {
           variant="outline"
           className="border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700"
         >
-          <Undo2 className="mr-1 h-4 w-4" />
+          <Undo2 className="mr-1 h-4 w-4" aria-hidden="true" />
           {t("undo")}
         </Button>
         <Button
@@ -544,17 +295,48 @@ export function ChessGame() {
           variant="outline"
           className="border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700"
         >
-          <RotateCcw className="mr-1 h-4 w-4" />
+          <RotateCcw className="mr-1 h-4 w-4" aria-hidden="true" />
           {t("restart")}
         </Button>
-        <Button
-          onClick={() => setShowRules(true)}
-          variant="outline"
-          className="border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700"
+        <GameRulesDialog
+          triggerLabel={t("howToPlay")}
+          closeLabel={t("close")}
+          triggerClassName="border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700"
+          triggerIconClassName="mr-1"
+          contentClassName="border-slate-600 bg-slate-900/95 p-4 text-slate-100"
+          titleClassName="text-lg font-bold text-slate-100"
+          closeButtonClassName="text-slate-100 hover:bg-slate-800"
         >
-          <HelpCircle className="mr-1 h-4 w-4" />
-          {t("howToPlay")}
-        </Button>
+          <div className="space-y-2 text-sm text-slate-300">
+            <div className="flex items-center gap-2">
+              <span className="text-xl">♔</span>
+              <span>{t("kingRuleInt")}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xl">♕</span>
+              <span>{t("queenRule")}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xl">♖</span>
+              <span>{t("rookRule")}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xl">♗</span>
+              <span>{t("bishopRule")}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xl">♘</span>
+              <span>{t("knightRule")}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-xl">♙</span>
+              <span>{t("pawnRuleInt")}</span>
+            </div>
+            <div className="mt-4 border-t border-slate-700 pt-4">
+              <p>{t("chessSpecialRules")}</p>
+            </div>
+          </div>
+        </GameRulesDialog>
       </div>
 
       {/* Instructions */}
@@ -562,52 +344,6 @@ export function ChessGame() {
         {t("chessInstructionsInt")}
       </p>
 
-      {/* Rules Modal */}
-      {showRules && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowRules(false)}>
-          <Card 
-            className="max-h-[80vh] w-full max-w-md overflow-y-auto border-slate-600 bg-slate-900/95 p-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-bold text-slate-100">{t("howToPlay")}</h2>
-              <Button variant="ghost" size="sm" onClick={() => setShowRules(false)} className="text-slate-100 hover:bg-slate-800">
-                <X className="h-5 w-5" />
-              </Button>
-            </div>
-            
-            <div className="space-y-2 text-sm text-slate-300">
-              <div className="flex items-center gap-2">
-                <span className="text-xl">♔</span>
-                <span>{t("kingRuleInt")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xl">♕</span>
-                <span>{t("queenRule")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xl">♖</span>
-                <span>{t("rookRule")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xl">♗</span>
-                <span>{t("bishopRule")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xl">♘</span>
-                <span>{t("knightRule")}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xl">♙</span>
-                <span>{t("pawnRuleInt")}</span>
-              </div>
-              <div className="mt-4 border-t border-slate-700 pt-4">
-                <p>{t("chessSpecialRules")}</p>
-              </div>
-            </div>
-          </Card>
-        </div>
-      )}
     </div>
   )
 }

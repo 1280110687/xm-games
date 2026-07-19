@@ -4,19 +4,23 @@ import { useState, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useLocale } from "@/lib/locale-context"
-import { LanguageSwitcher } from "@/components/language-switcher"
-import { Home, RotateCcw, Flag, Bomb, HelpCircle, X } from "lucide-react"
-import Link from "next/link"
-
-type CellState = {
-  isMine: boolean
-  isRevealed: boolean
-  isFlagged: boolean
-  adjacentMines: number
-}
+import { GameHeader } from "@/components/game-header"
+import { GameRulesDialog } from "@/components/game-rules-dialog"
+import {
+  countFlags,
+  createEmptyBoard,
+  hasWon,
+  populateMines,
+  revealAllMines,
+  revealCells,
+  toggleFlag,
+  type MinesweeperBoard,
+} from "@/features/minesweeper/engine"
+import { RotateCcw, Flag, Bomb, Eye } from "lucide-react"
 
 type GameStatus = "playing" | "won" | "lost"
 type Difficulty = "easy" | "medium" | "hard"
+type InputMode = "reveal" | "flag"
 
 const DIFFICULTIES = {
   easy: { rows: 9, cols: 9, mines: 10 },
@@ -24,80 +28,67 @@ const DIFFICULTIES = {
   hard: { rows: 16, cols: 30, mines: 99 },
 }
 
-function createBoard(rows: number, cols: number, mines: number, firstClickRow?: number, firstClickCol?: number): CellState[][] {
-  const board: CellState[][] = Array(rows).fill(null).map(() =>
-    Array(cols).fill(null).map(() => ({
-      isMine: false,
-      isRevealed: false,
-      isFlagged: false,
-      adjacentMines: 0,
-    }))
-  )
-
-  // Place mines randomly, avoiding first click area
-  let placedMines = 0
-  while (placedMines < mines) {
-    const row = Math.floor(Math.random() * rows)
-    const col = Math.floor(Math.random() * cols)
-    
-    // Skip if already a mine or too close to first click
-    if (board[row][col].isMine) continue
-    if (firstClickRow !== undefined && firstClickCol !== undefined) {
-      if (Math.abs(row - firstClickRow) <= 1 && Math.abs(col - firstClickCol) <= 1) continue
-    }
-    
-    board[row][col].isMine = true
-    placedMines++
-  }
-
-  // Calculate adjacent mines
-  for (let r = 0; r < rows; r++) {
-    for (let c = 0; c < cols; c++) {
-      if (board[r][c].isMine) continue
-      let count = 0
-      for (let dr = -1; dr <= 1; dr++) {
-        for (let dc = -1; dc <= 1; dc++) {
-          const nr = r + dr
-          const nc = c + dc
-          if (nr >= 0 && nr < rows && nc >= 0 && nc < cols && board[nr][nc].isMine) {
-            count++
-          }
-        }
-      }
-      board[r][c].adjacentMines = count
-    }
-  }
-
-  return board
-}
+const accessibleText = {
+  zh: {
+    revealMode: "翻开模式",
+    flagMode: "插旗模式",
+    modeHelp: "触屏操作：先选择翻开或插旗模式，再点击格子。电脑仍可右键插旗。",
+    row: "行",
+    column: "列",
+    hidden: "未翻开",
+    flagged: "已插旗",
+    mine: "地雷",
+    empty: "空白",
+    adjacent: "相邻地雷",
+  },
+  en: {
+    revealMode: "Reveal mode",
+    flagMode: "Flag mode",
+    modeHelp: "Touch controls: choose reveal or flag mode, then tap a cell. Right-click still places a flag.",
+    row: "row",
+    column: "column",
+    hidden: "hidden",
+    flagged: "flagged",
+    mine: "mine",
+    empty: "empty",
+    adjacent: "adjacent mines",
+  },
+  th: {
+    revealMode: "โหมดเปิดช่อง",
+    flagMode: "โหมดปักธง",
+    modeHelp: "บนหน้าจอสัมผัส ให้เลือกโหมดเปิดช่องหรือปักธงแล้วแตะช่อง และยังคลิกขวาเพื่อปักธงได้",
+    row: "แถว",
+    column: "คอลัมน์",
+    hidden: "ยังไม่เปิด",
+    flagged: "ปักธงแล้ว",
+    mine: "กับระเบิด",
+    empty: "ว่าง",
+    adjacent: "กับระเบิดรอบข้าง",
+  },
+} as const
 
 export function MinesweeperGame() {
   const { t, locale } = useLocale()
   const [difficulty, setDifficulty] = useState<Difficulty>("easy")
-  const [board, setBoard] = useState<CellState[][]>([])
+  const [board, setBoard] = useState<MinesweeperBoard>([])
   const [gameStatus, setGameStatus] = useState<GameStatus>("playing")
-  const [flagCount, setFlagCount] = useState(0)
   const [firstClick, setFirstClick] = useState(true)
-  const [showRules, setShowRules] = useState(false)
   const [timer, setTimer] = useState(0)
   const [timerActive, setTimerActive] = useState(false)
+  const [inputMode, setInputMode] = useState<InputMode>("reveal")
+
+  const a11y = accessibleText[locale]
 
   const { rows, cols, mines } = DIFFICULTIES[difficulty]
+  const flagCount = countFlags(board)
 
   const initGame = useCallback(() => {
-    setBoard(Array(rows).fill(null).map(() =>
-      Array(cols).fill(null).map(() => ({
-        isMine: false,
-        isRevealed: false,
-        isFlagged: false,
-        adjacentMines: 0,
-      }))
-    ))
+    setBoard(createEmptyBoard(rows, cols))
     setGameStatus("playing")
-    setFlagCount(0)
     setFirstClick(true)
     setTimer(0)
     setTimerActive(false)
+    setInputMode("reveal")
   }, [rows, cols])
 
   useEffect(() => {
@@ -114,74 +105,65 @@ export function MinesweeperGame() {
     return () => clearInterval(interval)
   }, [timerActive, gameStatus])
 
-  const revealCell = useCallback((row: number, col: number, currentBoard: CellState[][]) => {
-    const newBoard = currentBoard.map(r => r.map(c => ({ ...c })))
-    
-    const reveal = (r: number, c: number) => {
-      if (r < 0 || r >= rows || c < 0 || c >= cols) return
-      if (newBoard[r][c].isRevealed || newBoard[r][c].isFlagged) return
-      
-      newBoard[r][c].isRevealed = true
-      
-      if (newBoard[r][c].adjacentMines === 0 && !newBoard[r][c].isMine) {
-        for (let dr = -1; dr <= 1; dr++) {
-          for (let dc = -1; dc <= 1; dc++) {
-            reveal(r + dr, c + dc)
-          }
-        }
-      }
-    }
-    
-    reveal(row, col)
-    return newBoard
-  }, [rows, cols])
-
-  const handleCellClick = useCallback((row: number, col: number) => {
+  const revealCell = useCallback((row: number, col: number) => {
     if (gameStatus !== "playing") return
     if (board[row]?.[col]?.isFlagged) return
 
     let currentBoard = board
 
     if (firstClick) {
-      currentBoard = createBoard(rows, cols, mines, row, col)
+      currentBoard = populateMines(board, mines, { row, col })
       setFirstClick(false)
       setTimerActive(true)
     }
 
     if (currentBoard[row][col].isMine) {
       // Game over - reveal all mines
-      const newBoard = currentBoard.map(r => r.map(c => ({
-        ...c,
-        isRevealed: c.isMine ? true : c.isRevealed,
-      })))
+      const newBoard = revealAllMines(currentBoard)
       setBoard(newBoard)
       setGameStatus("lost")
       setTimerActive(false)
       return
     }
 
-    const newBoard = revealCell(row, col, currentBoard)
-    if (!newBoard) return
+    const newBoard = revealCells(currentBoard, row, col)
     setBoard(newBoard)
 
     // Check win condition
-    const unrevealed = newBoard.flat().filter(c => !c.isRevealed && !c.isMine).length
-    if (unrevealed === 0) {
+    if (hasWon(newBoard)) {
       setGameStatus("won")
       setTimerActive(false)
     }
-  }, [board, gameStatus, firstClick, rows, cols, mines, revealCell])
+  }, [board, gameStatus, firstClick, mines])
+
+  const flagCell = useCallback((row: number, col: number) => {
+    if (gameStatus !== "playing" || board[row][col].isRevealed) return
+    setBoard(toggleFlag(board, row, col))
+  }, [board, gameStatus])
+
+  const handleCellClick = useCallback((row: number, col: number) => {
+    if (inputMode === "flag") {
+      flagCell(row, col)
+      return
+    }
+    revealCell(row, col)
+  }, [flagCell, inputMode, revealCell])
 
   const handleRightClick = useCallback((e: React.MouseEvent, row: number, col: number) => {
     e.preventDefault()
-    if (gameStatus !== "playing") return
-    if (board[row][col].isRevealed) return
+    flagCell(row, col)
+  }, [flagCell])
 
-    const newBoard = board.map(r => r.map(c => ({ ...c })))
-    newBoard[row][col].isFlagged = !newBoard[row][col].isFlagged
-    setBoard(newBoard)
-    setFlagCount(prev => newBoard[row][col].isFlagged ? prev + 1 : prev - 1)
-  }, [board, gameStatus])
+  const getCellLabel = (row: number, col: number) => {
+    const cell = board[row][col]
+    const position = `${a11y.row} ${row + 1}, ${a11y.column} ${col + 1}`
+    if (!cell.isRevealed) {
+      return `${position}, ${cell.isFlagged ? a11y.flagged : a11y.hidden}`
+    }
+    if (cell.isMine) return `${position}, ${a11y.mine}`
+    if (cell.adjacentMines === 0) return `${position}, ${a11y.empty}`
+    return `${position}, ${a11y.adjacent}: ${cell.adjacentMines}`
+  }
 
   const getNumberColor = (num: number) => {
     const colors = [
@@ -200,15 +182,10 @@ export function MinesweeperGame() {
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
-      <div className="flex items-center justify-between">
-        <Link href="/">
-          <Button variant="ghost" size="sm" className="text-slate-400 hover:text-white">
-            <Home className="mr-2 h-4 w-4" />
-            {t("appName")}
-          </Button>
-        </Link>
-        <LanguageSwitcher />
-      </div>
+      <GameHeader
+        homeLabel={t("appName")}
+        homeButtonClassName="text-slate-400 hover:text-white"
+      />
 
       <main className="flex flex-1 flex-col items-center gap-4 py-4">
         <h1 className="text-2xl font-bold text-white sm:text-3xl">{t("minesweeper")}</h1>
@@ -221,6 +198,7 @@ export function MinesweeperGame() {
               variant={difficulty === d ? "default" : "outline"}
               size="sm"
               onClick={() => { setDifficulty(d) }}
+              aria-pressed={difficulty === d}
               className={difficulty === d 
                 ? "bg-slate-600" 
                 : "border-slate-600 bg-transparent text-slate-300 hover:bg-slate-700"
@@ -232,28 +210,59 @@ export function MinesweeperGame() {
         </div>
 
         {/* Game stats */}
-        <Card className="flex items-center gap-6 border-slate-700 bg-slate-800/50 px-4 py-2">
+        <Card
+          className="flex items-center gap-6 border-slate-700 bg-slate-800/50 px-4 py-2"
+          aria-label={`${t("minesweeper")}: ${mines - flagCount}; ${formatTime(timer)}; ${flagCount}`}
+        >
           <div className="flex items-center gap-2">
-            <Bomb className="h-4 w-4 text-red-400" />
+            <Bomb className="h-4 w-4 text-red-400" aria-hidden="true" />
             <span className="font-mono text-lg text-white">{mines - flagCount}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="font-mono text-lg text-white">{formatTime(timer)}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Flag className="h-4 w-4 text-yellow-400" />
+            <Flag className="h-4 w-4 text-yellow-400" aria-hidden="true" />
             <span className="font-mono text-lg text-white">{flagCount}</span>
           </div>
         </Card>
 
         {/* Game status */}
         {gameStatus !== "playing" && (
-          <div className={`rounded-lg px-4 py-2 text-lg font-bold ${
+          <div role="status" aria-live="polite" className={`rounded-lg px-4 py-2 text-lg font-bold ${
             gameStatus === "won" ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
           }`}>
             {gameStatus === "won" ? t("youWin") : t("gameOver")}
           </div>
         )}
+
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex gap-2" role="group" aria-label={a11y.modeHelp}>
+            <Button
+              type="button"
+              size="sm"
+              variant={inputMode === "reveal" ? "default" : "outline"}
+              aria-pressed={inputMode === "reveal"}
+              onClick={() => setInputMode("reveal")}
+              className={inputMode === "reveal" ? "bg-slate-600" : "border-slate-600 bg-transparent text-slate-300 hover:bg-slate-700"}
+            >
+              <Eye className="mr-2 h-4 w-4" aria-hidden="true" />
+              {a11y.revealMode}
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant={inputMode === "flag" ? "default" : "outline"}
+              aria-pressed={inputMode === "flag"}
+              onClick={() => setInputMode("flag")}
+              className={inputMode === "flag" ? "bg-slate-600" : "border-slate-600 bg-transparent text-slate-300 hover:bg-slate-700"}
+            >
+              <Flag className="mr-2 h-4 w-4" aria-hidden="true" />
+              {a11y.flagMode}
+            </Button>
+          </div>
+          <p className="max-w-md text-center text-xs text-slate-400">{a11y.modeHelp}</p>
+        </div>
 
         {/* Game board */}
         <div 
@@ -262,6 +271,8 @@ export function MinesweeperGame() {
         >
           <div 
             className="grid gap-px"
+            role="group"
+            aria-label={`${t("minesweeper")}, ${rows} × ${cols}`}
             style={{ 
               gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
             }}
@@ -273,6 +284,8 @@ export function MinesweeperGame() {
                   onClick={() => handleCellClick(rowIndex, colIndex)}
                   onContextMenu={(e) => handleRightClick(e, rowIndex, colIndex)}
                   disabled={gameStatus !== "playing"}
+                  aria-label={getCellLabel(rowIndex, colIndex)}
+                  aria-pressed={cell.isFlagged}
                   className={`
                     flex items-center justify-center font-bold transition-all
                     ${difficulty === "hard" ? "h-5 w-5 text-xs sm:h-6 sm:w-6" : "h-7 w-7 text-sm sm:h-8 sm:w-8"}
@@ -286,12 +299,12 @@ export function MinesweeperGame() {
                 >
                   {cell.isRevealed ? (
                     cell.isMine ? (
-                      <Bomb className="h-4 w-4 text-black" />
+                      <Bomb className="h-4 w-4 text-black" aria-hidden="true" />
                     ) : cell.adjacentMines > 0 ? (
                       <span className={getNumberColor(cell.adjacentMines)}>{cell.adjacentMines}</span>
                     ) : null
                   ) : cell.isFlagged ? (
-                    <Flag className="h-4 w-4 text-red-600" />
+                    <Flag className="h-4 w-4 text-red-600" aria-hidden="true" />
                   ) : null}
                 </button>
               ))
@@ -306,45 +319,30 @@ export function MinesweeperGame() {
             variant="outline"
             className="border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700"
           >
-            <RotateCcw className="mr-2 h-4 w-4" />
+            <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
             {t("restart")}
           </Button>
-          <Button
-            onClick={() => setShowRules(true)}
-            variant="outline"
-            className="border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700"
+          <GameRulesDialog
+            triggerLabel={t("howToPlay")}
+            closeLabel={t("close")}
+            triggerClassName="border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700"
+            contentClassName="border-slate-600 bg-slate-800 p-4 text-white sm:p-6"
+            titleClassName="text-lg font-bold text-white"
+            closeButtonClassName="text-slate-400 hover:text-white"
           >
-            <HelpCircle className="mr-2 h-4 w-4" />
-            {t("howToPlay")}
-          </Button>
+            <ul className="space-y-2 text-sm text-slate-300">
+              <li>{t("minesweeperRule1")}</li>
+              <li>{t("minesweeperRule2")}</li>
+              <li>{t("minesweeperRule3")}</li>
+              <li>{t("minesweeperRule4")}</li>
+            </ul>
+          </GameRulesDialog>
         </div>
 
         <p className="max-w-md text-center text-xs text-slate-400">
           {t("minesweeperInstructions")}
         </p>
 
-        {/* Rules Modal */}
-        {showRules && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowRules(false)}>
-            <Card 
-              className="max-h-[80vh] w-full max-w-md overflow-y-auto border-slate-600 bg-slate-800 p-4 sm:p-6"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-bold text-white">{t("howToPlay")}</h2>
-                <Button variant="ghost" size="sm" onClick={() => setShowRules(false)} className="text-slate-400 hover:text-white">
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-              <ul className="space-y-2 text-sm text-slate-300">
-                <li>{t("minesweeperRule1")}</li>
-                <li>{t("minesweeperRule2")}</li>
-                <li>{t("minesweeperRule3")}</li>
-                <li>{t("minesweeperRule4")}</li>
-              </ul>
-            </Card>
-          </div>
-        )}
       </main>
     </div>
   )

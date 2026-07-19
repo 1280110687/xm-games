@@ -1,20 +1,21 @@
 "use client"
 
 import Link from "next/link"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { useLocale } from "@/lib/locale-context"
+import type { TranslationKey } from "@/lib/i18n"
 import { LanguageSwitcher } from "@/components/language-switcher"
 
 type GameItem = {
   href: string
-  titleKey: string
-  descKey: string
+  titleKey: TranslationKey
+  descKey: TranslationKey
   color: string
   customTitle?: React.ReactNode
 }
 
 type Category = {
-  titleKey: string
+  titleKey: TranslationKey
   games: GameItem[]
 }
 
@@ -110,7 +111,7 @@ export default function Home() {
           {categories.map((category) => (
             <section key={category.titleKey}>
               <h2 className="mb-4 text-xl font-semibold text-slate-300">
-                {t(category.titleKey as keyof ReturnType<typeof t>)}
+                {t(category.titleKey)}
               </h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {category.games.map((game) => (
@@ -130,13 +131,13 @@ export default function Home() {
                               </>
                             ) : game.customTitle
                           ) : (
-                            t(game.titleKey as keyof ReturnType<typeof t>)
+                            t(game.titleKey)
                           )}
                         </CardTitle>
                       </CardHeader>
                       <CardContent>
                         <p className="text-sm text-slate-400">
-                          {t(game.descKey as keyof ReturnType<typeof t>)}
+                          {t(game.descKey)}
                         </p>
                       </CardContent>
                     </Card>

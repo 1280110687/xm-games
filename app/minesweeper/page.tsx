@@ -1,9 +1,8 @@
 import { MinesweeperGame } from "@/components/minesweeper-game"
+import { getPageMetadata } from "@/lib/page-metadata"
 
 export default function MinesweeperPage() {
   return <MinesweeperGame />
 }
 
-export const metadata = {
-  title: "Minesweeper - XM-Games",
-}
+export const metadata = getPageMetadata("/minesweeper", "zh")

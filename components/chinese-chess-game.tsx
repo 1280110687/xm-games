@@ -4,9 +4,9 @@ import { useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useLocale } from "@/lib/locale-context"
-import { LanguageSwitcher } from "@/components/language-switcher"
-import { RotateCcw, Home, Flag, Undo2, HelpCircle, X } from "lucide-react"
-import Link from "next/link"
+import { GameHeader } from "@/components/game-header"
+import { GameRulesDialog } from "@/components/game-rules-dialog"
+import { RotateCcw, Flag, Undo2 } from "lucide-react"
 
 // Piece types
 type PieceType = "king" | "advisor" | "elephant" | "horse" | "chariot" | "cannon" | "pawn"
@@ -304,7 +304,6 @@ export function ChineseChessGame() {
   const [moveHistory, setMoveHistory] = useState<{ from: Position; to: Position; piece: Piece; capturedPiece: Piece | null }[]>([])
   const [redUndoUsed, setRedUndoUsed] = useState(false)
   const [blackUndoUsed, setBlackUndoUsed] = useState(false)
-  const [showRules, setShowRules] = useState(false)
 
   const resetGame = useCallback(() => {
     setBoard(createInitialBoard())
@@ -425,20 +424,19 @@ export function ChineseChessGame() {
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-amber-900 via-amber-800 to-amber-900 p-2 sm:p-4">
-      <div className="mb-2 flex items-center justify-between sm:mb-4">
-        <Link href="/">
-          <Button variant="ghost" size="sm" className="text-amber-100 hover:bg-amber-700 hover:text-white">
-            <Home className="mr-1 h-4 w-4 sm:mr-2" />
-            <span className="hidden sm:inline">{t("appName")}</span>
-          </Button>
-        </Link>
-        <h1 className="text-lg font-bold text-amber-100 sm:text-2xl">{t("chineseChess")}</h1>
-        <LanguageSwitcher />
-      </div>
+      <GameHeader
+        layout="centered"
+        homeLabel={t("appName")}
+        homeLabelMode="desktop"
+        title={t("chineseChess")}
+        className="mb-2 sm:mb-4"
+        homeButtonClassName="text-amber-100 hover:bg-amber-700 hover:text-white"
+        titleClassName="text-lg font-bold text-amber-100 sm:text-2xl"
+      />
 
       <div className="flex flex-1 flex-col items-center justify-center gap-4">
         {/* Game Status */}
-        <Card className="border-amber-600 bg-amber-800/50 p-3 sm:p-4">
+        <Card className="border-amber-600 bg-amber-800/50 p-3 sm:p-4" role="status" aria-live="polite">
           <div className="flex flex-col gap-3">
             {/* Turn indicator and status */}
             <div className="flex items-center justify-center gap-4">
@@ -502,6 +500,8 @@ export function ChineseChessGame() {
           {/* SVG Board Lines - positioned to match intersections */}
           <svg 
             className="absolute"
+            aria-hidden="true"
+            focusable="false"
             style={{
               left: "16px",
               top: "16px",
@@ -579,7 +579,12 @@ export function ChineseChessGame() {
           </div>
 
           {/* Pieces layer - absolute positioned on intersections */}
-          <div className="relative" style={{ width: "calc(36px * 8)", height: "calc(36px * 9)" }}>
+          <div
+            className="relative"
+            role="group"
+            aria-label={t("chineseChess")}
+            style={{ width: "calc(36px * 8)", height: "calc(36px * 9)" }}
+          >
             {board.map((row, rowIndex) => (
               row.map((piece, colIndex) => {
                 const isSelected = selectedPos?.row === rowIndex && selectedPos?.col === colIndex
@@ -592,6 +597,8 @@ export function ChineseChessGame() {
                   <button
                     key={`${rowIndex}-${colIndex}`}
                     onClick={() => handleCellClick(rowIndex, colIndex)}
+                    aria-label={`${rowIndex + 1}, ${colIndex + 1}, ${piece ? `${piece.color === "red" ? t("redTurn") : t("blackTurn")} ${getPieceName(piece)}` : "empty"}${isValidTarget ? ", valid move" : ""}`}
+                    aria-pressed={isSelected}
                     className="absolute flex items-center justify-center transition-all"
                     style={{
                       left: `${colIndex * 36 - 18}px`,
@@ -603,17 +610,18 @@ export function ChineseChessGame() {
                   >
                     {/* Last move highlight */}
                     {(isLastMoveFrom || isLastMoveTo) && (
-                      <div className="absolute h-8 w-8 rounded bg-yellow-400/40" />
+                      <div className="absolute h-8 w-8 rounded bg-yellow-400/40" aria-hidden="true" />
                     )}
                     
                     {/* Valid move indicator */}
                     {isValidTarget && !piece && (
-                      <div className="absolute h-4 w-4 rounded-full bg-green-500/70 shadow" />
+                      <div className="absolute h-4 w-4 rounded-full bg-green-500/70 shadow" aria-hidden="true" />
                     )}
                     
                     {/* Piece */}
                     {piece && (
                       <div
+                        aria-hidden="true"
                         className={`
                           flex items-center justify-center rounded-full border-2
                           h-8 w-8 text-sm font-bold
@@ -649,7 +657,7 @@ export function ChineseChessGame() {
             }
             className="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700 disabled:opacity-50"
           >
-            <Undo2 className="mr-1 h-4 w-4 sm:mr-2" />
+            <Undo2 className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
             {t("undo")}
           </Button>
           <Button
@@ -657,23 +665,64 @@ export function ChineseChessGame() {
             variant="outline"
             className="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700"
           >
-            <RotateCcw className="mr-1 h-4 w-4 sm:mr-2" />
+            <RotateCcw className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
             {t("restart")}
           </Button>
-          <Button
-            onClick={() => setShowRules(true)}
-            variant="outline"
-            className="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700"
+          <GameRulesDialog
+            triggerLabel={t("howToPlay")}
+            closeLabel={t("close")}
+            triggerClassName="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700"
+            triggerIconClassName="mr-1 sm:mr-2"
+            contentClassName="border-amber-600 bg-amber-900/95 p-4 text-amber-100 sm:p-6"
+            titleClassName="text-lg font-bold text-amber-100 sm:text-xl"
+            closeButtonClassName="text-amber-100 hover:bg-amber-800"
           >
-            <HelpCircle className="mr-1 h-4 w-4 sm:mr-2" />
-            {t("howToPlay")}
-          </Button>
+            <div className="space-y-4">
+              <div>
+                <h3 className="mb-2 font-semibold text-amber-200">{t("pieceRules")}</h3>
+                <ul className="space-y-2 text-sm text-amber-100/90">
+                  <li className="flex gap-2">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">帅</span>
+                    <span>{t("kingRule")}</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">仕</span>
+                    <span>{t("advisorRule")}</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">相</span>
+                    <span>{t("elephantRule")}</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">馬</span>
+                    <span>{t("horseRule")}</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">車</span>
+                    <span>{t("chariotRule")}</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">炮</span>
+                    <span>{t("cannonRule")}</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">兵</span>
+                    <span>{t("pawnRule")}</span>
+                  </li>
+                </ul>
+              </div>
+
+              <div className="border-t border-amber-700 pt-4">
+                <h3 className="mb-2 font-semibold text-amber-200">{t("winCondition")}</h3>
+              </div>
+            </div>
+          </GameRulesDialog>
           {gameStatus === "checkmate" && (
             <Button
               onClick={resetGame}
               className="bg-amber-600 text-white hover:bg-amber-500"
             >
-              <Flag className="mr-1 h-4 w-4 sm:mr-2" />
+              <Flag className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
               {t("newGame")}
             </Button>
           )}
@@ -684,67 +733,6 @@ export function ChineseChessGame() {
           {t("chessInstructions")}
         </p>
 
-        {/* Rules Modal */}
-        {showRules && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowRules(false)}>
-            <Card 
-              className="max-h-[80vh] w-full max-w-md overflow-y-auto border-amber-600 bg-amber-900/95 p-4 sm:p-6"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-bold text-amber-100 sm:text-xl">{t("howToPlay")}</h2>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowRules(false)}
-                  className="text-amber-100 hover:bg-amber-800"
-                >
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-              
-              <div className="space-y-4">
-                <div>
-                  <h3 className="mb-2 font-semibold text-amber-200">{t("pieceRules")}</h3>
-                  <ul className="space-y-2 text-sm text-amber-100/90">
-                    <li className="flex gap-2">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">帅</span>
-                      <span>{t("kingRule")}</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">仕</span>
-                      <span>{t("advisorRule")}</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">相</span>
-                      <span>{t("elephantRule")}</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">馬</span>
-                      <span>{t("horseRule")}</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">車</span>
-                      <span>{t("chariotRule")}</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">炮</span>
-                      <span>{t("cannonRule")}</span>
-                    </li>
-                    <li className="flex gap-2">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">兵</span>
-                      <span>{t("pawnRule")}</span>
-                    </li>
-                  </ul>
-                </div>
-
-                <div className="border-t border-amber-700 pt-4">
-                  <h3 className="mb-2 font-semibold text-amber-200">{t("winCondition")}</h3>
-                </div>
-              </div>
-            </Card>
-          </div>
-        )}
       </div>
     </div>
   )

@@ -2,6 +2,12 @@ export type Locale = "zh" | "en" | "th"
 
 export const locales: Locale[] = ["zh", "en", "th"]
 
+export const localeHtmlLang: Record<Locale, string> = {
+  zh: "zh-CN",
+  en: "en",
+  th: "th",
+}
+
 export const localeNames: Record<Locale, string> = {
   zh: "中文",
   en: "English",
@@ -27,6 +33,7 @@ export const translations = {
     nextPiece: "下一个",
     save: "保存",
     cancel: "取消",
+    close: "关闭",
     edit: "编辑",
     delete: "删除",
     all: "全部",
@@ -244,6 +251,7 @@ export const translations = {
     nextPiece: "Next",
     save: "Save",
     cancel: "Cancel",
+    close: "Close",
     edit: "Edit",
     delete: "Delete",
     all: "All",
@@ -461,6 +469,7 @@ export const translations = {
     nextPiece: "ถัดไป",
     save: "บันทึก",
     cancel: "ยกเลิก",
+    close: "ปิด",
     edit: "แก้ไข",
     delete: "ลบ",
     all: "ทั้งหมด",
@@ -666,4 +675,8 @@ export type TranslationKey = keyof typeof translations.zh
 
 export function getTranslation(locale: Locale, key: TranslationKey): string {
   return translations[locale][key]
+}
+
+export function isLocale(value: unknown): value is Locale {
+  return typeof value === "string" && locales.includes(value as Locale)
 }

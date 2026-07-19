@@ -5,9 +5,15 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { useLocale } from "@/lib/locale-context"
-import { LanguageSwitcher } from "@/components/language-switcher"
-import { Plus, Trash2, Mic, MicOff, RotateCcw, Home } from "lucide-react"
-import Link from "next/link"
+import { GameHeader } from "@/components/game-header"
+import { Plus, Trash2, Mic, MicOff, RotateCcw } from "lucide-react"
+import { parseBingoNumbers } from "@/features/bingo/number-parser"
+
+const SPEECH_LANGUAGE = {
+  zh: "zh-CN",
+  en: "en-US",
+  th: "th-TH",
+} as const
 
 interface BingoCard {
   id: string
@@ -132,7 +138,18 @@ export function BingoCards() {
   const [isListening, setIsListening] = useState(false)
   const [speechSupported, setSpeechSupported] = useState(false)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const shouldListenRef = useRef(false)
+  const mountedRef = useRef(false)
+  const localeRef = useRef(locale)
+  const restartTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [bingoCards, setBingoCards] = useState<Set<string>>(new Set()) // Track cards that have bingo'd
+
+  const clearRestartTimer = useCallback(() => {
+    if (restartTimerRef.current !== null) {
+      clearTimeout(restartTimerRef.current)
+      restartTimerRef.current = null
+    }
+  }, [])
 
   // Speak "Bingo" announcement
   const speakBingo = useCallback((cardName: string) => {
@@ -158,170 +175,140 @@ export function BingoCards() {
     window.speechSynthesis.speak(utterance)
   }, [locale])
 
-  // Check speech recognition support
+  // Keep the active recognizer in sync without rebuilding its event handlers.
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-      setSpeechSupported(!!SpeechRecognition)
+    localeRef.current = locale
+    if (recognitionRef.current) {
+      recognitionRef.current.lang = SPEECH_LANGUAGE[locale]
     }
-  }, [])
+  }, [locale])
 
-  // Initialize speech recognition (only once, update language separately)
+  // Initialize recognition once and fully tear it down on unmount. A separate
+  // intent ref prevents an async `end` event from reviving a stopped session.
   useEffect(() => {
     if (typeof window === "undefined") return
 
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    if (!SpeechRecognition) return
+    const SpeechRecognitionConstructor = window.SpeechRecognition || window.webkitSpeechRecognition
+    setSpeechSupported(Boolean(SpeechRecognitionConstructor))
+    if (!SpeechRecognitionConstructor) return
 
-    const recognition = new SpeechRecognition()
+    mountedRef.current = true
+    const recognition = new SpeechRecognitionConstructor()
     recognition.continuous = true
     recognition.interimResults = false
+    recognition.lang = SPEECH_LANGUAGE[localeRef.current]
 
     recognitionRef.current = recognition
 
-    return () => {
-      recognition.stop()
-    }
-  }, [])
-
-  // Update language and handlers when locale changes
-  useEffect(() => {
-    if (!recognitionRef.current) return
-
-    const recognition = recognitionRef.current
-    
-    // Set language based on locale
-    const langMap: Record<string, string> = {
-      zh: "zh-CN",
-      en: "en-US",
-      th: "th-TH",
-    }
-    recognition.lang = langMap[locale] || "en-US"
-
     const handleResult = (event: SpeechRecognitionEvent) => {
-      const last = event.results.length - 1
-      const transcript = event.results[last][0].transcript.trim()
-      
-      // Extract numbers from speech
-      const numbers = extractNumbersFromSpeech(transcript, locale)
+      const transcripts: string[] = []
+      for (let index = event.resultIndex; index < event.results.length; index++) {
+        const result = event.results[index]
+        if (result.isFinal) transcripts.push(result[0].transcript.trim())
+      }
+
+      const numbers = parseBingoNumbers(transcripts.join(" "), localeRef.current)
       if (numbers.length > 0) {
-        numbers.forEach(num => {
-          if (num >= 1 && num <= 75) {
-            setDrawnNumbers(prev => new Set([...prev, num]))
-          }
+        setDrawnNumbers((previous) => {
+          const next = new Set(previous)
+          numbers.forEach((number) => next.add(number))
+          return next.size === previous.size ? previous : next
         })
       }
     }
 
     const handleError = (event: SpeechRecognitionErrorEvent) => {
-      console.log("[v0] Speech recognition error:", event.error)
-      if (event.error === "not-allowed" || event.error === "aborted") {
+      console.warn("[bingo] Speech recognition error:", event.error)
+      if (event.error === "not-allowed" || event.error === "service-not-allowed") {
+        shouldListenRef.current = false
+        clearRestartTimer()
+        if (mountedRef.current) setIsListening(false)
+      } else if (event.error === "aborted" && !shouldListenRef.current && mountedRef.current) {
         setIsListening(false)
       }
     }
 
-    const handleEnd = () => {
-      // Check if we should restart (use a ref to avoid stale closure)
-      if (isListening && recognitionRef.current) {
-        try {
-          recognitionRef.current.start()
-        } catch (e) {
-          // Already started, ignore
+    const scheduleRestart = () => {
+      clearRestartTimer()
+      if (!mountedRef.current || !shouldListenRef.current) return
+
+      restartTimerRef.current = setTimeout(() => {
+        restartTimerRef.current = null
+        if (
+          !mountedRef.current ||
+          !shouldListenRef.current ||
+          recognitionRef.current !== recognition
+        ) {
+          return
         }
-      }
+
+        try {
+          recognition.start()
+        } catch {
+          scheduleRestart()
+        }
+      }, 150)
     }
 
     recognition.onresult = handleResult
     recognition.onerror = handleError
-    recognition.onend = handleEnd
-
-  }, [locale, isListening])
-
-  // Extract numbers from speech in different languages
-  function extractNumbersFromSpeech(text: string, lang: string): number[] {
-    const numbers: number[] = []
-    
-    // Thai number words
-    const thaiNumbers: Record<string, number> = {
-      "หนึ่ง": 1, "สอง": 2, "สาม": 3, "สี่": 4, "ห้า": 5,
-      "หก": 6, "เจ็ด": 7, "แปด": 8, "เก้า": 9, "สิบ": 10,
-      "ศูนย์": 0,
+    recognition.onend = scheduleRestart
+    recognition.onstart = () => {
+      if (mountedRef.current && shouldListenRef.current) setIsListening(true)
     }
 
-    // Chinese number words
-    const chineseNumbers: Record<string, number> = {
-      "一": 1, "二": 2, "三": 3, "四": 4, "五": 5,
-      "六": 6, "七": 7, "八": 8, "九": 9, "十": 10,
-      "零": 0,
+    return () => {
+      mountedRef.current = false
+      shouldListenRef.current = false
+      clearRestartTimer()
+      recognition.onresult = null
+      recognition.onerror = null
+      recognition.onend = null
+      recognition.onstart = null
+      if (recognitionRef.current === recognition) recognitionRef.current = null
+      try {
+        recognition.abort()
+      } catch {
+        // The recognizer may already be inactive.
+      }
     }
+  }, [clearRestartTimer])
 
-    // Try to extract digit numbers first
-    const digitMatches = text.match(/\d+/g)
-    if (digitMatches) {
-      digitMatches.forEach(match => {
-        const num = parseInt(match, 10)
-        if (!isNaN(num)) numbers.push(num)
-      })
-    }
-
-    // Extract Thai numbers
-    if (lang === "th") {
-      Object.entries(thaiNumbers).forEach(([word, num]) => {
-        if (text.includes(word)) numbers.push(num)
-      })
-    }
-
-    // Extract Chinese numbers
-    if (lang === "zh") {
-      Object.entries(chineseNumbers).forEach(([word, num]) => {
-        if (text.includes(word)) numbers.push(num)
-      })
-    }
-
-    return numbers
-  }
+  useEffect(() => {
+    return () => window.speechSynthesis?.cancel()
+  }, [])
 
   const toggleListening = useCallback(() => {
-    if (!recognitionRef.current) {
-      console.log("[v0] Speech recognition not initialized")
+    const recognition = recognitionRef.current
+    if (!recognition) {
+      console.warn("[bingo] Speech recognition not initialized")
       return
     }
 
-    if (isListening) {
-      try {
-        recognitionRef.current.stop()
-      } catch (e) {
-        // Ignore stop errors
-      }
+    if (shouldListenRef.current) {
+      shouldListenRef.current = false
+      clearRestartTimer()
       setIsListening(false)
-    } else {
       try {
-        // Update language before starting
-        const langMap: Record<string, string> = {
-          zh: "zh-CN",
-          en: "en-US",
-          th: "th-TH",
-        }
-        recognitionRef.current.lang = langMap[locale] || "en-US"
-        recognitionRef.current.start()
-        setIsListening(true)
-      } catch (error) {
-        console.log("[v0] Failed to start speech recognition:", error)
-        // Try to stop and restart
-        try {
-          recognitionRef.current.stop()
-          setTimeout(() => {
-            if (recognitionRef.current) {
-              recognitionRef.current.start()
-              setIsListening(true)
-            }
-          }, 100)
-        } catch (e) {
-          console.log("[v0] Failed to restart speech recognition:", e)
-        }
+        recognition.abort()
+      } catch {
+        // The recognizer may already be inactive.
       }
+      return
     }
-  }, [isListening, locale])
+
+    shouldListenRef.current = true
+    recognition.lang = SPEECH_LANGUAGE[locale]
+    try {
+      recognition.start()
+      setIsListening(true)
+    } catch (error) {
+      shouldListenRef.current = false
+      clearRestartTimer()
+      setIsListening(false)
+      console.warn("[bingo] Failed to start speech recognition:", error)
+    }
+  }, [clearRestartTimer, locale])
 
   const addCard = useCallback(() => {
     const newCard: BingoCard = {
@@ -393,24 +380,24 @@ export function BingoCards() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
       {/* Header */}
       <div className="mx-auto max-w-7xl">
-        <div className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link href="/">
-              <Button variant="ghost" size="icon" className="text-slate-400 hover:text-white">
-                <Home className="h-5 w-5" />
-              </Button>
-            </Link>
-            <h1 className="text-2xl font-bold text-white md:text-3xl">
+        <GameHeader
+          layout="tool"
+          homeLabel={t("appName")}
+          homeLabelMode="sr-only"
+          homeButtonClassName="text-slate-400 hover:text-white"
+          className="mb-6"
+          titleClassName="text-2xl font-bold text-white md:text-3xl"
+          title={
+            <>
               <span className="text-red-500">B</span>
               <span className="text-orange-500">I</span>
               <span className="text-yellow-500">N</span>
               <span className="text-green-500">G</span>
               <span className="text-blue-500">O</span>
               <span className="ml-2 text-slate-400">{t("bingoCards")}</span>
-            </h1>
-          </div>
-          <LanguageSwitcher />
-        </div>
+            </>
+          }
+        />
 
         {/* Controls */}
         <Card className="mb-6 border-slate-700 bg-slate-800/50">
@@ -423,6 +410,7 @@ export function BingoCards() {
                   min={1}
                   max={75}
                   value={inputNumber}
+                  aria-label={t("enterNumber")}
                   onChange={(e) => setInputNumber(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder={t("enterNumber")}
@@ -440,25 +428,25 @@ export function BingoCards() {
                   variant={isListening ? "destructive" : "outline"}
                   className={isListening ? "" : "border-slate-600 text-slate-300 hover:bg-slate-700"}
                 >
-                  {isListening ? <MicOff className="mr-2 h-4 w-4" /> : <Mic className="mr-2 h-4 w-4" />}
+                  {isListening ? <MicOff className="mr-2 h-4 w-4" aria-hidden="true" /> : <Mic className="mr-2 h-4 w-4" aria-hidden="true" />}
                   {isListening ? t("stopListening") : t("startListening")}
                 </Button>
               )}
 
               {/* Add Card */}
               <Button onClick={addCard} className="bg-green-600 hover:bg-green-700">
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
                 {t("addCard")}
               </Button>
 
               {/* Reset */}
               <Button onClick={resetAll} variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
-                <RotateCcw className="mr-2 h-4 w-4" />
+                <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
                 {t("resetMarks")}
               </Button>
 
               {/* Stats */}
-              <div className="ml-auto text-sm text-slate-400">
+              <div className="ml-auto text-sm text-slate-400" role="status" aria-live="polite">
                 {t("markedCount")}: <span className="font-bold text-white">{drawnNumbers.size}</span> / 75
               </div>
             </div>
@@ -467,10 +455,11 @@ export function BingoCards() {
             {drawnNumbers.size > 0 && (
               <div className="mt-4 border-t border-slate-700 pt-4">
                 <p className="mb-2 text-sm text-slate-400">{t("markedNumbers")}:</p>
-                <div className="flex flex-wrap gap-1">
+                <div className="flex flex-wrap gap-1" role="list">
                   {Array.from(drawnNumbers).sort((a, b) => a - b).map(num => (
                     <span
                       key={num}
+                      role="listitem"
                       className="inline-flex h-7 w-7 items-center justify-center rounded bg-amber-500/20 text-xs font-medium text-amber-400"
                     >
                       {num}
@@ -488,7 +477,7 @@ export function BingoCards() {
             <CardContent className="flex flex-col items-center justify-center py-16">
               <p className="mb-4 text-slate-400">{t("noCards")}</p>
               <Button onClick={addCard} className="bg-green-600 hover:bg-green-700">
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
                 {t("addFirstCard")}
               </Button>
             </CardContent>
@@ -509,7 +498,7 @@ export function BingoCards() {
                       <CardTitle className="text-lg text-white">
                         {card.name}
                         {hasBingo && (
-                          <span className="ml-2 rounded bg-amber-500 px-2 py-0.5 text-xs font-bold text-black">
+                          <span className="ml-2 rounded bg-amber-500 px-2 py-0.5 text-xs font-bold text-black" role="status" aria-live="assertive">
                             BINGO!
                           </span>
                         )}
@@ -518,9 +507,10 @@ export function BingoCards() {
                         variant="ghost"
                         size="icon"
                         onClick={() => removeCard(card.id)}
+                        aria-label={`${t("delete")} ${card.name}`}
                         className="h-8 w-8 text-slate-400 hover:bg-red-500/20 hover:text-red-400"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-4 w-4" aria-hidden="true" />
                       </Button>
                     </div>
                   </CardHeader>
@@ -537,13 +527,15 @@ export function BingoCards() {
                       ))}
                     </div>
                     {/* Bingo Grid */}
-                    <div className="grid grid-cols-5 gap-1">
+                    <div className="grid grid-cols-5 gap-1" role="group" aria-label={card.name}>
                       {card.numbers.flat().map((num, index) => {
                         const isMarked = num !== null && drawnNumbers.has(num)
                         const isFree = num === null
                         return (
                           <div
                             key={index}
+                            role="img"
+                            aria-label={`${isFree ? "FREE" : num}${isFree || isMarked ? `, ${t("drawn")}` : ""}`}
                             className={`flex h-10 items-center justify-center rounded text-sm font-medium transition-all ${
                               isFree
                                 ? "bg-amber-500/30 text-amber-400"

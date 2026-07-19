@@ -1,9 +1,7 @@
 import { BingoGame } from "@/components/bingo-game"
+import { getPageMetadata } from "@/lib/page-metadata"
 
-export const metadata = {
-  title: "Bingo 抽数字 - XM-Games",
-  description: "Bingo 抽数字游戏，支持自动抽取和泰语语音播报",
-}
+export const metadata = getPageMetadata("/bingo", "zh")
 
 export default function BingoPage() {
   return <BingoGame />

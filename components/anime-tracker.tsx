@@ -32,10 +32,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useLocale } from "@/lib/locale-context"
-import { LanguageSwitcher } from "@/components/language-switcher"
-import Link from "next/link"
+import type { TranslationKey } from "@/lib/i18n"
+import { GameHeader } from "@/components/game-header"
 import { 
-  ArrowLeft, 
   Plus, 
   Minus, 
   Play, 
@@ -71,6 +70,20 @@ interface Anime {
   updatedAt: number
 }
 
+const STATUS_TRANSLATION_KEYS: Record<AnimeStatus, TranslationKey> = {
+  watching: "statusWatching",
+  completed: "statusCompleted",
+  planned: "statusPlanned",
+  paused: "statusPaused",
+  dropped: "statusDropped",
+}
+
+const TYPE_TRANSLATION_KEYS: Record<Anime["type"], TranslationKey> = {
+  anime: "typeAnime",
+  drama: "typeDrama",
+  movie: "typeMovie",
+}
+
 interface JikanAnime {
   mal_id: number
   title: string
@@ -86,6 +99,57 @@ interface JikanAnime {
 
 const STORAGE_KEY = "xm-games-anime-tracker"
 const IMAGE_CACHE_KEY = "xm-games-anime-images"
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+function isAnime(value: unknown): value is Anime {
+  if (!isRecord(value)) return false
+
+  return (
+    typeof value.id === "string" &&
+    typeof value.title === "string" &&
+    (value.totalEpisodes === null || typeof value.totalEpisodes === "number") &&
+    typeof value.currentEpisode === "number" &&
+    ["watching", "completed", "planned", "paused", "dropped"].includes(
+      String(value.status)
+    ) &&
+    ["anime", "drama", "movie"].includes(String(value.type)) &&
+    (value.rating === null || typeof value.rating === "number") &&
+    typeof value.notes === "string" &&
+    typeof value.imageUrl === "string" &&
+    typeof value.addedAt === "number" &&
+    typeof value.updatedAt === "number"
+  )
+}
+
+function isAnimeList(value: unknown): value is Anime[] {
+  return Array.isArray(value) && value.every(isAnime)
+}
+
+function isImageCache(value: unknown): value is Record<string, string> {
+  return isRecord(value) && Object.values(value).every(item => typeof item === "string")
+}
+
+function parseStoredValue<T>(
+  rawValue: string | null,
+  fallback: T,
+  isValid: (value: unknown) => value is T,
+  label: string
+): T {
+  if (rawValue === null) return fallback
+
+  try {
+    const parsed: unknown = JSON.parse(rawValue)
+    if (isValid(parsed)) return parsed
+  } catch {
+    // Invalid JSON falls through to the safe default below.
+  }
+
+  console.error(`Failed to parse ${label}`)
+  return fallback
+}
 
 export function AnimeTracker() {
   const { t } = useLocale()
@@ -109,37 +173,46 @@ export function AnimeTracker() {
   const [searchResults, setSearchResults] = useState<JikanAnime[]>([])
   const [showSearchResults, setShowSearchResults] = useState(false)
   const [imageCache, setImageCache] = useState<Record<string, string>>({})
+  const [isStorageReady, setIsStorageReady] = useState(false)
 
-  // Load from localStorage
+  // Load both persisted values before enabling writes. The ready guard is
+  // important in development too, where Strict Mode replays effects.
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) {
-      try {
-        setAnimeList(JSON.parse(saved))
-      } catch {
-        console.error("Failed to parse saved anime list")
-      }
-    }
-    // Load image cache
-    const cachedImages = localStorage.getItem(IMAGE_CACHE_KEY)
-    if (cachedImages) {
-      try {
-        setImageCache(JSON.parse(cachedImages))
-      } catch {
-        console.error("Failed to parse image cache")
-      }
+    try {
+      const savedAnimeList = parseStoredValue(
+        localStorage.getItem(STORAGE_KEY),
+        [],
+        isAnimeList,
+        "saved anime list"
+      )
+      const savedImageCache = parseStoredValue(
+        localStorage.getItem(IMAGE_CACHE_KEY),
+        {},
+        isImageCache,
+        "image cache"
+      )
+
+      setAnimeList(savedAnimeList)
+      setImageCache(savedImageCache)
+    } catch {
+      console.error("Failed to read anime tracker storage")
+    } finally {
+      setIsStorageReady(true)
     }
   }, [])
 
-  // Save to localStorage
+  // Persist only after the initial read has completed. This prevents the
+  // component's empty initial state from replacing existing user data.
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(animeList))
-  }, [animeList])
+    if (!isStorageReady) return
 
-  // Save image cache
-  useEffect(() => {
-    localStorage.setItem(IMAGE_CACHE_KEY, JSON.stringify(imageCache))
-  }, [imageCache])
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(animeList))
+      localStorage.setItem(IMAGE_CACHE_KEY, JSON.stringify(imageCache))
+    } catch {
+      console.error("Failed to save anime tracker storage")
+    }
+  }, [animeList, imageCache, isStorageReady])
 
   // Search anime using Jikan API (MyAnimeList)
   const searchAnime = useCallback(async (query: string) => {
@@ -352,22 +425,18 @@ export function AnimeTracker() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-2 sm:p-4">
       <div className="mx-auto max-w-6xl">
-        {/* Header - Mobile Optimized */}
-        <div className="mb-4 sm:mb-6">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 sm:gap-4">
-              <Link href="/">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-white sm:h-10 sm:w-10">
-                  <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
-                </Button>
-              </Link>
-              <div>
-                <h1 className="text-lg font-bold text-white sm:text-2xl">{t("animeTracker")}</h1>
-                <p className="hidden text-sm text-slate-400 sm:block">{t("animeTrackerDescription")}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-1 sm:gap-2">
-              <LanguageSwitcher />
+        <GameHeader
+          layout="tool"
+          homeIcon="back"
+          homeLabel={t("appName")}
+          homeLabelMode="sr-only"
+          title={t("animeTracker")}
+          description={t("animeTrackerDescription")}
+          className="mb-4 sm:mb-6"
+          homeButtonClassName="h-8 w-8 text-slate-400 hover:text-white sm:h-10 sm:w-10"
+          titleClassName="text-lg font-bold text-white sm:text-2xl"
+          descriptionClassName="hidden text-sm text-slate-400 sm:block"
+          actions={
               <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
                 setIsAddDialogOpen(open)
                 if (!open) resetForm()
@@ -434,6 +503,8 @@ export function AnimeTracker() {
                                               className="flex w-full items-center gap-3 p-2 text-left hover:bg-slate-600"
                                             >
                                               {anime.images?.jpg?.image_url ? (
+                                                // Search results are short-lived third-party URLs from Jikan.
+                                                // eslint-disable-next-line @next/next/no-img-element
                                                 <img 
                                                   src={anime.images.jpg.image_url} 
                                                   alt={anime.title}
@@ -543,6 +614,8 @@ export function AnimeTracker() {
                         />
                         {formImageUrl && (
                           <div className="h-10 w-8 overflow-hidden rounded border border-slate-600">
+                            {/* User-entered URLs can use any host, so they cannot use a fixed Next Image allowlist. */}
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img 
                               src={formImageUrl} 
                               alt="Preview" 
@@ -582,9 +655,8 @@ export function AnimeTracker() {
                   </DialogFooter>
                 </DialogContent>
               </Dialog>
-            </div>
-          </div>
-        </div>
+          }
+        />
 
         {/* Tabs - Mobile Optimized with horizontal scroll */}
         <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as AnimeStatus | "all")} className="w-full">
@@ -671,7 +743,7 @@ export function AnimeTracker() {
                         <div className="absolute right-1 top-1 hidden sm:right-2 sm:top-2 sm:flex">
                           <Badge className={`${getStatusColor(anime.status)} text-xs text-white`}>
                             {getStatusIcon(anime.status)}
-                            <span className="ml-1">{t(`status${anime.status.charAt(0).toUpperCase() + anime.status.slice(1)}` as keyof typeof translations.zh)}</span>
+                            <span className="ml-1">{t(STATUS_TRANSLATION_KEYS[anime.status])}</span>
                           </Badge>
                         </div>
                       </div>
@@ -688,7 +760,7 @@ export function AnimeTracker() {
                               <div className="mt-1 sm:hidden">
                                 <Badge className={`${getStatusColor(anime.status)} text-xs text-white`}>
                                   {getStatusIcon(anime.status)}
-                                  <span className="ml-1">{t(`status${anime.status.charAt(0).toUpperCase() + anime.status.slice(1)}` as keyof typeof translations.zh)}</span>
+                                  <span className="ml-1">{t(STATUS_TRANSLATION_KEYS[anime.status])}</span>
                                 </Badge>
                               </div>
                             </div>
@@ -715,7 +787,7 @@ export function AnimeTracker() {
                           </div>
                           <div className="flex flex-wrap items-center gap-1 text-xs text-slate-400 sm:gap-2 sm:text-sm">
                             {getTypeIcon(anime.type)}
-                            <span>{t(`type${anime.type.charAt(0).toUpperCase() + anime.type.slice(1)}` as keyof typeof translations.zh)}</span>
+                            <span>{t(TYPE_TRANSLATION_KEYS[anime.type])}</span>
                             {anime.rating && (
                               <>
                                 <Star className="ml-1 h-3 w-3 fill-yellow-500 text-yellow-500 sm:ml-2 sm:h-4 sm:w-4" />
@@ -763,7 +835,7 @@ export function AnimeTracker() {
                               disabled={anime.totalEpisodes !== null && anime.currentEpisode >= anime.totalEpisodes}
                               className="h-7 w-7 border-slate-600 bg-slate-700 p-0 text-white hover:bg-slate-600 sm:h-8 sm:w-8"
                             >
-                              <Plus className="h-3 w-3 sm:h-4 sm:4" />
+                              <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                             </Button>
                           </div>
 
@@ -790,6 +862,3 @@ export function AnimeTracker() {
     </div>
   )
 }
-
-// Add translations type
-type translations = typeof import("@/lib/i18n").translations

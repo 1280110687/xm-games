@@ -1,9 +1,7 @@
 import { SnakeGame } from "@/components/snake-game"
+import { getPageMetadata } from "@/lib/page-metadata"
 
-export const metadata = {
-  title: "Snake - XM-Games",
-  description: "Classic Snake game",
-}
+export const metadata = getPageMetadata("/snake", "zh")
 
 export default function SnakePage() {
   return <SnakeGame />

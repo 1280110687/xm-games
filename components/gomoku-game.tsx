@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react"
+import { useState, useCallback } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { useLocale } from "@/lib/locale-context"
-import { LanguageSwitcher } from "@/components/language-switcher"
-import { Home, RotateCcw, HelpCircle, X, Undo2 } from "lucide-react"
-import Link from "next/link"
+import { GameHeader } from "@/components/game-header"
+import { GameRulesDialog } from "@/components/game-rules-dialog"
+import { RotateCcw, Undo2 } from "lucide-react"
 
 type Stone = "black" | "white" | null
 type Board = Stone[][]
@@ -56,13 +56,13 @@ function checkWin(board: Board, row: number, col: number, stone: Stone): boolean
 
 export function GomokuGame() {
   const { t, locale } = useLocale()
+  const emptyLabel = locale === "zh" ? "空位" : locale === "th" ? "ช่องว่าง" : "empty"
   const [board, setBoard] = useState<Board>(createEmptyBoard)
   const [currentPlayer, setCurrentPlayer] = useState<"black" | "white">("black")
   const [winner, setWinner] = useState<"black" | "white" | null>(null)
   const [moveHistory, setMoveHistory] = useState<{ row: number; col: number; stone: Stone }[]>([])
   const [blackUndoUsed, setBlackUndoUsed] = useState(false)
   const [whiteUndoUsed, setWhiteUndoUsed] = useState(false)
-  const [showRules, setShowRules] = useState(false)
 
   const resetGame = useCallback(() => {
     setBoard(createEmptyBoard())
@@ -111,21 +111,16 @@ export function GomokuGame() {
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-br from-amber-900 via-amber-800 to-yellow-900 p-4">
-      <div className="flex items-center justify-between">
-        <Link href="/">
-          <Button variant="ghost" size="sm" className="text-amber-200 hover:text-white">
-            <Home className="mr-2 h-4 w-4" />
-            {t("appName")}
-          </Button>
-        </Link>
-        <LanguageSwitcher />
-      </div>
+      <GameHeader
+        homeLabel={t("appName")}
+        homeButtonClassName="text-amber-200 hover:text-white"
+      />
 
       <main className="flex flex-1 flex-col items-center gap-4 py-4">
         <h1 className="text-2xl font-bold text-white sm:text-3xl">{t("gomoku")}</h1>
 
         {/* Game status */}
-        <Card className="border-amber-600 bg-amber-800/50 px-4 py-2">
+        <Card className="border-amber-600 bg-amber-800/50 px-4 py-2" role="status" aria-live="polite">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className={`h-5 w-5 rounded-full ${currentPlayer === "black" ? "bg-slate-900 ring-2 ring-yellow-400" : "bg-slate-900"}`} />
@@ -144,7 +139,7 @@ export function GomokuGame() {
         </Card>
 
         {winner && (
-          <div className="rounded-lg bg-yellow-500/20 px-4 py-2 text-lg font-bold text-yellow-300">
+          <div className="rounded-lg bg-yellow-500/20 px-4 py-2 text-lg font-bold text-yellow-300" role="status" aria-live="assertive">
             {winner === "black" ? t("blackWinsGo") : t("whiteWinsGo")}
           </div>
         )}
@@ -166,6 +161,8 @@ export function GomokuGame() {
           {/* Grid lines */}
           <svg 
             className="absolute inset-2"
+            aria-hidden="true"
+            focusable="false"
             width={BOARD_SIZE * 24 - 24}
             height={BOARD_SIZE * 24 - 24}
             style={{ left: "20px", top: "20px" }}
@@ -199,6 +196,8 @@ export function GomokuGame() {
           {/* Stones */}
           <div 
             className="relative grid"
+            role="group"
+            aria-label={t("gomoku")}
             style={{ gridTemplateColumns: `repeat(${BOARD_SIZE}, 24px)` }}
           >
             {board.map((row, rowIndex) =>
@@ -208,9 +207,11 @@ export function GomokuGame() {
                   onClick={() => handleCellClick(rowIndex, colIndex)}
                   className="flex h-6 w-6 items-center justify-center"
                   disabled={!!winner || cell !== null}
+                  aria-label={`${rowIndex + 1}, ${colIndex + 1}, ${cell === "black" ? t("blackStone") : cell === "white" ? t("whiteStone") : emptyLabel}`}
                 >
                   {cell && (
                     <div
+                      aria-hidden="true"
                       className={`h-5 w-5 rounded-full shadow-md ${
                         cell === "black"
                           ? "bg-gradient-to-br from-slate-700 to-slate-900"
@@ -237,7 +238,7 @@ export function GomokuGame() {
             }
             className="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700 disabled:opacity-50"
           >
-            <Undo2 className="mr-2 h-4 w-4" />
+            <Undo2 className="mr-2 h-4 w-4" aria-hidden="true" />
             {t("undo")}
           </Button>
           <Button
@@ -245,44 +246,29 @@ export function GomokuGame() {
             variant="outline"
             className="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700"
           >
-            <RotateCcw className="mr-2 h-4 w-4" />
+            <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
             {t("restart")}
           </Button>
-          <Button
-            onClick={() => setShowRules(true)}
-            variant="outline"
-            className="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700"
+          <GameRulesDialog
+            triggerLabel={t("howToPlay")}
+            closeLabel={t("close")}
+            triggerClassName="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700"
+            contentClassName="border-amber-600 bg-amber-800 p-4 text-white sm:p-6"
+            titleClassName="text-lg font-bold text-white"
+            closeButtonClassName="text-amber-200 hover:text-white"
           >
-            <HelpCircle className="mr-2 h-4 w-4" />
-            {t("howToPlay")}
-          </Button>
+            <ul className="space-y-2 text-sm text-amber-100">
+              <li>{t("gomokuRule1")}</li>
+              <li>{t("gomokuRule2")}</li>
+              <li>{t("gomokuRule3")}</li>
+            </ul>
+          </GameRulesDialog>
         </div>
 
         <p className="max-w-md text-center text-xs text-amber-200/70">
           {t("gomokuInstructions")}
         </p>
 
-        {/* Rules Modal */}
-        {showRules && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4" onClick={() => setShowRules(false)}>
-            <Card 
-              className="max-h-[80vh] w-full max-w-md overflow-y-auto border-amber-600 bg-amber-800 p-4 sm:p-6"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-lg font-bold text-white">{t("howToPlay")}</h2>
-                <Button variant="ghost" size="sm" onClick={() => setShowRules(false)} className="text-amber-200 hover:text-white">
-                  <X className="h-5 w-5" />
-                </Button>
-              </div>
-              <ul className="space-y-2 text-sm text-amber-100">
-                <li>{t("gomokuRule1")}</li>
-                <li>{t("gomokuRule2")}</li>
-                <li>{t("gomokuRule3")}</li>
-              </ul>
-            </Card>
-          </div>
-        )}
       </main>
     </div>
   )

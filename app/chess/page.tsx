@@ -1,9 +1,7 @@
 import { ChessGame } from "@/components/chess-game"
+import { getPageMetadata } from "@/lib/page-metadata"
 
-export const metadata = {
-  title: "Chess - XM-Games",
-  description: "Play International Chess game",
-}
+export const metadata = getPageMetadata("/chess", "zh")
 
 export default function ChessPage() {
   return <ChessGame />

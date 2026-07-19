@@ -8,7 +8,7 @@ import { Slider } from "@/components/ui/slider"
 import { Label } from "@/components/ui/label"
 import { Volume2, VolumeX, Play, Pause, RotateCcw } from "lucide-react"
 import { useLocale } from "@/lib/locale-context"
-import { LanguageSwitcher } from "@/components/language-switcher"
+import { GameHeader } from "@/components/game-header"
 
 // 泰语数字发音映射
 const thaiNumbers: { [key: number]: string } = {
@@ -184,6 +184,10 @@ export function BingoGame() {
     }
   }, [isAutoMode, isPlaying, autoInterval, drawNumber, remainingNumbers.length])
 
+  useEffect(() => {
+    return () => window.speechSynthesis?.cancel()
+  }, [])
+
   // 重置游戏
   const resetGame = () => {
     setDrawnNumbers([])
@@ -219,20 +223,24 @@ export function BingoGame() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8">
       <div className="mx-auto max-w-6xl">
-        {/* 标题和语言切换 */}
-        <div className="mb-8 flex flex-col items-center gap-4">
-          <div className="flex w-full items-center justify-end">
-            <LanguageSwitcher />
-          </div>
-          <h1 className="text-4xl font-bold text-white md:text-6xl">
+        <GameHeader
+          layout="hero"
+          homeIcon="back"
+          homeLabel={t("appName")}
+          homeButtonClassName="text-slate-400 hover:text-white"
+          titleClassName="text-4xl font-bold text-white md:text-6xl"
+          description={t("bingoSubtitle")}
+          descriptionClassName="text-slate-400"
+          title={
+            <>
             <span className="text-red-500">B</span>
             <span className="text-orange-500">I</span>
             <span className="text-yellow-500">N</span>
             <span className="text-green-500">G</span>
             <span className="text-blue-500">O</span>
-          </h1>
-          <p className="text-slate-400">{t("bingoSubtitle")}</p>
-        </div>
+            </>
+          }
+        />
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* 当前抽到的数字 */}
@@ -245,6 +253,9 @@ export function BingoGame() {
                 {currentNumber ? (
                   <div className="flex flex-col items-center gap-4">
                     <div
+                      role="status"
+                      aria-live="assertive"
+                      aria-atomic="true"
                       className={`flex h-40 w-40 items-center justify-center rounded-full ${getLetterColor(currentNumber)} text-white shadow-2xl transition-all duration-300 md:h-56 md:w-56`}
                     >
                       <div className="text-center">
@@ -290,11 +301,11 @@ export function BingoGame() {
                     >
                       {isPlaying ? (
                         <>
-                          <Pause className="mr-2 h-5 w-5" /> {t("pause")}
+                          <Pause className="mr-2 h-5 w-5" aria-hidden="true" /> {t("pause")}
                         </>
                       ) : (
                         <>
-                          <Play className="mr-2 h-5 w-5" /> {t("start")}
+                          <Play className="mr-2 h-5 w-5" aria-hidden="true" /> {t("start")}
                         </>
                       )}
                     </Button>
@@ -305,12 +316,12 @@ export function BingoGame() {
                     onClick={resetGame}
                     className="border-slate-600 bg-transparent text-lg text-slate-300 hover:bg-slate-700 hover:text-white"
                   >
-                    <RotateCcw className="mr-2 h-5 w-5" /> {t("reset")}
+                    <RotateCcw className="mr-2 h-5 w-5" aria-hidden="true" /> {t("reset")}
                   </Button>
                 </div>
 
                 {/* 统计 */}
-                <div className="text-center text-slate-400">
+                <div className="text-center text-slate-400" role="status" aria-live="polite">
                   <p>
                     {t("drawn")}: {drawnNumbers.length} / 75 | {t("remaining")}:{" "}
                     {remainingNumbers.length}
@@ -330,9 +341,9 @@ export function BingoGame() {
               <div className="flex items-center justify-between">
                 <Label htmlFor="sound" className="flex items-center gap-2 text-slate-300">
                   {isSoundEnabled ? (
-                    <Volume2 className="h-5 w-5" />
+                    <Volume2 className="h-5 w-5" aria-hidden="true" />
                   ) : (
-                    <VolumeX className="h-5 w-5" />
+                    <VolumeX className="h-5 w-5" aria-hidden="true" />
                   )}
                   {t("voiceBroadcast")}
                 </Label>
@@ -361,10 +372,12 @@ export function BingoGame() {
               {/* 自动抽取间隔 */}
               {isAutoMode && (
                 <div className="space-y-3">
-                  <Label className="text-slate-300">
+                  <Label htmlFor="auto-interval" className="text-slate-300">
                     {t("drawInterval")}: {autoInterval} {t("seconds")}
                   </Label>
                   <Slider
+                    id="auto-interval"
+                    aria-label={`${t("drawInterval")}: ${autoInterval} ${t("seconds")}`}
                     value={[autoInterval]}
                     onValueChange={([value]) => setAutoInterval(value)}
                     min={1}
@@ -378,10 +391,11 @@ export function BingoGame() {
               {/* 最近抽取的数字 */}
               <div className="space-y-3">
                 <Label className="text-slate-300">{t("recentDraws")}</Label>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2" role="list">
                   {drawnNumbers.slice(-10).reverse().map((num, index) => (
                     <div
                       key={`recent-${num}`}
+                      role="listitem"
                       className={`flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold text-white ${getLetterColor(num)} ${
                         index === 0 ? "ring-2 ring-white" : "opacity-70"
                       }`}
@@ -401,7 +415,7 @@ export function BingoGame() {
             <CardTitle className="text-white">{t("numberBoard")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="grid grid-cols-5 gap-2">
+            <div className="grid grid-cols-5 gap-2" role="group" aria-label={t("numberBoard")}>
               {/* BINGO 字母标题 */}
               {["B", "I", "N", "G", "O"].map((letter, idx) => (
                 <div
@@ -429,6 +443,8 @@ export function BingoGame() {
                   return (
                     <div
                       key={num}
+                      role="img"
+                      aria-label={`${getLetter(num)} ${num}, ${isDrawn ? t("drawn") : t("remaining")}`}
                       className={`flex h-10 items-center justify-center rounded-md text-sm font-medium transition-all duration-300 md:h-12 md:text-base ${
                         isDrawn
                           ? `${getLetterColor(num)} text-white shadow-lg`

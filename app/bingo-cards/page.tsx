@@ -1,9 +1,7 @@
 import { BingoCards } from "@/components/bingo-cards"
+import { getPageMetadata } from "@/lib/page-metadata"
 
-export const metadata = {
-  title: "Bingo Cards - XM-Games",
-  description: "Generate and manage multiple Bingo cards",
-}
+export const metadata = getPageMetadata("/bingo-cards", "zh")
 
 export default function BingoCardsPage() {
   return <BingoCards />
