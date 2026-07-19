@@ -71,6 +71,11 @@ export const PAGE_METADATA_KEYS = {
     descriptionKey: "sudokuDescription",
     includeAppName: true,
   },
+  "/memory-match": {
+    titleKey: "memoryMatch",
+    descriptionKey: "memoryMatchDescription",
+    includeAppName: true,
+  },
   "/gomoku": {
     titleKey: "gomoku",
     descriptionKey: "gomokuDescription",

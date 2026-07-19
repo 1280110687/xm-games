@@ -239,6 +239,24 @@ export const translations = {
     sudokuRule2: "黑色数字是初始数字，不能修改",
     sudokuRule3: "蓝色数字是你填入的，红色表示错误",
 
+    // Memory Match
+    memoryMatch: "记忆翻牌",
+    memoryMatchDescription: "翻开卡片找到相同图案，挑战更少步数和更快时间",
+    memoryPairs: "配对",
+    memoryMoves: "步数",
+    memoryTime: "用时",
+    memoryBest: "最佳",
+    memoryStreak: "连击",
+    memoryNoRecord: "暂无记录",
+    memoryMoveUnit: "步",
+    memoryCompleted: "全部配对完成！",
+    memoryNewBest: "刷新最佳记录",
+    memoryInstructions: "每次翻开两张卡片，记住图案位置并找出全部配对。",
+    memoryRule1: "每次最多翻开两张卡片，相同图案会保留在棋盘上",
+    memoryRule2: "图案不同时，卡片会在短暂停留后自动盖回",
+    memoryRule3: "用更少的步数和更短的时间完成全部配对",
+    memoryRule4: "切换难度或重新开始会生成一套全新的卡片",
+
     // Gomoku
     gomoku: "五子棋",
     gomokuDescription: "先在棋盘上连成五子的一方获胜",
@@ -481,6 +499,24 @@ export const translations = {
     sudokuRule2: "Black numbers are given clues and cannot be changed.",
     sudokuRule3: "Blue numbers are your input. Red indicates errors.",
 
+    // Memory Match
+    memoryMatch: "Memory Match",
+    memoryMatchDescription: "Match every pair of cards with fewer moves and a faster time",
+    memoryPairs: "Pairs",
+    memoryMoves: "Moves",
+    memoryTime: "Time",
+    memoryBest: "Best",
+    memoryStreak: "Streak",
+    memoryNoRecord: "No record",
+    memoryMoveUnit: "moves",
+    memoryCompleted: "All pairs matched!",
+    memoryNewBest: "New best record",
+    memoryInstructions: "Flip two cards at a time, remember their positions, and find every matching pair.",
+    memoryRule1: "Flip up to two cards at a time. Matching symbols stay visible.",
+    memoryRule2: "If the symbols differ, both cards turn back over after a short pause.",
+    memoryRule3: "Match every pair using fewer moves and less time.",
+    memoryRule4: "Changing difficulty or restarting creates a fresh deck.",
+
     // Gomoku
     gomoku: "Gomoku",
     gomokuDescription: "Five in a row wins the game",
@@ -722,6 +758,24 @@ export const translations = {
     sudokuRule1: "แต่ละแถว คอลัมน์ และช่อง 3x3 ต้องมีตัวเลข 1-9 อย่างละครั้ง",
     sudokuRule2: "ตัวเลขสีดำคือตัวเลขที่ให้มา เปลี่ยนไม่ได้",
     sudokuRule3: "ตัวเลขสีน้ำเงินคือที่คุณใส่ สีแดงแสดงข้อผิดพลาด",
+
+    // Memory Match
+    memoryMatch: "เกมจับคู่ความจำ",
+    memoryMatchDescription: "เปิดการ์ดจับคู่ลวดลายให้ครบด้วยจำนวนครั้งและเวลาที่น้อยลง",
+    memoryPairs: "คู่",
+    memoryMoves: "จำนวนครั้ง",
+    memoryTime: "เวลา",
+    memoryBest: "สถิติดีที่สุด",
+    memoryStreak: "ต่อเนื่อง",
+    memoryNoRecord: "ยังไม่มีสถิติ",
+    memoryMoveUnit: "ครั้ง",
+    memoryCompleted: "จับคู่ครบทั้งหมดแล้ว!",
+    memoryNewBest: "สถิติใหม่",
+    memoryInstructions: "เปิดการ์ดครั้งละสองใบ จดจำตำแหน่ง และค้นหาคู่ที่เหมือนกันให้ครบ",
+    memoryRule1: "เปิดการ์ดได้ครั้งละไม่เกินสองใบ คู่ที่เหมือนกันจะหงายค้างไว้",
+    memoryRule2: "หากลวดลายต่างกัน การ์ดทั้งสองใบจะคว่ำกลับหลังจากหยุดชั่วครู่",
+    memoryRule3: "จับคู่ให้ครบโดยใช้จำนวนครั้งและเวลาให้น้อยที่สุด",
+    memoryRule4: "เมื่อเปลี่ยนระดับหรือเริ่มใหม่ ระบบจะสร้างชุดการ์ดใหม่",
 
     // Gomoku
     gomoku: "โกะโมกุ",
