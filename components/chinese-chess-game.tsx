@@ -423,33 +423,33 @@ export function ChineseChessGame() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-amber-900 via-amber-800 to-amber-900 p-2 sm:p-4">
+    <div className="game-page">
       <GameHeader
         layout="centered"
         homeLabel={t("appName")}
         homeLabelMode="desktop"
         title={t("chineseChess")}
-        className="mb-2 sm:mb-4"
-        homeButtonClassName="text-amber-100 hover:bg-amber-700 hover:text-white"
-        titleClassName="text-lg font-bold text-amber-100 sm:text-2xl"
+        className="mb-3 [&_[data-slot=select-trigger]]:w-14 [&_[data-slot=select-trigger]]:px-1 sm:mb-4 sm:[&_[data-slot=select-trigger]]:w-[122px] sm:[&_[data-slot=select-trigger]]:px-3"
+        homeButtonClassName="text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+        titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
-      <div className="flex flex-1 flex-col items-center justify-center gap-4">
+      <main className="flex flex-1 flex-col items-center gap-4 py-1 sm:py-3">
         {/* Game Status */}
-        <Card className="border-amber-600 bg-amber-800/50 p-3 sm:p-4" role="status" aria-live="polite">
+        <Card className="surface-panel border-white/10 bg-card/70 p-3 sm:p-4" role="status" aria-live="polite">
           <div className="flex flex-col gap-3">
             {/* Turn indicator and status */}
             <div className="flex items-center justify-center gap-4">
               <div className="flex items-center gap-2">
                 <div className={`h-4 w-4 rounded-full ${currentTurn === "red" ? "bg-red-500 ring-2 ring-red-300" : "bg-slate-700"}`} />
-                <span className={`text-sm font-medium sm:text-base ${currentTurn === "red" ? "text-red-300" : "text-amber-100/50"}`}>
+                <span className={`text-sm font-medium sm:text-base ${currentTurn === "red" ? "text-foreground" : "text-muted-foreground"}`}>
                   {t("redTurn")}
                 </span>
               </div>
-              <div className="h-4 w-px bg-amber-600" />
+              <div className="h-4 w-px bg-border" />
               <div className="flex items-center gap-2">
                 <div className={`h-4 w-4 rounded-full ${currentTurn === "black" ? "bg-slate-800 ring-2 ring-slate-400" : "bg-slate-600"}`} />
-                <span className={`text-sm font-medium sm:text-base ${currentTurn === "black" ? "text-slate-300" : "text-amber-100/50"}`}>
+                <span className={`text-sm font-medium sm:text-base ${currentTurn === "black" ? "text-foreground" : "text-muted-foreground"}`}>
                   {t("blackTurn")}
                 </span>
               </div>
@@ -476,7 +476,7 @@ export function ChineseChessGame() {
                   {redUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}
                 </span>
               </div>
-              <div className="h-3 w-px bg-amber-600/50" />
+              <div className="h-3 w-px bg-border" />
               <div className="flex items-center gap-1">
                 <span className="text-slate-400">
                   {blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}
@@ -487,27 +487,13 @@ export function ChineseChessGame() {
         </Card>
 
         {/* Chess Board */}
-        <div 
-          className="relative rounded-lg border-4 border-amber-700 bg-[#d4a574]"
-          style={{
-            // 8 gaps between 9 columns, 9 gaps between 10 rows
-            // Cell size: 36px on mobile, scales up
-            width: "calc(36px * 8 + 32px)", // 8 gaps + padding
-            height: "calc(36px * 9 + 32px)", // 9 gaps + padding
-            padding: "16px",
-          }}
-        >
+        <div className="relative aspect-[80/89] w-full max-w-80 rounded-xl border-4 border-amber-800 bg-[#d4a574] p-4 shadow-2xl shadow-black/30">
+          <div className="relative h-full w-full">
           {/* SVG Board Lines - positioned to match intersections */}
           <svg 
-            className="absolute"
+            className="absolute inset-0 h-full w-full"
             aria-hidden="true"
             focusable="false"
-            style={{
-              left: "16px",
-              top: "16px",
-              width: "calc(36px * 8)",
-              height: "calc(36px * 9)",
-            }}
             viewBox="0 0 288 324"
             preserveAspectRatio="none"
           >
@@ -566,24 +552,18 @@ export function ChineseChessGame() {
           {/* River text */}
           <div 
             className="pointer-events-none absolute flex items-center justify-center"
-            style={{ 
-              left: "16px",
-              right: "16px",
-              top: "calc(16px + 36px * 4)",
-              height: "36px",
-            }}
+            style={{ left: 0, right: 0, top: "44.444%", height: "11.111%" }}
           >
-            <span className="text-sm font-bold tracking-[0.3em] text-amber-800/50 sm:text-base sm:tracking-[0.5em]">
+            <span className="text-[clamp(0.7rem,3.6vw,1rem)] font-bold tracking-[0.24em] text-amber-900/55 sm:tracking-[0.5em]">
               {locale === "zh" ? "楚河      汉界" : locale === "th" ? "แม่น้ำ" : "RIVER"}
             </span>
           </div>
 
           {/* Pieces layer - absolute positioned on intersections */}
           <div
-            className="relative"
+            className="relative h-full w-full"
             role="group"
             aria-label={t("chineseChess")}
-            style={{ width: "calc(36px * 8)", height: "calc(36px * 9)" }}
           >
             {board.map((row, rowIndex) => (
               row.map((piece, colIndex) => {
@@ -599,23 +579,21 @@ export function ChineseChessGame() {
                     onClick={() => handleCellClick(rowIndex, colIndex)}
                     aria-label={`${rowIndex + 1}, ${colIndex + 1}, ${piece ? `${piece.color === "red" ? t("redTurn") : t("blackTurn")} ${getPieceName(piece)}` : "empty"}${isValidTarget ? ", valid move" : ""}`}
                     aria-pressed={isSelected}
-                    className="absolute flex items-center justify-center transition-all"
+                    className="absolute flex h-[11.111%] w-[12.5%] -translate-x-1/2 -translate-y-1/2 items-center justify-center touch-manipulation transition-all"
                     style={{
-                      left: `${colIndex * 36 - 18}px`,
-                      top: `${rowIndex * 36 - 18}px`,
-                      width: "36px",
-                      height: "36px",
+                      left: `${(colIndex / 8) * 100}%`,
+                      top: `${(rowIndex / 9) * 100}%`,
                       zIndex: isSelected ? 10 : 1,
                     }}
                   >
                     {/* Last move highlight */}
                     {(isLastMoveFrom || isLastMoveTo) && (
-                      <div className="absolute h-8 w-8 rounded bg-yellow-400/40" aria-hidden="true" />
+                      <div className="absolute h-[88%] w-[88%] rounded bg-yellow-400/40" aria-hidden="true" />
                     )}
                     
                     {/* Valid move indicator */}
                     {isValidTarget && !piece && (
-                      <div className="absolute h-4 w-4 rounded-full bg-green-500/70 shadow" aria-hidden="true" />
+                      <div className="absolute h-[44%] w-[44%] rounded-full bg-green-500/70 shadow" aria-hidden="true" />
                     )}
                     
                     {/* Piece */}
@@ -624,7 +602,7 @@ export function ChineseChessGame() {
                         aria-hidden="true"
                         className={`
                           flex items-center justify-center rounded-full border-2
-                          h-8 w-8 text-sm font-bold
+                          aspect-square w-[88%] text-[clamp(0.65rem,3.5vw,0.875rem)] font-bold
                           shadow-lg transition-transform
                           ${piece.color === "red" 
                             ? "border-red-700 bg-gradient-to-br from-amber-50 to-amber-100 text-red-600" 
@@ -642,6 +620,7 @@ export function ChineseChessGame() {
               })
             ))}
           </div>
+          </div>
         </div>
 
         {/* Controls */}
@@ -655,7 +634,6 @@ export function ChineseChessGame() {
               (moveHistory.length > 0 && moveHistory[moveHistory.length - 1].piece.color === "red" && redUndoUsed) ||
               (moveHistory.length > 0 && moveHistory[moveHistory.length - 1].piece.color === "black" && blackUndoUsed)
             }
-            className="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700 disabled:opacity-50"
           >
             <Undo2 className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
             {t("undo")}
@@ -663,7 +641,6 @@ export function ChineseChessGame() {
           <Button
             onClick={resetGame}
             variant="outline"
-            className="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700"
           >
             <RotateCcw className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
             {t("restart")}
@@ -671,16 +648,13 @@ export function ChineseChessGame() {
           <GameRulesDialog
             triggerLabel={t("howToPlay")}
             closeLabel={t("close")}
-            triggerClassName="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700"
             triggerIconClassName="mr-1 sm:mr-2"
-            contentClassName="border-amber-600 bg-amber-900/95 p-4 text-amber-100 sm:p-6"
-            titleClassName="text-lg font-bold text-amber-100 sm:text-xl"
-            closeButtonClassName="text-amber-100 hover:bg-amber-800"
+            titleClassName="text-lg font-bold text-foreground sm:text-xl"
           >
             <div className="space-y-4">
               <div>
-                <h3 className="mb-2 font-semibold text-amber-200">{t("pieceRules")}</h3>
-                <ul className="space-y-2 text-sm text-amber-100/90">
+                <h3 className="mb-2 font-semibold text-foreground">{t("pieceRules")}</h3>
+                <ul className="space-y-2 text-sm text-muted-foreground">
                   <li className="flex gap-2">
                     <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">帅</span>
                     <span>{t("kingRule")}</span>
@@ -712,15 +686,14 @@ export function ChineseChessGame() {
                 </ul>
               </div>
 
-              <div className="border-t border-amber-700 pt-4">
-                <h3 className="mb-2 font-semibold text-amber-200">{t("winCondition")}</h3>
+              <div className="border-t border-border pt-4">
+                <h3 className="mb-2 font-semibold text-foreground">{t("winCondition")}</h3>
               </div>
             </div>
           </GameRulesDialog>
           {gameStatus === "checkmate" && (
             <Button
               onClick={resetGame}
-              className="bg-amber-600 text-white hover:bg-amber-500"
             >
               <Flag className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
               {t("newGame")}
@@ -729,11 +702,11 @@ export function ChineseChessGame() {
         </div>
 
         {/* Instructions */}
-        <p className="max-w-md text-center text-xs text-amber-200/70 sm:text-sm">
+        <p className="max-w-md text-center text-xs text-muted-foreground sm:text-sm">
           {t("chessInstructions")}
         </p>
 
-      </div>
+      </main>
     </div>
   )
 }

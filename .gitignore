@@ -10,6 +10,10 @@
 # production
 /build
 
+# local browser validation artifacts
+/.playwright-cli/
+/output/
+
 # debug
 npm-debug.log*
 yarn-debug.log*

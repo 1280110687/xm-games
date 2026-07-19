@@ -221,16 +221,16 @@ export function BingoGame() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-8">
+    <div className="game-page">
       <div className="mx-auto max-w-6xl">
         <GameHeader
           layout="hero"
           homeIcon="back"
           homeLabel={t("appName")}
-          homeButtonClassName="text-slate-400 hover:text-white"
-          titleClassName="text-4xl font-bold text-white md:text-6xl"
+          homeButtonClassName="text-muted-foreground hover:text-foreground"
+          titleClassName="text-4xl font-bold text-foreground md:text-6xl"
           description={t("bingoSubtitle")}
-          descriptionClassName="text-slate-400"
+          descriptionClassName="text-muted-foreground"
           title={
             <>
             <span className="text-red-500">B</span>
@@ -244,7 +244,7 @@ export function BingoGame() {
 
         <div className="grid gap-6 lg:grid-cols-3">
           {/* 当前抽到的数字 */}
-          <Card className="border-slate-700 bg-slate-800/50 lg:col-span-2">
+          <Card className="border-white/10 bg-card/70 lg:col-span-2">
             <CardHeader>
               <CardTitle className="text-white">{t("currentNumber")}</CardTitle>
             </CardHeader>
@@ -284,7 +284,7 @@ export function BingoGame() {
                       size="lg"
                       onClick={drawNumber}
                       disabled={remainingNumbers.length === 0}
-                      className="bg-gradient-to-r from-blue-600 to-blue-700 text-lg hover:from-blue-700 hover:to-blue-800"
+                      className="text-lg"
                     >
                       {t("drawNumber")}
                     </Button>
@@ -296,7 +296,7 @@ export function BingoGame() {
                       className={`text-lg ${
                         isPlaying
                           ? "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800"
-                          : "bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+                          : "bg-primary hover:bg-primary/90"
                       }`}
                     >
                       {isPlaying ? (
@@ -314,7 +314,7 @@ export function BingoGame() {
                     size="lg"
                     variant="outline"
                     onClick={resetGame}
-                    className="border-slate-600 bg-transparent text-lg text-slate-300 hover:bg-slate-700 hover:text-white"
+                    className="border-white/10 bg-white/[0.035] text-lg text-foreground"
                   >
                     <RotateCcw className="mr-2 h-5 w-5" aria-hidden="true" /> {t("reset")}
                   </Button>
@@ -332,7 +332,7 @@ export function BingoGame() {
           </Card>
 
           {/* 设置面板 */}
-          <Card className="border-slate-700 bg-slate-800/50">
+          <Card className="border-white/10 bg-card/70">
             <CardHeader>
               <CardTitle className="text-white">{t("settings")}</CardTitle>
             </CardHeader>
@@ -410,7 +410,7 @@ export function BingoGame() {
         </div>
 
         {/* 所有数字网格 */}
-        <Card className="mt-6 border-slate-700 bg-slate-800/50">
+        <Card className="mt-6 border-white/10 bg-card/70">
           <CardHeader>
             <CardTitle className="text-white">{t("numberBoard")}</CardTitle>
           </CardHeader>

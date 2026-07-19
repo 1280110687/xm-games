@@ -174,15 +174,18 @@ export function SudokuGame() {
   )
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 p-4">
+    <div className="game-page">
       <GameHeader
+        layout="centered"
         homeLabel={t("appName")}
-        homeButtonClassName="text-blue-200 hover:text-white"
+        homeLabelMode="desktop"
+        title={t("sudoku")}
+        className="mb-4 [&_[data-slot=select-trigger]]:w-14 [&_[data-slot=select-trigger]]:px-1 sm:[&_[data-slot=select-trigger]]:w-[122px] sm:[&_[data-slot=select-trigger]]:px-3"
+        homeButtonClassName="text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+        titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
-      <main className="flex flex-1 flex-col items-center gap-4 py-4">
-        <h1 className="text-2xl font-bold text-white sm:text-3xl">{t("sudoku")}</h1>
-
+      <main className="flex flex-1 flex-col items-center gap-4 py-2 sm:py-4">
         {/* Difficulty selector */}
         <div className="flex gap-2">
           {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
@@ -192,10 +195,6 @@ export function SudokuGame() {
               size="sm"
               onClick={() => setDifficulty(d)}
               aria-pressed={difficulty === d}
-              className={difficulty === d 
-                ? "bg-blue-600" 
-                : "border-blue-600 bg-transparent text-blue-200 hover:bg-blue-700"
-              }
             >
               {t(d === "easy" ? "easy" : d === "medium" ? "medium" : "hard")}
             </Button>
@@ -210,8 +209,8 @@ export function SudokuGame() {
         )}
 
         {/* Game board */}
-        <div className="rounded-lg border-2 border-blue-300 bg-white p-1">
-          <div className="grid grid-cols-9" role="group" aria-label={t("sudoku")}>
+        <div className="w-full max-w-[22.75rem] rounded-xl border-2 border-blue-300 bg-white p-1 shadow-2xl shadow-black/25">
+          <div className="grid w-full grid-cols-9" role="group" aria-label={t("sudoku")}>
             {board.map((row, rowIndex) =>
               row.map((cell, colIndex) => (
                 <button
@@ -227,8 +226,7 @@ export function SudokuGame() {
                   aria-disabled={completed}
                   aria-label={`${cellText.row} ${rowIndex + 1}, ${cellText.column} ${colIndex + 1}, ${cell ?? cellText.empty}${cell !== null ? `, ${initialCells[rowIndex]?.[colIndex] ? cellText.given : cellText.entered}` : ""}${errors[rowIndex]?.[colIndex] ? `, ${cellText.error}` : ""}`}
                   className={`
-                    flex h-9 w-9 items-center justify-center text-lg font-semibold transition-colors
-                    sm:h-10 sm:w-10 sm:text-xl
+                    flex aspect-square w-full min-w-0 items-center justify-center text-[clamp(1rem,5vw,1.25rem)] font-semibold transition-colors
                     ${getCellStyle(rowIndex, colIndex)}
                     ${colIndex % 3 === 2 && colIndex !== 8 ? "border-r-2 border-blue-400" : "border-r border-blue-200"}
                     ${rowIndex % 3 === 2 && rowIndex !== 8 ? "border-b-2 border-blue-400" : "border-b border-blue-200"}
@@ -250,7 +248,7 @@ export function SudokuGame() {
               onClick={() => handleNumberInput(num)}
               disabled={!canEditSelected}
               variant="outline"
-              className="h-10 w-10 border-blue-500 bg-blue-700/50 text-lg font-bold text-white hover:bg-blue-600"
+              className="h-10 w-10 text-lg font-bold"
             >
               {num}
             </Button>
@@ -260,7 +258,7 @@ export function SudokuGame() {
             disabled={!canEditSelected}
             aria-label={cellText.empty}
             variant="outline"
-            className="h-10 w-10 border-blue-500 bg-blue-700/50 text-white hover:bg-blue-600"
+            className="h-10 w-10"
           >
             <Eraser className="h-5 w-5" aria-hidden="true" />
           </Button>
@@ -271,7 +269,6 @@ export function SudokuGame() {
           <Button
             onClick={initGame}
             variant="outline"
-            className="border-blue-500 bg-blue-700/50 text-blue-100 hover:bg-blue-600"
           >
             <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
             {t("restart")}
@@ -280,7 +277,6 @@ export function SudokuGame() {
             onClick={useHint}
             variant="outline"
             disabled={hints <= 0 || !canEditSelected}
-            className="border-blue-500 bg-blue-700/50 text-blue-100 hover:bg-blue-600 disabled:opacity-50"
           >
             <Lightbulb className="mr-2 h-4 w-4" aria-hidden="true" />
             {t("hint")} ({hints})
@@ -288,12 +284,9 @@ export function SudokuGame() {
           <GameRulesDialog
             triggerLabel={t("howToPlay")}
             closeLabel={t("close")}
-            triggerClassName="border-blue-500 bg-blue-700/50 text-blue-100 hover:bg-blue-600"
-            contentClassName="border-blue-500 bg-blue-800 p-4 text-white sm:p-6"
-            titleClassName="text-lg font-bold text-white"
-            closeButtonClassName="text-blue-200 hover:text-white"
+            titleClassName="text-lg font-bold text-foreground"
           >
-            <ul className="space-y-2 text-sm text-blue-100">
+            <ul className="space-y-2 text-sm text-muted-foreground">
               <li>{t("sudokuRule1")}</li>
               <li>{t("sudokuRule2")}</li>
               <li>{t("sudokuRule3")}</li>
@@ -301,7 +294,7 @@ export function SudokuGame() {
           </GameRulesDialog>
         </div>
 
-        <p className="max-w-md text-center text-xs text-blue-200/70">
+        <p className="max-w-md text-center text-xs text-muted-foreground">
           {t("sudokuInstructions")}
         </p>
 

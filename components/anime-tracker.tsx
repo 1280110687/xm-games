@@ -1,23 +1,56 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react"
+import {
+  AlertTriangle,
+  CalendarDays,
+  Check,
+  CheckCircle2,
+  Clock3,
+  Edit3,
+  Film,
+  ImageIcon,
+  Loader2,
+  Minus,
+  MoreHorizontal,
+  Pause,
+  Play,
+  Plus,
+  Search,
+  Star,
+  Trash2,
+  Tv,
+  Wifi,
+  WifiOff,
+} from "lucide-react"
+
+import { GameHeader } from "@/components/game-header"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
-  DialogTrigger,
-  DialogFooter,
-  DialogClose,
 } from "@/components/ui/dialog"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Progress } from "@/components/ui/progress"
 import {
   Select,
   SelectContent,
@@ -25,50 +58,36 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { useLocale } from "@/lib/locale-context"
+  cacheCoverImage,
+  readCachedCoverBlob,
+} from "@/features/anime-tracker/cover-cache"
+import {
+  applyAnimeSearchTitle,
+  getBestMatchedTitle,
+  normalizeSearchQuery,
+  searchAnimeOnline,
+} from "@/features/anime-tracker/search"
+import {
+  readCachedAnimeSearch,
+  writeCachedAnimeSearch,
+} from "@/features/anime-tracker/search-cache"
+import {
+  readAnimeImageCache,
+  readAnimeStorage,
+  writeAnimeImageCache,
+  writeAnimeStorage,
+} from "@/features/anime-tracker/storage"
+import type {
+  AnimeMediaType,
+  AnimeRecord,
+  AnimeSearchResult,
+  AnimeStatus,
+} from "@/features/anime-tracker/types"
 import type { TranslationKey } from "@/lib/i18n"
-import { GameHeader } from "@/components/game-header"
-import { 
-  Plus, 
-  Minus, 
-  Play, 
-  CheckCircle2, 
-  Clock, 
-  Pause, 
-  Trash2, 
-  Edit, 
-  MoreVertical,
-  Tv,
-  Film,
-  Star,
-  Calendar,
-  Search,
-  Loader2,
-  ImageIcon
-} from "lucide-react"
-
-// Types
-type AnimeStatus = "watching" | "completed" | "planned" | "paused" | "dropped"
-
-interface Anime {
-  id: string
-  title: string
-  totalEpisodes: number | null // null for ongoing series
-  currentEpisode: number
-  status: AnimeStatus
-  type: "anime" | "drama" | "movie"
-  rating: number | null
-  notes: string
-  imageUrl: string
-  addedAt: number
-  updatedAt: number
-}
+import { useLocale } from "@/lib/locale-context"
+import { cn } from "@/lib/utils"
 
 const STATUS_TRANSLATION_KEYS: Record<AnimeStatus, TranslationKey> = {
   watching: "statusWatching",
@@ -78,353 +97,641 @@ const STATUS_TRANSLATION_KEYS: Record<AnimeStatus, TranslationKey> = {
   dropped: "statusDropped",
 }
 
-const TYPE_TRANSLATION_KEYS: Record<Anime["type"], TranslationKey> = {
+const TYPE_TRANSLATION_KEYS: Record<AnimeMediaType, TranslationKey> = {
   anime: "typeAnime",
   drama: "typeDrama",
   movie: "typeMovie",
 }
 
-interface JikanAnime {
-  mal_id: number
+const STATUS_STYLES: Record<AnimeStatus, string> = {
+  watching: "border-sky-400/30 bg-sky-400/10 text-sky-600 dark:text-sky-300",
+  completed:
+    "border-emerald-400/30 bg-emerald-400/10 text-emerald-600 dark:text-emerald-300",
+  planned: "border-amber-400/30 bg-amber-400/10 text-amber-600 dark:text-amber-300",
+  paused: "border-orange-400/30 bg-orange-400/10 text-orange-600 dark:text-orange-300",
+  dropped: "border-rose-400/30 bg-rose-400/10 text-rose-600 dark:text-rose-300",
+}
+
+interface AnimeFormState {
   title: string
-  images: {
-    jpg: {
-      image_url: string
-      large_image_url: string
-    }
+  totalEpisodes: string
+  currentEpisode: string
+  status: AnimeStatus
+  type: AnimeMediaType
+  rating: string
+  notes: string
+  imageUrl: string
+}
+
+type SearchPhase =
+  | "idle"
+  | "loading"
+  | "success"
+  | "empty"
+  | "offline"
+  | "error"
+
+const EMPTY_FORM: AnimeFormState = {
+  title: "",
+  totalEpisodes: "",
+  currentEpisode: "0",
+  status: "watching",
+  type: "anime",
+  rating: "",
+  notes: "",
+  imageUrl: "",
+}
+
+function statusIcon(status: AnimeStatus) {
+  switch (status) {
+    case "watching":
+      return <Play aria-hidden="true" />
+    case "completed":
+      return <CheckCircle2 aria-hidden="true" />
+    case "planned":
+      return <Clock3 aria-hidden="true" />
+    case "paused":
+      return <Pause aria-hidden="true" />
+    case "dropped":
+      return <Trash2 aria-hidden="true" />
   }
-  episodes: number | null
-  score: number | null
 }
 
-const STORAGE_KEY = "xm-games-anime-tracker"
-const IMAGE_CACHE_KEY = "xm-games-anime-images"
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value)
+function mediaIcon(type: AnimeMediaType, className = "h-4 w-4") {
+  const Icon = type === "anime" ? Tv : Film
+  return <Icon className={className} aria-hidden="true" />
 }
 
-function isAnime(value: unknown): value is Anime {
-  if (!isRecord(value)) return false
+function createAnimeId(): string {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return crypto.randomUUID()
+  }
+  return `anime-${Date.now()}-${Math.random().toString(36).slice(2)}`
+}
+
+function parseNonNegativeInteger(value: string): number {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed >= 0 ? Math.floor(parsed) : 0
+}
+
+function parseEpisodeTotal(value: string): number | null {
+  if (!value.trim()) return null
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : null
+}
+
+function parsePersonalRating(value: string): number | null {
+  if (!value.trim()) return null
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed >= 0 && parsed <= 10
+    ? parsed
+    : null
+}
+
+function useOnlineStatus(): boolean {
+  const [isOnline, setIsOnline] = useState(true)
+
+  useEffect(() => {
+    setIsOnline(navigator.onLine)
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+    window.addEventListener("online", handleOnline)
+    window.addEventListener("offline", handleOffline)
+    return () => {
+      window.removeEventListener("online", handleOnline)
+      window.removeEventListener("offline", handleOffline)
+    }
+  }, [])
+
+  return isOnline
+}
+
+function useCoverSource(sourceUrl: string, shouldPersist: boolean): string {
+  const [cachedUrl, setCachedUrl] = useState("")
+
+  useEffect(() => {
+    let isCurrent = true
+    let objectUrl = ""
+    const controller = new AbortController()
+
+    setCachedUrl("")
+    if (!sourceUrl) return () => controller.abort()
+
+    const applyCachedBlob = async () => {
+      const cachedBlob = await readCachedCoverBlob(sourceUrl)
+      if (cachedBlob && isCurrent) {
+        objectUrl = URL.createObjectURL(cachedBlob)
+        setCachedUrl(objectUrl)
+        return true
+      }
+      return false
+    }
+
+    void (async () => {
+      const found = await applyCachedBlob()
+      if (!found && shouldPersist && navigator.onLine) {
+        const cached = await cacheCoverImage(sourceUrl, undefined, controller.signal)
+        if (cached && isCurrent) await applyCachedBlob()
+      }
+    })()
+
+    return () => {
+      isCurrent = false
+      controller.abort()
+      if (objectUrl) URL.revokeObjectURL(objectUrl)
+    }
+  }, [shouldPersist, sourceUrl])
+
+  return cachedUrl || sourceUrl
+}
+
+/* eslint-disable @next/next/no-img-element -- Arbitrary legacy URLs and cached Blob URLs cannot use a fixed Next Image allow-list. */
+function AnimeCover({
+  sourceUrl,
+  title,
+  type = "anime",
+  className,
+  persist = true,
+}: {
+  sourceUrl: string
+  title: string
+  type?: AnimeMediaType
+  className?: string
+  persist?: boolean
+}) {
+  const resolvedUrl = useCoverSource(sourceUrl, persist)
+  const [failed, setFailed] = useState(false)
+
+  useEffect(() => setFailed(false), [resolvedUrl])
+
+  if (!resolvedUrl || failed) {
+    return (
+      <div
+        className={cn(
+          "flex items-center justify-center bg-gradient-to-br from-primary/10 via-muted to-accent/20 text-muted-foreground",
+          className,
+        )}
+        role="img"
+        aria-label={title}
+      >
+        {mediaIcon(type, "h-8 w-8")}
+      </div>
+    )
+  }
 
   return (
-    typeof value.id === "string" &&
-    typeof value.title === "string" &&
-    (value.totalEpisodes === null || typeof value.totalEpisodes === "number") &&
-    typeof value.currentEpisode === "number" &&
-    ["watching", "completed", "planned", "paused", "dropped"].includes(
-      String(value.status)
-    ) &&
-    ["anime", "drama", "movie"].includes(String(value.type)) &&
-    (value.rating === null || typeof value.rating === "number") &&
-    typeof value.notes === "string" &&
-    typeof value.imageUrl === "string" &&
-    typeof value.addedAt === "number" &&
-    typeof value.updatedAt === "number"
+    <img
+      src={resolvedUrl}
+      alt={title}
+      className={cn("object-cover", className)}
+      loading="lazy"
+      onError={() => setFailed(true)}
+    />
+  )
+}
+/* eslint-enable @next/next/no-img-element */
+
+function SearchResultItem({
+  result,
+  query,
+  selectedCover,
+  onUseTitle,
+  onUseCover,
+  t,
+}: {
+  result: AnimeSearchResult
+  query: string
+  selectedCover: string
+  onUseTitle: () => void
+  onUseCover: () => void
+  t: (key: TranslationKey) => string
+}) {
+  const matchedTitle = getBestMatchedTitle(query, result)
+  const coverSelected = Boolean(result.imageUrl) && result.imageUrl === selectedCover
+
+  return (
+    <article
+      className="surface-card grid grid-cols-[72px_minmax(0,1fr)] gap-3 rounded-2xl border border-border/70 bg-card/70 p-2.5 shadow-sm"
+      role="listitem"
+    >
+      <AnimeCover
+        sourceUrl={result.imageUrl}
+        title={result.title}
+        className="h-24 w-[72px] rounded-xl"
+        persist={false}
+      />
+      <div className="min-w-0">
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <h4 className="line-clamp-1 text-sm font-semibold">{result.title}</h4>
+            {result.originalTitle && result.originalTitle !== result.title && (
+              <p className="mt-0.5 line-clamp-1 text-xs text-muted-foreground">
+                {result.originalTitle}
+              </p>
+            )}
+          </div>
+          <Badge variant="outline" className="shrink-0 text-[10px] uppercase">
+            {result.source}
+          </Badge>
+        </div>
+
+        <div className="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+          {result.year && <span>{result.year}</span>}
+          {result.mediaType && <span>{result.mediaType}</span>}
+          {result.totalEpisodes && (
+            <span>
+              {result.totalEpisodes} {t("episodesUnit")}
+            </span>
+          )}
+          {result.externalScore !== null && (
+            <span className="inline-flex items-center gap-1">
+              <Star className="h-3 w-3 fill-amber-400 text-amber-400" aria-hidden="true" />
+              {result.externalScore}
+            </span>
+          )}
+        </div>
+
+        <p className="mt-1 truncate text-[11px] text-muted-foreground">
+          {matchedTitle}
+        </p>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={onUseTitle}
+            aria-label={`${t("animeUseTitle")}: ${matchedTitle}`}
+          >
+            {t("animeUseTitle")}
+          </Button>
+          <Button
+            type="button"
+            variant={coverSelected ? "secondary" : "default"}
+            size="sm"
+            disabled={!result.imageUrl}
+            onClick={onUseCover}
+            aria-label={`${
+              coverSelected ? t("animeCoverSelected") : t("animeUseCover")
+            }: ${result.title}`}
+          >
+            {coverSelected ? <Check aria-hidden="true" /> : <ImageIcon aria-hidden="true" />}
+            {coverSelected ? t("animeCoverSelected") : t("animeUseCover")}
+          </Button>
+        </div>
+      </div>
+    </article>
   )
 }
 
-function isAnimeList(value: unknown): value is Anime[] {
-  return Array.isArray(value) && value.every(isAnime)
-}
-
-function isImageCache(value: unknown): value is Record<string, string> {
-  return isRecord(value) && Object.values(value).every(item => typeof item === "string")
-}
-
-function parseStoredValue<T>(
-  rawValue: string | null,
-  fallback: T,
-  isValid: (value: unknown) => value is T,
-  label: string
-): T {
-  if (rawValue === null) return fallback
-
-  try {
-    const parsed: unknown = JSON.parse(rawValue)
-    if (isValid(parsed)) return parsed
-  } catch {
-    // Invalid JSON falls through to the safe default below.
-  }
-
-  console.error(`Failed to parse ${label}`)
-  return fallback
-}
-
 export function AnimeTracker() {
-  const { t } = useLocale()
-  const [animeList, setAnimeList] = useState<Anime[]>([])
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false)
-  const [editingAnime, setEditingAnime] = useState<Anime | null>(null)
-  const [activeTab, setActiveTab] = useState<AnimeStatus | "all">("watching")
-
-  // Form state
-  const [formTitle, setFormTitle] = useState("")
-  const [formTotalEpisodes, setFormTotalEpisodes] = useState("")
-  const [formCurrentEpisode, setFormCurrentEpisode] = useState("0")
-  const [formStatus, setFormStatus] = useState<AnimeStatus>("watching")
-  const [formType, setFormType] = useState<"anime" | "drama" | "movie">("anime")
-  const [formRating, setFormRating] = useState("")
-  const [formNotes, setFormNotes] = useState("")
-  const [formImageUrl, setFormImageUrl] = useState("")
-
-  // Search state
-  const [isSearching, setIsSearching] = useState(false)
-  const [searchResults, setSearchResults] = useState<JikanAnime[]>([])
-  const [showSearchResults, setShowSearchResults] = useState(false)
+  const { t, locale } = useLocale()
+  const isOnline = useOnlineStatus()
+  const [animeList, setAnimeList] = useState<AnimeRecord[]>([])
   const [imageCache, setImageCache] = useState<Record<string, string>>({})
-  const [isStorageReady, setIsStorageReady] = useState(false)
+  const [storageReady, setStorageReady] = useState(false)
+  const [canPersistAnime, setCanPersistAnime] = useState(false)
+  const [canPersistImages, setCanPersistImages] = useState(false)
+  const [storageProtected, setStorageProtected] = useState(false)
 
-  // Load both persisted values before enabling writes. The ready guard is
-  // important in development too, where Strict Mode replays effects.
+  const [activeTab, setActiveTab] = useState<AnimeStatus | "all">("watching")
+  const [libraryQuery, setLibraryQuery] = useState("")
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [form, setForm] = useState<AnimeFormState>(EMPTY_FORM)
+  const [deleteCandidate, setDeleteCandidate] = useState<AnimeRecord | null>(null)
+
+  const [searchQuery, setSearchQuery] = useState("")
+  const [searchResults, setSearchResults] = useState<AnimeSearchResult[]>([])
+  const [searchPhase, setSearchPhase] = useState<SearchPhase>("idle")
+  const [showingCachedResults, setShowingCachedResults] = useState(false)
+  const requestSequence = useRef(0)
+  const searchController = useRef<AbortController | null>(null)
+  const searchDebounceTimer = useRef<number | null>(null)
+  const previousOnlineStatus = useRef(isOnline)
+
   useEffect(() => {
-    try {
-      const savedAnimeList = parseStoredValue(
-        localStorage.getItem(STORAGE_KEY),
-        [],
-        isAnimeList,
-        "saved anime list"
-      )
-      const savedImageCache = parseStoredValue(
-        localStorage.getItem(IMAGE_CACHE_KEY),
-        {},
-        isImageCache,
-        "image cache"
-      )
-
-      setAnimeList(savedAnimeList)
-      setImageCache(savedImageCache)
-    } catch {
-      console.error("Failed to read anime tracker storage")
-    } finally {
-      setIsStorageReady(true)
-    }
+    const animeStorage = readAnimeStorage(window.localStorage)
+    const legacyImageCache = readAnimeImageCache(window.localStorage)
+    setAnimeList(animeStorage.records)
+    setImageCache(legacyImageCache.cache)
+    setCanPersistAnime(animeStorage.canPersist)
+    setCanPersistImages(legacyImageCache.canPersist)
+    setStorageProtected(!animeStorage.canPersist)
+    setStorageReady(true)
   }, [])
 
-  // Persist only after the initial read has completed. This prevents the
-  // component's empty initial state from replacing existing user data.
   useEffect(() => {
-    if (!isStorageReady) return
-
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(animeList))
-      localStorage.setItem(IMAGE_CACHE_KEY, JSON.stringify(imageCache))
-    } catch {
-      console.error("Failed to save anime tracker storage")
+    if (!storageReady || !canPersistAnime) return
+    if (!writeAnimeStorage(window.localStorage, animeList)) {
+      setCanPersistAnime(false)
+      setStorageProtected(true)
     }
-  }, [animeList, imageCache, isStorageReady])
+  }, [animeList, canPersistAnime, storageReady])
 
-  // Search anime using Jikan API (MyAnimeList)
-  const searchAnime = useCallback(async (query: string) => {
-    if (!query.trim() || query.length < 2) {
-      setSearchResults([])
-      setShowSearchResults(false)
+  useEffect(() => {
+    if (!storageReady || !canPersistImages) return
+    if (!writeAnimeImageCache(window.localStorage, imageCache)) {
+      setCanPersistImages(false)
+    }
+  }, [canPersistImages, imageCache, storageReady])
+
+  const clearSearchState = useCallback(() => {
+    if (searchDebounceTimer.current !== null) {
+      window.clearTimeout(searchDebounceTimer.current)
+      searchDebounceTimer.current = null
+    }
+    searchController.current?.abort()
+    searchController.current = null
+    requestSequence.current += 1
+    setSearchResults([])
+    setSearchPhase("idle")
+    setShowingCachedResults(false)
+  }, [])
+
+  const resetDialog = useCallback(() => {
+    clearSearchState()
+    setEditingId(null)
+    setForm(EMPTY_FORM)
+    setSearchQuery("")
+  }, [clearSearchState])
+
+  const closeDialog = useCallback(() => {
+    setDialogOpen(false)
+    resetDialog()
+  }, [resetDialog])
+
+  const openAddDialog = () => {
+    resetDialog()
+    setDialogOpen(true)
+  }
+
+  const openEditDialog = (anime: AnimeRecord) => {
+    clearSearchState()
+    setEditingId(anime.id)
+    setForm({
+      title: anime.title,
+      totalEpisodes: anime.totalEpisodes?.toString() ?? "",
+      currentEpisode: anime.currentEpisode.toString(),
+      status: anime.status,
+      type: anime.type,
+      rating: anime.rating?.toString() ?? "",
+      notes: anime.notes,
+      imageUrl: anime.imageUrl,
+    })
+    setSearchQuery(anime.title)
+    setDialogOpen(true)
+  }
+
+  const runSearch = useCallback(async () => {
+    const querySnapshot = searchQuery
+    const mediaTypeSnapshot = form.type
+    const normalized = normalizeSearchQuery(querySnapshot)
+    if (normalized.length < 2) {
+      clearSearchState()
       return
     }
 
-    // Check cache first
-    const cacheKey = query.toLowerCase().trim()
-    if (imageCache[cacheKey]) {
-      setFormImageUrl(imageCache[cacheKey])
-    }
+    searchController.current?.abort()
+    const controller = new AbortController()
+    searchController.current = controller
+    const sequence = ++requestSequence.current
 
-    setIsSearching(true)
+    let cachedResults: AnimeSearchResult[] = []
+    setSearchResults([])
+    setShowingCachedResults(false)
     try {
-      const response = await fetch(
-        `https://api.jikan.moe/v4/anime?q=${encodeURIComponent(query)}&limit=5`
+      const cached = readCachedAnimeSearch(
+        window.localStorage,
+        querySnapshot,
+        mediaTypeSnapshot,
       )
-      if (response.ok) {
-        const data = await response.json()
-        setSearchResults(data.data || [])
-        setShowSearchResults(true)
+      if (cached) {
+        cachedResults = cached.results
+        setSearchResults(cached.results)
+        setShowingCachedResults(true)
       }
-    } catch (error) {
-      console.error("Failed to search anime:", error)
-    } finally {
-      setIsSearching(false)
+    } catch {
+      // Search remains usable without localStorage.
     }
-  }, [imageCache])
 
-  // Debounced search
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (formTitle && formType === "anime" && !editingAnime) {
-        searchAnime(formTitle)
+    if (!isOnline) {
+      setSearchPhase(cachedResults.length > 0 ? "success" : "offline")
+      if (searchController.current === controller) searchController.current = null
+      return
+    }
+
+    setSearchPhase("loading")
+    try {
+      const results = await searchAnimeOnline(querySnapshot, mediaTypeSnapshot, {
+        signal: controller.signal,
+      })
+      if (sequence !== requestSequence.current) return
+
+      setSearchResults(results)
+      setShowingCachedResults(false)
+      setSearchPhase(results.length > 0 ? "success" : "empty")
+      if (results.length > 0) {
+        try {
+          writeCachedAnimeSearch(window.localStorage, {
+            query: querySnapshot,
+            mediaType: mediaTypeSnapshot,
+            cachedAt: Date.now(),
+            results,
+          })
+        } catch {
+          // The live result remains available even when the cache is blocked.
+        }
       }
-    }, 500)
-    return () => clearTimeout(timer)
-  }, [formTitle, formType, editingAnime, searchAnime])
+    } catch {
+      if (controller.signal.aborted || sequence !== requestSequence.current) return
+      setSearchPhase(cachedResults.length > 0 ? "success" : "error")
+      setShowingCachedResults(cachedResults.length > 0)
+    } finally {
+      if (searchController.current === controller) searchController.current = null
+    }
+  }, [clearSearchState, form.type, isOnline, searchQuery])
 
-  const selectSearchResult = (anime: JikanAnime) => {
-    setFormTitle(anime.title)
-    if (anime.images?.jpg?.large_image_url) {
-      setFormImageUrl(anime.images.jpg.large_image_url)
-      // Cache the image URL
-      setImageCache(prev => ({
-        ...prev,
-        [anime.title.toLowerCase()]: anime.images.jpg.large_image_url
+  const updateSearchQuery = (value: string) => {
+    clearSearchState()
+    setSearchQuery(value)
+  }
+
+  const updateMediaType = (value: AnimeMediaType) => {
+    clearSearchState()
+    setForm((current) => ({ ...current, type: value }))
+  }
+
+  const runSearchImmediately = () => {
+    if (searchDebounceTimer.current !== null) {
+      window.clearTimeout(searchDebounceTimer.current)
+      searchDebounceTimer.current = null
+    }
+    void runSearch()
+  }
+
+  useEffect(() => {
+    if (!dialogOpen) return
+    if (normalizeSearchQuery(searchQuery).length < 2) {
+      clearSearchState()
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      if (searchDebounceTimer.current === timer) {
+        searchDebounceTimer.current = null
+      }
+      void runSearch()
+    }, 450)
+    searchDebounceTimer.current = timer
+    return () => {
+      window.clearTimeout(timer)
+      if (searchDebounceTimer.current === timer) {
+        searchDebounceTimer.current = null
+      }
+    }
+  }, [clearSearchState, dialogOpen, runSearch, searchQuery])
+
+  useEffect(() => {
+    if (previousOnlineStatus.current === isOnline) return
+    previousOnlineStatus.current = isOnline
+    if (!dialogOpen || normalizeSearchQuery(searchQuery).length < 2) return
+
+    clearSearchState()
+    void runSearch()
+  }, [clearSearchState, dialogOpen, isOnline, runSearch, searchQuery])
+
+  useEffect(
+    () => () => {
+      searchController.current?.abort()
+      if (searchDebounceTimer.current !== null) {
+        window.clearTimeout(searchDebounceTimer.current)
+      }
+    },
+    [],
+  )
+
+  const applySearchTitle = (result: AnimeSearchResult) => {
+    setForm((current) => applyAnimeSearchTitle(current, searchQuery, result))
+  }
+
+  const applySearchCover = (result: AnimeSearchResult) => {
+    if (!result.imageUrl) return
+    setForm((current) => ({ ...current, imageUrl: result.imageUrl }))
+    setImageCache((current) => ({
+      ...current,
+      [normalizeSearchQuery(searchQuery)]: result.imageUrl,
+      [normalizeSearchQuery(result.title)]: result.imageUrl,
+    }))
+  }
+
+  const saveAnime = () => {
+    const title = form.title.trim()
+    if (!title) return
+    const now = Date.now()
+    const values = {
+      title,
+      totalEpisodes: parseEpisodeTotal(form.totalEpisodes),
+      currentEpisode: parseNonNegativeInteger(form.currentEpisode),
+      status: form.status,
+      type: form.type,
+      rating: parsePersonalRating(form.rating),
+      notes: form.notes,
+      imageUrl: form.imageUrl.trim(),
+      updatedAt: now,
+    }
+
+    if (editingId) {
+      setAnimeList((current) =>
+        current.map((anime) =>
+          anime.id === editingId ? { ...anime, ...values } : anime,
+        ),
+      )
+    } else {
+      setAnimeList((current) => [
+        { id: createAnimeId(), ...values, addedAt: now },
+        ...current,
+      ])
+    }
+
+    if (values.imageUrl) {
+      setImageCache((current) => ({
+        ...current,
+        [normalizeSearchQuery(title)]: values.imageUrl,
       }))
     }
-    if (anime.episodes) {
-      setFormTotalEpisodes(anime.episodes.toString())
-    }
-    if (anime.score) {
-      setFormRating(anime.score.toString())
-    }
-    setShowSearchResults(false)
-  }
-
-  const resetForm = useCallback(() => {
-    setFormTitle("")
-    setFormTotalEpisodes("")
-    setFormCurrentEpisode("0")
-    setFormStatus("watching")
-    setFormType("anime")
-    setFormRating("")
-    setFormNotes("")
-    setFormImageUrl("")
-    setEditingAnime(null)
-    setSearchResults([])
-    setShowSearchResults(false)
-  }, [])
-
-  const openEditDialog = (anime: Anime) => {
-    setEditingAnime(anime)
-    setFormTitle(anime.title)
-    setFormTotalEpisodes(anime.totalEpisodes?.toString() || "")
-    setFormCurrentEpisode(anime.currentEpisode.toString())
-    setFormStatus(anime.status)
-    setFormType(anime.type)
-    setFormRating(anime.rating?.toString() || "")
-    setFormNotes(anime.notes)
-    setFormImageUrl(anime.imageUrl)
-    setIsAddDialogOpen(true)
-  }
-
-  const handleSave = () => {
-    if (!formTitle.trim()) return
-
-    const now = Date.now()
-    const totalEps = formTotalEpisodes ? parseInt(formTotalEpisodes) : null
-    const currentEp = parseInt(formCurrentEpisode) || 0
-
-    if (editingAnime) {
-      // Update existing
-      setAnimeList(list => list.map(a => 
-        a.id === editingAnime.id 
-          ? {
-              ...a,
-              title: formTitle.trim(),
-              totalEpisodes: totalEps,
-              currentEpisode: currentEp,
-              status: formStatus,
-              type: formType,
-              rating: formRating ? parseFloat(formRating) : null,
-              notes: formNotes,
-              imageUrl: formImageUrl,
-              updatedAt: now,
-            }
-          : a
-      ))
-    } else {
-      // Add new
-      const newAnime: Anime = {
-        id: crypto.randomUUID(),
-        title: formTitle.trim(),
-        totalEpisodes: totalEps,
-        currentEpisode: currentEp,
-        status: formStatus,
-        type: formType,
-        rating: formRating ? parseFloat(formRating) : null,
-        notes: formNotes,
-        imageUrl: formImageUrl,
-        addedAt: now,
-        updatedAt: now,
-      }
-      setAnimeList(list => [newAnime, ...list])
-    }
-
-    resetForm()
-    setIsAddDialogOpen(false)
-  }
-
-  const handleDelete = (id: string) => {
-    setAnimeList(list => list.filter(a => a.id !== id))
+    closeDialog()
   }
 
   const incrementEpisode = (id: string) => {
-    setAnimeList(list => list.map(a => {
-      if (a.id !== id) return a
-      const newEp = a.currentEpisode + 1
-      const isCompleted = a.totalEpisodes && newEp >= a.totalEpisodes
-      return {
-        ...a,
-        currentEpisode: newEp,
-        status: isCompleted ? "completed" : a.status,
-        updatedAt: Date.now(),
-      }
-    }))
+    setAnimeList((current) =>
+      current.map((anime) => {
+        if (anime.id !== id) return anime
+        const currentEpisode = anime.currentEpisode + 1
+        const isCompleted =
+          anime.totalEpisodes !== null && currentEpisode >= anime.totalEpisodes
+        return {
+          ...anime,
+          currentEpisode,
+          status: isCompleted ? "completed" : anime.status,
+          updatedAt: Date.now(),
+        }
+      }),
+    )
   }
 
   const decrementEpisode = (id: string) => {
-    setAnimeList(list => list.map(a => {
-      if (a.id !== id) return a
-      const newEp = Math.max(0, a.currentEpisode - 1)
-      return {
-        ...a,
-        currentEpisode: newEp,
-        status: a.status === "completed" && a.totalEpisodes && newEp < a.totalEpisodes ? "watching" : a.status,
-        updatedAt: Date.now(),
-      }
-    }))
+    setAnimeList((current) =>
+      current.map((anime) => {
+        if (anime.id !== id) return anime
+        const currentEpisode = Math.max(0, anime.currentEpisode - 1)
+        return {
+          ...anime,
+          currentEpisode,
+          status:
+            anime.status === "completed" &&
+            anime.totalEpisodes !== null &&
+            currentEpisode < anime.totalEpisodes
+              ? "watching"
+              : anime.status,
+          updatedAt: Date.now(),
+        }
+      }),
+    )
   }
 
-  const getStatusColor = (status: AnimeStatus) => {
-    switch (status) {
-      case "watching": return "bg-blue-500"
-      case "completed": return "bg-green-500"
-      case "planned": return "bg-yellow-500"
-      case "paused": return "bg-orange-500"
-      case "dropped": return "bg-red-500"
-    }
-  }
+  const statusCounts = useMemo(
+    () => ({
+      all: animeList.length,
+      watching: animeList.filter((anime) => anime.status === "watching").length,
+      completed: animeList.filter((anime) => anime.status === "completed").length,
+      planned: animeList.filter((anime) => anime.status === "planned").length,
+      paused: animeList.filter((anime) => anime.status === "paused").length,
+      dropped: animeList.filter((anime) => anime.status === "dropped").length,
+    }),
+    [animeList],
+  )
 
-  const getStatusIcon = (status: AnimeStatus) => {
-    switch (status) {
-      case "watching": return <Play className="h-3 w-3" />
-      case "completed": return <CheckCircle2 className="h-3 w-3" />
-      case "planned": return <Clock className="h-3 w-3" />
-      case "paused": return <Pause className="h-3 w-3" />
-      case "dropped": return <Trash2 className="h-3 w-3" />
-    }
-  }
+  const visibleAnime = useMemo(() => {
+    const normalizedFilter = normalizeSearchQuery(libraryQuery)
+    return animeList
+      .filter((anime) => activeTab === "all" || anime.status === activeTab)
+      .filter((anime) => {
+        if (!normalizedFilter) return true
+        return normalizeSearchQuery(`${anime.title} ${anime.notes}`).includes(
+          normalizedFilter,
+        )
+      })
+      .sort((a, b) => b.updatedAt - a.updatedAt)
+  }, [activeTab, animeList, libraryQuery])
 
-  const getTypeIcon = (type: "anime" | "drama" | "movie") => {
-    switch (type) {
-      case "anime": return <Tv className="h-4 w-4" />
-      case "drama": return <Film className="h-4 w-4" />
-      case "movie": return <Film className="h-4 w-4" />
-    }
-  }
-
-  const filteredList = activeTab === "all" 
-    ? animeList 
-    : animeList.filter(a => a.status === activeTab)
-
-  const sortedList = [...filteredList].sort((a, b) => b.updatedAt - a.updatedAt)
-
-  const statusCounts = {
-    all: animeList.length,
-    watching: animeList.filter(a => a.status === "watching").length,
-    completed: animeList.filter(a => a.status === "completed").length,
-    planned: animeList.filter(a => a.status === "planned").length,
-    paused: animeList.filter(a => a.status === "paused").length,
-    dropped: animeList.filter(a => a.status === "dropped").length,
-  }
+  const watchedEpisodes = animeList.reduce(
+    (total, anime) => total + anime.currentEpisode,
+    0,
+  )
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-2 sm:p-4">
-      <div className="mx-auto max-w-6xl">
+    <main className="app-shell min-h-screen bg-background text-foreground">
+      <div className="app-container mx-auto w-full max-w-7xl px-3 py-4 sm:px-6 sm:py-7 lg:px-8">
         <GameHeader
           layout="tool"
           homeIcon="back"
@@ -432,433 +739,596 @@ export function AnimeTracker() {
           homeLabelMode="sr-only"
           title={t("animeTracker")}
           description={t("animeTrackerDescription")}
-          className="mb-4 sm:mb-6"
-          homeButtonClassName="h-8 w-8 text-slate-400 hover:text-white sm:h-10 sm:w-10"
-          titleClassName="text-lg font-bold text-white sm:text-2xl"
-          descriptionClassName="hidden text-sm text-slate-400 sm:block"
+          className="mb-5"
+          homeButtonClassName="border border-border/70 bg-card/70 shadow-sm"
+          titleClassName="text-xl font-semibold tracking-tight sm:text-2xl"
+          descriptionClassName="hidden text-sm text-muted-foreground sm:block"
           actions={
-              <Dialog open={isAddDialogOpen} onOpenChange={(open) => {
-                setIsAddDialogOpen(open)
-                if (!open) resetForm()
-              }}>
-                <DialogTrigger asChild>
-                  <Button size="sm" className="gap-1 px-2 sm:gap-2 sm:px-4">
-                    <Plus className="h-4 w-4" />
-                    <span className="hidden sm:inline">{t("addAnime")}</span>
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-h-[90vh] w-[95vw] max-w-md overflow-y-auto border-slate-700 bg-slate-800 text-white">
-                  <DialogHeader>
-                    <DialogTitle>
-                      {editingAnime ? t("editAnime") : t("addAnime")}
-                    </DialogTitle>
-                    <DialogDescription className="text-slate-400">
-                      {editingAnime ? t("editAnimeDescription") : t("addAnimeDescription")}
-                    </DialogDescription>
-                  </DialogHeader>
-                  <div className="grid gap-4 py-4">
-{/* Title with Search */}
-                                    <div className="relative grid gap-2">
-                                      <Label htmlFor="title">{t("animeTitle")} *</Label>
-                                      <div className="relative">
-                                        <Input
-                                          id="title"
-                                          value={formTitle}
-                                          onChange={(e) => {
-                                            setFormTitle(e.target.value)
-                                            if (e.target.value.length >= 2 && formType === "anime") {
-                                              setShowSearchResults(true)
-                                            }
-                                          }}
-                                          onFocus={() => {
-                                            if (searchResults.length > 0 && formType === "anime") {
-                                              setShowSearchResults(true)
-                                            }
-                                          }}
-                                          onBlur={() => {
-                                            // Delay hiding to allow click on results
-                                            setTimeout(() => setShowSearchResults(false), 200)
-                                          }}
-                                          placeholder={t("animeTitlePlaceholder")}
-                                          className="border-slate-600 bg-slate-700 pr-10"
-                                        />
-                                        {isSearching && (
-                                          <Loader2 className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 animate-spin text-slate-400" />
-                                        )}
-                                        {!isSearching && formType === "anime" && (
-                                          <Search className="absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                                        )}
-                                      </div>
-                                      {/* Search Results Dropdown */}
-                                      {showSearchResults && searchResults.length > 0 && (
-                                        <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-60 overflow-y-auto rounded-md border border-slate-600 bg-slate-700 shadow-lg">
-                                          {searchResults.map((anime) => (
-                                            <button
-                                              key={anime.mal_id}
-                                              type="button"
-                                              onMouseDown={(e) => {
-                                                e.preventDefault()
-                                                selectSearchResult(anime)
-                                              }}
-                                              className="flex w-full items-center gap-3 p-2 text-left hover:bg-slate-600"
-                                            >
-                                              {anime.images?.jpg?.image_url ? (
-                                                // Search results are short-lived third-party URLs from Jikan.
-                                                // eslint-disable-next-line @next/next/no-img-element
-                                                <img 
-                                                  src={anime.images.jpg.image_url} 
-                                                  alt={anime.title}
-                                                  className="h-12 w-9 rounded object-cover"
-                                                />
-                                              ) : (
-                                                <div className="flex h-12 w-9 items-center justify-center rounded bg-slate-600">
-                                                  <ImageIcon className="h-4 w-4 text-slate-400" />
-                                                </div>
-                                              )}
-                                              <div className="flex-1 overflow-hidden">
-                                                <p className="truncate text-sm font-medium text-white">{anime.title}</p>
-                                                <p className="text-xs text-slate-400">
-                                                  {anime.episodes ? `${anime.episodes} ${t("episodesUnit")}` : t("ongoing")}
-                                                  {anime.score && ` · ${anime.score}`}
-                                                </p>
-                                              </div>
-                                            </button>
-                                          ))}
-                                        </div>
-                                      )}
-                                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor="type">{t("animeType")}</Label>
-                        <Select value={formType} onValueChange={(v) => setFormType(v as "anime" | "drama" | "movie")}>
-                          <SelectTrigger className="border-slate-600 bg-slate-700">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="border-slate-600 bg-slate-700">
-                            <SelectItem value="anime">{t("typeAnime")}</SelectItem>
-                            <SelectItem value="drama">{t("typeDrama")}</SelectItem>
-                            <SelectItem value="movie">{t("typeMovie")}</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="grid gap-2">
-                        <Label htmlFor="status">{t("animeStatus")}</Label>
-                        <Select value={formStatus} onValueChange={(v) => setFormStatus(v as AnimeStatus)}>
-                          <SelectTrigger className="border-slate-600 bg-slate-700">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent className="border-slate-600 bg-slate-700">
-                            <SelectItem value="watching">{t("statusWatching")}</SelectItem>
-                            <SelectItem value="completed">{t("statusCompleted")}</SelectItem>
-                            <SelectItem value="planned">{t("statusPlanned")}</SelectItem>
-                            <SelectItem value="paused">{t("statusPaused")}</SelectItem>
-                            <SelectItem value="dropped">{t("statusDropped")}</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
-                      <div className="grid gap-2">
-                        <Label htmlFor="currentEp">{t("currentEpisode")}</Label>
-                        <Input
-                          id="currentEp"
-                          type="number"
-                          min="0"
-                          value={formCurrentEpisode}
-                          onChange={(e) => setFormCurrentEpisode(e.target.value)}
-                          className="border-slate-600 bg-slate-700"
-                        />
-                      </div>
-
-                      <div className="grid gap-2">
-                        <Label htmlFor="totalEp">{t("totalEpisodes")}</Label>
-                        <Input
-                          id="totalEp"
-                          type="number"
-                          min="1"
-                          value={formTotalEpisodes}
-                          onChange={(e) => setFormTotalEpisodes(e.target.value)}
-                          placeholder={t("ongoing")}
-                          className="border-slate-600 bg-slate-700"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid gap-2">
-                      <Label htmlFor="rating">{t("rating")} (0-10)</Label>
-                      <Input
-                        id="rating"
-                        type="number"
-                        min="0"
-                        max="10"
-                        step="0.1"
-                        value={formRating}
-                        onChange={(e) => setFormRating(e.target.value)}
-                        placeholder={t("ratingPlaceholder")}
-                        className="border-slate-600 bg-slate-700"
-                      />
-                    </div>
-
-                    <div className="grid gap-2">
-                      <Label htmlFor="imageUrl">{t("coverImage")}</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          id="imageUrl"
-                          value={formImageUrl}
-                          onChange={(e) => setFormImageUrl(e.target.value)}
-                          placeholder="https://..."
-                          className="flex-1 border-slate-600 bg-slate-700"
-                        />
-                        {formImageUrl && (
-                          <div className="h-10 w-8 overflow-hidden rounded border border-slate-600">
-                            {/* User-entered URLs can use any host, so they cannot use a fixed Next Image allowlist. */}
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img 
-                              src={formImageUrl} 
-                              alt="Preview" 
-                              className="h-full w-full object-cover"
-                              onError={(e) => {
-                                e.currentTarget.style.display = 'none'
-                              }}
-                            />
-                          </div>
-                        )}
-                      </div>
-                      {formType === "anime" && (
-                        <p className="text-xs text-slate-500">{t("autoSearchHint")}</p>
-                      )}
-                    </div>
-
-                    <div className="grid gap-2">
-                      <Label htmlFor="notes">{t("notes")}</Label>
-                      <Input
-                        id="notes"
-                        value={formNotes}
-                        onChange={(e) => setFormNotes(e.target.value)}
-                        placeholder={t("notesPlaceholder")}
-                        className="border-slate-600 bg-slate-700"
-                      />
-                    </div>
-                  </div>
-                  <DialogFooter className="gap-2 sm:gap-0">
-                    <DialogClose asChild>
-                      <Button variant="outline" className="border-slate-600">
-                        {t("cancel")}
-                      </Button>
-                    </DialogClose>
-                    <Button onClick={handleSave} disabled={!formTitle.trim()}>
-                      {t("save")}
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
+            <Button
+              onClick={openAddDialog}
+              className="rounded-full px-3 sm:px-4"
+              aria-label={t("addAnime")}
+            >
+              <Plus aria-hidden="true" />
+              <span className="hidden sm:inline">{t("addAnime")}</span>
+            </Button>
           }
         />
 
-        {/* Tabs - Mobile Optimized with horizontal scroll */}
-        <Tabs value={activeTab} onValueChange={(v) => setActiveTab(v as AnimeStatus | "all")} className="w-full">
-          <div className="-mx-2 mb-4 overflow-x-auto px-2 sm:mx-0 sm:mb-6 sm:px-0">
-            <TabsList className="inline-flex h-auto min-w-max gap-1.5 bg-transparent p-0 sm:flex-wrap sm:gap-2">
-              <TabsTrigger 
-                value="all" 
-                className="whitespace-nowrap rounded-full border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs data-[state=active]:border-white data-[state=active]:bg-white data-[state=active]:text-slate-900 sm:px-4 sm:py-2 sm:text-sm"
-              >
-                {t("all")} ({statusCounts.all})
-              </TabsTrigger>
-              <TabsTrigger 
-                value="watching" 
-                className="whitespace-nowrap rounded-full border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs data-[state=active]:border-blue-500 data-[state=active]:bg-blue-500 data-[state=active]:text-white sm:px-4 sm:py-2 sm:text-sm"
-              >
-                <Play className="mr-1 h-3 w-3" />
-                {t("statusWatching")} ({statusCounts.watching})
-              </TabsTrigger>
-              <TabsTrigger 
-                value="planned" 
-                className="whitespace-nowrap rounded-full border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs data-[state=active]:border-yellow-500 data-[state=active]:bg-yellow-500 data-[state=active]:text-white sm:px-4 sm:py-2 sm:text-sm"
-              >
-                <Clock className="mr-1 h-3 w-3" />
-                {t("statusPlanned")} ({statusCounts.planned})
-              </TabsTrigger>
-              <TabsTrigger 
-                value="completed" 
-                className="whitespace-nowrap rounded-full border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs data-[state=active]:border-green-500 data-[state=active]:bg-green-500 data-[state=active]:text-white sm:px-4 sm:py-2 sm:text-sm"
-              >
-                <CheckCircle2 className="mr-1 h-3 w-3" />
-                {t("statusCompleted")} ({statusCounts.completed})
-              </TabsTrigger>
-              <TabsTrigger 
-                value="paused" 
-                className="whitespace-nowrap rounded-full border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs data-[state=active]:border-orange-500 data-[state=active]:bg-orange-500 data-[state=active]:text-white sm:px-4 sm:py-2 sm:text-sm"
-              >
-                <Pause className="mr-1 h-3 w-3" />
-                {t("statusPaused")} ({statusCounts.paused})
-              </TabsTrigger>
-              <TabsTrigger 
-                value="dropped" 
-                className="whitespace-nowrap rounded-full border border-slate-600 bg-slate-800 px-3 py-1.5 text-xs data-[state=active]:border-red-500 data-[state=active]:bg-red-500 data-[state=active]:text-white sm:px-4 sm:py-2 sm:text-sm"
-              >
-                <Trash2 className="mr-1 h-3 w-3" />
-                {t("statusDropped")} ({statusCounts.dropped})
-              </TabsTrigger>
-            </TabsList>
+        {storageProtected && (
+          <div
+            className="mb-5 flex gap-3 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm"
+            role="alert"
+          >
+            <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-500" aria-hidden="true" />
+            <div>
+              <p className="font-semibold">{t("animeStorageProtectionTitle")}</p>
+              <p className="mt-1 text-muted-foreground">
+                {t("animeStorageProtectionDescription")}
+              </p>
+            </div>
           </div>
+        )}
+
+        <section className="surface-panel relative mb-5 overflow-hidden rounded-[28px] border border-border/70 bg-card/80 p-5 shadow-sm sm:p-7">
+          <div className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
+          <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
+            <div>
+              <Badge variant="outline" className="mb-3 rounded-full bg-background/60">
+                {isOnline ? <Wifi aria-hidden="true" /> : <WifiOff aria-hidden="true" />}
+                {isOnline ? t("animeSearchOnline") : t("animeSearchOffline")}
+              </Badge>
+              <h2 className="max-w-2xl text-2xl font-semibold tracking-tight sm:text-3xl">
+                {t("animeTrackerDescription")}
+              </h2>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-muted-foreground">
+                {t("animeLibrarySearchHint")}
+              </p>
+            </div>
+            <div className="grid grid-cols-3 gap-2 sm:gap-3">
+              <div className="rounded-2xl border border-border/60 bg-background/60 px-3 py-3 text-center sm:min-w-24">
+                <p className="text-2xl font-semibold">{animeList.length}</p>
+                <p className="text-[11px] text-muted-foreground">{t("all")}</p>
+              </div>
+              <div className="rounded-2xl border border-border/60 bg-background/60 px-3 py-3 text-center sm:min-w-24">
+                <p className="text-2xl font-semibold">{statusCounts.watching}</p>
+                <p className="text-[11px] text-muted-foreground">{t("statusWatching")}</p>
+              </div>
+              <div className="rounded-2xl border border-border/60 bg-background/60 px-3 py-3 text-center sm:min-w-24">
+                <p className="text-2xl font-semibold">{watchedEpisodes}</p>
+                <p className="text-[11px] text-muted-foreground">{t("episodesUnit")}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as AnimeStatus | "all")}
+        >
+          <section className="surface-panel mb-5 rounded-3xl border border-border/70 bg-card/70 p-3 shadow-sm sm:p-4">
+            <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
+              <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                <Input
+                  value={libraryQuery}
+                  onChange={(event) => setLibraryQuery(event.target.value)}
+                  placeholder={t("animeFilterPlaceholder")}
+                  aria-label={t("animeFilterPlaceholder")}
+                  className="h-10 rounded-full bg-background/70 pl-9"
+                />
+              </div>
+              <div className="overflow-x-auto pb-1 lg:pb-0">
+                <TabsList className="h-auto min-w-max rounded-full bg-muted/70 p-1">
+                  {(
+                    [
+                      ["all", "all"],
+                      ["watching", "statusWatching"],
+                      ["planned", "statusPlanned"],
+                      ["completed", "statusCompleted"],
+                      ["paused", "statusPaused"],
+                      ["dropped", "statusDropped"],
+                    ] as const
+                  ).map(([status, key]) => (
+                    <TabsTrigger
+                      key={status}
+                      value={status}
+                      className="h-9 rounded-full px-3 text-xs data-[state=active]:bg-background data-[state=active]:shadow-sm sm:text-sm"
+                    >
+                      {t(key)} · {statusCounts[status]}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
+              </div>
+            </div>
+          </section>
 
           <TabsContent value={activeTab} className="mt-0">
-            {sortedList.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-12 text-slate-400 sm:py-16">
-                <Tv className="mb-4 h-12 w-12 opacity-50 sm:h-16 sm:w-16" />
-                <p className="mb-4 text-base sm:text-lg">{t("noAnime")}</p>
-                <Button onClick={() => setIsAddDialogOpen(true)} className="gap-2">
-                  <Plus className="h-4 w-4" />
-                  {t("addFirstAnime")}
-                </Button>
-              </div>
+            {visibleAnime.length === 0 ? (
+              <section className="surface-panel flex min-h-72 flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-card/40 px-6 text-center">
+                <div className="mb-4 rounded-2xl bg-primary/10 p-4 text-primary">
+                  <Tv className="h-8 w-8" aria-hidden="true" />
+                </div>
+                <h3 className="text-lg font-semibold">
+                  {animeList.length === 0
+                    ? t("noAnime")
+                    : t("animeNoFilteredResults")}
+                </h3>
+                {animeList.length === 0 && (
+                  <Button onClick={openAddDialog} className="mt-4 rounded-full">
+                    <Plus aria-hidden="true" />
+                    {t("addFirstAnime")}
+                  </Button>
+                )}
+              </section>
             ) : (
-              <div className="grid gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
-                {sortedList.map((anime) => (
-                  <Card 
-                    key={anime.id} 
-                    className="overflow-hidden border-slate-700 bg-slate-800/50 transition-all hover:border-slate-500"
-                  >
-                    {/* Card with horizontal layout on mobile */}
-                    <div className="flex sm:block">
-                      {/* Image - smaller on mobile, side by side */}
-                      <div className="relative w-24 flex-shrink-0 sm:w-full">
-                        {anime.imageUrl ? (
-                          <div 
-                            className="h-full min-h-[120px] bg-cover bg-center sm:h-40" 
-                            style={{ backgroundImage: `url(${anime.imageUrl})` }}
+              <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {visibleAnime.map((anime) => {
+                  const progress = anime.totalEpisodes
+                    ? Math.min(100, (anime.currentEpisode / anime.totalEpisodes) * 100)
+                    : 0
+                  return (
+                    <Card
+                      key={anime.id}
+                      className="surface-card group overflow-hidden rounded-3xl border-border/70 bg-card/90 py-0 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                    >
+                      <CardContent className="grid min-h-56 grid-cols-[104px_minmax(0,1fr)] gap-0 p-0 sm:grid-cols-[120px_minmax(0,1fr)]">
+                        <div className="relative overflow-hidden bg-muted">
+                          <AnimeCover
+                            sourceUrl={anime.imageUrl}
+                            title={anime.title}
+                            type={anime.type}
+                            className="h-full min-h-56 w-full transition duration-500 group-hover:scale-[1.03]"
+                          />
+                          <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/50 to-transparent" />
+                          <Badge
+                            variant="outline"
+                            className={cn(
+                              "absolute bottom-2 left-2 max-w-[calc(100%-1rem)] rounded-full backdrop-blur",
+                              STATUS_STYLES[anime.status],
+                            )}
                           >
-                            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-slate-800 sm:bg-gradient-to-t sm:from-slate-800 sm:to-transparent" />
-                          </div>
-                        ) : (
-                          <div className="flex h-full min-h-[120px] items-center justify-center bg-slate-700 sm:h-40">
-                            {getTypeIcon(anime.type)}
-                          </div>
-                        )}
-                        {/* Status badge - desktop only on image */}
-                        <div className="absolute right-1 top-1 hidden sm:right-2 sm:top-2 sm:flex">
-                          <Badge className={`${getStatusColor(anime.status)} text-xs text-white`}>
-                            {getStatusIcon(anime.status)}
-                            <span className="ml-1">{t(STATUS_TRANSLATION_KEYS[anime.status])}</span>
+                            {statusIcon(anime.status)}
+                            <span className="truncate">
+                              {t(STATUS_TRANSLATION_KEYS[anime.status])}
+                            </span>
                           </Badge>
                         </div>
-                      </div>
 
-                      {/* Content area */}
-                      <div className="flex flex-1 flex-col p-3 sm:p-0">
-                        <CardHeader className="p-0 pb-2 sm:p-4 sm:pb-2">
-                          <div className="flex items-start justify-between gap-1">
-                            <div className="min-w-0 flex-1">
-                              <CardTitle className="line-clamp-2 text-sm font-bold text-white sm:text-lg">
+                        <div className="flex min-w-0 flex-col p-4">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="min-w-0">
+                              <h3 className="line-clamp-2 font-semibold leading-snug">
                                 {anime.title}
-                              </CardTitle>
-                              {/* Mobile status badge */}
-                              <div className="mt-1 sm:hidden">
-                                <Badge className={`${getStatusColor(anime.status)} text-xs text-white`}>
-                                  {getStatusIcon(anime.status)}
-                                  <span className="ml-1">{t(STATUS_TRANSLATION_KEYS[anime.status])}</span>
-                                </Badge>
+                              </h3>
+                              <div className="mt-1.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+                                <span className="inline-flex items-center gap-1">
+                                  {mediaIcon(anime.type, "h-3.5 w-3.5")}
+                                  {t(TYPE_TRANSLATION_KEYS[anime.type])}
+                                </span>
+                                {anime.rating !== null && (
+                                  <span className="inline-flex items-center gap-1">
+                                    <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" aria-hidden="true" />
+                                    {anime.rating}
+                                  </span>
+                                )}
                               </div>
                             </div>
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-7 w-7 flex-shrink-0 text-slate-400 sm:h-8 sm:w-8">
-                                  <MoreVertical className="h-4 w-4" />
+                                <Button
+                                  variant="ghost"
+                                  size="icon-sm"
+                                  aria-label={`${t("edit")} ${anime.title}`}
+                                  className="-mr-1 -mt-1 rounded-full"
+                                >
+                                  <MoreHorizontal aria-hidden="true" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent className="border-slate-600 bg-slate-700">
-                                <DropdownMenuItem onClick={() => openEditDialog(anime)} className="text-white">
-                                  <Edit className="mr-2 h-4 w-4" />
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onClick={() => openEditDialog(anime)}>
+                                  <Edit3 aria-hidden="true" />
                                   {t("edit")}
                                 </DropdownMenuItem>
-                                <DropdownMenuItem 
-                                  onClick={() => handleDelete(anime.id)} 
-                                  className="text-red-400 focus:text-red-400"
+                                <DropdownMenuItem
+                                  onClick={() => setDeleteCandidate(anime)}
+                                  className="text-destructive focus:text-destructive"
                                 >
-                                  <Trash2 className="mr-2 h-4 w-4" />
+                                  <Trash2 aria-hidden="true" />
                                   {t("delete")}
                                 </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>
-                          <div className="flex flex-wrap items-center gap-1 text-xs text-slate-400 sm:gap-2 sm:text-sm">
-                            {getTypeIcon(anime.type)}
-                            <span>{t(TYPE_TRANSLATION_KEYS[anime.type])}</span>
-                            {anime.rating && (
-                              <>
-                                <Star className="ml-1 h-3 w-3 fill-yellow-500 text-yellow-500 sm:ml-2 sm:h-4 sm:w-4" />
-                                <span>{anime.rating}</span>
-                              </>
-                            )}
-                          </div>
-                        </CardHeader>
 
-                        <CardContent className="flex-1 p-0 sm:p-4 sm:pt-0">
-                          {/* Episode Progress */}
-                          <div className="mb-2 sm:mb-3">
-                            <div className="mb-1 flex items-center justify-between text-xs sm:text-sm">
-                              <span className="text-slate-400">{t("progress")}</span>
-                              <span className="text-white">
-                                {anime.currentEpisode} / {anime.totalEpisodes || "?"}
+                          <div className="mt-4">
+                            <div className="mb-1.5 flex items-center justify-between text-xs">
+                              <span className="text-muted-foreground">{t("progress")}</span>
+                              <span className="font-medium">
+                                {anime.currentEpisode} / {anime.totalEpisodes ?? "?"}
                               </span>
                             </div>
-                            {anime.totalEpisodes && (
-                              <Progress 
-                                value={(anime.currentEpisode / anime.totalEpisodes) * 100} 
-                                className="h-1.5 bg-slate-700 sm:h-2"
-                              />
+                            {anime.totalEpisodes ? (
+                              <Progress value={progress} className="h-1.5" />
+                            ) : (
+                              <div className="h-1.5 rounded-full bg-muted" />
                             )}
                           </div>
 
-                          {/* Episode Controls */}
-                          <div className="flex items-center justify-between gap-2">
+                          <div className="mt-4 flex items-center justify-between rounded-2xl bg-muted/60 p-1.5">
                             <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => decrementEpisode(anime.id)}
+                              variant="ghost"
+                              size="icon-sm"
+                              className="rounded-xl"
                               disabled={anime.currentEpisode === 0}
-                              className="h-7 w-7 border-slate-600 bg-slate-700 p-0 text-white hover:bg-slate-600 sm:h-8 sm:w-8"
+                              onClick={() => decrementEpisode(anime.id)}
+                              aria-label={`${t("currentEpisode")} -1`}
                             >
-                              <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
+                              <Minus aria-hidden="true" />
                             </Button>
-                            <span className="text-sm font-bold text-white sm:text-lg">
+                            <span className="text-sm font-semibold tabular-nums">
                               {t("episode")} {anime.currentEpisode}
                             </span>
                             <Button
-                              variant="outline"
-                              size="sm"
+                              variant="ghost"
+                              size="icon-sm"
+                              className="rounded-xl"
+                              disabled={
+                                anime.totalEpisodes !== null &&
+                                anime.currentEpisode >= anime.totalEpisodes
+                              }
                               onClick={() => incrementEpisode(anime.id)}
-                              disabled={anime.totalEpisodes !== null && anime.currentEpisode >= anime.totalEpisodes}
-                              className="h-7 w-7 border-slate-600 bg-slate-700 p-0 text-white hover:bg-slate-600 sm:h-8 sm:w-8"
+                              aria-label={`${t("currentEpisode")} +1`}
                             >
-                              <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                              <Plus aria-hidden="true" />
                             </Button>
                           </div>
 
                           {anime.notes && (
-                            <p className="mt-2 line-clamp-2 text-xs text-slate-400 sm:mt-3 sm:text-sm">
+                            <p className="mt-3 line-clamp-2 text-xs leading-5 text-muted-foreground">
                               {anime.notes}
                             </p>
                           )}
-
-                          <div className="mt-2 flex items-center gap-1 text-xs text-slate-500 sm:mt-3">
-                            <Calendar className="h-3 w-3" />
-                            {new Date(anime.updatedAt).toLocaleDateString()}
-                          </div>
-                        </CardContent>
-                      </div>
-                    </div>
-                  </Card>
-                ))}
+                          <p className="mt-auto flex items-center gap-1 pt-3 text-[11px] text-muted-foreground">
+                            <CalendarDays className="h-3 w-3" aria-hidden="true" />
+                            {new Date(anime.updatedAt).toLocaleDateString(locale)}
+                          </p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )
+                })}
               </div>
             )}
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+
+      <Dialog
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          if (!open) closeDialog()
+        }}
+      >
+        <DialogContent
+          closeLabel={t("close")}
+          className="max-h-[92vh] overflow-y-auto rounded-3xl p-0 sm:max-w-5xl"
+        >
+          <DialogHeader className="border-b px-5 py-5 text-left sm:px-7">
+            <DialogTitle>
+              {editingId ? t("editAnime") : t("addAnime")}
+            </DialogTitle>
+            <DialogDescription>
+              {editingId ? t("editAnimeDescription") : t("addAnimeDescription")}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid gap-5 px-5 py-5 sm:px-7 lg:grid-cols-[1.05fr_0.95fr]">
+            <section className="surface-panel rounded-3xl border border-border/70 bg-muted/25 p-4 sm:p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="font-semibold">{t("animeLibrarySearch")}</h3>
+                  <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                    {t("animeLibrarySearchHint")}
+                  </p>
+                </div>
+                <Badge variant="outline" className="shrink-0 rounded-full">
+                  {isOnline ? <Wifi aria-hidden="true" /> : <WifiOff aria-hidden="true" />}
+                  {isOnline ? t("animeSearchOnline") : t("animeSearchOffline")}
+                </Badge>
+              </div>
+
+              <div className="mt-4 flex gap-2">
+                <div className="relative min-w-0 flex-1">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+                  <Input
+                    value={searchQuery}
+                    onChange={(event) => updateSearchQuery(event.target.value)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter") {
+                        event.preventDefault()
+                        runSearchImmediately()
+                      }
+                    }}
+                    placeholder={t("animeSearchPlaceholder")}
+                    className="rounded-full bg-background pl-9"
+                    role="searchbox"
+                    aria-label={t("animeLibrarySearch")}
+                    aria-controls="anime-search-results"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  size="icon"
+                  className="rounded-full"
+                  disabled={normalizeSearchQuery(searchQuery).length < 2}
+                  onClick={runSearchImmediately}
+                  aria-label={t("animeLibrarySearch")}
+                >
+                  {searchPhase === "loading" ? (
+                    <Loader2 className="animate-spin" aria-hidden="true" />
+                  ) : (
+                    <Search aria-hidden="true" />
+                  )}
+                </Button>
+              </div>
+
+              <div
+                className="mt-3 min-h-8 text-xs text-muted-foreground"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                {showingCachedResults && (
+                  <span className="inline-flex items-center gap-1.5 text-primary">
+                    <Check className="h-3.5 w-3.5" aria-hidden="true" />
+                    {t("animeCachedResults")}
+                  </span>
+                )}
+                {!showingCachedResults && searchPhase === "loading" &&
+                  t("animeSearchLoading")}
+                {searchPhase === "success" && (
+                  <span className={cn(showingCachedResults && "ml-2")}>
+                    {t("animeSearchResultCount").replace(
+                      "{count}",
+                      String(searchResults.length),
+                    )}
+                  </span>
+                )}
+                {searchPhase === "idle" && t("animeSearchMinChars")}
+                {searchPhase === "empty" && t("animeSearchEmpty")}
+                {searchPhase === "offline" && t("animeOfflineSearchEmpty")}
+                {searchPhase === "error" && t("animeSearchUnavailable")}
+              </div>
+
+              {(searchPhase === "offline" || searchPhase === "error") && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="mb-3 rounded-full"
+                  onClick={runSearchImmediately}
+                >
+                  {t("animeRetrySearch")}
+                </Button>
+              )}
+
+              <div
+                id="anime-search-results"
+                className="grid max-h-[420px] gap-2.5 overflow-y-auto pr-1"
+                aria-label={t("animeLibrarySearch")}
+                aria-busy={searchPhase === "loading"}
+                role="list"
+              >
+                {searchResults.map((result) => (
+                  <SearchResultItem
+                    key={`${result.source}:${result.sourceId}`}
+                    result={result}
+                    query={searchQuery}
+                    selectedCover={form.imageUrl}
+                    onUseTitle={() => applySearchTitle(result)}
+                    onUseCover={() => applySearchCover(result)}
+                    t={t}
+                  />
+                ))}
+              </div>
+            </section>
+
+            <section className="surface-panel rounded-3xl border border-border/70 bg-card p-4 sm:p-5">
+              <h3 className="font-semibold">{t("animeManualDetails")}</h3>
+              <div className="mt-4 grid gap-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="anime-title">{t("animeTitle")} *</Label>
+                  <Input
+                    id="anime-title"
+                    value={form.title}
+                    onChange={(event) =>
+                      setForm((current) => ({ ...current, title: event.target.value }))
+                    }
+                    placeholder={t("animeTitlePlaceholder")}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-2">
+                    <Label htmlFor="anime-type">{t("animeType")}</Label>
+                    <Select
+                      value={form.type}
+                      onValueChange={(value) =>
+                        updateMediaType(value as AnimeMediaType)
+                      }
+                    >
+                      <SelectTrigger id="anime-type"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="anime">{t("typeAnime")}</SelectItem>
+                        <SelectItem value="drama">{t("typeDrama")}</SelectItem>
+                        <SelectItem value="movie">{t("typeMovie")}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="anime-status">{t("animeStatus")}</Label>
+                    <Select
+                      value={form.status}
+                      onValueChange={(value) =>
+                        setForm((current) => ({
+                          ...current,
+                          status: value as AnimeStatus,
+                        }))
+                      }
+                    >
+                      <SelectTrigger id="anime-status"><SelectValue /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="watching">{t("statusWatching")}</SelectItem>
+                        <SelectItem value="completed">{t("statusCompleted")}</SelectItem>
+                        <SelectItem value="planned">{t("statusPlanned")}</SelectItem>
+                        <SelectItem value="paused">{t("statusPaused")}</SelectItem>
+                        <SelectItem value="dropped">{t("statusDropped")}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="grid gap-2">
+                    <Label htmlFor="anime-current-episode">{t("currentEpisode")}</Label>
+                    <Input
+                      id="anime-current-episode"
+                      type="number"
+                      min="0"
+                      inputMode="numeric"
+                      value={form.currentEpisode}
+                      onChange={(event) =>
+                        setForm((current) => ({
+                          ...current,
+                          currentEpisode: event.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <Label htmlFor="anime-total-episodes">{t("totalEpisodes")}</Label>
+                    <Input
+                      id="anime-total-episodes"
+                      type="number"
+                      min="1"
+                      inputMode="numeric"
+                      value={form.totalEpisodes}
+                      onChange={(event) =>
+                        setForm((current) => ({
+                          ...current,
+                          totalEpisodes: event.target.value,
+                        }))
+                      }
+                      placeholder={t("ongoing")}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="anime-rating">{t("rating")} (0–10)</Label>
+                  <Input
+                    id="anime-rating"
+                    type="number"
+                    min="0"
+                    max="10"
+                    step="0.1"
+                    inputMode="decimal"
+                    value={form.rating}
+                    onChange={(event) =>
+                      setForm((current) => ({ ...current, rating: event.target.value }))
+                    }
+                    placeholder={t("ratingPlaceholder")}
+                  />
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="anime-cover">{t("coverImage")}</Label>
+                  <div className="grid grid-cols-[72px_minmax(0,1fr)] gap-3">
+                    <AnimeCover
+                      sourceUrl={form.imageUrl}
+                      title={form.title || t("coverImage")}
+                      type={form.type}
+                      className="h-24 w-[72px] rounded-xl border"
+                    />
+                    <Input
+                      id="anime-cover"
+                      value={form.imageUrl}
+                      onChange={(event) =>
+                        setForm((current) => ({
+                          ...current,
+                          imageUrl: event.target.value,
+                        }))
+                      }
+                      placeholder="https://..."
+                      className="self-center"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-2">
+                  <Label htmlFor="anime-notes">{t("notes")}</Label>
+                  <textarea
+                    id="anime-notes"
+                    value={form.notes}
+                    onChange={(event) =>
+                      setForm((current) => ({ ...current, notes: event.target.value }))
+                    }
+                    placeholder={t("notesPlaceholder")}
+                    rows={3}
+                    className="flex w-full rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-xs outline-none transition focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                  />
+                </div>
+              </div>
+            </section>
+          </div>
+
+          <DialogFooter className="border-t px-5 py-4 sm:px-7">
+            <Button type="button" variant="outline" onClick={closeDialog}>
+              {t("cancel")}
+            </Button>
+            <Button type="button" disabled={!form.title.trim()} onClick={saveAnime}>
+              {t("save")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={deleteCandidate !== null}
+        onOpenChange={(open) => {
+          if (!open) setDeleteCandidate(null)
+        }}
+      >
+        <DialogContent closeLabel={t("close")} className="rounded-3xl sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("deleteAnimeTitle")}</DialogTitle>
+            <DialogDescription>
+              {deleteCandidate?.title}
+              <br />
+              {t("deleteAnimeDescription")}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteCandidate(null)}>
+              {t("cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (deleteCandidate) {
+                  setAnimeList((current) =>
+                    current.filter((anime) => anime.id !== deleteCandidate.id),
+                  )
+                }
+                setDeleteCandidate(null)
+              }}
+            >
+              <Trash2 aria-hidden="true" />
+              {t("confirmDeleteAnime")}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </main>
   )
 }

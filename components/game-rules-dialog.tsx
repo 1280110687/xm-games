@@ -40,7 +40,7 @@ export function GameRulesDialog({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" className={triggerClassName}>
+        <Button variant="outline" className={cn("border-white/10 bg-white/[0.04] text-foreground hover:bg-white/[0.08]", triggerClassName)}>
           <HelpCircle
             className={cn("h-4 w-4", triggerIconClassName)}
             aria-hidden="true"
@@ -51,7 +51,7 @@ export function GameRulesDialog({
       <DialogContent
         showCloseButton={false}
         className={cn(
-          "max-h-[80vh] w-full max-w-md overflow-y-auto",
+          "max-h-[82vh] overflow-y-auto border-white/10 bg-popover p-5 text-foreground sm:max-w-md sm:p-6",
           contentClassName,
         )}
       >

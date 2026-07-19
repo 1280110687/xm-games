@@ -167,38 +167,40 @@ export function ChessGame() {
   const isValidTarget = (row: number, col: number) => validMoves.some(m => m.row === row && m.col === col)
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
+    <div className="game-page">
       <GameHeader
         layout="centered"
         homeLabel={t("appName")}
+        homeLabelMode="desktop"
         title={t("chess")}
-        className="mb-4 w-full max-w-lg"
-        homeButtonClassName="text-slate-100 hover:bg-slate-700"
-        titleClassName="text-xl font-bold text-slate-100 sm:text-2xl"
+        className="mb-4 [&_[data-slot=select-trigger]]:w-14 [&_[data-slot=select-trigger]]:px-1 sm:[&_[data-slot=select-trigger]]:w-[122px] sm:[&_[data-slot=select-trigger]]:px-3"
+        homeButtonClassName="text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+        titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
-      {/* Game Status */}
-      <Card
-        className="mb-4 w-full max-w-lg border-slate-600 bg-slate-800/50 p-3"
-        role="status"
-        aria-live="polite"
-      >
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-center gap-4">
-            <div className="flex items-center gap-2">
-              <span className={`text-2xl ${currentTurn === "white" ? "opacity-100" : "opacity-40"}`}>♔</span>
-              <span className={`text-sm ${currentTurn === "white" ? "text-slate-100" : "text-slate-100/50"}`}>
-                {t("whiteTurn")}
-              </span>
+      <main className="flex flex-1 flex-col items-center gap-4 py-2 sm:py-4">
+        {/* Game Status */}
+        <Card
+          className="surface-panel w-full max-w-lg border-white/10 bg-card/70 p-3"
+          role="status"
+          aria-live="polite"
+        >
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-center gap-4">
+              <div className="flex items-center gap-2">
+                <span className={`text-2xl ${currentTurn === "white" ? "opacity-100" : "opacity-35"}`}>♔</span>
+                <span className={`text-sm ${currentTurn === "white" ? "text-foreground" : "text-muted-foreground"}`}>
+                  {t("whiteTurn")}
+                </span>
+              </div>
+              <div className="h-4 w-px bg-border" />
+              <div className="flex items-center gap-2">
+                <span className={`text-2xl ${currentTurn === "black" ? "opacity-100" : "opacity-35"}`}>♚</span>
+                <span className={`text-sm ${currentTurn === "black" ? "text-foreground" : "text-muted-foreground"}`}>
+                  {t("blackTurnChess")}
+                </span>
+              </div>
             </div>
-            <div className="h-4 w-px bg-slate-600" />
-            <div className="flex items-center gap-2">
-              <span className={`text-2xl ${currentTurn === "black" ? "opacity-100" : "opacity-40"}`}>♚</span>
-              <span className={`text-sm ${currentTurn === "black" ? "text-slate-100" : "text-slate-100/50"}`}>
-                {t("blackTurnChess")}
-              </span>
-            </div>
-          </div>
 
           {gameStatus === "check" && (
             <div className="flex justify-center">
@@ -222,21 +224,17 @@ export function ChessGame() {
             </div>
           )}
 
-          <div className="flex items-center justify-center gap-4 text-xs">
-            <span className="text-amber-200">
-              {whiteUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}
-            </span>
-            <div className="h-3 w-px bg-slate-600/50" />
-            <span className="text-slate-400">
-              {blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}
-            </span>
+            <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+              <span>{whiteUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
+              <div className="h-3 w-px bg-border" />
+              <span>{blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
+            </div>
           </div>
-        </div>
-      </Card>
+        </Card>
 
-      {/* Board */}
-      <div className="rounded-lg border-4 border-amber-900 shadow-xl">
-        <div className="grid grid-cols-8" role="group" aria-label={t("chess")}>
+        {/* Board */}
+        <div className="w-full max-w-[22.5rem] overflow-hidden rounded-xl border-4 border-amber-950 shadow-2xl shadow-black/30">
+          <div className="grid w-full grid-cols-8" role="group" aria-label={t("chess")}>
           {board.map((row, rowIndex) =>
             row.map((piece, colIndex) => {
               const isLight = (rowIndex + colIndex) % 2 === 0
@@ -254,8 +252,7 @@ export function ChessGame() {
                   aria-label={`${square}, ${cellContent}${isValid ? ", valid move" : ""}`}
                   aria-pressed={isSelected}
                   className={`
-                    relative flex h-9 w-9 items-center justify-center text-2xl transition-all
-                    sm:h-11 sm:w-11 sm:text-3xl
+                    relative flex aspect-square w-full items-center justify-center text-[clamp(1.35rem,8vw,1.875rem)] transition-all
                     ${isLight ? "bg-amber-200" : "bg-amber-700"}
                     ${isSelected ? "ring-2 ring-yellow-400 ring-inset" : ""}
                     ${isLastFrom || isLastTo ? "bg-yellow-400/50" : ""}
@@ -273,11 +270,11 @@ export function ChessGame() {
               )
             })
           )}
+          </div>
         </div>
-      </div>
 
-      {/* Controls */}
-      <div className="mt-4 flex flex-wrap justify-center gap-2">
+        {/* Controls */}
+        <div className="flex flex-wrap justify-center gap-2">
         <Button
           onClick={handleUndo}
           disabled={history.length === 0 || gameStatus === "checkmate" || gameStatus === "stalemate" ||
@@ -285,7 +282,6 @@ export function ChessGame() {
             (currentTurn === "black" && whiteUndoUsed)
           }
           variant="outline"
-          className="border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700"
         >
           <Undo2 className="mr-1 h-4 w-4" aria-hidden="true" />
           {t("undo")}
@@ -293,7 +289,6 @@ export function ChessGame() {
         <Button
           onClick={resetGame}
           variant="outline"
-          className="border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700"
         >
           <RotateCcw className="mr-1 h-4 w-4" aria-hidden="true" />
           {t("restart")}
@@ -301,13 +296,10 @@ export function ChessGame() {
         <GameRulesDialog
           triggerLabel={t("howToPlay")}
           closeLabel={t("close")}
-          triggerClassName="border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700"
           triggerIconClassName="mr-1"
-          contentClassName="border-slate-600 bg-slate-900/95 p-4 text-slate-100"
-          titleClassName="text-lg font-bold text-slate-100"
-          closeButtonClassName="text-slate-100 hover:bg-slate-800"
+          titleClassName="text-lg font-bold text-foreground"
         >
-          <div className="space-y-2 text-sm text-slate-300">
+          <div className="space-y-2 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
               <span className="text-xl">♔</span>
               <span>{t("kingRuleInt")}</span>
@@ -332,17 +324,18 @@ export function ChessGame() {
               <span className="text-xl">♙</span>
               <span>{t("pawnRuleInt")}</span>
             </div>
-            <div className="mt-4 border-t border-slate-700 pt-4">
+            <div className="mt-4 border-t border-border pt-4">
               <p>{t("chessSpecialRules")}</p>
             </div>
           </div>
         </GameRulesDialog>
-      </div>
+        </div>
 
-      {/* Instructions */}
-      <p className="mt-4 max-w-md text-center text-xs text-slate-400">
-        {t("chessInstructionsInt")}
-      </p>
+        {/* Instructions */}
+        <p className="max-w-md text-center text-xs text-muted-foreground">
+          {t("chessInstructionsInt")}
+        </p>
+      </main>
 
     </div>
   )

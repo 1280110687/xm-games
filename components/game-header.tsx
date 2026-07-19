@@ -90,12 +90,12 @@ export function GameHeader({
 
   if (layout === "hero") {
     return (
-      <header className={cn("mb-8", className)}>
-        <div className="mb-4 flex items-center justify-between">
+      <header className={cn("game-header mb-8 p-3 sm:p-4", className)}>
+        <div className="mb-6 flex items-center justify-between">
           {home}
           {languageAndActions}
         </div>
-        <div className="flex flex-col items-center gap-4 text-center">
+        <div className="flex flex-col items-center gap-3 pb-3 text-center sm:pb-5">
           {title && <h1 className={titleClassName}>{title}</h1>}
           {description && <p className={descriptionClassName}>{description}</p>}
         </div>
@@ -105,7 +105,7 @@ export function GameHeader({
 
   if (layout === "tool") {
     return (
-      <header className={cn("flex items-center justify-between gap-2", className)}>
+      <header className={cn("game-header flex items-center justify-between gap-2 p-3 sm:p-4", className)}>
         <div className="flex min-w-0 items-center gap-2 sm:gap-4">
           {home}
           <div className="min-w-0">
@@ -122,7 +122,7 @@ export function GameHeader({
     return (
       <header
         className={cn(
-          "grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2",
+          "game-header grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 p-3 sm:p-4",
           className,
         )}
       >
@@ -134,7 +134,7 @@ export function GameHeader({
   }
 
   return (
-    <header className={cn("flex items-center justify-between", className)}>
+    <header className={cn("game-header flex items-center justify-between p-3 sm:p-4", className)}>
       {home}
       {languageAndActions}
     </header>

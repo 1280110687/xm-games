@@ -15,6 +15,7 @@ import {
   tetrisReducer,
   type TetrominoType,
 } from "@/features/tetris/engine"
+import { shouldIgnoreGameKeyboardEvent } from "@/lib/game-keyboard"
 
 const TETROMINO_COLORS: Record<TetrominoType, string> = {
   I: "bg-cyan-500",
@@ -69,7 +70,7 @@ export function TetrisGame() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (phase !== "playing") return
+      if (phase !== "playing" || shouldIgnoreGameKeyboardEvent(e)) return
 
       switch (e.key) {
         case "ArrowLeft":
@@ -116,19 +117,21 @@ export function TetrisGame() {
   const displayBoard = getDisplayBoard(state)
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
+    <div className="game-page">
       <GameHeader
+        layout="centered"
         homeIcon="back"
         homeLabel={t("appName")}
-        homeButtonClassName="text-slate-400 hover:text-white"
+        homeLabelMode="sr-only"
+        title={t("tetris")}
+        titleClassName="text-lg font-bold text-foreground sm:text-xl"
+        homeButtonClassName="text-muted-foreground hover:text-foreground"
       />
 
-      <main className="flex flex-1 flex-col items-center justify-center gap-6 py-4">
-        <h1 className="text-3xl font-bold text-white">{t("tetris")}</h1>
-
-        <div className="flex gap-4">
+      <main className="flex flex-1 flex-col items-center justify-center gap-5 py-5 sm:gap-6">
+        <div className="flex w-full flex-col items-center gap-4 sm:w-auto sm:flex-row sm:items-start">
           {/* Game Board */}
-          <Card className="border-slate-700 bg-slate-800/50">
+          <Card className="border-white/10 bg-card/70">
             <CardContent className="p-2">
               <div
                 className="grid gap-[1px] rounded bg-slate-900 p-1"
@@ -142,7 +145,7 @@ export function TetrisGame() {
                   row.map((cell, x) => (
                     <div
                       key={`${y}-${x}`}
-                      className={`h-5 w-5 rounded-sm ${getCellColor(cell)} sm:h-6 sm:w-6`}
+                      className={`h-[clamp(1.05rem,5.2vw,1.5rem)] w-[clamp(1.05rem,5.2vw,1.5rem)] rounded-sm ${getCellColor(cell)}`}
                       aria-hidden="true"
                     />
                   ))
@@ -152,9 +155,9 @@ export function TetrisGame() {
           </Card>
 
           {/* Side Panel */}
-          <div className="flex flex-col gap-4">
+          <div className="grid w-full max-w-xs grid-cols-2 gap-3 sm:flex sm:w-auto sm:flex-col sm:gap-4">
             {/* Next Piece */}
-            <Card className="border-slate-700 bg-slate-800/50">
+            <Card className="border-white/10 bg-card/70">
               <CardHeader className="p-3 pb-1">
                 <CardTitle className="text-sm text-slate-400">{t("nextPiece")}</CardTitle>
               </CardHeader>
@@ -180,7 +183,7 @@ export function TetrisGame() {
             </Card>
 
             {/* Stats */}
-            <Card className="border-slate-700 bg-slate-800/50" role="status" aria-live="polite">
+            <Card className="border-white/10 bg-card/70" role="status" aria-live="polite">
               <CardContent className="space-y-2 p-3">
                 <div className="text-center">
                   <div className="text-xs text-slate-400">{t("score")}</div>
@@ -198,9 +201,9 @@ export function TetrisGame() {
             </Card>
 
             {/* Controls */}
-            <div className="flex flex-col gap-2">
+            <div className="col-span-2 flex flex-row justify-center gap-2 sm:flex-col">
               {phase === "idle" && (
-                <Button onClick={startGame} className="gap-2 bg-green-600 hover:bg-green-700">
+                <Button onClick={startGame} className="gap-2">
                   <Play className="h-4 w-4" aria-hidden="true" />
                   {t("start")}
                 </Button>
@@ -218,7 +221,7 @@ export function TetrisGame() {
               {phase === "paused" && (
                 <Button
                   onClick={() => dispatch({ type: "resume" })}
-                  className="gap-2 bg-green-600 hover:bg-green-700"
+                  className="gap-2"
                 >
                   <Play className="h-4 w-4" aria-hidden="true" />
                   {t("resume")}

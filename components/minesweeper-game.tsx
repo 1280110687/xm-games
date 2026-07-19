@@ -181,15 +181,18 @@ export function MinesweeperGame() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
+    <div className="game-page">
       <GameHeader
+        layout="centered"
         homeLabel={t("appName")}
-        homeButtonClassName="text-slate-400 hover:text-white"
+        homeLabelMode="desktop"
+        title={t("minesweeper")}
+        className="mb-4 [&_[data-slot=select-trigger]]:w-14 [&_[data-slot=select-trigger]]:px-1 sm:[&_[data-slot=select-trigger]]:w-[122px] sm:[&_[data-slot=select-trigger]]:px-3"
+        homeButtonClassName="text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+        titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
-      <main className="flex flex-1 flex-col items-center gap-4 py-4">
-        <h1 className="text-2xl font-bold text-white sm:text-3xl">{t("minesweeper")}</h1>
-
+      <main className="flex flex-1 flex-col items-center gap-4 py-2 sm:py-4">
         {/* Difficulty selector */}
         <div className="flex gap-2">
           {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
@@ -199,10 +202,6 @@ export function MinesweeperGame() {
               size="sm"
               onClick={() => { setDifficulty(d) }}
               aria-pressed={difficulty === d}
-              className={difficulty === d 
-                ? "bg-slate-600" 
-                : "border-slate-600 bg-transparent text-slate-300 hover:bg-slate-700"
-              }
             >
               {t(d === "easy" ? "easy" : d === "medium" ? "medium" : "hard")}
             </Button>
@@ -211,19 +210,19 @@ export function MinesweeperGame() {
 
         {/* Game stats */}
         <Card
-          className="flex items-center gap-6 border-slate-700 bg-slate-800/50 px-4 py-2"
+          className="surface-panel flex items-center gap-6 border-white/10 bg-card/70 px-4 py-2"
           aria-label={`${t("minesweeper")}: ${mines - flagCount}; ${formatTime(timer)}; ${flagCount}`}
         >
           <div className="flex items-center gap-2">
             <Bomb className="h-4 w-4 text-red-400" aria-hidden="true" />
-            <span className="font-mono text-lg text-white">{mines - flagCount}</span>
+            <span className="font-mono text-lg text-foreground">{mines - flagCount}</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="font-mono text-lg text-white">{formatTime(timer)}</span>
+            <span className="font-mono text-lg text-foreground">{formatTime(timer)}</span>
           </div>
           <div className="flex items-center gap-2">
             <Flag className="h-4 w-4 text-yellow-400" aria-hidden="true" />
-            <span className="font-mono text-lg text-white">{flagCount}</span>
+            <span className="font-mono text-lg text-foreground">{flagCount}</span>
           </div>
         </Card>
 
@@ -244,7 +243,6 @@ export function MinesweeperGame() {
               variant={inputMode === "reveal" ? "default" : "outline"}
               aria-pressed={inputMode === "reveal"}
               onClick={() => setInputMode("reveal")}
-              className={inputMode === "reveal" ? "bg-slate-600" : "border-slate-600 bg-transparent text-slate-300 hover:bg-slate-700"}
             >
               <Eye className="mr-2 h-4 w-4" aria-hidden="true" />
               {a11y.revealMode}
@@ -255,13 +253,12 @@ export function MinesweeperGame() {
               variant={inputMode === "flag" ? "default" : "outline"}
               aria-pressed={inputMode === "flag"}
               onClick={() => setInputMode("flag")}
-              className={inputMode === "flag" ? "bg-slate-600" : "border-slate-600 bg-transparent text-slate-300 hover:bg-slate-700"}
             >
               <Flag className="mr-2 h-4 w-4" aria-hidden="true" />
               {a11y.flagMode}
             </Button>
           </div>
-          <p className="max-w-md text-center text-xs text-slate-400">{a11y.modeHelp}</p>
+          <p className="max-w-md text-center text-xs text-muted-foreground">{a11y.modeHelp}</p>
         </div>
 
         {/* Game board */}
@@ -317,7 +314,6 @@ export function MinesweeperGame() {
           <Button
             onClick={initGame}
             variant="outline"
-            className="border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700"
           >
             <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
             {t("restart")}
@@ -325,12 +321,9 @@ export function MinesweeperGame() {
           <GameRulesDialog
             triggerLabel={t("howToPlay")}
             closeLabel={t("close")}
-            triggerClassName="border-slate-600 bg-slate-800/50 text-slate-100 hover:bg-slate-700"
-            contentClassName="border-slate-600 bg-slate-800 p-4 text-white sm:p-6"
-            titleClassName="text-lg font-bold text-white"
-            closeButtonClassName="text-slate-400 hover:text-white"
+            titleClassName="text-lg font-bold text-foreground"
           >
-            <ul className="space-y-2 text-sm text-slate-300">
+            <ul className="space-y-2 text-sm text-muted-foreground">
               <li>{t("minesweeperRule1")}</li>
               <li>{t("minesweeperRule2")}</li>
               <li>{t("minesweeperRule3")}</li>
@@ -339,7 +332,7 @@ export function MinesweeperGame() {
           </GameRulesDialog>
         </div>
 
-        <p className="max-w-md text-center text-xs text-slate-400">
+        <p className="max-w-md text-center text-xs text-muted-foreground">
           {t("minesweeperInstructions")}
         </p>
 

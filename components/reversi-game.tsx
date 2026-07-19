@@ -143,32 +143,35 @@ export function ReversiGame() {
   const { black: blackCount, white: whiteCount } = countStones(board)
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-green-900 via-green-800 to-emerald-900 p-4">
+    <div className="game-page">
       <GameHeader
+        layout="centered"
         homeLabel={t("appName")}
-        homeButtonClassName="text-green-200 hover:text-white"
+        homeLabelMode="desktop"
+        title={t("reversi")}
+        className="mb-4 [&_[data-slot=select-trigger]]:w-14 [&_[data-slot=select-trigger]]:px-1 sm:[&_[data-slot=select-trigger]]:w-[122px] sm:[&_[data-slot=select-trigger]]:px-3"
+        homeButtonClassName="text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+        titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
-      <main className="flex flex-1 flex-col items-center gap-4 py-4">
-        <h1 className="text-2xl font-bold text-white sm:text-3xl">{t("reversi")}</h1>
-
+      <main className="flex flex-1 flex-col items-center gap-4 py-2 sm:py-4">
         {/* Game status */}
-        <Card className="border-green-600 bg-green-800/50 px-4 py-2" role="status" aria-live="polite">
+        <Card className="surface-panel border-white/10 bg-card/70 px-4 py-2" role="status" aria-live="polite">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
-              <div className={`flex h-6 w-6 items-center justify-center rounded-full ${currentPlayer === "black" ? "ring-2 ring-yellow-400" : ""} bg-slate-900`}>
+              <div className={`flex h-6 w-6 items-center justify-center rounded-full bg-slate-950 ${currentPlayer === "black" ? "ring-2 ring-primary" : ""}`}>
                 <span className="text-xs font-bold text-white">{blackCount}</span>
               </div>
-              <span className={`text-sm ${currentPlayer === "black" ? "text-yellow-300" : "text-green-200/50"}`}>
+              <span className={`text-sm ${currentPlayer === "black" ? "text-foreground" : "text-muted-foreground"}`}>
                 {t("blackStone")}
               </span>
             </div>
-            <div className="h-4 w-px bg-green-600" />
+            <div className="h-4 w-px bg-border" />
             <div className="flex items-center gap-2">
-              <div className={`flex h-6 w-6 items-center justify-center rounded-full ${currentPlayer === "white" ? "ring-2 ring-yellow-400" : ""} bg-white`}>
+              <div className={`flex h-6 w-6 items-center justify-center rounded-full bg-white ${currentPlayer === "white" ? "ring-2 ring-primary" : ""}`}>
                 <span className="text-xs font-bold text-slate-900">{whiteCount}</span>
               </div>
-              <span className={`text-sm ${currentPlayer === "white" ? "text-yellow-300" : "text-green-200/50"}`}>
+              <span className={`text-sm ${currentPlayer === "white" ? "text-foreground" : "text-muted-foreground"}`}>
                 {t("whiteStone")}
               </span>
             </div>
@@ -187,8 +190,8 @@ export function ReversiGame() {
         )}
 
         {/* Game board */}
-        <div className="rounded-lg border-4 border-green-700 bg-green-600 p-1">
-          <div className="grid grid-cols-8 gap-px bg-green-800" role="group" aria-label={t("reversi")}>
+        <div className="w-full max-w-[22.875rem] rounded-xl border-4 border-green-800 bg-green-600 p-1 shadow-2xl shadow-black/30">
+          <div className="grid w-full grid-cols-8 gap-px bg-green-800" role="group" aria-label={t("reversi")}>
             {board.map((row, rowIndex) =>
               row.map((cell, colIndex) => {
                 const isValid = isValidMove(rowIndex, colIndex)
@@ -199,15 +202,14 @@ export function ReversiGame() {
                     disabled={gameOver || !isValid}
                     aria-label={`${rowIndex + 1}, ${colIndex + 1}, ${cell === "black" ? t("blackStone") : cell === "white" ? t("whiteStone") : emptyLabel}${isValid ? `, ${validLabel}` : ""}`}
                     className={`
-                      flex h-9 w-9 items-center justify-center bg-green-600
-                      sm:h-11 sm:w-11
+                      flex aspect-square w-full items-center justify-center bg-green-600
                       ${isValid ? "cursor-pointer" : "cursor-default"}
                     `}
                   >
                     {cell ? (
                       <div
                         aria-hidden="true"
-                        className={`h-7 w-7 rounded-full shadow-md transition-all sm:h-9 sm:w-9 ${
+                        className={`h-[78%] w-[78%] rounded-full shadow-md transition-all ${
                           cell === "black"
                             ? "bg-gradient-to-br from-slate-700 to-slate-900"
                             : "bg-gradient-to-br from-white to-slate-200"
@@ -228,7 +230,6 @@ export function ReversiGame() {
           <Button
             onClick={resetGame}
             variant="outline"
-            className="border-green-600 bg-green-800/50 text-green-100 hover:bg-green-700"
           >
             <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
             {t("restart")}
@@ -236,12 +237,9 @@ export function ReversiGame() {
           <GameRulesDialog
             triggerLabel={t("howToPlay")}
             closeLabel={t("close")}
-            triggerClassName="border-green-600 bg-green-800/50 text-green-100 hover:bg-green-700"
-            contentClassName="border-green-600 bg-green-800 p-4 text-white sm:p-6"
-            titleClassName="text-lg font-bold text-white"
-            closeButtonClassName="text-green-200 hover:text-white"
+            titleClassName="text-lg font-bold text-foreground"
           >
-            <ul className="space-y-2 text-sm text-green-100">
+            <ul className="space-y-2 text-sm text-muted-foreground">
               <li>{t("reversiRule1")}</li>
               <li>{t("reversiRule2")}</li>
               <li>{t("reversiRule3")}</li>
@@ -250,7 +248,7 @@ export function ReversiGame() {
           </GameRulesDialog>
         </div>
 
-        <p className="max-w-md text-center text-xs text-green-200/70">
+        <p className="max-w-md text-center text-xs text-muted-foreground">
           {t("reversiInstructions")}
         </p>
 

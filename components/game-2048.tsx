@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card"
 import { useLocale } from "@/lib/locale-context"
 import { GameHeader } from "@/components/game-header"
 import { GameRulesDialog } from "@/components/game-rules-dialog"
+import { shouldIgnoreGameKeyboardEvent } from "@/lib/game-keyboard"
 import { RotateCcw, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
 
 type Board = (number | null)[][]
@@ -206,7 +207,9 @@ export function Game2048() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "a", "s", "d"].includes(e.key)) {
+      if (gameOver || shouldIgnoreGameKeyboardEvent(e)) return
+
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "W", "a", "A", "s", "S", "d", "D"].includes(e.key)) {
         e.preventDefault()
         const directionMap: Record<string, "left" | "right" | "up" | "down"> = {
           ArrowUp: "up", w: "up", W: "up",
@@ -221,7 +224,7 @@ export function Game2048() {
     
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [handleMove])
+  }, [gameOver, handleMove])
 
   const resetGame = () => {
     setBoard(createRandomBoard())
@@ -231,23 +234,25 @@ export function Game2048() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-amber-900 via-amber-800 to-orange-900 p-4">
+    <div className="game-page">
       <GameHeader
+        layout="centered"
         homeLabel={t("appName")}
-        homeButtonClassName="text-amber-200 hover:text-white"
+        homeLabelMode="sr-only"
+        title="2048"
+        titleClassName="text-xl font-bold text-foreground sm:text-2xl"
+        homeButtonClassName="text-muted-foreground hover:text-foreground"
       />
 
       <main className="flex flex-1 flex-col items-center gap-4 py-4">
-        <h1 className="text-4xl font-bold text-white">2048</h1>
-
         {/* Score cards */}
         <div className="flex gap-4" role="status" aria-live="polite">
-          <Card className="border-amber-600 bg-amber-700/50 px-4 py-2 text-center">
-            <div className="text-xs text-amber-200">{t("score")}</div>
+          <Card className="border-white/10 bg-card/70 px-5 py-2 text-center">
+            <div className="text-xs text-muted-foreground">{t("score")}</div>
             <div className="text-2xl font-bold text-white">{score}</div>
           </Card>
-          <Card className="border-amber-600 bg-amber-700/50 px-4 py-2 text-center">
-            <div className="text-xs text-amber-200">{t("highScore")}</div>
+          <Card className="border-white/10 bg-card/70 px-5 py-2 text-center">
+            <div className="text-xs text-muted-foreground">{t("highScore")}</div>
             <div className="text-2xl font-bold text-white">{bestScore}</div>
           </Card>
         </div>
@@ -271,8 +276,7 @@ export function Game2048() {
                   role="img"
                   aria-label={`${rowIndex + 1}, ${colIndex + 1}, ${cell || directionLabels.empty}`}
                   className={`
-                    flex h-16 w-16 items-center justify-center rounded-md font-bold transition-all
-                    sm:h-20 sm:w-20
+                    flex size-[clamp(3.35rem,18vw,5rem)] items-center justify-center rounded-md font-bold transition-all
                     ${cell ? TILE_COLORS[cell] || "bg-amber-800 text-white" : "bg-amber-600/50"}
                     ${cell && cell >= 100 ? "text-xl sm:text-2xl" : "text-2xl sm:text-3xl"}
                     ${cell && cell >= 1000 ? "text-lg sm:text-xl" : ""}
@@ -293,7 +297,7 @@ export function Game2048() {
             aria-label={directionLabels.up}
             variant="outline"
             size="lg"
-            className="border-amber-600 bg-amber-700/50 text-white"
+            className="border-white/10 bg-white/[0.04] text-white"
           >
             <ChevronUp className="h-6 w-6" aria-hidden="true" />
           </Button>
@@ -303,7 +307,7 @@ export function Game2048() {
             aria-label={directionLabels.left}
             variant="outline"
             size="lg"
-            className="border-amber-600 bg-amber-700/50 text-white"
+            className="border-white/10 bg-white/[0.04] text-white"
           >
             <ChevronLeft className="h-6 w-6" aria-hidden="true" />
           </Button>
@@ -312,7 +316,7 @@ export function Game2048() {
             aria-label={directionLabels.down}
             variant="outline"
             size="lg"
-            className="border-amber-600 bg-amber-700/50 text-white"
+            className="border-white/10 bg-white/[0.04] text-white"
           >
             <ChevronDown className="h-6 w-6" aria-hidden="true" />
           </Button>
@@ -321,7 +325,7 @@ export function Game2048() {
             aria-label={directionLabels.right}
             variant="outline"
             size="lg"
-            className="border-amber-600 bg-amber-700/50 text-white"
+            className="border-white/10 bg-white/[0.04] text-white"
           >
             <ChevronRight className="h-6 w-6" aria-hidden="true" />
           </Button>
@@ -332,7 +336,7 @@ export function Game2048() {
           <Button
             onClick={resetGame}
             variant="outline"
-            className="border-amber-600 bg-amber-700/50 text-amber-100 hover:bg-amber-600"
+            className="border-white/10 bg-white/[0.04] text-foreground"
           >
             <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
             {t("restart")}
@@ -340,12 +344,9 @@ export function Game2048() {
           <GameRulesDialog
             triggerLabel={t("howToPlay")}
             closeLabel={t("close")}
-            triggerClassName="border-amber-600 bg-amber-700/50 text-amber-100 hover:bg-amber-600"
-            contentClassName="border-amber-600 bg-amber-800 p-4 text-white sm:p-6"
-            titleClassName="text-lg font-bold text-white"
-            closeButtonClassName="text-amber-200 hover:text-white"
+            titleClassName="text-lg font-bold"
           >
-            <ul className="space-y-2 text-sm text-amber-100">
+            <ul className="space-y-2 text-sm text-muted-foreground">
               <li>{t("game2048Rule1")}</li>
               <li>{t("game2048Rule2")}</li>
               <li>{t("game2048Rule3")}</li>
@@ -353,7 +354,7 @@ export function Game2048() {
           </GameRulesDialog>
         </div>
 
-        <p className="max-w-md text-center text-xs text-amber-200/70">
+        <p className="max-w-md text-center text-xs text-muted-foreground">
           {t("game2048Instructions")}
         </p>
 

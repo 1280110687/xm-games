@@ -110,28 +110,31 @@ export function GomokuGame() {
   }, [moveHistory, board, winner, blackUndoUsed, whiteUndoUsed])
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-amber-900 via-amber-800 to-yellow-900 p-4">
+    <div className="game-page">
       <GameHeader
+        layout="centered"
         homeLabel={t("appName")}
-        homeButtonClassName="text-amber-200 hover:text-white"
+        homeLabelMode="desktop"
+        title={t("gomoku")}
+        className="mb-4 [&_[data-slot=select-trigger]]:w-14 [&_[data-slot=select-trigger]]:px-1 sm:[&_[data-slot=select-trigger]]:w-[122px] sm:[&_[data-slot=select-trigger]]:px-3"
+        homeButtonClassName="text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+        titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
-      <main className="flex flex-1 flex-col items-center gap-4 py-4">
-        <h1 className="text-2xl font-bold text-white sm:text-3xl">{t("gomoku")}</h1>
-
+      <main className="flex flex-1 flex-col items-center gap-4 py-2 sm:py-4">
         {/* Game status */}
-        <Card className="border-amber-600 bg-amber-800/50 px-4 py-2" role="status" aria-live="polite">
+        <Card className="surface-panel border-white/10 bg-card/70 px-4 py-2" role="status" aria-live="polite">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <div className={`h-5 w-5 rounded-full ${currentPlayer === "black" ? "bg-slate-900 ring-2 ring-yellow-400" : "bg-slate-900"}`} />
-              <span className={`text-sm ${currentPlayer === "black" ? "text-yellow-300" : "text-amber-200/50"}`}>
+              <div className={`h-5 w-5 rounded-full bg-slate-950 ${currentPlayer === "black" ? "ring-2 ring-primary" : ""}`} />
+              <span className={`text-sm ${currentPlayer === "black" ? "text-foreground" : "text-muted-foreground"}`}>
                 {t("blackStone")}
               </span>
             </div>
-            <div className="h-4 w-px bg-amber-600" />
+            <div className="h-4 w-px bg-border" />
             <div className="flex items-center gap-2">
-              <div className={`h-5 w-5 rounded-full ${currentPlayer === "white" ? "bg-white ring-2 ring-yellow-400" : "bg-white"}`} />
-              <span className={`text-sm ${currentPlayer === "white" ? "text-yellow-300" : "text-amber-200/50"}`}>
+              <div className={`h-5 w-5 rounded-full bg-white ${currentPlayer === "white" ? "ring-2 ring-primary" : ""}`} />
+              <span className={`text-sm ${currentPlayer === "white" ? "text-foreground" : "text-muted-foreground"}`}>
                 {t("whiteStone")}
               </span>
             </div>
@@ -145,27 +148,21 @@ export function GomokuGame() {
         )}
 
         {/* Undo status */}
-        <div className="flex items-center gap-4 text-xs text-amber-200/70">
+        <div className="flex items-center gap-4 text-xs text-muted-foreground">
           <span>{t("blackStone")}: {blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
           <span>{t("whiteStone")}: {whiteUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
         </div>
 
         {/* Game board */}
-        <div 
-          className="relative rounded-lg bg-amber-600 p-2"
-          style={{ 
-            width: `${BOARD_SIZE * 24 + 16}px`,
-            height: `${BOARD_SIZE * 24 + 16}px`,
-          }}
-        >
+        <div className="relative aspect-square w-full max-w-[23.5rem] rounded-xl border-4 border-amber-800 bg-amber-600 p-2 shadow-2xl shadow-black/30">
+          <div className="relative h-full w-full">
           {/* Grid lines */}
           <svg 
-            className="absolute inset-2"
+            className="pointer-events-none absolute left-[3.333%] top-[3.333%] h-[93.333%] w-[93.333%]"
             aria-hidden="true"
             focusable="false"
-            width={BOARD_SIZE * 24 - 24}
-            height={BOARD_SIZE * 24 - 24}
-            style={{ left: "20px", top: "20px" }}
+            viewBox={`0 0 ${(BOARD_SIZE - 1) * 24} ${(BOARD_SIZE - 1) * 24}`}
+            preserveAspectRatio="none"
           >
             {Array.from({ length: BOARD_SIZE }).map((_, i) => (
               <g key={i}>
@@ -195,24 +192,24 @@ export function GomokuGame() {
 
           {/* Stones */}
           <div 
-            className="relative grid"
+            className="relative grid h-full w-full"
             role="group"
             aria-label={t("gomoku")}
-            style={{ gridTemplateColumns: `repeat(${BOARD_SIZE}, 24px)` }}
+            style={{ gridTemplateColumns: `repeat(${BOARD_SIZE}, minmax(0, 1fr))` }}
           >
             {board.map((row, rowIndex) =>
               row.map((cell, colIndex) => (
                 <button
                   key={`${rowIndex}-${colIndex}`}
                   onClick={() => handleCellClick(rowIndex, colIndex)}
-                  className="flex h-6 w-6 items-center justify-center"
+                  className="flex aspect-square w-full touch-manipulation items-center justify-center"
                   disabled={!!winner || cell !== null}
                   aria-label={`${rowIndex + 1}, ${colIndex + 1}, ${cell === "black" ? t("blackStone") : cell === "white" ? t("whiteStone") : emptyLabel}`}
                 >
                   {cell && (
                     <div
                       aria-hidden="true"
-                      className={`h-5 w-5 rounded-full shadow-md ${
+                      className={`aspect-square w-[82%] rounded-full shadow-md ${
                         cell === "black"
                           ? "bg-gradient-to-br from-slate-700 to-slate-900"
                           : "bg-gradient-to-br from-white to-slate-200"
@@ -222,6 +219,7 @@ export function GomokuGame() {
                 </button>
               ))
             )}
+          </div>
           </div>
         </div>
 
@@ -236,7 +234,6 @@ export function GomokuGame() {
               (moveHistory.length > 0 && moveHistory[moveHistory.length - 1].stone === "black" && blackUndoUsed) ||
               (moveHistory.length > 0 && moveHistory[moveHistory.length - 1].stone === "white" && whiteUndoUsed)
             }
-            className="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700 disabled:opacity-50"
           >
             <Undo2 className="mr-2 h-4 w-4" aria-hidden="true" />
             {t("undo")}
@@ -244,7 +241,6 @@ export function GomokuGame() {
           <Button
             onClick={resetGame}
             variant="outline"
-            className="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700"
           >
             <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
             {t("restart")}
@@ -252,12 +248,9 @@ export function GomokuGame() {
           <GameRulesDialog
             triggerLabel={t("howToPlay")}
             closeLabel={t("close")}
-            triggerClassName="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700"
-            contentClassName="border-amber-600 bg-amber-800 p-4 text-white sm:p-6"
-            titleClassName="text-lg font-bold text-white"
-            closeButtonClassName="text-amber-200 hover:text-white"
+            titleClassName="text-lg font-bold text-foreground"
           >
-            <ul className="space-y-2 text-sm text-amber-100">
+            <ul className="space-y-2 text-sm text-muted-foreground">
               <li>{t("gomokuRule1")}</li>
               <li>{t("gomokuRule2")}</li>
               <li>{t("gomokuRule3")}</li>
@@ -265,7 +258,7 @@ export function GomokuGame() {
           </GameRulesDialog>
         </div>
 
-        <p className="max-w-md text-center text-xs text-amber-200/70">
+        <p className="max-w-md text-center text-xs text-muted-foreground">
           {t("gomokuInstructions")}
         </p>
 

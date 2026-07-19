@@ -28,12 +28,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="zh-CN">
+    <html lang="zh-CN" className="dark">
       <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
         <LocaleProvider>
           {children}
         </LocaleProvider>
-        <Analytics />
+        {process.env.VERCEL === '1' && <Analytics />}
       </body>
     </html>
   )

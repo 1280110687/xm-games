@@ -12,9 +12,10 @@ import {
   snakeReducer,
   type Position,
 } from "@/features/snake/engine"
+import { shouldIgnoreGameKeyboardEvent } from "@/lib/game-keyboard"
 
 export function SnakeGame() {
-  const { t } = useLocale()
+  const { locale, t } = useLocale()
   const [game, dispatch] = useReducer(snakeReducer, undefined, createInitialSnakeState)
   const persistedHighScoreRef = useRef<number | null>(null)
   const { food, highScore, phase, score, snake, speed } = game
@@ -64,7 +65,7 @@ export function SnakeGame() {
   // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!isPlaying) return
+      if (!isPlaying || shouldIgnoreGameKeyboardEvent(e)) return
 
       switch (e.key) {
         case "ArrowUp":
@@ -106,17 +107,25 @@ export function SnakeGame() {
     dispatch({ type: "togglePause" })
   }
 
+  const boardLabels = {
+    zh: { head: "蛇头", food: "食物", none: "无" },
+    en: { head: "Head", food: "Food", none: "none" },
+    th: { head: "หัวงู", food: "อาหาร", none: "ไม่มี" },
+  }[locale]
+
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
+    <div className="game-page">
       <GameHeader
+        layout="centered"
         homeIcon="back"
         homeLabel={t("appName")}
-        homeButtonClassName="text-slate-400 hover:text-white"
+        homeLabelMode="sr-only"
+        title={t("snake")}
+        titleClassName="text-lg font-bold text-foreground sm:text-xl"
+        homeButtonClassName="text-muted-foreground hover:text-foreground"
       />
 
-      <main className="flex flex-1 flex-col items-center justify-center gap-6 py-4">
-        <h1 className="text-3xl font-bold text-white">{t("snake")}</h1>
-
+      <main className="flex flex-1 flex-col items-center justify-center gap-5 py-5 sm:gap-6">
         {/* Score Display */}
         <div className="flex gap-8 text-center" role="status" aria-live="polite">
           <div>
@@ -130,12 +139,12 @@ export function SnakeGame() {
         </div>
 
         {/* Game Board */}
-        <Card className="border-slate-700 bg-slate-800/50">
+        <Card className="border-white/10 bg-card/70">
           <CardContent className="p-2">
             <div
               className="grid gap-[1px] rounded bg-slate-900 p-1"
               role="img"
-              aria-label={`${t("snake")}. ${t("score")}: ${score}. Head: ${snake[0] ? `${snake[0].x + 1}, ${snake[0].y + 1}` : "none"}. Food: ${food ? `${food.x + 1}, ${food.y + 1}` : "none"}.`}
+              aria-label={`${t("snake")}. ${t("score")}: ${score}. ${boardLabels.head}: ${snake[0] ? `${snake[0].x + 1}, ${snake[0].y + 1}` : boardLabels.none}. ${boardLabels.food}: ${food ? `${food.x + 1}, ${food.y + 1}` : boardLabels.none}.`}
               style={{
                 gridTemplateColumns: `repeat(${DEFAULT_BOARD_SIZE}, 1fr)`,
               }}
@@ -158,7 +167,7 @@ export function SnakeGame() {
                       return (
                         <div
                           key={`${y}-${x}`}
-                          className={`h-3.5 w-3.5 sm:h-4 sm:w-4 ${cellClass}`}
+                          className={`h-[clamp(0.65rem,3.25vw,1rem)] w-[clamp(0.65rem,3.25vw,1rem)] ${cellClass}`}
                           aria-hidden="true"
                         />
                       )
@@ -185,7 +194,7 @@ export function SnakeGame() {
         {/* Controls */}
         <div className="flex gap-2">
           {phase === "idle" && (
-            <Button onClick={startGame} className="gap-2 bg-green-600 hover:bg-green-700">
+            <Button onClick={startGame} className="gap-2">
               <Play className="h-4 w-4" aria-hidden="true" />
               {t("start")}
             </Button>
@@ -197,7 +206,7 @@ export function SnakeGame() {
             </Button>
           )}
           {isPaused && (
-            <Button onClick={togglePause} className="gap-2 bg-green-600 hover:bg-green-700">
+            <Button onClick={togglePause} className="gap-2">
               <Play className="h-4 w-4" aria-hidden="true" />
               {t("resume")}
             </Button>

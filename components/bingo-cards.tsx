@@ -377,14 +377,14 @@ export function BingoCards() {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4">
+    <div className="game-page">
       {/* Header */}
       <div className="mx-auto max-w-7xl">
         <GameHeader
           layout="tool"
           homeLabel={t("appName")}
           homeLabelMode="sr-only"
-          homeButtonClassName="text-slate-400 hover:text-white"
+          homeButtonClassName="text-muted-foreground hover:text-foreground"
           className="mb-6"
           titleClassName="text-2xl font-bold text-white md:text-3xl"
           title={
@@ -400,7 +400,7 @@ export function BingoCards() {
         />
 
         {/* Controls */}
-        <Card className="mb-6 border-slate-700 bg-slate-800/50">
+        <Card className="mb-6 border-white/10 bg-card/70">
           <CardContent className="p-4">
             <div className="flex flex-wrap items-center gap-4">
               {/* Number Input */}
@@ -414,7 +414,7 @@ export function BingoCards() {
                   onChange={(e) => setInputNumber(e.target.value)}
                   onKeyPress={handleKeyPress}
                   placeholder={t("enterNumber")}
-                  className="w-32 border-slate-600 bg-slate-700 text-white"
+                  className="w-36"
                 />
                 <Button onClick={handleInputNumber} variant="secondary">
                   {t("confirm")}
@@ -426,7 +426,7 @@ export function BingoCards() {
                 <Button
                   onClick={toggleListening}
                   variant={isListening ? "destructive" : "outline"}
-                  className={isListening ? "" : "border-slate-600 text-slate-300 hover:bg-slate-700"}
+                  className={isListening ? "" : "border-white/10 text-foreground"}
                 >
                   {isListening ? <MicOff className="mr-2 h-4 w-4" aria-hidden="true" /> : <Mic className="mr-2 h-4 w-4" aria-hidden="true" />}
                   {isListening ? t("stopListening") : t("startListening")}
@@ -434,13 +434,13 @@ export function BingoCards() {
               )}
 
               {/* Add Card */}
-              <Button onClick={addCard} className="bg-green-600 hover:bg-green-700">
+              <Button onClick={addCard}>
                 <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
                 {t("addCard")}
               </Button>
 
               {/* Reset */}
-              <Button onClick={resetAll} variant="outline" className="border-slate-600 text-slate-300 hover:bg-slate-700">
+              <Button onClick={resetAll} variant="outline">
                 <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
                 {t("resetMarks")}
               </Button>
@@ -473,10 +473,10 @@ export function BingoCards() {
 
         {/* Cards Grid */}
         {cards.length === 0 ? (
-          <Card className="border-slate-700 bg-slate-800/50">
+          <Card className="border-white/10 bg-card/70">
             <CardContent className="flex flex-col items-center justify-center py-16">
               <p className="mb-4 text-slate-400">{t("noCards")}</p>
-              <Button onClick={addCard} className="bg-green-600 hover:bg-green-700">
+              <Button onClick={addCard}>
                 <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
                 {t("addFirstCard")}
               </Button>
@@ -489,7 +489,7 @@ export function BingoCards() {
               return (
                 <Card
                   key={card.id}
-                  className={`border-slate-700 bg-slate-800/50 transition-all ${
+                  className={`border-white/10 bg-card/70 transition-all ${
                     hasBingo ? "ring-2 ring-amber-500 ring-offset-2 ring-offset-slate-900" : ""
                   }`}
                 >
@@ -508,7 +508,7 @@ export function BingoCards() {
                         size="icon"
                         onClick={() => removeCard(card.id)}
                         aria-label={`${t("delete")} ${card.name}`}
-                        className="h-8 w-8 text-slate-400 hover:bg-red-500/20 hover:text-red-400"
+                        className="size-10 text-slate-400 hover:bg-red-500/20 hover:text-red-400"
                       >
                         <Trash2 className="h-4 w-4" aria-hidden="true" />
                       </Button>

@@ -179,66 +179,58 @@ export function GoGame() {
   ]
 
   return (
-    <div className="flex min-h-screen flex-col items-center bg-gradient-to-br from-amber-900 via-amber-800 to-amber-900 p-4">
+    <div className="game-page">
       <GameHeader
         layout="centered"
         homeLabel={t("appName")}
+        homeLabelMode="desktop"
         title={t("go")}
-        className="mb-4 w-full max-w-lg"
-        homeButtonClassName="text-amber-100 hover:bg-amber-700"
-        titleClassName="text-xl font-bold text-amber-100 sm:text-2xl"
+        className="mb-4 [&_[data-slot=select-trigger]]:w-14 [&_[data-slot=select-trigger]]:px-1 sm:[&_[data-slot=select-trigger]]:w-[122px] sm:[&_[data-slot=select-trigger]]:px-3"
+        homeButtonClassName="text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+        titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
-      {/* Game Status */}
-      <Card className="mb-4 w-full max-w-lg border-amber-600 bg-amber-800/50 p-3" role="status" aria-live="polite">
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center justify-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className={`h-5 w-5 rounded-full border-2 ${currentTurn === "black" ? "border-amber-300 bg-slate-900" : "border-transparent bg-slate-800"}`} />
-              <span className={`text-sm ${currentTurn === "black" ? "text-amber-100" : "text-amber-100/50"}`}>
-                {t("blackStone")} ({captures.black})
-              </span>
+      <main className="flex flex-1 flex-col items-center gap-4 py-2 sm:py-4">
+        {/* Game Status */}
+        <Card className="surface-panel w-full max-w-lg border-white/10 bg-card/70 p-3" role="status" aria-live="polite">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className={`h-5 w-5 rounded-full border-2 ${currentTurn === "black" ? "border-primary bg-slate-950" : "border-transparent bg-slate-800"}`} />
+                <span className={`text-sm ${currentTurn === "black" ? "text-foreground" : "text-muted-foreground"}`}>
+                  {t("blackStone")} ({captures.black})
+                </span>
+              </div>
+              <div className="h-4 w-px bg-border" />
+              <div className="flex items-center gap-2">
+                <div className={`h-5 w-5 rounded-full border-2 ${currentTurn === "white" ? "border-primary bg-stone-50" : "border-transparent bg-stone-300"}`} />
+                <span className={`text-sm ${currentTurn === "white" ? "text-foreground" : "text-muted-foreground"}`}>
+                  {t("whiteStone")} ({captures.white})
+                </span>
+              </div>
             </div>
-            <div className="h-4 w-px bg-amber-600" />
-            <div className="flex items-center gap-2">
-              <div className={`h-5 w-5 rounded-full border-2 ${currentTurn === "white" ? "border-amber-300 bg-amber-50" : "border-transparent bg-amber-100/70"}`} />
-              <span className={`text-sm ${currentTurn === "white" ? "text-amber-100" : "text-amber-100/50"}`}>
-                {t("whiteStone")} ({captures.white})
-              </span>
+
+            {gameStatus === "ended" && (
+              <div className="mt-2 text-center">
+                <p className="text-sm text-muted-foreground">
+                  {t("blackStone")}: {blackTotal.toFixed(1)} | {t("whiteStone")}: {whiteTotal.toFixed(1)}
+                </p>
+                <p className="text-lg font-bold text-foreground">
+                  {blackTotal > whiteTotal ? t("blackWinsGo") : t("whiteWinsGo")}
+                </p>
+              </div>
+            )}
+
+            <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+              <span>{blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
+              <div className="h-3 w-px bg-border" />
+              <span>{whiteUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
             </div>
           </div>
+        </Card>
 
-          {gameStatus === "ended" && (
-            <div className="mt-2 text-center">
-              <p className="text-sm text-amber-200">
-                {t("blackStone")}: {blackTotal.toFixed(1)} | {t("whiteStone")}: {whiteTotal.toFixed(1)}
-              </p>
-              <p className="text-lg font-bold text-amber-100">
-                {blackTotal > whiteTotal ? t("blackWinsGo") : t("whiteWinsGo")}
-              </p>
-            </div>
-          )}
-
-          <div className="flex items-center justify-center gap-4 text-xs">
-            <span className="text-slate-300">
-              {blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}
-            </span>
-            <div className="h-3 w-px bg-amber-600/50" />
-            <span className="text-amber-200">
-              {whiteUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}
-            </span>
-          </div>
-        </div>
-      </Card>
-
-      {/* Board */}
-      <div 
-        className="relative rounded-lg border-4 border-amber-700 bg-[#dcb35c] p-3 shadow-xl"
-        style={{
-          width: `${BOARD_SIZE * 32 + 24}px`,
-          height: `${BOARD_SIZE * 32 + 24}px`,
-        }}
-      >
+        {/* Board */}
+        <div className="relative aspect-square w-full max-w-[19.5rem] rounded-xl border-4 border-amber-800 bg-[#dcb35c] p-3 shadow-2xl shadow-black/30">
         {/* Grid lines */}
         <svg
           className="absolute"
@@ -247,8 +239,8 @@ export function GoGame() {
           style={{
             left: "12px",
             top: "12px",
-            width: `${(BOARD_SIZE - 1) * 32}px`,
-            height: `${(BOARD_SIZE - 1) * 32}px`,
+            width: "calc(100% - 24px)",
+            height: "calc(100% - 24px)",
           }}
           viewBox={`0 0 ${(BOARD_SIZE - 1) * 32} ${(BOARD_SIZE - 1) * 32}`}
         >
@@ -290,10 +282,9 @@ export function GoGame() {
 
         {/* Stones */}
         <div
-          className="relative"
+          className="relative h-full w-full"
           role="group"
           aria-label={t("go")}
-          style={{ width: `${(BOARD_SIZE - 1) * 32}px`, height: `${(BOARD_SIZE - 1) * 32}px` }}
         >
           {board.map((row, rowIndex) =>
             row.map((stone, colIndex) => (
@@ -302,12 +293,10 @@ export function GoGame() {
                 onClick={() => handleCellClick(rowIndex, colIndex)}
                 aria-label={`${rowIndex + 1}, ${colIndex + 1}, ${stone === "black" ? t("blackStone") : stone === "white" ? t("whiteStone") : "empty"}`}
                 aria-current={lastMove?.row === rowIndex && lastMove?.col === colIndex ? "true" : undefined}
-                className="absolute flex items-center justify-center"
+                className="absolute flex aspect-square w-[11.111%] -translate-x-1/2 -translate-y-1/2 items-center justify-center touch-manipulation"
                 style={{
-                  left: `${colIndex * 32 - 16}px`,
-                  top: `${rowIndex * 32 - 16}px`,
-                  width: "32px",
-                  height: "32px",
+                  left: `${(colIndex / (BOARD_SIZE - 1)) * 100}%`,
+                  top: `${(rowIndex / (BOARD_SIZE - 1)) * 100}%`,
                 }}
               >
                 {/* Last move indicator */}
@@ -319,7 +308,7 @@ export function GoGame() {
                 {stone && (
                   <div
                     aria-hidden="true"
-                    className={`h-7 w-7 rounded-full shadow-lg ${
+                    className={`h-[87.5%] w-[87.5%] rounded-full shadow-lg ${
                       stone === "black"
                         ? "bg-gradient-to-br from-slate-700 to-slate-900"
                         : "bg-gradient-to-br from-amber-50 to-amber-200 border border-amber-300"
@@ -330,14 +319,13 @@ export function GoGame() {
             ))
           )}
         </div>
-      </div>
+        </div>
 
-      {/* Controls */}
-      <div className="mt-4 flex flex-wrap justify-center gap-2">
+        {/* Controls */}
+        <div className="flex flex-wrap justify-center gap-2">
         <Button
           onClick={handlePass}
           disabled={gameStatus === "ended"}
-          className="bg-amber-600 text-white hover:bg-amber-500"
         >
           <Flag className="mr-1 h-4 w-4" aria-hidden="true" />
           {t("pass")}
@@ -349,7 +337,6 @@ export function GoGame() {
             (currentTurn === "white" && blackUndoUsed)
           }
           variant="outline"
-          className="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700"
         >
           <Undo2 className="mr-1 h-4 w-4" aria-hidden="true" />
           {t("undo")}
@@ -357,7 +344,6 @@ export function GoGame() {
         <Button
           onClick={resetGame}
           variant="outline"
-          className="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700"
         >
           <RotateCcw className="mr-1 h-4 w-4" aria-hidden="true" />
           {t("restart")}
@@ -365,13 +351,10 @@ export function GoGame() {
         <GameRulesDialog
           triggerLabel={t("howToPlay")}
           closeLabel={t("close")}
-          triggerClassName="border-amber-600 bg-amber-800/50 text-amber-100 hover:bg-amber-700"
           triggerIconClassName="mr-1"
-          contentClassName="border-amber-600 bg-amber-900/95 p-4 text-amber-100"
-          titleClassName="text-lg font-bold text-amber-100"
-          closeButtonClassName="text-amber-100 hover:bg-amber-800"
+          titleClassName="text-lg font-bold text-foreground"
         >
-          <div className="space-y-3 text-sm text-amber-100/90">
+          <div className="space-y-3 text-sm text-muted-foreground">
             <p>{t("goRule1")}</p>
             <p>{t("goRule2")}</p>
             <p>{t("goRule3")}</p>
@@ -379,12 +362,13 @@ export function GoGame() {
             <p>{t("goRule5")}</p>
           </div>
         </GameRulesDialog>
-      </div>
+        </div>
 
-      {/* Instructions */}
-      <p className="mt-4 max-w-md text-center text-xs text-amber-200/70">
-        {t("goInstructions")}
-      </p>
+        {/* Instructions */}
+        <p className="max-w-md text-center text-xs text-muted-foreground">
+          {t("goInstructions")}
+        </p>
+      </main>
 
     </div>
   )
