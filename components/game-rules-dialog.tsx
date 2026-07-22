@@ -24,6 +24,7 @@ interface GameRulesDialogProps {
   contentClassName?: string
   titleClassName?: string
   closeButtonClassName?: string
+  onOpenChange?: (open: boolean) => void
 }
 
 export function GameRulesDialog({
@@ -36,9 +37,10 @@ export function GameRulesDialog({
   contentClassName,
   titleClassName,
   closeButtonClassName,
+  onOpenChange,
 }: GameRulesDialogProps) {
   return (
-    <Dialog>
+    <Dialog onOpenChange={onOpenChange}>
       <DialogTrigger asChild>
         <Button variant="outline" className={cn("border-white/10 bg-white/[0.04] text-foreground hover:bg-white/[0.08]", triggerClassName)}>
           <HelpCircle

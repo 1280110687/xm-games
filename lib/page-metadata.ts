@@ -36,6 +36,11 @@ export const PAGE_METADATA_KEYS = {
     descriptionKey: "snakeDescription",
     includeAppName: true,
   },
+  "/neon-breaker": {
+    titleKey: "neonBreaker",
+    descriptionKey: "neonBreakerDescription",
+    includeAppName: true,
+  },
   "/anime-tracker": {
     titleKey: "animeTracker",
     descriptionKey: "animeTrackerDescription",
