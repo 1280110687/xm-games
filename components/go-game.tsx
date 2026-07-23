@@ -179,7 +179,7 @@ export function GoGame() {
   ]
 
   return (
-    <div className="game-page">
+    <div className="game-page" data-page="go">
       <GameHeader
         layout="centered"
         homeLabel={t("appName")}
@@ -190,9 +190,12 @@ export function GoGame() {
         titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
-      <main className="flex flex-1 flex-col items-center gap-4 py-2 sm:py-4">
+      <main
+        className="game-content flex flex-1 flex-col items-center gap-4 py-2 sm:py-4"
+        data-slot="game-content"
+      >
         {/* Game Status */}
-        <Card className="surface-panel w-full max-w-lg border-white/10 bg-card/70 p-3" role="status" aria-live="polite">
+        <Card className="game-summary surface-panel w-full max-w-lg border-white/10 bg-card/70 p-3" role="status" aria-live="polite">
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-center gap-4">
               <div className="flex items-center gap-2">
@@ -211,7 +214,7 @@ export function GoGame() {
             </div>
 
             {gameStatus === "ended" && (
-              <div className="mt-2 text-center">
+              <div className="game-message mt-2 text-center" data-slot="game-message">
                 <p className="text-sm text-muted-foreground">
                   {t("blackStone")}: {blackTotal.toFixed(1)} | {t("whiteStone")}: {whiteTotal.toFixed(1)}
                 </p>
@@ -230,7 +233,10 @@ export function GoGame() {
         </Card>
 
         {/* Board */}
-        <div className="relative aspect-square w-full max-w-[19.5rem] rounded-xl border-4 border-amber-800 bg-[#dcb35c] p-3 shadow-2xl shadow-black/30">
+        <div
+          className="game-stage relative aspect-square w-full max-w-[19.5rem] rounded-xl border-4 border-amber-800 bg-[#dcb35c] p-3 shadow-2xl shadow-black/30"
+          data-slot="game-stage"
+        >
         {/* Grid lines */}
         <svg
           className="absolute"
@@ -322,7 +328,7 @@ export function GoGame() {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="game-actions flex flex-wrap justify-center gap-2" data-slot="game-actions">
         <Button
           onClick={handlePass}
           disabled={gameStatus === "ended"}
@@ -365,7 +371,7 @@ export function GoGame() {
         </div>
 
         {/* Instructions */}
-        <p className="max-w-md text-center text-xs text-muted-foreground">
+        <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
           {t("goInstructions")}
         </p>
       </main>

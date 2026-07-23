@@ -1,9 +1,14 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { LocaleProvider } from '@/lib/locale-context'
+import { ThemeProvider } from '@/components/theme-provider'
+import { ThemeTwoTabBar } from '@/components/theme-two-tab-bar'
 import { getPageMetadata } from '@/lib/page-metadata'
+import { themeBootstrapScript } from '@/lib/theme'
 import './globals.css'
+import './theme-one.css'
+import './theme-two.css'
 
 const geist = Geist({
   subsets: ['latin'],
@@ -22,17 +27,34 @@ export const metadata: Metadata = {
   },
 }
 
+export const viewport: Viewport = {
+  themeColor: '#101421',
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   return (
-    <html lang="zh-CN" className="dark">
+    <html
+      lang="zh-CN"
+      className="dark"
+      data-theme="theme-one"
+      suppressHydrationWarning
+    >
       <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
-        <LocaleProvider>
-          {children}
-        </LocaleProvider>
+        <script
+          id="xm-games-theme-bootstrap"
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
+        />
+        <ThemeProvider>
+          <LocaleProvider>
+            {children}
+            <ThemeTwoTabBar />
+          </LocaleProvider>
+        </ThemeProvider>
         {process.env.VERCEL === '1' && <Analytics />}
       </body>
     </html>

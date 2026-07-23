@@ -46,6 +46,11 @@ export const PAGE_METADATA_KEYS = {
     descriptionKey: "animeTrackerDescription",
     includeAppName: true,
   },
+  "/settings": {
+    titleKey: "settings",
+    descriptionKey: "settingsDescription",
+    includeAppName: true,
+  },
   "/chinese-chess": {
     titleKey: "chineseChess",
     descriptionKey: "chineseChessDescription",

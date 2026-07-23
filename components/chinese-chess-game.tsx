@@ -423,7 +423,7 @@ export function ChineseChessGame() {
   }
 
   return (
-    <div className="game-page">
+    <div className="game-page" data-page="chinese-chess">
       <GameHeader
         layout="centered"
         homeLabel={t("appName")}
@@ -434,9 +434,12 @@ export function ChineseChessGame() {
         titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
-      <main className="flex flex-1 flex-col items-center gap-4 py-1 sm:py-3">
+      <main
+        className="game-content flex flex-1 flex-col items-center gap-4 py-1 sm:py-3"
+        data-slot="game-content"
+      >
         {/* Game Status */}
-        <Card className="surface-panel border-white/10 bg-card/70 p-3 sm:p-4" role="status" aria-live="polite">
+        <Card className="game-summary surface-panel border-white/10 bg-card/70 p-3 sm:p-4" role="status" aria-live="polite">
           <div className="flex flex-col gap-3">
             {/* Turn indicator and status */}
             <div className="flex items-center justify-center gap-4">
@@ -457,13 +460,21 @@ export function ChineseChessGame() {
 
             {/* Check/Checkmate status */}
             {gameStatus === "check" && (
-              <div className="flex justify-center">
-                <span className="animate-pulse rounded-full bg-yellow-500/20 px-3 py-1 text-sm font-bold text-yellow-400">{t("check")}</span>
+              <div className="game-message flex justify-center" data-slot="game-message">
+                <span
+                  className="game-status-banner animate-pulse rounded-full bg-yellow-500/20 px-3 py-1 text-sm font-bold text-yellow-400"
+                  data-tone="warning"
+                >
+                  {t("check")}
+                </span>
               </div>
             )}
             {gameStatus === "checkmate" && (
-              <div className="flex justify-center">
-                <span className="rounded-full bg-red-500/20 px-3 py-1 text-sm font-bold text-red-400">
+              <div className="game-message flex justify-center" data-slot="game-message">
+                <span
+                  className="game-status-banner rounded-full bg-red-500/20 px-3 py-1 text-sm font-bold text-red-400"
+                  data-tone="danger"
+                >
                   {winner === "red" ? t("redWins") : t("blackWins")}
                 </span>
               </div>
@@ -472,13 +483,13 @@ export function ChineseChessGame() {
             {/* Undo status */}
             <div className="flex items-center justify-center gap-4 text-xs">
               <div className="flex items-center gap-1">
-                <span className="text-red-400">
+                <span className="game-status-copy text-red-400" data-tone="danger">
                   {redUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}
                 </span>
               </div>
               <div className="h-3 w-px bg-border" />
               <div className="flex items-center gap-1">
-                <span className="text-slate-400">
+                <span className="game-status-copy text-slate-400" data-tone="neutral">
                   {blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}
                 </span>
               </div>
@@ -487,7 +498,10 @@ export function ChineseChessGame() {
         </Card>
 
         {/* Chess Board */}
-        <div className="relative aspect-[80/89] w-full max-w-80 rounded-xl border-4 border-amber-800 bg-[#d4a574] p-4 shadow-2xl shadow-black/30">
+        <div
+          className="game-stage relative aspect-[80/89] w-full max-w-80 rounded-xl border-4 border-amber-800 bg-[#d4a574] p-4 shadow-2xl shadow-black/30"
+          data-slot="game-stage"
+        >
           <div className="relative h-full w-full">
           {/* SVG Board Lines - positioned to match intersections */}
           <svg 
@@ -624,7 +638,7 @@ export function ChineseChessGame() {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="game-actions flex flex-wrap justify-center gap-2" data-slot="game-actions">
           <Button
             onClick={handleUndo}
             variant="outline"
@@ -702,7 +716,7 @@ export function ChineseChessGame() {
         </div>
 
         {/* Instructions */}
-        <p className="max-w-md text-center text-xs text-muted-foreground sm:text-sm">
+        <p className="game-help max-w-md text-center text-xs text-muted-foreground sm:text-sm" data-slot="game-help">
           {t("chessInstructions")}
         </p>
 

@@ -1,0 +1,2135 @@
+/*
+ * Theme Two: an original iOS-inspired XM-Games system.
+ * It owns a separate light palette, typography rhythm, component chrome and
+ * route layout suite while game rules, data and board artwork stay shared.
+ */
+html[data-theme='theme-two'] {
+  color-scheme: light;
+  --background: oklch(0.965 0.006 255);
+  --foreground: oklch(0.2 0.018 255);
+  --card: oklch(0.995 0.002 255);
+  --card-foreground: oklch(0.2 0.018 255);
+  --popover: oklch(0.995 0.002 255 / 0.96);
+  --popover-foreground: oklch(0.2 0.018 255);
+  --primary: oklch(0.61 0.19 252);
+  --primary-foreground: oklch(0.99 0.003 255);
+  --secondary: oklch(0.93 0.01 255);
+  --secondary-foreground: oklch(0.26 0.025 255);
+  --muted: oklch(0.935 0.008 255);
+  --muted-foreground: oklch(0.5 0.025 255);
+  --accent: oklch(0.91 0.035 250);
+  --accent-foreground: oklch(0.36 0.11 252);
+  --destructive: oklch(0.61 0.23 25);
+  --destructive-foreground: oklch(0.99 0.003 255);
+  --border: oklch(0.84 0.014 255);
+  --input: oklch(0.92 0.012 255);
+  --ring: oklch(0.61 0.19 252);
+  --radius: 1rem;
+  --surface-low: oklch(0.95 0.008 255);
+  --surface: oklch(0.995 0.002 255);
+  --surface-high: oklch(1 0 0 / 0.94);
+  --surface-border: oklch(0.86 0.012 255);
+  --surface-shadow: 0 1px 2px oklch(0.25 0.03 255 / 0.05),
+    0 12px 34px oklch(0.25 0.03 255 / 0.08);
+  --control-fill: oklch(0.92 0.012 255);
+  --control-hover: oklch(0.885 0.018 255);
+  --separator: oklch(0.84 0.014 255 / 0.82);
+  --glow-primary: oklch(0.72 0.12 250 / 0.16);
+  --glow-cyan: oklch(0.82 0.09 210 / 0.12);
+  --theme-two-page-gutter: clamp(1rem, 3vw, 2rem);
+  --theme-two-content-width: 72rem;
+  --theme-two-control-size: 2.75rem;
+}
+
+html[data-theme='theme-two'],
+html[data-theme='theme-two'] body {
+  background: var(--background);
+}
+
+html[data-theme='theme-two'] body {
+  min-height: 100vh;
+  background-image:
+    radial-gradient(circle at 8% -8%, oklch(0.82 0.1 250 / 0.2), transparent 26rem),
+    linear-gradient(180deg, oklch(0.985 0.004 255), var(--background) 24rem);
+  background-attachment: scroll;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Hiragino Sans GB', 'Noto Sans Thai', sans-serif;
+}
+
+html[data-theme='theme-two'] ::selection {
+  color: var(--primary-foreground);
+  background: color-mix(in oklab, var(--primary) 72%, white);
+}
+
+/* Theme Two layout foundation */
+html[data-theme='theme-two'] .app-shell::before,
+html[data-theme='theme-two'] .game-page::before {
+  display: none;
+}
+
+html[data-theme='theme-two'] .app-shell,
+html[data-theme='theme-two'] .game-page {
+  color: var(--foreground);
+}
+
+html[data-theme='theme-two'] .app-container {
+  width: min(100%, 76rem);
+  padding-inline: var(--theme-two-page-gutter);
+}
+
+html[data-theme='theme-two'] .game-page {
+  min-height: 100svh;
+  padding:
+    max(0.75rem, env(safe-area-inset-top))
+    max(0.75rem, env(safe-area-inset-right))
+    max(1.5rem, env(safe-area-inset-bottom))
+    max(0.75rem, env(safe-area-inset-left));
+}
+
+html[data-theme='theme-two'] .game-page main {
+  width: min(100%, var(--theme-two-content-width));
+  margin-inline: auto;
+}
+
+html[data-theme='theme-two'] .game-page h1 {
+  letter-spacing: -0.035em;
+}
+
+html[data-theme='theme-two'] .surface-panel {
+  border: 1px solid var(--surface-border);
+  border-radius: 1.35rem;
+  background: var(--surface);
+  box-shadow: var(--surface-shadow);
+  backdrop-filter: none;
+}
+
+html[data-theme='theme-two'] .surface-card {
+  border: 1px solid var(--surface-border);
+  border-radius: 1.15rem;
+  background: var(--surface);
+  box-shadow: 0 1px 2px oklch(0.25 0.03 255 / 0.04);
+}
+
+html[data-theme='theme-two'] .eyebrow {
+  border: 0;
+  border-radius: 999px;
+  color: var(--primary);
+  background: color-mix(in oklab, var(--primary) 10%, white);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: none;
+}
+
+/* Navigation material: Theme Two keeps glass only on navigation and portals. */
+html[data-theme='theme-two'] .game-header {
+  width: min(100%, var(--theme-two-content-width));
+  margin-inline: auto;
+  border: 1px solid oklch(1 0 0 / 0.82);
+  border-radius: 1.35rem;
+  color: var(--foreground);
+  background: oklch(1 0 0 / 0.72);
+  box-shadow:
+    0 1px 1px oklch(0.25 0.03 255 / 0.04),
+    0 12px 40px oklch(0.25 0.03 255 / 0.08);
+  -webkit-backdrop-filter: saturate(160%) blur(22px);
+  backdrop-filter: saturate(160%) blur(22px);
+}
+
+html[data-theme='theme-two'] .game-header[data-layout='centered'] {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  gap: 0.65rem 0.75rem;
+  padding: 0.75rem 0.85rem 1rem;
+}
+
+html[data-theme='theme-two'] .game-header[data-layout='centered'] > :first-child {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+html[data-theme='theme-two'] .game-header[data-layout='centered'] > h1 {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  justify-self: start;
+  padding-inline: 0.35rem;
+  font-size: clamp(1.55rem, 5vw, 2.25rem);
+  line-height: 1.08;
+  text-align: left;
+}
+
+html[data-theme='theme-two'] .game-header[data-layout='centered'] > :last-child {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+html[data-theme='theme-two'] .game-header[data-layout='tool'] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  align-items: center;
+  gap: 0.65rem 0.75rem;
+  padding: 0.85rem;
+}
+
+html[data-theme='theme-two'] .game-header[data-layout='tool'] > :first-child {
+  display: contents;
+}
+
+html[data-theme='theme-two'] .game-header[data-layout='tool'] > :first-child > [data-slot='button'] {
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+}
+
+html[data-theme='theme-two'] .game-header[data-layout='tool'] > :first-child > div {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  padding-inline: 0.3rem;
+}
+
+html[data-theme='theme-two'] .game-header[data-layout='tool'] > [data-slot='game-header-controls'] {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+html[data-theme='theme-two'] .game-header[data-layout='tool'] h1 {
+  font-size: clamp(1.45rem, 4vw, 2rem);
+  color: var(--foreground);
+}
+
+html[data-theme='theme-two'] .game-header[data-layout='hero'] {
+  padding: 0.8rem 0.85rem 1.1rem;
+}
+
+html[data-theme='theme-two'] [data-slot='game-header-controls'] {
+  gap: 0.4rem;
+}
+
+/* Shared control suite */
+html[data-theme='theme-two'] [data-slot='button'] {
+  min-width: var(--theme-two-control-size);
+  min-height: var(--theme-two-control-size);
+  border-radius: 0.85rem;
+  box-shadow: none;
+}
+
+html[data-theme='theme-two'] [data-slot='button'].rounded-full {
+  border-radius: 999px;
+}
+
+html[data-theme='theme-two'] [data-slot='button']:where(.bg-primary) {
+  box-shadow: 0 6px 16px color-mix(in oklab, var(--primary) 22%, transparent);
+}
+
+html[data-theme='theme-two'] [data-slot='button'][data-variant='outline'] {
+  border-color: var(--border);
+  color: var(--foreground);
+  background-color: var(--control-fill);
+}
+
+html[data-theme='theme-two'] [data-slot='button'][data-variant='outline']:hover,
+html[data-theme='theme-two'] [data-slot='button'][data-variant='secondary']:hover,
+html[data-theme='theme-two'] [data-slot='button'][data-variant='ghost']:hover {
+  color: var(--foreground);
+  background-color: var(--control-hover);
+}
+
+html[data-theme='theme-two'] [data-slot='button'][data-tone='danger']:hover {
+  color: var(--destructive);
+  background-color: color-mix(in oklab, var(--destructive) 12%, white);
+}
+
+html[data-theme='theme-two'] [data-slot='card'] {
+  border-color: var(--surface-border);
+  border-radius: 1.35rem;
+  color: var(--card-foreground);
+  background: var(--card);
+  box-shadow: var(--surface-shadow);
+  backdrop-filter: none;
+}
+
+html[data-theme='theme-two'] [data-slot='card-title'] {
+  color: var(--foreground);
+}
+
+html[data-theme='theme-two'] [data-slot='input'],
+html[data-theme='theme-two'] [data-slot='select-trigger'] {
+  min-height: var(--theme-two-control-size);
+  border-color: transparent;
+  border-radius: 0.8rem;
+  color: var(--foreground);
+  background: var(--control-fill);
+  box-shadow: inset 0 0 0 1px oklch(0.75 0.018 255 / 0.2);
+}
+
+html[data-theme='theme-two'] [data-slot='select-content'],
+html[data-theme='theme-two'] [data-slot='dropdown-menu-content'],
+html[data-theme='theme-two'] [data-slot='dropdown-menu-sub-content'] {
+  border-color: oklch(1 0 0 / 0.78);
+  border-radius: 1rem;
+  background: oklch(1 0 0 / 0.9);
+  box-shadow: 0 18px 60px oklch(0.2 0.025 255 / 0.18);
+  -webkit-backdrop-filter: saturate(165%) blur(24px);
+  backdrop-filter: saturate(165%) blur(24px);
+}
+
+html[data-theme='theme-two'] [data-slot='select-item'],
+html[data-theme='theme-two'] [data-slot='dropdown-menu-item'],
+html[data-theme='theme-two'] [data-slot='dropdown-menu-radio-item'] {
+  border-radius: 0.75rem;
+}
+
+html[data-theme='theme-two'] [data-slot='dialog-overlay'] {
+  background: oklch(0.22 0.02 255 / 0.32);
+  -webkit-backdrop-filter: blur(7px);
+  backdrop-filter: blur(7px);
+}
+
+html[data-theme='theme-two'] [data-slot='dialog-content'] {
+  border-color: oklch(1 0 0 / 0.82);
+  border-radius: 1.5rem;
+  color: var(--foreground);
+  background: oklch(1 0 0 / 0.94);
+  box-shadow: 0 28px 90px oklch(0.2 0.025 255 / 0.22);
+  -webkit-backdrop-filter: saturate(150%) blur(26px);
+  backdrop-filter: saturate(150%) blur(26px);
+}
+
+html[data-theme='theme-two'] [data-slot='tabs-list'] {
+  min-height: var(--theme-two-control-size);
+  border-color: transparent;
+  border-radius: 0.75rem;
+  background: var(--control-fill);
+}
+
+html[data-theme='theme-two'] [data-slot='tabs-trigger'] {
+  min-height: 2.25rem;
+  border-radius: 0.6rem;
+}
+
+html[data-theme='theme-two'] [data-slot='tabs-trigger'][data-state='active'] {
+  border-color: transparent;
+  background: var(--card);
+  box-shadow:
+    0 1px 2px oklch(0.2 0.025 255 / 0.08),
+    0 3px 10px oklch(0.2 0.025 255 / 0.06);
+}
+
+html[data-theme='theme-two'] [data-slot='switch'] {
+  min-width: 3.15rem;
+  min-height: 1.9rem;
+  padding: 0.15rem;
+  background: var(--input);
+}
+
+html[data-theme='theme-two'] [data-slot='switch-thumb'] {
+  width: 1.55rem;
+  height: 1.55rem;
+  background: white;
+  box-shadow: 0 2px 7px oklch(0.2 0.025 255 / 0.24);
+}
+
+html[data-theme='theme-two'] [data-slot='slider-thumb'] {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+html[data-theme='theme-two'] .theme-switcher-trigger,
+html[data-theme='theme-two'] [data-slot='select-trigger'] {
+  border-color: oklch(0.78 0.014 255 / 0.55);
+  color: var(--foreground);
+  background: oklch(1 0 0 / 0.7);
+}
+
+html[data-theme='theme-two'] .theme-switcher-trigger {
+  color: var(--primary);
+}
+
+html[data-theme='theme-two'] .language-switcher-trigger > svg {
+  color: var(--primary);
+}
+
+html[data-theme='theme-two'] .game-header .language-switcher-trigger {
+  width: var(--theme-two-control-size);
+  padding-inline: 0 !important;
+}
+
+html[data-theme='theme-two'] .game-header .language-switcher-compact-label {
+  display: none;
+}
+
+html[data-theme='theme-two'] .theme-switcher-content {
+  color: var(--foreground);
+}
+
+html[data-theme='theme-two'] [data-theme-label='theme-one'] {
+  display: none;
+}
+
+html[data-theme='theme-two'] [data-theme-label='theme-two'] {
+  display: inline;
+}
+
+/* Home: a grouped navigation layout independent from Theme One's card wall. */
+html[data-theme='theme-two'] .home-shell {
+  padding-block:
+    max(0.75rem, env(safe-area-inset-top))
+    max(2rem, env(safe-area-inset-bottom));
+}
+
+html[data-theme='theme-two'] .home-header {
+  position: sticky;
+  z-index: 20;
+  top: max(0.5rem, env(safe-area-inset-top));
+  margin-bottom: 1rem;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid oklch(1 0 0 / 0.82);
+  border-radius: 1.2rem;
+  background: oklch(1 0 0 / 0.72);
+  box-shadow: 0 10px 34px oklch(0.25 0.03 255 / 0.08);
+  -webkit-backdrop-filter: saturate(160%) blur(22px);
+  backdrop-filter: saturate(160%) blur(22px);
+}
+
+html[data-theme='theme-two'] .home-brand-icon {
+  border: 0;
+  border-radius: 0.85rem;
+  color: white;
+  background: linear-gradient(145deg, oklch(0.67 0.2 250), oklch(0.56 0.21 262));
+  box-shadow: 0 8px 20px oklch(0.54 0.19 255 / 0.22);
+}
+
+html[data-theme='theme-two'] .home-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1.5rem;
+  padding: clamp(1.75rem, 6vw, 4.5rem) 0.35rem 1.5rem;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+  overflow: visible;
+}
+
+html[data-theme='theme-two'] .home-hero h1 {
+  margin-top: 0.9rem;
+  max-width: 12ch;
+  color: var(--foreground);
+  font-size: clamp(2.55rem, 9vw, 5.5rem);
+  font-weight: 790;
+  letter-spacing: -0.065em;
+  line-height: 0.95;
+}
+
+html[data-theme='theme-two'] .home-hero-stats {
+  width: min(100%, 26rem);
+  min-width: 0;
+  padding: 0.25rem;
+  border: 0;
+  border-radius: 1rem;
+  background: var(--control-fill);
+  box-shadow: none;
+}
+
+html[data-theme='theme-two'] .home-hero-stats > div {
+  padding: 0.75rem 1rem;
+}
+
+html[data-theme='theme-two'] .home-instant-play {
+  color: var(--primary);
+}
+
+html[data-theme='theme-two'] .home-sections {
+  margin-top: 1.25rem;
+  padding-bottom: 1rem;
+}
+
+html[data-theme='theme-two'] .home-category {
+  overflow: hidden;
+  border: 1px solid var(--surface-border);
+  border-radius: 1.35rem;
+  background: var(--card);
+  box-shadow: 0 1px 2px oklch(0.25 0.03 255 / 0.04);
+}
+
+html[data-theme='theme-two'] .home-category-heading {
+  margin: 0;
+  padding: 1rem 1rem 0.85rem;
+  border-bottom: 1px solid var(--separator);
+}
+
+html[data-theme='theme-two'] .home-category-heading h2 {
+  font-size: 1rem;
+  font-weight: 720;
+}
+
+html[data-theme='theme-two'] .home-category-count {
+  border: 0;
+  color: var(--muted-foreground);
+  background: var(--control-fill);
+}
+
+html[data-theme='theme-two'] .home-game-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0;
+}
+
+html[data-theme='theme-two'] .home-game-card {
+  min-height: 4.75rem;
+  padding: 0.75rem 1rem;
+  border: 0;
+  border-bottom: 1px solid var(--separator);
+  border-radius: 0;
+  color: var(--foreground);
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+html[data-theme='theme-two'] .home-game-card:hover {
+  border-color: var(--separator);
+  background: color-mix(in oklab, var(--primary) 5%, white);
+  box-shadow: none;
+  transform: none;
+}
+
+html[data-theme='theme-two'] .home-game-card:last-child {
+  border-bottom: 0;
+}
+
+html[data-theme='theme-two'] .home-game-card:not(.home-game-card--featured) {
+  display: grid;
+  grid-template-columns: 2.8rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+html[data-theme='theme-two'] .home-game-card-top {
+  display: contents;
+}
+
+html[data-theme='theme-two'] .home-game-card-icon {
+  grid-column: 1;
+  width: 2.8rem;
+  height: 2.8rem;
+  border: 0;
+  border-radius: 0.85rem;
+}
+
+html[data-theme='theme-two'] .home-game-card-icon[class*='text-violet'] {
+  color: oklch(0.56 0.18 285);
+  background: oklch(0.93 0.035 285);
+}
+
+html[data-theme='theme-two'] .home-game-card-icon[class*='text-cyan'] {
+  color: oklch(0.55 0.13 220);
+  background: oklch(0.94 0.035 220);
+}
+
+html[data-theme='theme-two'] .home-game-card-icon[class*='text-emerald'] {
+  color: oklch(0.53 0.14 160);
+  background: oklch(0.94 0.035 160);
+}
+
+html[data-theme='theme-two'] .home-game-card-icon[class*='text-amber'] {
+  color: oklch(0.58 0.15 75);
+  background: oklch(0.95 0.045 75);
+}
+
+html[data-theme='theme-two'] .home-game-card-icon[class*='text-rose'] {
+  color: oklch(0.58 0.19 20);
+  background: oklch(0.94 0.04 20);
+}
+
+html[data-theme='theme-two'] .home-game-card-arrow {
+  grid-column: 3;
+  grid-row: 1;
+  color: var(--muted-foreground);
+}
+
+html[data-theme='theme-two'] .home-game-card-copy {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0;
+  padding: 0;
+}
+
+html[data-theme='theme-two'] .home-game-card-title {
+  font-size: 0.98rem;
+  font-weight: 680;
+}
+
+html[data-theme='theme-two'] .home-game-card-description {
+  margin-top: 0.2rem;
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+  line-height: 1.15rem;
+}
+
+html[data-theme='theme-two'] .home-game-card--featured {
+  min-height: 8rem;
+  margin: 0.75rem;
+  padding: 1rem;
+  border: 0;
+  border-radius: 1.1rem;
+  color: white;
+  background:
+    radial-gradient(circle at 85% 0%, oklch(0.88 0.1 230 / 0.42), transparent 12rem),
+    linear-gradient(140deg, oklch(0.61 0.19 252), oklch(0.5 0.2 267));
+  box-shadow: 0 12px 28px oklch(0.48 0.17 258 / 0.22);
+}
+
+html[data-theme='theme-two'] .home-game-card--featured:hover {
+  background:
+    radial-gradient(circle at 85% 0%, oklch(0.9 0.1 230 / 0.5), transparent 12rem),
+    linear-gradient(140deg, oklch(0.64 0.19 252), oklch(0.53 0.2 267));
+}
+
+html[data-theme='theme-two'] .home-game-card--featured .home-game-card-title,
+html[data-theme='theme-two'] .home-game-card--featured .home-game-card-description {
+  color: white;
+}
+
+html[data-theme='theme-two'] .home-game-card--featured .home-game-card-arrow {
+  border-color: oklch(1 0 0 / 0.26);
+  color: white;
+  background: oklch(1 0 0 / 0.14);
+}
+
+/* Route layout suite: every route can evolve independently under Theme Two. */
+html[data-theme='theme-two'] .game-page[data-page='2048'] main,
+html[data-theme='theme-two'] .game-page[data-page='snake'] main,
+html[data-theme='theme-two'] .game-page[data-page='sudoku'] main,
+html[data-theme='theme-two'] .game-page[data-page='minesweeper'] main,
+html[data-theme='theme-two'] .game-page[data-page='gomoku'] main,
+html[data-theme='theme-two'] .game-page[data-page='reversi'] main {
+  justify-content: flex-start;
+  padding-top: 1.25rem;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='tetris'] main {
+  justify-content: flex-start;
+  max-width: 48rem;
+  padding-top: 1.25rem;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] main {
+  max-width: 52rem;
+  padding-top: 1rem;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] [data-tone='amber'],
+html[data-theme='theme-two'] .game-page[data-page='neon-breaker'] [data-tone='amber'] {
+  --game-accent-ink: #865400;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] [data-tone='rose'],
+html[data-theme='theme-two'] .game-page[data-page='neon-breaker'] [data-tone='rose'] {
+  --game-accent-ink: #b42348;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] [data-tone='cyan'],
+html[data-theme='theme-two'] .game-page[data-page='neon-breaker'] [data-tone='cyan'] {
+  --game-accent-ink: #006f83;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] [data-tone='violet'],
+html[data-theme='theme-two'] .game-page[data-page='neon-breaker'] [data-tone='violet'] {
+  --game-accent-ink: #6741b5;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] [data-tone='blue'] {
+  --game-accent-ink: #1764bd;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] [data-tone='emerald'],
+html[data-theme='theme-two'] .game-page[data-page='neon-breaker'] [data-tone='emerald'] {
+  --game-accent-ink: #08783e;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] [data-tone='indigo'] {
+  --game-accent-ink: #5146a8;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] [data-tone='fuchsia'],
+html[data-theme='theme-two'] .game-page[data-page='neon-breaker'] [data-tone='fuchsia'] {
+  --game-accent-ink: #9c2a78;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] [data-tone='orange'] {
+  --game-accent-ink: #ad4700;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] [data-tone='yellow'] {
+  --game-accent-ink: #726000;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] .memory-kicker {
+  color: #006f83;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] .memory-difficulty-control {
+  border-color: var(--separator);
+  background-color: var(--control-fill);
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] .memory-accent,
+html[data-theme='theme-two'] .game-page[data-page='neon-breaker'] .neon-breaker-accent {
+  color: var(--game-accent-ink);
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] span.memory-accent,
+html[data-theme='theme-two'] .game-page[data-page='neon-breaker'] span.neon-breaker-accent {
+  border-color: color-mix(in oklab, var(--game-accent-ink) 22%, white);
+  background-color: color-mix(in oklab, var(--game-accent-ink) 11%, white);
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] .memory-accent-pill {
+  border-color: color-mix(in oklab, var(--game-accent-ink) 24%, white);
+  color: var(--game-accent-ink);
+  background-color: color-mix(in oklab, var(--game-accent-ink) 10%, white);
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] .memory-progress-track {
+  background-color: var(--control-fill);
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] .memory-complete-panel {
+  border-color: color-mix(in oklab, #08783e 24%, white);
+  background-color: color-mix(in oklab, #08783e 7%, white);
+}
+
+html[data-theme='theme-two'] .game-page[data-page='memory-match'] .memory-symbol {
+  border-color: color-mix(in oklab, var(--game-accent-ink) 24%, white);
+  color: var(--game-accent-ink);
+  background-color: color-mix(in oklab, var(--game-accent-ink) 12%, white);
+}
+
+html[data-theme='theme-two'] .game-page[data-page='chess'] main,
+html[data-theme='theme-two'] .game-page[data-page='chinese-chess'] main,
+html[data-theme='theme-two'] .game-page[data-page='go'] main {
+  max-width: 54rem;
+  padding-top: 1rem;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='bingo'] > div,
+html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] > div {
+  width: min(100%, 70rem);
+}
+
+html[data-theme='theme-two'] .game-page[data-page='bingo'] [data-slot='card-header'],
+html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] [data-slot='card-header'] {
+  border-color: var(--separator);
+}
+
+html[data-theme='theme-two'] .game-page[data-page='bingo'] [data-slot='card'] {
+  box-shadow: 0 1px 2px oklch(0.25 0.03 255 / 0.04);
+}
+
+html[data-theme='theme-two'] .game-page[data-page='neon-breaker'] main {
+  max-width: 68rem;
+  align-items: start;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='neon-breaker'] canvas {
+  color-scheme: dark;
+}
+
+html[data-theme='theme-two'] .game-page[data-page='neon-breaker'] .neon-breaker-power-up {
+  border-color: color-mix(in oklab, #08783e 24%, white);
+  color: #08783e;
+  background-color: color-mix(in oklab, #08783e 8%, white);
+}
+
+html[data-theme='theme-two'] .game-status-banner[data-tone='success'] {
+  color: #08783e;
+  background-color: #ddf6e7;
+}
+
+html[data-theme='theme-two'] .game-status-banner[data-tone='danger'] {
+  color: #a3182f;
+  background-color: #ffe2e8;
+}
+
+html[data-theme='theme-two'] .game-status-banner[data-tone='warning'] {
+  color: #725500;
+  background-color: #fff1bd;
+}
+
+html[data-theme='theme-two'] .game-status-banner[data-tone='neutral'] {
+  color: #4d5663;
+  background-color: #e8ebef;
+}
+
+html[data-theme='theme-two'] .game-stat-value[data-tone='success'],
+html[data-theme='theme-two'] .game-status-copy[data-tone='success'] {
+  color: #08783e;
+}
+
+html[data-theme='theme-two'] .game-stat-value[data-tone='achievement'],
+html[data-theme='theme-two'] .game-stat-icon[data-tone='achievement'],
+html[data-theme='theme-two'] .game-number-chip[data-tone='achievement'] {
+  color: #865400;
+}
+
+html[data-theme='theme-two'] .game-stat-value[data-tone='info'] {
+  color: #006f83;
+}
+
+html[data-theme='theme-two'] .game-stat-icon[data-tone='danger'],
+html[data-theme='theme-two'] .game-status-copy[data-tone='danger'] {
+  color: #a3182f;
+}
+
+html[data-theme='theme-two'] .game-status-copy[data-tone='neutral'] {
+  color: #4d5663;
+}
+
+html[data-theme='theme-two'] .game-number-chip[data-tone='achievement'] {
+  background-color: #fff0bd;
+}
+
+html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] {
+  background: transparent;
+}
+
+html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] [data-slot='card'] {
+  box-shadow: 0 1px 2px oklch(0.25 0.03 255 / 0.04);
+}
+
+/* Settings: a dedicated iOS-style preferences surface. */
+html[data-theme='theme-two'] .settings-shell {
+  padding-block:
+    max(1rem, env(safe-area-inset-top))
+    max(2rem, env(safe-area-inset-bottom));
+  background: transparent;
+}
+
+html[data-theme='theme-two'] .settings-container {
+  width: min(100%, 48rem);
+}
+
+html[data-theme='theme-two'] .settings-page-header {
+  align-items: flex-start;
+  padding: 0.35rem 0.25rem;
+}
+
+html[data-theme='theme-two'] .settings-back-button {
+  border: 1px solid oklch(0.78 0.014 255 / 0.55);
+  background: oklch(1 0 0 / 0.72);
+}
+
+html[data-theme='theme-two'] .settings-eyebrow {
+  color: var(--primary);
+}
+
+html[data-theme='theme-two'] .settings-title {
+  font-size: clamp(2.25rem, 8vw, 3.75rem);
+  font-weight: 790;
+  line-height: 0.98;
+}
+
+html[data-theme='theme-two'] .settings-panel {
+  border: 1px solid oklch(1 0 0 / 0.82);
+  border-radius: 1.35rem;
+  background: oklch(1 0 0 / 0.78);
+  box-shadow: 0 14px 42px oklch(0.25 0.03 255 / 0.08);
+  -webkit-backdrop-filter: saturate(160%) blur(22px);
+  backdrop-filter: saturate(160%) blur(22px);
+}
+
+html[data-theme='theme-two'] .settings-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.85rem;
+  align-items: center;
+  min-height: 5.6rem;
+  padding: 1rem;
+}
+
+html[data-theme='theme-two'] .settings-row + .settings-row {
+  border-top: 1px solid var(--separator);
+}
+
+html[data-theme='theme-two'] .settings-row-icon {
+  display: inline-flex;
+  width: 2.35rem;
+  height: 2.35rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.72rem;
+  color: white;
+}
+
+html[data-theme='theme-two'] .settings-row-icon[data-tone='violet'] {
+  background: linear-gradient(145deg, #8c66ee, #6d47d9);
+}
+
+html[data-theme='theme-two'] .settings-row-icon[data-tone='blue'] {
+  background: linear-gradient(145deg, #4fa6ff, #1474df);
+}
+
+html[data-theme='theme-two'] .settings-row-icon > svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+html[data-theme='theme-two'] .settings-row-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+html[data-theme='theme-two'] .settings-row-title {
+  color: var(--foreground);
+  font-size: 0.98rem;
+  font-weight: 680;
+}
+
+html[data-theme='theme-two'] .settings-row-description {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+html[data-theme='theme-two'] .settings-shell .settings-control {
+  flex-shrink: 0;
+  border-radius: 0.85rem;
+  background: oklch(0.96 0.008 255 / 0.92);
+}
+
+html[data-theme='theme-two'] .settings-shell .theme-current-label {
+  display: inline;
+}
+
+html[data-theme='theme-two'] .settings-storage-note {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  margin-top: 1rem;
+  padding-inline: 0.75rem;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.45;
+}
+
+html[data-theme='theme-two'] .settings-storage-note > svg {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  margin-top: 0.05rem;
+  color: var(--primary);
+}
+
+@media (max-width: 359px) {
+  html[data-theme='theme-two'] .settings-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  html[data-theme='theme-two'] .settings-row .settings-control {
+    grid-column: 1 / -1;
+    width: 100% !important;
+    justify-content: space-between;
+  }
+}
+
+@media (min-width: 640px) {
+  html[data-theme='theme-two'] .game-header .language-switcher-trigger {
+    width: 7.25rem;
+    padding-inline: 0.65rem !important;
+  }
+
+  html[data-theme='theme-two'] .game-header .language-switcher-compact-label {
+    display: inline;
+  }
+
+  html[data-theme='theme-two'] .home-game-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html[data-theme='theme-two'] .home-game-card {
+    border-right: 1px solid var(--separator);
+  }
+
+  html[data-theme='theme-two'] .home-game-card:nth-child(2n) {
+    border-right: 0;
+  }
+
+  html[data-theme='theme-two'] .home-game-card--featured {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 900px) {
+  html[data-theme='theme-two'] .home-hero {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
+  }
+
+  html[data-theme='theme-two'] .home-game-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  html[data-theme='theme-two'] .home-game-card:nth-child(2n) {
+    border-right: 1px solid var(--separator);
+  }
+
+  html[data-theme='theme-two'] .home-game-card:nth-child(3n) {
+    border-right: 0;
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  html[data-theme='theme-two'] .home-header,
+  html[data-theme='theme-two'] .game-header,
+  html[data-theme='theme-two'] [data-slot='dialog-content'],
+  html[data-theme='theme-two'] [data-slot='select-content'],
+  html[data-theme='theme-two'] [data-slot='dropdown-menu-content'] {
+    background: var(--card);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+/*
+ * Theme Two application composition
+ *
+ * Theme One remains a centered arcade hub. Theme Two treats the same stable
+ * game DOM as a separate iOS-inspired application: large-title navigation on
+ * compact screens, a tab bar on H5, and sidebar + inspector layouts on desktop.
+ * Game state, focusable boards and the Pixi host are never conditionally
+ * mounted when the theme changes.
+ */
+.theme-two-tab-bar {
+  display: none;
+}
+
+.theme-two-settings-shortcut {
+  display: none;
+}
+
+html[data-theme='theme-two'] .game-header .theme-switcher-trigger,
+html[data-theme='theme-two'] .game-header .language-switcher-trigger,
+html[data-theme='theme-two'] .home-header .theme-switcher-trigger,
+html[data-theme='theme-two'] .home-header .language-switcher-trigger {
+  display: none;
+}
+
+html[data-theme='theme-two'] .theme-two-settings-shortcut {
+  display: inline-flex;
+}
+
+html[data-theme='theme-two'] .game-content {
+  align-content: start;
+}
+
+html[data-theme='theme-two'] .game-summary,
+html[data-theme='theme-two'] .game-settings,
+html[data-theme='theme-two'] .game-actions {
+  min-width: 0;
+}
+
+@media (max-width: 1023px) {
+  html[data-theme='theme-two'] .game-header {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  html[data-theme='theme-two'] .game-header[data-layout='centered'],
+  html[data-theme='theme-two'] .game-header[data-layout='tool'] {
+    padding: 0.35rem 0.25rem 0.9rem;
+  }
+
+  html[data-theme='theme-two'] .game-header [data-layout-slot='title'] {
+    font-size: clamp(2rem, 8vw, 3rem);
+    font-weight: 780;
+    letter-spacing: -0.055em;
+  }
+
+  html[data-theme='theme-two'] .game-header [data-layout-slot='description'] {
+    margin-top: 0.35rem;
+    white-space: normal;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-stage {
+    order: 1;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-summary {
+    order: 2;
+    width: min(100%, 22.75rem);
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--surface-border);
+    border-radius: 1.1rem;
+    background: var(--card);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-summary > * {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-summary > * + * {
+    border-left: 1px solid var(--separator);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-message {
+    order: 3;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] [data-slot='mobile-controls'] {
+    order: 4;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-actions {
+    order: 5;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-help {
+    order: 6;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='snake'] .game-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='snake'] .game-stage {
+    order: 1;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='snake'] .game-summary {
+    order: 2;
+    width: min(100%, 22rem);
+    justify-content: space-around;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 1.1rem;
+    background: var(--card);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='snake'] .game-status-copy {
+    order: 3;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='snake'] .game-actions {
+    order: 4;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='snake'] [data-slot='mobile-controls'] {
+    order: 5;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='snake'] .game-help {
+    order: 6;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='tetris'] .game-content {
+    justify-content: flex-start;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='tetris'] .tetris-workspace {
+    display: grid;
+    width: min(100%, 34rem);
+    grid-template-areas:
+      'sidebar'
+      'stage';
+    justify-items: center;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='tetris'] .tetris-sidebar {
+    grid-area: sidebar;
+    max-width: none;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='tetris'] .game-stage {
+    grid-area: stage;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='tetris'] [data-slot='mobile-controls'] {
+    width: min(100%, 24rem);
+    padding: 0.75rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 1.25rem;
+    background: var(--card);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='minesweeper'] .game-settings,
+  html[data-theme='theme-two'] .game-page[data-page='minesweeper'] .game-summary,
+  html[data-theme='theme-two'] .game-page[data-page='minesweeper'] .game-actions {
+    width: min(100%, 30rem);
+    justify-content: center;
+    padding: 0.75rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 1rem;
+    background: var(--card);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='minesweeper'] .game-stage {
+    border-radius: 1.25rem;
+    box-shadow: var(--surface-shadow);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='sudoku'] .game-settings,
+  html[data-theme='theme-two'] .game-page[data-page='sudoku'] .sudoku-keypad,
+  html[data-theme='theme-two'] .game-page[data-page='sudoku'] .game-actions {
+    width: min(100%, 30rem);
+    padding: 0.75rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 1rem;
+    background: var(--card);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='sudoku'] .game-stage {
+    border-radius: 1.25rem;
+    box-shadow: var(--surface-shadow);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chess'] .game-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chess'] .game-stage {
+    order: 1;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chess'] .game-summary {
+    order: 2;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chess'] .game-actions {
+    order: 3;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chess'] .game-help {
+    order: 4;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chinese-chess'] .game-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chinese-chess'] .game-stage {
+    order: 1;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chinese-chess'] .game-summary {
+    order: 2;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chinese-chess'] .game-actions {
+    order: 3;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chinese-chess'] .game-help {
+    order: 4;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='go'] .game-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='go'] .game-stage {
+    order: 1;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='go'] .game-summary {
+    order: 2;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='go'] .game-actions {
+    order: 3;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='go'] .game-help {
+    order: 4;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .game-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .game-stage {
+    order: 1;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .game-summary {
+    order: 2;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .game-message {
+    order: 3;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .gomoku-undo-status {
+    order: 4;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .game-actions {
+    order: 5;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .game-help {
+    order: 6;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='reversi'] .game-content {
+    display: flex;
+    flex-direction: column;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='reversi'] .game-stage {
+    order: 1;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='reversi'] .game-summary {
+    order: 2;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='reversi'] .game-message {
+    order: 3;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='reversi'] .game-actions {
+    order: 4;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='reversi'] .game-help {
+    order: 5;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='memory-match'] .game-content {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='neon-breaker'] .neon-dashboard {
+    width: min(100%, 28rem);
+    margin-inline: auto;
+  }
+
+  html[data-theme='theme-two'] .bingo-shell .bingo-workspace {
+    display: contents;
+  }
+
+  html[data-theme='theme-two'] .bingo-shell .game-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  html[data-theme='theme-two'] .bingo-shell .game-header {
+    order: 0;
+  }
+
+  html[data-theme='theme-two'] .bingo-shell .bingo-draw {
+    order: 1;
+  }
+
+  html[data-theme='theme-two'] .bingo-shell .bingo-board {
+    order: 2;
+    margin-top: 0;
+  }
+
+  html[data-theme='theme-two'] .bingo-shell .bingo-settings {
+    order: 3;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-cards-toolbar {
+    border-radius: 1.25rem;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-cards-library.grid {
+    display: grid;
+    grid-auto-columns: minmax(17rem, calc(100% - 2rem));
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    gap: 0.85rem;
+    margin-inline: calc(var(--theme-two-page-gutter) * -0.25);
+    padding: 0.25rem 0.25rem 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-cards-library.grid > * {
+    scroll-snap-align: center;
+  }
+
+  html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] .anime-overview {
+    padding: 0.25rem 0 0.75rem;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] .anime-overview > div {
+    gap: 1rem;
+  }
+
+  html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] .anime-filters {
+    position: sticky;
+    z-index: 15;
+    top: max(0.25rem, env(safe-area-inset-top));
+    border-radius: 1.15rem;
+  }
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-two'] .theme-two-tab-bar {
+    position: fixed;
+    z-index: 40;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    display: grid;
+    height: calc(4.45rem + env(safe-area-inset-bottom));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    align-items: start;
+    padding: 0.35rem 0.35rem env(safe-area-inset-bottom);
+    border-top: 1px solid oklch(0.78 0.014 255 / 0.52);
+    background: oklch(0.99 0.003 255 / 0.9);
+    box-shadow: 0 -8px 30px oklch(0.2 0.025 255 / 0.1);
+    -webkit-backdrop-filter: saturate(175%) blur(24px);
+    backdrop-filter: saturate(175%) blur(24px);
+  }
+
+  html[data-theme='theme-two'] .theme-two-tab-item {
+    display: flex;
+    min-width: 0;
+    height: 3.75rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.16rem;
+    border-radius: 0.8rem;
+    color: var(--muted-foreground);
+    font-size: 0.62rem;
+    font-weight: 650;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  html[data-theme='theme-two'] .theme-two-tab-item > svg {
+    width: 1.28rem;
+    height: 1.28rem;
+  }
+
+  html[data-theme='theme-two'] .theme-two-tab-item.is-active {
+    color: var(--primary);
+    background: color-mix(in oklab, var(--primary) 8%, transparent);
+  }
+
+  html[data-theme='theme-two'] .theme-two-tab-item:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: -2px;
+  }
+
+  html[data-theme='theme-two'] .game-page,
+  html[data-theme='theme-two'] .home-shell,
+  html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'],
+  html[data-theme='theme-two'] .settings-shell {
+    padding-bottom: calc(5.6rem + env(safe-area-inset-bottom));
+  }
+
+  html[data-theme='theme-two'] .theme-two-settings-shortcut {
+    display: none;
+  }
+
+  html[data-theme='theme-two'] .home-header {
+    position: static;
+    padding-inline: 0.25rem;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  html[data-theme='theme-two'] .home-hero {
+    padding-top: 1rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  html[data-theme='theme-two'] .home-shell .app-container {
+    display: grid;
+    width: min(100%, 90rem);
+    grid-template-columns: 16rem minmax(0, 1fr);
+    gap: 0 2rem;
+    align-items: start;
+  }
+
+  html[data-theme='theme-two'] .home-shell .home-header {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: calc(100svh - 2rem);
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    margin: 0;
+    padding: 1rem;
+  }
+
+  html[data-theme='theme-two'] .home-shell .home-header > :first-child {
+    align-items: flex-start;
+  }
+
+  html[data-theme='theme-two'] .home-shell .home-header > :last-child {
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: auto;
+  }
+
+  html[data-theme='theme-two'] .home-shell .home-header .theme-switcher-trigger,
+  html[data-theme='theme-two'] .home-shell .home-header .language-switcher-trigger,
+  html[data-theme='theme-two'] .home-shell .home-header .theme-two-settings-shortcut {
+    width: 100% !important;
+    justify-content: flex-start;
+    border-radius: 0.85rem;
+  }
+
+  html[data-theme='theme-two'] .game-header .theme-two-settings-shortcut {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  html[data-theme='theme-two'] .home-shell main {
+    grid-column: 2;
+    grid-row: 1;
+    min-width: 0;
+  }
+
+  html[data-theme='theme-two'] .home-shell .home-hero {
+    padding-top: 1.5rem;
+  }
+
+  html[data-theme='theme-two'] .home-shell .home-game-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html[data-theme='theme-two'] .home-shell .home-game-card:nth-child(3n) {
+    border-right: 1px solid var(--separator);
+  }
+
+  html[data-theme='theme-two'] .home-shell .home-game-card:nth-child(2n) {
+    border-right: 0;
+  }
+
+  html[data-theme='theme-two'] .game-page:not([data-page='bingo']):not([data-page='bingo-cards']) {
+    display: grid;
+    width: min(100%, 90rem);
+    grid-template-columns: 16rem minmax(0, 1fr);
+    gap: 2rem;
+    align-items: start;
+    margin-inline: auto;
+  }
+
+  html[data-theme='theme-two'] .game-page:not([data-page='bingo']):not([data-page='bingo-cards']) > .game-header,
+  html[data-theme='theme-two'] .bingo-shell .game-header,
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .game-header,
+  html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] .game-header {
+    position: sticky;
+    top: 1rem;
+    display: flex;
+    min-height: calc(100svh - 2rem);
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 1rem;
+    margin: 0;
+    padding: 1rem;
+  }
+
+  html[data-theme='theme-two'] .game-header[data-layout='centered'] > :first-child {
+    align-self: flex-start;
+  }
+
+  html[data-theme='theme-two'] .game-header[data-layout='centered'] > [data-layout-slot='title'] {
+    align-self: stretch;
+    margin-top: 1.25rem;
+    padding: 0;
+    font-size: clamp(2.2rem, 3.6vw, 3.75rem);
+    font-weight: 790;
+    line-height: 0.95;
+    text-align: left;
+    white-space: normal;
+  }
+
+  html[data-theme='theme-two'] .game-header[data-layout='centered'] > [data-layout-slot='controls'] {
+    width: 100%;
+    align-self: stretch;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-top: auto;
+  }
+
+  html[data-theme='theme-two'] .game-header[data-layout='centered'] > [data-layout-slot='controls'] > [data-slot='game-header-controls'] {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  html[data-theme='theme-two'] .game-header[data-layout='tool'] > [data-layout-slot='identity'] {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.25rem;
+  }
+
+  html[data-theme='theme-two'] .game-header[data-layout='tool'] [data-layout-slot='title'] {
+    overflow: visible;
+    font-size: clamp(2rem, 3vw, 3.2rem);
+    font-weight: 780;
+    line-height: 0.98;
+    white-space: normal;
+  }
+
+  html[data-theme='theme-two'] .game-header[data-layout='tool'] [data-layout-slot='description'] {
+    display: block;
+    overflow: visible;
+    margin-top: 0.75rem;
+    line-height: 1.5;
+    white-space: normal;
+  }
+
+  html[data-theme='theme-two'] .game-header[data-layout='tool'] > [data-slot='game-header-controls'] {
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-top: auto;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] > .game-content {
+    display: grid;
+    max-width: 54rem;
+    grid-template-columns: minmax(22rem, 1fr) 17rem;
+    grid-auto-rows: max-content;
+    gap: 1rem 1.5rem;
+    justify-items: stretch;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-stage {
+    grid-column: 1;
+    grid-row: 1 / span 6;
+    justify-self: center;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-summary,
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-message,
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-actions,
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-help {
+    grid-column: 2;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid var(--surface-border);
+    border-radius: 1.15rem;
+    background: var(--card);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-summary > * {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-summary > * + * {
+    border-left: 1px solid var(--separator);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-actions {
+    align-self: end;
+    justify-content: flex-start;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='2048'] .game-help {
+    text-align: left;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='snake'] > .game-content {
+    display: grid;
+    max-width: 54rem;
+    grid-template-columns: minmax(22rem, 1fr) 17rem;
+    grid-auto-rows: max-content;
+    gap: 1rem 1.5rem;
+    justify-items: stretch;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='snake'] .game-stage {
+    grid-column: 1;
+    grid-row: 1 / span 6;
+    justify-self: center;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='snake'] .game-summary,
+  html[data-theme='theme-two'] .game-page[data-page='snake'] .game-status-copy,
+  html[data-theme='theme-two'] .game-page[data-page='snake'] .game-actions,
+  html[data-theme='theme-two'] .game-page[data-page='snake'] .game-help {
+    grid-column: 2;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='snake'] .game-summary {
+    justify-content: space-around;
+    padding: 1rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 1.15rem;
+    background: var(--card);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='snake'] .game-actions {
+    justify-content: flex-start;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='snake'] .game-help {
+    text-align: left;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='tetris'] > .game-content {
+    max-width: 58rem;
+    align-items: stretch;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='tetris'] .tetris-workspace {
+    display: grid;
+    width: 100%;
+    grid-template-columns: 18rem minmax(20rem, 1fr);
+    grid-template-areas: 'sidebar stage';
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='tetris'] .tetris-sidebar {
+    grid-area: sidebar;
+    display: grid;
+    width: 100%;
+    max-width: none;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='tetris'] .tetris-sidebar .game-actions {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='tetris'] .game-stage {
+    grid-area: stage;
+    justify-self: center;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='minesweeper'] > .game-content {
+    display: grid;
+    max-width: 62rem;
+    grid-template-columns: minmax(24rem, 1fr) 18rem;
+    grid-auto-rows: max-content;
+    gap: 1rem 1.5rem;
+    justify-items: stretch;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='minesweeper'] .game-stage {
+    grid-column: 1;
+    grid-row: 1 / span 8;
+    justify-self: center;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='minesweeper'] .game-settings,
+  html[data-theme='theme-two'] .game-page[data-page='minesweeper'] .game-summary,
+  html[data-theme='theme-two'] .game-page[data-page='minesweeper'] .game-message,
+  html[data-theme='theme-two'] .game-page[data-page='minesweeper'] .game-actions,
+  html[data-theme='theme-two'] .game-page[data-page='minesweeper'] .game-help {
+    grid-column: 2;
+    width: 100%;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='minesweeper'] .game-settings,
+  html[data-theme='theme-two'] .game-page[data-page='minesweeper'] .game-summary,
+  html[data-theme='theme-two'] .game-page[data-page='minesweeper'] .game-actions {
+    padding: 0.85rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 1rem;
+    background: var(--card);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='sudoku'] > .game-content {
+    display: grid;
+    max-width: 60rem;
+    grid-template-columns: minmax(23rem, 1fr) 19rem;
+    grid-auto-rows: max-content;
+    gap: 1rem 1.5rem;
+    justify-items: stretch;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='sudoku'] .game-stage {
+    grid-column: 1;
+    grid-row: 1 / span 8;
+    justify-self: center;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='sudoku'] .game-settings,
+  html[data-theme='theme-two'] .game-page[data-page='sudoku'] .game-message,
+  html[data-theme='theme-two'] .game-page[data-page='sudoku'] .sudoku-keypad,
+  html[data-theme='theme-two'] .game-page[data-page='sudoku'] .game-actions,
+  html[data-theme='theme-two'] .game-page[data-page='sudoku'] .game-help {
+    grid-column: 2;
+    width: 100%;
+    justify-content: flex-start;
+    text-align: left;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='sudoku'] .game-settings,
+  html[data-theme='theme-two'] .game-page[data-page='sudoku'] .sudoku-keypad,
+  html[data-theme='theme-two'] .game-page[data-page='sudoku'] .game-actions {
+    padding: 0.85rem;
+    border: 1px solid var(--surface-border);
+    border-radius: 1rem;
+    background: var(--card);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chess'] > .game-content {
+    display: grid;
+    max-width: 62rem;
+    grid-template-columns: minmax(24rem, 1fr) 18rem;
+    grid-auto-rows: max-content;
+    gap: 1rem 1.5rem;
+    justify-items: stretch;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chess'] .game-stage {
+    grid-column: 1;
+    grid-row: 1 / span 6;
+    justify-self: center;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chess'] .game-summary,
+  html[data-theme='theme-two'] .game-page[data-page='chess'] .game-actions,
+  html[data-theme='theme-two'] .game-page[data-page='chess'] .game-help {
+    grid-column: 2;
+    width: 100%;
+    text-align: left;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chess'] .game-actions {
+    justify-content: flex-start;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chinese-chess'] > .game-content {
+    display: grid;
+    max-width: 58rem;
+    grid-template-columns: minmax(21rem, 1fr) 18rem;
+    grid-auto-rows: max-content;
+    gap: 1rem 1.5rem;
+    justify-items: stretch;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chinese-chess'] .game-stage {
+    grid-column: 1;
+    grid-row: 1 / span 6;
+    justify-self: center;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chinese-chess'] .game-summary,
+  html[data-theme='theme-two'] .game-page[data-page='chinese-chess'] .game-actions,
+  html[data-theme='theme-two'] .game-page[data-page='chinese-chess'] .game-help {
+    grid-column: 2;
+    width: 100%;
+    text-align: left;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chinese-chess'] .game-actions {
+    justify-content: flex-start;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='go'] > .game-content {
+    display: grid;
+    max-width: 56rem;
+    grid-template-columns: minmax(20rem, 1fr) 18rem;
+    grid-auto-rows: max-content;
+    gap: 1rem 1.5rem;
+    justify-items: stretch;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='go'] .game-stage {
+    grid-column: 1;
+    grid-row: 1 / span 6;
+    justify-self: center;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='go'] .game-summary,
+  html[data-theme='theme-two'] .game-page[data-page='go'] .game-actions,
+  html[data-theme='theme-two'] .game-page[data-page='go'] .game-help {
+    grid-column: 2;
+    width: 100%;
+    text-align: left;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='go'] .game-actions {
+    justify-content: flex-start;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] > .game-content {
+    display: grid;
+    max-width: 62rem;
+    grid-template-columns: minmax(24rem, 1fr) 18rem;
+    grid-auto-rows: max-content;
+    gap: 1rem 1.5rem;
+    justify-items: stretch;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .game-stage {
+    grid-column: 1;
+    grid-row: 1 / span 7;
+    justify-self: center;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .game-summary,
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .game-message,
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .gomoku-undo-status,
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .game-actions,
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .game-help {
+    grid-column: 2;
+    width: 100%;
+    text-align: left;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .game-actions {
+    justify-content: flex-start;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='reversi'] > .game-content {
+    display: grid;
+    max-width: 60rem;
+    grid-template-columns: minmax(23rem, 1fr) 18rem;
+    grid-auto-rows: max-content;
+    gap: 1rem 1.5rem;
+    justify-items: stretch;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='reversi'] .game-stage {
+    grid-column: 1;
+    grid-row: 1 / span 6;
+    justify-self: center;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='reversi'] .game-summary,
+  html[data-theme='theme-two'] .game-page[data-page='reversi'] .game-message,
+  html[data-theme='theme-two'] .game-page[data-page='reversi'] .game-actions,
+  html[data-theme='theme-two'] .game-page[data-page='reversi'] .game-help {
+    grid-column: 2;
+    width: 100%;
+    text-align: left;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='reversi'] .game-actions {
+    justify-content: flex-start;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='memory-match'] > .game-content {
+    display: grid;
+    max-width: 66rem;
+    grid-template-columns: 21rem minmax(22rem, 1fr);
+    grid-auto-rows: max-content;
+    gap: 1rem 1.5rem;
+    justify-items: stretch;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='memory-match'] .memory-board {
+    grid-column: 2;
+    grid-row: 1 / span 5;
+    max-width: 38rem;
+    justify-self: center;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='memory-match'] .memory-dashboard,
+  html[data-theme='theme-two'] .game-page[data-page='memory-match'] .memory-complete-panel {
+    grid-column: 1;
+    width: 100%;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='memory-match'] .memory-dashboard {
+    grid-row: auto;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='memory-match'] .game-actions {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    justify-content: flex-start;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='neon-breaker'] > .game-content {
+    display: grid;
+    max-width: 68rem;
+    grid-template-columns: minmax(18rem, 1fr) minmax(22rem, 25rem);
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='neon-breaker'] .neon-dashboard {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='neon-breaker'] .neon-stage {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+  }
+
+  html[data-theme='theme-two'] .bingo-shell {
+    padding-inline: 1rem;
+  }
+
+  html[data-theme='theme-two'] .bingo-shell > .game-content {
+    display: grid;
+    width: min(100%, 90rem);
+    max-width: none;
+    grid-template-columns: 16rem minmax(0, 1fr);
+    gap: 1.5rem 2rem;
+    align-items: start;
+  }
+
+  html[data-theme='theme-two'] .bingo-shell .game-header {
+    grid-column: 1;
+    grid-row: 1 / span 3;
+  }
+
+  html[data-theme='theme-two'] .bingo-shell .bingo-workspace {
+    grid-column: 2;
+    display: grid;
+    grid-template-columns: minmax(0, 1.45fr) minmax(18rem, 0.55fr);
+    gap: 1.25rem;
+  }
+
+  html[data-theme='theme-two'] .bingo-shell .bingo-draw,
+  html[data-theme='theme-two'] .bingo-shell .bingo-settings {
+    grid-column: auto;
+  }
+
+  html[data-theme='theme-two'] .bingo-shell .bingo-board {
+    grid-column: 2;
+    margin-top: 0;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] {
+    padding-inline: 1rem;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] > .game-content {
+    display: grid;
+    width: min(100%, 90rem);
+    max-width: none;
+    grid-template-columns: 18rem minmax(0, 1fr);
+    grid-auto-rows: max-content;
+    gap: 1.25rem 2rem;
+    align-items: start;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .game-header {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 19rem;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-cards-toolbar {
+    position: sticky;
+    top: 21rem;
+    grid-column: 1;
+    grid-row: 2;
+    margin: 0;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-cards-library {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    margin: 0;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-cards-library.grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] > .app-container {
+    display: grid;
+    width: min(100%, 90rem);
+    max-width: none;
+    grid-template-columns: 18rem minmax(0, 1fr);
+    grid-auto-rows: max-content;
+    gap: 1.25rem 2rem;
+    align-items: start;
+  }
+
+  html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] .game-header {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 22rem;
+  }
+
+  html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] [role='alert'] {
+    grid-column: 1;
+  }
+
+  html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] .anime-overview {
+    position: sticky;
+    top: 24rem;
+    grid-column: 1;
+    margin: 0;
+    padding: 1rem;
+  }
+
+  html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] .anime-overview > div {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] .anime-overview h2,
+  html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] .anime-overview p {
+    display: none;
+  }
+
+  html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] .anime-workspace {
+    grid-column: 2;
+    grid-row: 1 / span 5;
+    min-width: 0;
+  }
+
+  html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] .anime-filters {
+    position: sticky;
+    z-index: 15;
+    top: 1rem;
+  }
+
+  html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] .anime-library > .grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -167,7 +167,7 @@ export function ChessGame() {
   const isValidTarget = (row: number, col: number) => validMoves.some(m => m.row === row && m.col === col)
 
   return (
-    <div className="game-page">
+    <div className="game-page" data-page="chess">
       <GameHeader
         layout="centered"
         homeLabel={t("appName")}
@@ -178,10 +178,13 @@ export function ChessGame() {
         titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
-      <main className="flex flex-1 flex-col items-center gap-4 py-2 sm:py-4">
+      <main
+        className="game-content flex flex-1 flex-col items-center gap-4 py-2 sm:py-4"
+        data-slot="game-content"
+      >
         {/* Game Status */}
         <Card
-          className="surface-panel w-full max-w-lg border-white/10 bg-card/70 p-3"
+          className="game-summary surface-panel w-full max-w-lg border-white/10 bg-card/70 p-3"
           role="status"
           aria-live="polite"
         >
@@ -203,22 +206,31 @@ export function ChessGame() {
             </div>
 
           {gameStatus === "check" && (
-            <div className="flex justify-center">
-              <span className="animate-pulse rounded-full bg-yellow-500/20 px-3 py-1 text-sm font-bold text-yellow-400">
+            <div className="game-message flex justify-center" data-slot="game-message">
+              <span
+                className="game-status-banner animate-pulse rounded-full bg-yellow-500/20 px-3 py-1 text-sm font-bold text-yellow-400"
+                data-tone="warning"
+              >
                 {t("checkChess")}
               </span>
             </div>
           )}
           {gameStatus === "checkmate" && (
-            <div className="flex justify-center">
-              <span className="rounded-full bg-red-500/20 px-3 py-1 text-sm font-bold text-red-400">
+            <div className="game-message flex justify-center" data-slot="game-message">
+              <span
+                className="game-status-banner rounded-full bg-red-500/20 px-3 py-1 text-sm font-bold text-red-400"
+                data-tone="danger"
+              >
                 {winner === "white" ? t("whiteWinsChess") : t("blackWinsChess")}
               </span>
             </div>
           )}
           {gameStatus === "stalemate" && (
-            <div className="flex justify-center">
-              <span className="rounded-full bg-slate-500/20 px-3 py-1 text-sm font-bold text-slate-400">
+            <div className="game-message flex justify-center" data-slot="game-message">
+              <span
+                className="game-status-banner rounded-full bg-slate-500/20 px-3 py-1 text-sm font-bold text-slate-400"
+                data-tone="neutral"
+              >
                 {t("stalemate")}
               </span>
             </div>
@@ -233,7 +245,10 @@ export function ChessGame() {
         </Card>
 
         {/* Board */}
-        <div className="w-full max-w-[22.5rem] overflow-hidden rounded-xl border-4 border-amber-950 shadow-2xl shadow-black/30">
+        <div
+          className="game-stage w-full max-w-[22.5rem] overflow-hidden rounded-xl border-4 border-amber-950 shadow-2xl shadow-black/30"
+          data-slot="game-stage"
+        >
           <div className="grid w-full grid-cols-8" role="group" aria-label={t("chess")}>
           {board.map((row, rowIndex) =>
             row.map((piece, colIndex) => {
@@ -274,7 +289,7 @@ export function ChessGame() {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="game-actions flex flex-wrap justify-center gap-2" data-slot="game-actions">
         <Button
           onClick={handleUndo}
           disabled={history.length === 0 || gameStatus === "checkmate" || gameStatus === "stalemate" ||
@@ -332,7 +347,7 @@ export function ChessGame() {
         </div>
 
         {/* Instructions */}
-        <p className="max-w-md text-center text-xs text-muted-foreground">
+        <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
           {t("chessInstructionsInt")}
         </p>
       </main>

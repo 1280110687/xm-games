@@ -174,7 +174,7 @@ export function SudokuGame() {
   )
 
   return (
-    <div className="game-page">
+    <div className="game-page" data-page="sudoku">
       <GameHeader
         layout="centered"
         homeLabel={t("appName")}
@@ -185,9 +185,12 @@ export function SudokuGame() {
         titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
-      <main className="flex flex-1 flex-col items-center gap-4 py-2 sm:py-4">
+      <main
+        className="game-content flex flex-1 flex-col items-center gap-4 py-2 sm:py-4"
+        data-slot="game-content"
+      >
         {/* Difficulty selector */}
-        <div className="flex gap-2">
+        <div className="game-settings flex gap-2" data-slot="game-settings">
           {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
             <Button
               key={d}
@@ -203,13 +206,22 @@ export function SudokuGame() {
 
         {/* Game status */}
         {completed && (
-          <div className="rounded-lg bg-green-500/20 px-4 py-2 text-lg font-bold text-green-300" role="status" aria-live="assertive">
+          <div
+            className="game-message game-status-banner rounded-lg bg-green-500/20 px-4 py-2 text-lg font-bold text-green-300"
+            data-tone="success"
+            data-slot="game-message"
+            role="status"
+            aria-live="assertive"
+          >
             {t("youWin")}
           </div>
         )}
 
         {/* Game board */}
-        <div className="w-full max-w-[22.75rem] rounded-xl border-2 border-blue-300 bg-white p-1 shadow-2xl shadow-black/25">
+        <div
+          className="game-stage w-full max-w-[22.75rem] rounded-xl border-2 border-blue-300 bg-white p-1 shadow-2xl shadow-black/25"
+          data-slot="game-stage"
+        >
           <div className="grid w-full grid-cols-9" role="group" aria-label={t("sudoku")}>
             {board.map((row, rowIndex) =>
               row.map((cell, colIndex) => (
@@ -241,7 +253,12 @@ export function SudokuGame() {
         </div>
 
         {/* Number input buttons */}
-        <div className="flex flex-wrap justify-center gap-2" role="toolbar" aria-label={t("sudoku")}>
+        <div
+          className="sudoku-keypad flex flex-wrap justify-center gap-2"
+          data-slot="sudoku-keypad"
+          role="toolbar"
+          aria-label={t("sudoku")}
+        >
           {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
             <Button
               key={num}
@@ -265,7 +282,7 @@ export function SudokuGame() {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="game-actions flex flex-wrap justify-center gap-2" data-slot="game-actions">
           <Button
             onClick={initGame}
             variant="outline"
@@ -294,7 +311,7 @@ export function SudokuGame() {
           </GameRulesDialog>
         </div>
 
-        <p className="max-w-md text-center text-xs text-muted-foreground">
+        <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
           {t("sudokuInstructions")}
         </p>
 

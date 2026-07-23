@@ -16,6 +16,7 @@ import {
   Layers3,
   RefreshCw,
   Route,
+  Settings2,
   Sparkles,
   TicketCheck,
   Tv,
@@ -24,6 +25,8 @@ import {
 } from "lucide-react"
 
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { ThemeSwitcher } from "@/components/theme-switcher"
+import { Button } from "@/components/ui/button"
 import { useLocale } from "@/lib/locale-context"
 import type { Locale, TranslationKey } from "@/lib/i18n"
 
@@ -268,27 +271,27 @@ function GameCard({
       <Link
         href={game.href}
         aria-label={`${title} — ${description}`}
-        className="surface-card group col-span-2 flex min-h-36 items-center gap-4 overflow-hidden p-4 transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_24px_64px_oklch(0.08_0.06_278_/_0.42)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transform-none sm:col-span-2 sm:min-h-40 sm:gap-6 sm:p-6 md:col-span-3 lg:col-span-4"
+        className="home-game-card home-game-card--featured surface-card group col-span-2 flex min-h-36 items-center gap-4 overflow-hidden p-4 transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_24px_64px_oklch(0.08_0.06_278_/_0.42)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transform-none sm:col-span-2 sm:min-h-40 sm:gap-6 sm:p-6 md:col-span-3 lg:col-span-4"
       >
         <span
-          className={`flex size-14 shrink-0 items-center justify-center rounded-2xl border transition-colors sm:size-16 ${tone.icon} ${tone.hover}`}
+          className={`home-game-card-icon flex size-14 shrink-0 items-center justify-center rounded-2xl border transition-colors sm:size-16 ${tone.icon} ${tone.hover}`}
         >
           <Icon className="size-7 sm:size-8" aria-hidden="true" />
         </span>
 
-        <span className="min-w-0 flex-1">
+        <span className="home-game-card-copy min-w-0 flex-1">
           <span className="mb-2 block text-[0.68rem] font-bold uppercase tracking-[0.16em] text-rose-200/80">
             {featuredLabel}
           </span>
-          <span className="block text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+          <span className="home-game-card-title block text-xl font-bold tracking-tight text-foreground sm:text-2xl">
             {title}
           </span>
-          <span className="mt-1.5 block max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
+          <span className="home-game-card-description mt-1.5 block max-w-2xl text-sm leading-6 text-muted-foreground sm:text-base">
             {description}
           </span>
         </span>
 
-        <span className="flex size-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-muted-foreground transition-[background-color,color,transform] group-hover:translate-x-0.5 group-hover:bg-primary group-hover:text-primary-foreground sm:size-12">
+        <span className="home-game-card-arrow flex size-10 shrink-0 items-center justify-center rounded-full border border-white/10 bg-white/[0.04] text-muted-foreground transition-[background-color,color,transform] group-hover:translate-x-0.5 group-hover:bg-primary group-hover:text-primary-foreground sm:size-12">
           <ArrowUpRight className="size-5" aria-hidden="true" />
           <span className="sr-only">{openLabel}</span>
         </span>
@@ -300,25 +303,25 @@ function GameCard({
     <Link
       href={game.href}
       aria-label={`${title} — ${description}`}
-      className="surface-card group flex min-h-36 flex-col overflow-hidden p-3.5 transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_22px_56px_oklch(0.08_0.05_278_/_0.38)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transform-none sm:min-h-44 sm:p-5"
+      className="home-game-card surface-card group flex min-h-36 flex-col overflow-hidden p-3.5 transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_22px_56px_oklch(0.08_0.05_278_/_0.38)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transform-none sm:min-h-44 sm:p-5"
     >
-      <span className="flex items-start justify-between gap-3">
+      <span className="home-game-card-top flex items-start justify-between gap-3">
         <span
-          className={`flex size-10 items-center justify-center rounded-xl border transition-colors sm:size-12 sm:rounded-2xl ${tone.icon} ${tone.hover}`}
+          className={`home-game-card-icon flex size-10 items-center justify-center rounded-xl border transition-colors sm:size-12 sm:rounded-2xl ${tone.icon} ${tone.hover}`}
         >
           <Icon className="size-5 sm:size-6" aria-hidden="true" />
         </span>
         <ArrowUpRight
-          className="size-4 text-muted-foreground/60 transition-[color,transform] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-foreground sm:size-5"
+          className="home-game-card-arrow size-4 text-muted-foreground/60 transition-[color,transform] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-foreground sm:size-5"
           aria-hidden="true"
         />
       </span>
 
-      <span className="mt-auto block pt-4">
-        <span className="block text-sm font-bold tracking-tight text-foreground sm:text-lg">
+      <span className="home-game-card-copy mt-auto block pt-4">
+        <span className="home-game-card-title block text-sm font-bold tracking-tight text-foreground sm:text-lg">
           {title}
         </span>
-        <span className="mt-1.5 line-clamp-2 block text-xs leading-4 text-muted-foreground sm:text-sm sm:leading-5">
+        <span className="home-game-card-description mt-1.5 line-clamp-2 block text-xs leading-4 text-muted-foreground sm:text-sm sm:leading-5">
           {description}
         </span>
       </span>
@@ -331,11 +334,11 @@ export default function Home() {
   const copy = HOME_COPY[locale]
 
   return (
-    <div className="app-shell py-4 sm:py-6 lg:py-8">
+    <div data-page="home" className="home-shell app-shell py-4 sm:py-6 lg:py-8">
       <div className="app-container">
-        <header className="mb-4 flex items-center justify-between gap-4 px-1 sm:mb-6">
+        <header className="home-header mb-4 flex items-center justify-between gap-4 px-1 sm:mb-6">
           <div className="flex min-w-0 items-center gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl border border-primary/25 bg-primary/12 text-violet-100 shadow-[0_12px_34px_oklch(0.53_0.2_278_/_0.22)] sm:size-11">
+            <span className="home-brand-icon flex size-10 shrink-0 items-center justify-center rounded-xl border border-primary/25 bg-primary/12 text-violet-100 shadow-[0_12px_34px_oklch(0.53_0.2_278_/_0.22)] sm:size-11">
               <Gamepad2 className="size-5 sm:size-6" aria-hidden="true" />
             </span>
             <div className="min-w-0">
@@ -347,11 +350,25 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <LanguageSwitcher />
+          <div className="home-header-controls flex items-center gap-2">
+            <ThemeSwitcher />
+            <LanguageSwitcher />
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="theme-two-settings-shortcut"
+            >
+              <Link href="/settings">
+                <Settings2 aria-hidden="true" />
+                <span>{t("settings")}</span>
+              </Link>
+            </Button>
+          </div>
         </header>
 
         <main>
-          <section className="surface-panel grid gap-6 overflow-hidden px-5 py-6 sm:px-8 sm:py-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:px-10">
+          <section className="home-hero surface-panel grid gap-6 overflow-hidden px-5 py-6 sm:px-8 sm:py-8 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:px-10">
             <div>
               <span className="eyebrow">
                 <Sparkles className="size-3.5" aria-hidden="true" />
@@ -363,13 +380,13 @@ export default function Home() {
               <p className="mt-3 max-w-xl text-base leading-7 text-muted-foreground sm:text-lg">
                 {t("selectGame")}
               </p>
-              <p className="mt-4 flex items-center gap-2 text-xs font-semibold text-cyan-200/75 sm:text-sm">
+              <p className="home-instant-play mt-4 flex items-center gap-2 text-xs font-semibold text-cyan-200/75 sm:text-sm">
                 <Zap className="size-4" aria-hidden="true" />
                 {copy.instantPlay}
               </p>
             </div>
 
-            <div className="surface-card grid grid-cols-2 divide-x divide-white/10 p-4 sm:min-w-72 sm:p-5">
+            <div className="home-hero-stats surface-card grid grid-cols-2 divide-x divide-white/10 p-4 sm:min-w-72 sm:p-5">
               <div className="pr-4">
                 <p className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
                   {TOTAL_EXPERIENCES}
@@ -389,13 +406,16 @@ export default function Home() {
             </div>
           </section>
 
-          <div className="mt-8 space-y-9 pb-8 sm:mt-10 sm:space-y-11 sm:pb-12">
+          <div
+            id="game-library"
+            className="home-sections mt-8 space-y-9 pb-8 sm:mt-10 sm:space-y-11 sm:pb-12"
+          >
             {CATEGORIES.map((category) => {
               const headingId = `category-${category.titleKey}`
 
               return (
-                <section key={category.titleKey} aria-labelledby={headingId}>
-                  <div className="mb-4 flex items-end justify-between gap-4 px-1">
+                <section className="home-category" key={category.titleKey} aria-labelledby={headingId}>
+                  <div className="home-category-heading mb-4 flex items-end justify-between gap-4 px-1">
                     <h2
                       id={headingId}
                       className="text-lg font-bold tracking-tight text-foreground sm:text-xl"
@@ -403,14 +423,14 @@ export default function Home() {
                       {t(category.titleKey)}
                     </h2>
                     <span
-                      className="rounded-full border border-white/10 bg-white/[0.035] px-2.5 py-1 text-xs font-semibold tabular-nums text-muted-foreground"
+                      className="home-category-count rounded-full border border-white/10 bg-white/[0.035] px-2.5 py-1 text-xs font-semibold tabular-nums text-muted-foreground"
                       aria-hidden="true"
                     >
                       {String(category.games.length).padStart(2, "0")}
                     </span>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+                  <div className="home-game-grid grid grid-cols-2 gap-3 sm:grid-cols-2 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
                     {category.games.map((game) => (
                       <GameCard
                         key={game.href}

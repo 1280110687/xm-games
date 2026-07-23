@@ -110,7 +110,7 @@ export function GomokuGame() {
   }, [moveHistory, board, winner, blackUndoUsed, whiteUndoUsed])
 
   return (
-    <div className="game-page">
+    <div className="game-page" data-page="gomoku">
       <GameHeader
         layout="centered"
         homeLabel={t("appName")}
@@ -121,9 +121,12 @@ export function GomokuGame() {
         titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
-      <main className="flex flex-1 flex-col items-center gap-4 py-2 sm:py-4">
+      <main
+        className="game-content flex flex-1 flex-col items-center gap-4 py-2 sm:py-4"
+        data-slot="game-content"
+      >
         {/* Game status */}
-        <Card className="surface-panel border-white/10 bg-card/70 px-4 py-2" role="status" aria-live="polite">
+        <Card className="game-summary surface-panel border-white/10 bg-card/70 px-4 py-2" role="status" aria-live="polite">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
               <div className={`h-5 w-5 rounded-full bg-slate-950 ${currentPlayer === "black" ? "ring-2 ring-primary" : ""}`} />
@@ -142,19 +145,31 @@ export function GomokuGame() {
         </Card>
 
         {winner && (
-          <div className="rounded-lg bg-yellow-500/20 px-4 py-2 text-lg font-bold text-yellow-300" role="status" aria-live="assertive">
+          <div
+            className="game-message game-status-banner rounded-lg bg-yellow-500/20 px-4 py-2 text-lg font-bold text-yellow-300"
+            data-tone="success"
+            data-slot="game-message"
+            role="status"
+            aria-live="assertive"
+          >
             {winner === "black" ? t("blackWinsGo") : t("whiteWinsGo")}
           </div>
         )}
 
         {/* Undo status */}
-        <div className="flex items-center gap-4 text-xs text-muted-foreground">
+        <div
+          className="gomoku-undo-status flex items-center gap-4 text-xs text-muted-foreground"
+          data-slot="gomoku-undo-status"
+        >
           <span>{t("blackStone")}: {blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
           <span>{t("whiteStone")}: {whiteUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
         </div>
 
         {/* Game board */}
-        <div className="relative aspect-square w-full max-w-[23.5rem] rounded-xl border-4 border-amber-800 bg-amber-600 p-2 shadow-2xl shadow-black/30">
+        <div
+          className="game-stage relative aspect-square w-full max-w-[23.5rem] rounded-xl border-4 border-amber-800 bg-amber-600 p-2 shadow-2xl shadow-black/30"
+          data-slot="game-stage"
+        >
           <div className="relative h-full w-full">
           {/* Grid lines */}
           <svg 
@@ -224,7 +239,7 @@ export function GomokuGame() {
         </div>
 
         {/* Controls */}
-        <div className="flex flex-wrap justify-center gap-2">
+        <div className="game-actions flex flex-wrap justify-center gap-2" data-slot="game-actions">
           <Button
             onClick={handleUndo}
             variant="outline"
@@ -258,7 +273,7 @@ export function GomokuGame() {
           </GameRulesDialog>
         </div>
 
-        <p className="max-w-md text-center text-xs text-muted-foreground">
+        <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
           {t("gomokuInstructions")}
         </p>
 

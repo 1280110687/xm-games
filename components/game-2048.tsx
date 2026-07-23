@@ -234,7 +234,7 @@ export function Game2048() {
   }
 
   return (
-    <div className="game-page">
+    <div className="game-page" data-page="2048">
       <GameHeader
         layout="centered"
         homeLabel={t("appName")}
@@ -244,30 +244,46 @@ export function Game2048() {
         homeButtonClassName="text-muted-foreground hover:text-foreground"
       />
 
-      <main className="flex flex-1 flex-col items-center gap-4 py-4">
+      <main
+        className="game-content flex flex-1 flex-col items-center gap-4 py-4"
+        data-slot="game-content"
+      >
         {/* Score cards */}
-        <div className="flex gap-4" role="status" aria-live="polite">
+        <div
+          className="game-summary flex gap-4"
+          data-slot="game-summary"
+          role="status"
+          aria-live="polite"
+        >
           <Card className="border-white/10 bg-card/70 px-5 py-2 text-center">
             <div className="text-xs text-muted-foreground">{t("score")}</div>
-            <div className="text-2xl font-bold text-white">{score}</div>
+            <div className="text-2xl font-bold text-foreground">{score}</div>
           </Card>
           <Card className="border-white/10 bg-card/70 px-5 py-2 text-center">
             <div className="text-xs text-muted-foreground">{t("highScore")}</div>
-            <div className="text-2xl font-bold text-white">{bestScore}</div>
+            <div className="text-2xl font-bold text-foreground">{bestScore}</div>
           </Card>
         </div>
 
         {/* Game status */}
         {(gameOver || won) && (
-          <div role="status" aria-live="assertive" className={`rounded-lg px-4 py-2 text-lg font-bold ${
+          <div
+            role="status"
+            aria-live="assertive"
+            data-tone={won ? "success" : "danger"}
+            className={`game-status-banner rounded-lg px-4 py-2 text-lg font-bold ${
             won ? "bg-yellow-500/20 text-yellow-300" : "bg-red-500/20 text-red-300"
-          }`}>
+          }`}
+          >
             {won ? t("youWin") : t("gameOver")}
           </div>
         )}
 
         {/* Game board */}
-        <div className="rounded-lg bg-amber-700 p-3">
+        <div
+          className="game-stage rounded-lg bg-amber-700 p-3"
+          data-slot="game-stage"
+        >
           <div className="grid grid-cols-4 gap-2" role="group" aria-label="2048">
             {board.map((row, rowIndex) =>
               row.map((cell, colIndex) => (
@@ -290,14 +306,17 @@ export function Game2048() {
         </div>
 
         {/* Mobile controls */}
-        <div className="grid grid-cols-3 gap-2 sm:hidden">
+        <div
+          className="mobile-controls grid grid-cols-3 gap-2 sm:hidden"
+          data-slot="mobile-controls"
+        >
           <div />
           <Button
             onClick={() => handleMove("up")}
             aria-label={directionLabels.up}
             variant="outline"
             size="lg"
-            className="border-white/10 bg-white/[0.04] text-white"
+            className="border-white/10 bg-white/[0.04] text-foreground"
           >
             <ChevronUp className="h-6 w-6" aria-hidden="true" />
           </Button>
@@ -307,7 +326,7 @@ export function Game2048() {
             aria-label={directionLabels.left}
             variant="outline"
             size="lg"
-            className="border-white/10 bg-white/[0.04] text-white"
+            className="border-white/10 bg-white/[0.04] text-foreground"
           >
             <ChevronLeft className="h-6 w-6" aria-hidden="true" />
           </Button>
@@ -316,7 +335,7 @@ export function Game2048() {
             aria-label={directionLabels.down}
             variant="outline"
             size="lg"
-            className="border-white/10 bg-white/[0.04] text-white"
+            className="border-white/10 bg-white/[0.04] text-foreground"
           >
             <ChevronDown className="h-6 w-6" aria-hidden="true" />
           </Button>
@@ -325,14 +344,17 @@ export function Game2048() {
             aria-label={directionLabels.right}
             variant="outline"
             size="lg"
-            className="border-white/10 bg-white/[0.04] text-white"
+            className="border-white/10 bg-white/[0.04] text-foreground"
           >
             <ChevronRight className="h-6 w-6" aria-hidden="true" />
           </Button>
         </div>
 
         {/* Controls */}
-        <div className="flex gap-2">
+        <div
+          className="game-actions flex gap-2"
+          data-slot="game-actions"
+        >
           <Button
             onClick={resetGame}
             variant="outline"
@@ -354,7 +376,10 @@ export function Game2048() {
           </GameRulesDialog>
         </div>
 
-        <p className="max-w-md text-center text-xs text-muted-foreground">
+        <p
+          className="game-help max-w-md text-center text-xs text-muted-foreground"
+          data-slot="game-help"
+        >
           {t("game2048Instructions")}
         </p>
 

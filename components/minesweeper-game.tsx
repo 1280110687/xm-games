@@ -181,7 +181,7 @@ export function MinesweeperGame() {
   }
 
   return (
-    <div className="game-page">
+    <div className="game-page" data-page="minesweeper">
       <GameHeader
         layout="centered"
         homeLabel={t("appName")}
@@ -192,9 +192,12 @@ export function MinesweeperGame() {
         titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
-      <main className="flex flex-1 flex-col items-center gap-4 py-2 sm:py-4">
+      <main
+        className="game-content flex flex-1 flex-col items-center gap-4 py-2 sm:py-4"
+        data-slot="game-content"
+      >
         {/* Difficulty selector */}
-        <div className="flex gap-2">
+        <div className="game-settings flex gap-2" data-slot="game-settings">
           {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
             <Button
               key={d}
@@ -210,32 +213,46 @@ export function MinesweeperGame() {
 
         {/* Game stats */}
         <Card
-          className="surface-panel flex items-center gap-6 border-white/10 bg-card/70 px-4 py-2"
+          className="game-summary surface-panel flex items-center gap-6 border-white/10 bg-card/70 px-4 py-2"
           aria-label={`${t("minesweeper")}: ${mines - flagCount}; ${formatTime(timer)}; ${flagCount}`}
         >
           <div className="flex items-center gap-2">
-            <Bomb className="h-4 w-4 text-red-400" aria-hidden="true" />
+            <Bomb
+              className="game-stat-icon h-4 w-4 text-red-400"
+              data-tone="danger"
+              aria-hidden="true"
+            />
             <span className="font-mono text-lg text-foreground">{mines - flagCount}</span>
           </div>
           <div className="flex items-center gap-2">
             <span className="font-mono text-lg text-foreground">{formatTime(timer)}</span>
           </div>
           <div className="flex items-center gap-2">
-            <Flag className="h-4 w-4 text-yellow-400" aria-hidden="true" />
+            <Flag
+              className="game-stat-icon h-4 w-4 text-yellow-400"
+              data-tone="achievement"
+              aria-hidden="true"
+            />
             <span className="font-mono text-lg text-foreground">{flagCount}</span>
           </div>
         </Card>
 
         {/* Game status */}
         {gameStatus !== "playing" && (
-          <div role="status" aria-live="polite" className={`rounded-lg px-4 py-2 text-lg font-bold ${
+          <div
+            role="status"
+            aria-live="polite"
+            data-tone={gameStatus === "won" ? "success" : "danger"}
+            data-slot="game-message"
+            className={`game-message game-status-banner rounded-lg px-4 py-2 text-lg font-bold ${
             gameStatus === "won" ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
-          }`}>
+          }`}
+          >
             {gameStatus === "won" ? t("youWin") : t("gameOver")}
           </div>
         )}
 
-        <div className="flex flex-col items-center gap-2">
+        <div className="game-settings flex flex-col items-center gap-2" data-slot="game-settings">
           <div className="flex gap-2" role="group" aria-label={a11y.modeHelp}>
             <Button
               type="button"
@@ -258,12 +275,15 @@ export function MinesweeperGame() {
               {a11y.flagMode}
             </Button>
           </div>
-          <p className="max-w-md text-center text-xs text-muted-foreground">{a11y.modeHelp}</p>
+          <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
+            {a11y.modeHelp}
+          </p>
         </div>
 
         {/* Game board */}
         <div 
-          className="overflow-auto rounded-lg border-2 border-slate-600 bg-slate-300 p-1"
+          className="game-stage overflow-auto rounded-lg border-2 border-slate-600 bg-slate-300 p-1"
+          data-slot="game-stage"
           style={{ maxWidth: "100%", maxHeight: "60vh" }}
         >
           <div 
@@ -310,7 +330,7 @@ export function MinesweeperGame() {
         </div>
 
         {/* Controls */}
-        <div className="flex gap-2">
+        <div className="game-actions flex gap-2" data-slot="game-actions">
           <Button
             onClick={initGame}
             variant="outline"
@@ -332,7 +352,7 @@ export function MinesweeperGame() {
           </GameRulesDialog>
         </div>
 
-        <p className="max-w-md text-center text-xs text-muted-foreground">
+        <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
           {t("minesweeperInstructions")}
         </p>
 

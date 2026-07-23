@@ -143,7 +143,7 @@ export function ReversiGame() {
   const { black: blackCount, white: whiteCount } = countStones(board)
 
   return (
-    <div className="game-page">
+    <div className="game-page" data-page="reversi">
       <GameHeader
         layout="centered"
         homeLabel={t("appName")}
@@ -154,9 +154,12 @@ export function ReversiGame() {
         titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
-      <main className="flex flex-1 flex-col items-center gap-4 py-2 sm:py-4">
+      <main
+        className="game-content flex flex-1 flex-col items-center gap-4 py-2 sm:py-4"
+        data-slot="game-content"
+      >
         {/* Game status */}
-        <Card className="surface-panel border-white/10 bg-card/70 px-4 py-2" role="status" aria-live="polite">
+        <Card className="game-summary surface-panel border-white/10 bg-card/70 px-4 py-2" role="status" aria-live="polite">
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2">
               <div className={`flex h-6 w-6 items-center justify-center rounded-full bg-slate-950 ${currentPlayer === "black" ? "ring-2 ring-primary" : ""}`}>
@@ -179,7 +182,13 @@ export function ReversiGame() {
         </Card>
 
         {gameOver && (
-          <div className="rounded-lg bg-yellow-500/20 px-4 py-2 text-lg font-bold text-yellow-300" role="status" aria-live="assertive">
+          <div
+            className="game-message game-status-banner rounded-lg bg-yellow-500/20 px-4 py-2 text-lg font-bold text-yellow-300"
+            data-tone="success"
+            data-slot="game-message"
+            role="status"
+            aria-live="assertive"
+          >
             {winner === "tie" 
               ? t("tie") 
               : winner === "black" 
@@ -190,7 +199,10 @@ export function ReversiGame() {
         )}
 
         {/* Game board */}
-        <div className="w-full max-w-[22.875rem] rounded-xl border-4 border-green-800 bg-green-600 p-1 shadow-2xl shadow-black/30">
+        <div
+          className="game-stage w-full max-w-[22.875rem] rounded-xl border-4 border-green-800 bg-green-600 p-1 shadow-2xl shadow-black/30"
+          data-slot="game-stage"
+        >
           <div className="grid w-full grid-cols-8 gap-px bg-green-800" role="group" aria-label={t("reversi")}>
             {board.map((row, rowIndex) =>
               row.map((cell, colIndex) => {
@@ -226,7 +238,7 @@ export function ReversiGame() {
         </div>
 
         {/* Controls */}
-        <div className="flex gap-2">
+        <div className="game-actions flex gap-2" data-slot="game-actions">
           <Button
             onClick={resetGame}
             variant="outline"
@@ -248,7 +260,7 @@ export function ReversiGame() {
           </GameRulesDialog>
         </div>
 
-        <p className="max-w-md text-center text-xs text-muted-foreground">
+        <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
           {t("reversiInstructions")}
         </p>
 

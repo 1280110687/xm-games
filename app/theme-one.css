@@ -1,0 +1,290 @@
+/*
+ * Theme One: the existing XM-Games neon night system.
+ * This file intentionally owns the full visual token mapping so Theme One can
+ * evolve without changing Theme Two.
+ */
+html[data-theme='theme-one'] {
+  color-scheme: dark;
+  --background: oklch(0.145 0.028 268);
+  --foreground: oklch(0.965 0.008 260);
+  --card: oklch(0.195 0.032 266);
+  --card-foreground: oklch(0.965 0.008 260);
+  --popover: oklch(0.175 0.03 266);
+  --popover-foreground: oklch(0.965 0.008 260);
+  --primary: oklch(0.675 0.195 277);
+  --primary-foreground: oklch(0.99 0.006 260);
+  --secondary: oklch(0.245 0.038 266);
+  --secondary-foreground: oklch(0.94 0.01 260);
+  --muted: oklch(0.225 0.032 266);
+  --muted-foreground: oklch(0.72 0.026 260);
+  --accent: oklch(0.285 0.075 273);
+  --accent-foreground: oklch(0.965 0.008 260);
+  --destructive: oklch(0.63 0.22 25);
+  --destructive-foreground: oklch(0.99 0.006 260);
+  --border: oklch(0.31 0.04 266);
+  --input: oklch(0.255 0.038 266);
+  --ring: oklch(0.69 0.18 278);
+  --radius: 0.875rem;
+  --surface-low: oklch(0.17 0.03 266 / 0.72);
+  --surface: oklch(0.205 0.035 266 / 0.82);
+  --surface-high: oklch(0.245 0.042 266 / 0.92);
+  --surface-border: oklch(1 0 0 / 0.085);
+  --surface-shadow: 0 24px 70px oklch(0.07 0.03 270 / 0.32);
+  --control-fill: oklch(1 0 0 / 0.045);
+  --control-hover: oklch(1 0 0 / 0.08);
+  --separator: oklch(1 0 0 / 0.075);
+  --glow-primary: oklch(0.64 0.2 279 / 0.18);
+  --glow-cyan: oklch(0.76 0.13 207 / 0.11);
+}
+
+html[data-theme='theme-one'] body {
+  background-image:
+    radial-gradient(circle at 12% -10%, var(--glow-primary), transparent 31rem),
+    radial-gradient(circle at 88% 8%, var(--glow-cyan), transparent 27rem),
+    linear-gradient(180deg, oklch(0.16 0.032 267), var(--background) 42%);
+  background-attachment: fixed;
+}
+
+html[data-theme='theme-one'] .app-shell::before,
+html[data-theme='theme-one'] .game-page::before {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  content: '';
+  opacity: 0.32;
+  background-image:
+    linear-gradient(oklch(1 0 0 / 0.026) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(1 0 0 / 0.026) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, black, transparent 72%);
+}
+
+html[data-theme='theme-one'] .game-page {
+  padding: 0.75rem;
+}
+
+html[data-theme='theme-one'] .app-container {
+  width: min(100%, 80rem);
+  padding-inline: 1rem;
+}
+
+html[data-theme='theme-one'] .surface-panel {
+  border: 1px solid oklch(1 0 0 / 0.085);
+  border-radius: 1rem;
+  background: var(--surface);
+  box-shadow: 0 24px 70px oklch(0.07 0.03 270 / 0.32);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+
+html[data-theme='theme-one'] .surface-card {
+  border: 1px solid oklch(1 0 0 / 0.075);
+  border-radius: 1rem;
+  background: linear-gradient(
+    145deg,
+    oklch(0.225 0.04 266 / 0.9),
+    oklch(0.18 0.03 267 / 0.78)
+  );
+  box-shadow: 0 18px 45px oklch(0.08 0.025 270 / 0.22);
+}
+
+html[data-theme='theme-one'] .eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: fit-content;
+  padding: 0.35rem 0.65rem;
+  border: 1px solid oklch(0.69 0.18 278 / 0.28);
+  border-radius: 999px;
+  color: oklch(0.82 0.11 278);
+  background: oklch(0.62 0.19 278 / 0.09);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+html[data-theme='theme-one'] .game-header {
+  width: min(100%, 80rem);
+  margin-inline: auto;
+  border: 1px solid oklch(1 0 0 / 0.08);
+  border-radius: 1rem;
+  background: oklch(0.18 0.032 266 / 0.78);
+  box-shadow: 0 18px 55px oklch(0.07 0.03 270 / 0.24);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+
+html[data-theme='theme-one'] .game-page main {
+  width: min(100%, 74rem);
+  margin-inline: auto;
+}
+
+html[data-theme='theme-one'] .game-page h1 {
+  letter-spacing: -0.03em;
+}
+
+html[data-theme='theme-one'] .theme-switcher-trigger {
+  border-color: oklch(1 0 0 / 0.1);
+  background: oklch(1 0 0 / 0.045);
+}
+
+html[data-theme='theme-one'] .theme-switcher-trigger:hover {
+  border-color: oklch(0.75 0.12 278 / 0.32);
+  background: oklch(1 0 0 / 0.08);
+}
+
+html[data-theme='theme-one'] .language-switcher--compact {
+  width: 2.75rem;
+  padding-inline: 0;
+}
+
+html[data-theme='theme-one'] .language-switcher-compact-label {
+  display: none;
+}
+
+html[data-theme='theme-one'] [data-theme-label='theme-two'] {
+  display: none;
+}
+
+/* Settings keeps Theme One's neon control-room composition. */
+html[data-theme='theme-one'] .settings-shell {
+  padding-block: 1rem 2.5rem;
+}
+
+html[data-theme='theme-one'] .settings-container {
+  width: min(100%, 52rem);
+}
+
+html[data-theme='theme-one'] .settings-page-header {
+  padding: 1rem;
+  border: 1px solid oklch(1 0 0 / 0.08);
+  border-radius: 1rem;
+  background: oklch(0.18 0.032 266 / 0.78);
+  box-shadow: 0 18px 55px oklch(0.07 0.03 270 / 0.24);
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+}
+
+html[data-theme='theme-one'] .settings-back-button {
+  border: 1px solid oklch(1 0 0 / 0.09);
+  background: oklch(1 0 0 / 0.045);
+}
+
+html[data-theme='theme-one'] .settings-panel {
+  border-radius: 1rem;
+}
+
+html[data-theme='theme-one'] .settings-row {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.9rem;
+  align-items: center;
+  min-height: 6.25rem;
+  padding: 1rem;
+}
+
+html[data-theme='theme-one'] .settings-row + .settings-row {
+  border-top: 1px solid var(--separator);
+}
+
+html[data-theme='theme-one'] .settings-row-icon {
+  display: inline-flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid oklch(1 0 0 / 0.08);
+  border-radius: 0.9rem;
+}
+
+html[data-theme='theme-one'] .settings-row-icon[data-tone='violet'] {
+  color: oklch(0.82 0.11 278);
+  background: oklch(0.62 0.19 278 / 0.12);
+  box-shadow: 0 10px 28px oklch(0.55 0.2 278 / 0.16);
+}
+
+html[data-theme='theme-one'] .settings-row-icon[data-tone='blue'] {
+  color: oklch(0.84 0.1 220);
+  background: oklch(0.66 0.14 220 / 0.11);
+  box-shadow: 0 10px 28px oklch(0.6 0.15 220 / 0.13);
+}
+
+html[data-theme='theme-one'] .settings-row-icon > svg {
+  width: 1.3rem;
+  height: 1.3rem;
+}
+
+html[data-theme='theme-one'] .settings-row-copy {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+html[data-theme='theme-one'] .settings-row-title {
+  color: var(--foreground);
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+
+html[data-theme='theme-one'] .settings-row-description {
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+  line-height: 1.45;
+}
+
+html[data-theme='theme-one'] .settings-shell .theme-current-label {
+  display: inline;
+}
+
+html[data-theme='theme-one'] .settings-storage-note {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  color: var(--muted-foreground);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+html[data-theme='theme-one'] .settings-storage-note > svg {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+  margin-top: 0.1rem;
+  color: oklch(0.79 0.12 278);
+}
+
+@media (max-width: 359px) {
+  html[data-theme='theme-one'] .settings-row {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  html[data-theme='theme-one'] .settings-row .settings-control {
+    grid-column: 1 / -1;
+    width: 100% !important;
+    justify-content: space-between;
+  }
+}
+
+@media (min-width: 640px) {
+  html[data-theme='theme-one'] .game-page {
+    padding: 1rem;
+  }
+
+  html[data-theme='theme-one'] .app-container {
+    padding-inline: 1.5rem;
+  }
+
+  html[data-theme='theme-one'] .language-switcher--compact {
+    width: 7.875rem;
+    padding-inline: 0.75rem;
+  }
+
+  html[data-theme='theme-one'] .language-switcher-compact-label {
+    display: inline;
+  }
+}

@@ -2,10 +2,12 @@
 
 import type { ReactNode } from "react"
 import Link from "next/link"
-import { ArrowLeft, Home } from "lucide-react"
+import { ArrowLeft, Home, Settings2 } from "lucide-react"
 
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { ThemeSwitcher } from "@/components/theme-switcher"
 import { Button } from "@/components/ui/button"
+import { useLocale } from "@/lib/locale-context"
 import { cn } from "@/lib/utils"
 
 type HeaderLayout = "simple" | "centered" | "tool" | "hero"
@@ -43,7 +45,7 @@ function HomeLink({
       asChild
       variant="ghost"
       size={labelMode === "sr-only" ? "icon" : "sm"}
-      className={className}
+      className={cn("game-header-home", className)}
     >
       <Link href="/">
         <Icon className="h-4 w-4" aria-hidden="true" />
@@ -73,6 +75,7 @@ export function GameHeader({
   titleClassName,
   descriptionClassName,
 }: GameHeaderProps) {
+  const { t } = useLocale()
   const home = (
     <HomeLink
       label={homeLabel}
@@ -86,21 +89,40 @@ export function GameHeader({
       data-slot="game-header-controls"
       className="flex shrink-0 items-center gap-1.5 sm:gap-2"
     >
-      <LanguageSwitcher />
+      <ThemeSwitcher compact />
+      <LanguageSwitcher compact />
+      <Button
+        asChild
+        variant="outline"
+        size="sm"
+        className="theme-two-settings-shortcut"
+      >
+        <Link href="/settings">
+          <Settings2 aria-hidden="true" />
+          <span>{t("settings")}</span>
+        </Link>
+      </Button>
       {actions}
     </div>
   )
 
   if (layout === "hero") {
     return (
-      <header className={cn("game-header mb-8 p-3 sm:p-4", className)}>
+      <header
+        data-layout="hero"
+        className={cn("game-header mb-8 p-3 sm:p-4", className)}
+      >
         <div className="mb-6 flex min-w-0 items-center justify-between gap-3">
           {home}
           {languageAndActions}
         </div>
         <div className="flex flex-col items-center gap-3 pb-3 text-center sm:pb-5">
-          {title && <h1 className={titleClassName}>{title}</h1>}
-          {description && <p className={descriptionClassName}>{description}</p>}
+          {title && <h1 data-layout-slot="title" className={titleClassName}>{title}</h1>}
+          {description && (
+            <p data-layout-slot="description" className={descriptionClassName}>
+              {description}
+            </p>
+          )}
         </div>
       </header>
     )
@@ -108,12 +130,29 @@ export function GameHeader({
 
   if (layout === "tool") {
     return (
-      <header className={cn("game-header flex min-w-0 items-center justify-between gap-2 p-3 sm:gap-4 sm:p-4", className)}>
-        <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4">
+      <header
+        data-layout="tool"
+        className={cn("game-header flex min-w-0 items-center justify-between gap-2 p-3 sm:gap-4 sm:p-4", className)}
+      >
+        <div
+          data-layout-slot="identity"
+          className="flex min-w-0 flex-1 items-center gap-2 sm:gap-4"
+        >
           {home}
           <div className="min-w-0">
-            {title && <h1 className={cn("truncate", titleClassName)}>{title}</h1>}
-            {description && <p className={cn("truncate", descriptionClassName)}>{description}</p>}
+            {title && (
+              <h1 data-layout-slot="title" className={cn("truncate", titleClassName)}>
+                {title}
+              </h1>
+            )}
+            {description && (
+              <p
+                data-layout-slot="description"
+                className={cn("truncate", descriptionClassName)}
+              >
+                {description}
+              </p>
+            )}
           </div>
         </div>
         {languageAndActions}
@@ -124,20 +163,33 @@ export function GameHeader({
   if (layout === "centered") {
     return (
       <header
+        data-layout="centered"
         className={cn(
           "game-header grid min-w-0 grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-1.5 p-3 sm:gap-2 sm:p-4",
           className,
         )}
       >
         <div className="min-w-0 justify-self-start">{home}</div>
-        {title && <h1 className={cn("max-w-full truncate text-center", titleClassName)}>{title}</h1>}
-        <div className="min-w-0 justify-self-end">{languageAndActions}</div>
+        {title && (
+          <h1
+            data-layout-slot="title"
+            className={cn("max-w-full truncate text-center", titleClassName)}
+          >
+            {title}
+          </h1>
+        )}
+        <div data-layout-slot="controls" className="min-w-0 justify-self-end">
+          {languageAndActions}
+        </div>
       </header>
     )
   }
 
   return (
-    <header className={cn("game-header flex items-center justify-between p-3 sm:p-4", className)}>
+    <header
+      data-layout="simple"
+      className={cn("game-header flex items-center justify-between p-3 sm:p-4", className)}
+    >
       {home}
       {languageAndActions}
     </header>

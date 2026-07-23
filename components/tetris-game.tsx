@@ -117,7 +117,7 @@ export function TetrisGame() {
   const displayBoard = getDisplayBoard(state)
 
   return (
-    <div className="game-page">
+    <div className="game-page" data-page="tetris">
       <GameHeader
         layout="centered"
         homeIcon="back"
@@ -128,10 +128,13 @@ export function TetrisGame() {
         homeButtonClassName="text-muted-foreground hover:text-foreground"
       />
 
-      <main className="flex flex-1 flex-col items-center justify-center gap-5 py-5 sm:gap-6">
-        <div className="flex w-full flex-col items-center gap-4 sm:w-auto sm:flex-row sm:items-start">
+      <main
+        className="game-content flex flex-1 flex-col items-center justify-center gap-5 py-5 sm:gap-6"
+        data-slot="game-content"
+      >
+        <div className="tetris-workspace flex w-full flex-col items-center gap-4 sm:w-auto sm:flex-row sm:items-start">
           {/* Game Board */}
-          <Card className="border-white/10 bg-card/70">
+          <Card className="game-stage border-white/10 bg-card/70">
             <CardContent className="p-2">
               <div
                 className="grid gap-[1px] rounded bg-slate-900 p-1"
@@ -155,11 +158,11 @@ export function TetrisGame() {
           </Card>
 
           {/* Side Panel */}
-          <div className="grid w-full max-w-xs grid-cols-2 gap-3 sm:flex sm:w-auto sm:flex-col sm:gap-4">
+          <div className="tetris-sidebar grid w-full max-w-xs grid-cols-2 gap-3 sm:flex sm:w-auto sm:flex-col sm:gap-4">
             {/* Next Piece */}
-            <Card className="border-white/10 bg-card/70">
+            <Card className="tetris-next border-white/10 bg-card/70">
               <CardHeader className="p-3 pb-1">
-                <CardTitle className="text-sm text-slate-400">{t("nextPiece")}</CardTitle>
+                <CardTitle className="text-sm text-muted-foreground">{t("nextPiece")}</CardTitle>
               </CardHeader>
               <CardContent className="p-3 pt-1">
                 <div className="grid h-16 w-16 place-items-center rounded bg-slate-900 p-2" role="img" aria-label={`${t("nextPiece")}: ${nextPiece}`}>
@@ -183,25 +186,42 @@ export function TetrisGame() {
             </Card>
 
             {/* Stats */}
-            <Card className="border-white/10 bg-card/70" role="status" aria-live="polite">
+            <Card
+              className="game-summary tetris-stats border-white/10 bg-card/70"
+              role="status"
+              aria-live="polite"
+            >
               <CardContent className="space-y-2 p-3">
                 <div className="text-center">
-                  <div className="text-xs text-slate-400">{t("score")}</div>
-                  <div className="text-xl font-bold text-white">{score}</div>
+                  <div className="text-xs text-muted-foreground">{t("score")}</div>
+                  <div className="text-xl font-bold text-foreground">{score}</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xs text-slate-400">{t("lines")}</div>
-                  <div className="text-lg font-semibold text-cyan-400">{lines}</div>
+                  <div className="text-xs text-muted-foreground">{t("lines")}</div>
+                  <div
+                    className="game-stat-value text-lg font-semibold text-cyan-400"
+                    data-tone="info"
+                  >
+                    {lines}
+                  </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-xs text-slate-400">{t("level")}</div>
-                  <div className="text-lg font-semibold text-green-400">{level}</div>
+                  <div className="text-xs text-muted-foreground">{t("level")}</div>
+                  <div
+                    className="game-stat-value text-lg font-semibold text-green-400"
+                    data-tone="success"
+                  >
+                    {level}
+                  </div>
                 </div>
               </CardContent>
             </Card>
 
             {/* Controls */}
-            <div className="col-span-2 flex flex-row justify-center gap-2 sm:flex-col">
+            <div
+              className="game-actions col-span-2 flex flex-row justify-center gap-2 sm:flex-col"
+              data-slot="game-actions"
+            >
               {phase === "idle" && (
                 <Button onClick={startGame} className="gap-2">
                   <Play className="h-4 w-4" aria-hidden="true" />
@@ -241,14 +261,17 @@ export function TetrisGame() {
         {phase === "gameOver" && (
           <div className="text-center" role="status" aria-live="assertive">
             <div className="text-2xl font-bold text-red-500">{t("gameOver")}</div>
-            <div className="text-slate-400">
+            <div className="text-muted-foreground">
               {t("finalScore")}: {score}
             </div>
           </div>
         )}
 
         {/* Mobile Controls */}
-        <div className="flex flex-col items-center gap-2 md:hidden">
+        <div
+          className="mobile-controls flex flex-col items-center gap-2 md:hidden"
+          data-slot="mobile-controls"
+        >
           <Button
             variant="outline"
             size="icon"
@@ -304,7 +327,10 @@ export function TetrisGame() {
         </div>
 
         {/* Instructions */}
-        <div className="text-center text-sm text-slate-500">
+        <div
+          className="game-help text-center text-sm text-muted-foreground"
+          data-slot="game-help"
+        >
           <span className="hidden md:inline">{t("tetrisControls")}</span>
           <span className="md:hidden">{t("tetrisControlsMobile")}</span>
         </div>

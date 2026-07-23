@@ -730,7 +730,11 @@ export function AnimeTracker() {
   )
 
   return (
-    <main className="app-shell min-h-screen bg-background text-foreground">
+    <main
+      className="app-shell game-content min-h-screen bg-background text-foreground"
+      data-page="anime-tracker"
+      data-slot="game-content"
+    >
       <div className="app-container mx-auto w-full max-w-7xl px-3 py-4 sm:px-6 sm:py-7 lg:px-8">
         <GameHeader
           layout="tool"
@@ -746,7 +750,7 @@ export function AnimeTracker() {
           actions={
             <Button
               onClick={openAddDialog}
-              className="rounded-full px-3 sm:px-4"
+              className="game-actions rounded-full px-3 sm:px-4"
               aria-label={t("addAnime")}
             >
               <Plus aria-hidden="true" />
@@ -770,7 +774,10 @@ export function AnimeTracker() {
           </div>
         )}
 
-        <section className="surface-panel relative mb-5 overflow-hidden rounded-[28px] border border-border/70 bg-card/80 p-5 shadow-sm sm:p-7">
+        <section
+          className="anime-overview game-summary surface-panel relative mb-5 overflow-hidden rounded-[28px] border border-border/70 bg-card/80 p-5 shadow-sm sm:p-7"
+          data-slot="game-summary"
+        >
           <div className="pointer-events-none absolute -right-16 -top-24 h-64 w-64 rounded-full bg-primary/10 blur-3xl" />
           <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end">
             <div>
@@ -805,8 +812,12 @@ export function AnimeTracker() {
         <Tabs
           value={activeTab}
           onValueChange={(value) => setActiveTab(value as AnimeStatus | "all")}
+          className="anime-workspace"
         >
-          <section className="surface-panel mb-5 rounded-3xl border border-border/70 bg-card/70 p-3 shadow-sm sm:p-4">
+          <section
+            className="anime-filters game-settings surface-panel mb-5 rounded-3xl border border-border/70 bg-card/70 p-3 shadow-sm sm:p-4"
+            data-slot="game-settings"
+          >
             <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-center">
               <div className="relative">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
@@ -843,7 +854,10 @@ export function AnimeTracker() {
             </div>
           </section>
 
-          <TabsContent value={activeTab} className="mt-0">
+          <TabsContent
+            value={activeTab}
+            className="anime-library game-stage mt-0"
+          >
             {visibleAnime.length === 0 ? (
               <section className="surface-panel flex min-h-72 flex-col items-center justify-center rounded-3xl border border-dashed border-border bg-card/40 px-6 text-center">
                 <div className="mb-4 rounded-2xl bg-primary/10 p-4 text-primary">

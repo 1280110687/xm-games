@@ -9,6 +9,7 @@ import {
   SelectTrigger,
 } from "@/components/ui/select"
 import { Globe } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 const localeCompactNames: Record<Locale, string> = {
   zh: "中",
@@ -28,25 +29,45 @@ const localeSelectorLabels: Record<Locale, string> = {
   th: "เลือกภาษา ภาษาปัจจุบันคือไทย",
 }
 
-export function LanguageSwitcher() {
+export function LanguageSwitcher({
+  compact = false,
+  className,
+}: {
+  compact?: boolean
+  className?: string
+}) {
   const { locale, setLocale } = useLocale()
 
   return (
     <Select value={locale} onValueChange={(value) => setLocale(value as Locale)}>
       <SelectTrigger
         aria-label={localeSelectorLabels[locale]}
-        className="!w-[84px] gap-1.5 rounded-full border-white/10 bg-white/[0.055] !px-2 font-semibold text-foreground shadow-[inset_0_1px_0_oklch(1_0_0_/_0.04)] hover:border-violet-300/25 hover:bg-white/[0.085] data-[state=open]:border-violet-300/35 data-[state=open]:bg-violet-400/10 min-[360px]:!w-[96px] sm:!w-[126px] sm:gap-2 sm:!px-3"
+        className={cn(
+          "language-switcher-trigger gap-1.5 rounded-full border-white/10 bg-white/[0.055] font-semibold text-foreground shadow-[inset_0_1px_0_oklch(1_0_0_/_0.04)] hover:border-violet-300/25 hover:bg-white/[0.085] data-[state=open]:border-violet-300/35 data-[state=open]:bg-violet-400/10 sm:gap-2 sm:!px-3",
+          compact
+            ? "language-switcher--compact"
+            : "!w-[84px] !px-2 min-[360px]:!w-[96px] sm:!w-[126px]",
+          className,
+        )}
       >
         <Globe className="size-4 text-violet-300" aria-hidden="true" />
-        <span className="text-xs tracking-wide min-[360px]:hidden" aria-hidden="true">
-          {localeCompactNames[locale]}
-        </span>
-        <span className="hidden text-sm min-[360px]:inline sm:hidden" aria-hidden="true">
-          {localeMobileNames[locale]}
-        </span>
-        <span className="hidden text-sm sm:inline" aria-hidden="true">
-          {localeNames[locale]}
-        </span>
+        {compact ? (
+          <span className="language-switcher-compact-label text-sm" aria-hidden="true">
+            {localeNames[locale]}
+          </span>
+        ) : (
+          <>
+            <span className="text-xs tracking-wide min-[360px]:hidden" aria-hidden="true">
+              {localeCompactNames[locale]}
+            </span>
+            <span className="hidden text-sm min-[360px]:inline sm:hidden" aria-hidden="true">
+              {localeMobileNames[locale]}
+            </span>
+            <span className="hidden text-sm sm:inline" aria-hidden="true">
+              {localeNames[locale]}
+            </span>
+          </>
+        )}
       </SelectTrigger>
       <SelectContent align="end" sideOffset={6}>
         {locales.map((loc) => (

@@ -114,7 +114,7 @@ export function SnakeGame() {
   }[locale]
 
   return (
-    <div className="game-page">
+    <div className="game-page" data-page="snake">
       <GameHeader
         layout="centered"
         homeIcon="back"
@@ -125,21 +125,39 @@ export function SnakeGame() {
         homeButtonClassName="text-muted-foreground hover:text-foreground"
       />
 
-      <main className="flex flex-1 flex-col items-center justify-center gap-5 py-5 sm:gap-6">
+      <main
+        className="game-content flex flex-1 flex-col items-center justify-center gap-5 py-5 sm:gap-6"
+        data-slot="game-content"
+      >
         {/* Score Display */}
-        <div className="flex gap-8 text-center" role="status" aria-live="polite">
+        <div
+          className="game-summary flex gap-8 text-center"
+          data-slot="game-summary"
+          role="status"
+          aria-live="polite"
+        >
           <div>
-            <div className="text-sm text-slate-400">{t("score")}</div>
-            <div className="text-2xl font-bold text-green-400">{score}</div>
+            <div className="text-sm text-muted-foreground">{t("score")}</div>
+            <div
+              className="game-stat-value text-2xl font-bold text-green-400"
+              data-tone="success"
+            >
+              {score}
+            </div>
           </div>
           <div>
-            <div className="text-sm text-slate-400">{t("highScore")}</div>
-            <div className="text-2xl font-bold text-yellow-400">{highScore}</div>
+            <div className="text-sm text-muted-foreground">{t("highScore")}</div>
+            <div
+              className="game-stat-value text-2xl font-bold text-yellow-400"
+              data-tone="achievement"
+            >
+              {highScore}
+            </div>
           </div>
         </div>
 
         {/* Game Board */}
-        <Card className="border-white/10 bg-card/70">
+        <Card className="game-stage border-white/10 bg-card/70">
           <CardContent className="p-2">
             <div
               className="grid gap-[1px] rounded bg-slate-900 p-1"
@@ -181,18 +199,22 @@ export function SnakeGame() {
         {(isGameOver || isWon) && (
           <div className="text-center" role="status" aria-live="assertive">
             <div
-              className={`text-2xl font-bold ${isWon ? "text-green-400" : "text-red-500"}`}
+              data-tone={isWon ? "success" : "danger"}
+              className={`game-status-copy text-2xl font-bold ${isWon ? "text-green-400" : "text-red-500"}`}
             >
               {isWon ? t("youWin") : t("gameOver")}
             </div>
-            <div className="text-slate-400">
+            <div className="text-muted-foreground">
               {t("finalScore")}: {score}
             </div>
           </div>
         )}
 
         {/* Controls */}
-        <div className="flex gap-2">
+        <div
+          className="game-actions flex gap-2"
+          data-slot="game-actions"
+        >
           {phase === "idle" && (
             <Button onClick={startGame} className="gap-2">
               <Play className="h-4 w-4" aria-hidden="true" />
@@ -220,7 +242,10 @@ export function SnakeGame() {
         </div>
 
         {/* Mobile Controls */}
-        <div className="flex flex-col items-center gap-2 md:hidden">
+        <div
+          className="mobile-controls flex flex-col items-center gap-2 md:hidden"
+          data-slot="mobile-controls"
+        >
           <Button
             variant="outline"
             size="icon"
@@ -267,7 +292,10 @@ export function SnakeGame() {
         </div>
 
         {/* Instructions */}
-        <div className="text-center text-sm text-slate-500">
+        <div
+          className="game-help text-center text-sm text-muted-foreground"
+          data-slot="game-help"
+        >
           <span className="hidden md:inline">{t("snakeControls")}</span>
           <span className="md:hidden">{t("snakeControlsMobile")}</span>
         </div>

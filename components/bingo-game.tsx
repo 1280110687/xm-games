@@ -221,8 +221,11 @@ export function BingoGame() {
   }
 
   return (
-    <div className="game-page">
-      <div className="mx-auto w-full max-w-6xl">
+    <div className="bingo-shell game-page" data-page="bingo">
+      <div
+        className="game-content mx-auto w-full max-w-6xl"
+        data-slot="game-content"
+      >
         <GameHeader
           layout="centered"
           homeIcon="back"
@@ -242,12 +245,15 @@ export function BingoGame() {
           }
         />
 
-        <div className="grid gap-4 lg:grid-cols-3 lg:gap-6">
+        <div className="bingo-workspace grid gap-4 lg:grid-cols-3 lg:gap-6">
           {/* 当前抽到的数字 */}
-          <Card className="gap-0 overflow-hidden border-white/10 bg-card/70 py-0 lg:col-span-2">
+          <Card className="bingo-draw game-stage gap-0 overflow-hidden border-white/10 bg-card/70 py-0 lg:col-span-2">
             <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-white/[0.07] px-4 py-4 sm:px-6">
-              <CardTitle className="text-base text-white sm:text-lg">{t("currentNumber")}</CardTitle>
-              <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground sm:gap-2 sm:text-sm">
+              <CardTitle className="text-base text-foreground sm:text-lg">{t("currentNumber")}</CardTitle>
+              <div
+                className="game-summary flex items-center gap-1.5 text-[11px] text-muted-foreground sm:gap-2 sm:text-sm"
+                data-slot="game-summary"
+              >
                 <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-1 sm:px-2.5">
                   {t("drawn")} <strong className="font-semibold text-foreground">{drawnNumbers.length}</strong>
                 </span>
@@ -276,7 +282,7 @@ export function BingoGame() {
                       </div>
                     </div>
                     {locale !== "en" && (
-                      <div className="text-base font-medium text-slate-300 sm:text-lg">
+                      <div className="text-base font-medium text-muted-foreground sm:text-lg">
                         {locale === "th"
                           ? thaiNumbers[currentNumber]
                           : getChineseNumber(currentNumber)}
@@ -290,7 +296,10 @@ export function BingoGame() {
                 )}
 
                 {/* 操作按钮 */}
-                <div className="grid w-full max-w-sm grid-cols-2 gap-2.5 sm:gap-3">
+                <div
+                  className="game-actions grid w-full max-w-sm grid-cols-2 gap-2.5 sm:gap-3"
+                  data-slot="game-actions"
+                >
                   {!isAutoMode ? (
                     <Button
                       size="lg"
@@ -336,13 +345,13 @@ export function BingoGame() {
           </Card>
 
           {/* 设置面板 */}
-          <Card className="gap-0 overflow-hidden border-white/10 bg-card/70 py-0">
+          <Card className="bingo-settings game-settings gap-0 overflow-hidden border-white/10 bg-card/70 py-0">
             <CardHeader className="border-b border-white/[0.07] px-4 py-4 sm:px-6">
-              <CardTitle className="text-base text-white sm:text-lg">{t("settings")}</CardTitle>
+              <CardTitle className="text-base text-foreground sm:text-lg">{t("settings")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 px-4 py-4 sm:px-6 sm:py-5">
               <div className="flex min-h-11 items-center justify-between gap-4">
-                <Label htmlFor="sound" className="flex min-h-11 flex-1 cursor-pointer items-center gap-2.5 text-sm text-slate-300 sm:text-base">
+                <Label htmlFor="sound" className="flex min-h-11 flex-1 cursor-pointer items-center gap-2.5 text-sm text-foreground sm:text-base">
                   {isSoundEnabled ? (
                     <Volume2 className="h-5 w-5 text-primary" aria-hidden="true" />
                   ) : (
@@ -359,7 +368,7 @@ export function BingoGame() {
               </div>
 
               <div className="flex min-h-11 items-center justify-between gap-4 border-t border-white/[0.06] pt-3">
-                <Label htmlFor="auto" className="flex min-h-11 flex-1 cursor-pointer items-center text-sm text-slate-300 sm:text-base">
+                <Label htmlFor="auto" className="flex min-h-11 flex-1 cursor-pointer items-center text-sm text-foreground sm:text-base">
                   {t("autoDrawMode")}
                 </Label>
                 <Switch
@@ -376,7 +385,7 @@ export function BingoGame() {
               {isAutoMode && (
                 <div className="space-y-3 rounded-xl border border-primary/15 bg-primary/[0.055] p-3.5">
                   <div className="flex items-center justify-between gap-3">
-                    <Label htmlFor="auto-interval" className="text-sm text-slate-300">
+                    <Label htmlFor="auto-interval" className="text-sm text-foreground">
                       {t("drawInterval")}
                     </Label>
                     <span className="rounded-md bg-white/[0.06] px-2 py-1 text-xs font-semibold tabular-nums text-foreground">
@@ -398,7 +407,7 @@ export function BingoGame() {
 
               {drawnNumbers.length > 0 && (
                 <div className="space-y-3 border-t border-white/[0.06] pt-4">
-                  <Label className="text-sm text-slate-300">{t("recentDraws")}</Label>
+                  <Label className="text-sm text-foreground">{t("recentDraws")}</Label>
                   <div className="flex flex-wrap gap-2" role="list">
                     {drawnNumbers.slice(-10).reverse().map((num, index) => (
                       <div
@@ -423,9 +432,9 @@ export function BingoGame() {
         </div>
 
         {/* 所有数字网格 */}
-        <Card className="mt-4 border-white/10 bg-card/70 sm:mt-6">
+        <Card className="bingo-board game-stage mt-4 border-white/10 bg-card/70 sm:mt-6">
           <CardHeader>
-            <CardTitle className="text-white">{t("numberBoard")}</CardTitle>
+            <CardTitle className="text-foreground">{t("numberBoard")}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-5 gap-2" role="group" aria-label={t("numberBoard")}>
@@ -459,7 +468,7 @@ export function BingoGame() {
                       className={`flex h-10 items-center justify-center rounded-md text-sm font-medium transition-all duration-300 md:h-12 md:text-base ${
                         isDrawn
                           ? `${getLetterColor(num)} text-white shadow-lg`
-                          : "bg-slate-700 text-slate-400"
+                          : "bg-muted text-muted-foreground"
                       }`}
                     >
                       {num}

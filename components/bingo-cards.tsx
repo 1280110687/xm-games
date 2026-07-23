@@ -377,16 +377,19 @@ export function BingoCards() {
   ]
 
   return (
-    <div className="game-page">
+    <div className="game-page" data-page="bingo-cards">
       {/* Header */}
-      <div className="mx-auto max-w-7xl">
+      <div
+        className="game-content mx-auto max-w-7xl"
+        data-slot="game-content"
+      >
         <GameHeader
           layout="tool"
           homeLabel={t("appName")}
           homeLabelMode="sr-only"
           homeButtonClassName="text-muted-foreground hover:text-foreground"
           className="mb-6"
-          titleClassName="text-2xl font-bold text-white md:text-3xl"
+          titleClassName="text-2xl font-bold text-foreground md:text-3xl"
           title={
             <>
               <span className="text-red-500">B</span>
@@ -394,13 +397,13 @@ export function BingoCards() {
               <span className="text-yellow-500">N</span>
               <span className="text-green-500">G</span>
               <span className="text-blue-500">O</span>
-              <span className="ml-2 text-slate-400">{t("bingoCards")}</span>
+              <span className="ml-2 text-muted-foreground">{t("bingoCards")}</span>
             </>
           }
         />
 
         {/* Controls */}
-        <Card className="mb-6 border-white/10 bg-card/70">
+        <Card className="bingo-cards-toolbar game-actions mb-6 border-white/10 bg-card/70">
           <CardContent className="p-4">
             <div className="flex flex-wrap items-center gap-4">
               {/* Number Input */}
@@ -446,21 +449,27 @@ export function BingoCards() {
               </Button>
 
               {/* Stats */}
-              <div className="ml-auto text-sm text-slate-400" role="status" aria-live="polite">
-                {t("markedCount")}: <span className="font-bold text-white">{drawnNumbers.size}</span> / 75
+              <div
+                className="game-summary ml-auto text-sm text-muted-foreground"
+                data-slot="game-summary"
+                role="status"
+                aria-live="polite"
+              >
+                {t("markedCount")}: <span className="font-bold text-foreground">{drawnNumbers.size}</span> / 75
               </div>
             </div>
 
             {/* Drawn Numbers Display */}
             {drawnNumbers.size > 0 && (
               <div className="mt-4 border-t border-slate-700 pt-4">
-                <p className="mb-2 text-sm text-slate-400">{t("markedNumbers")}:</p>
+                <p className="mb-2 text-sm text-muted-foreground">{t("markedNumbers")}:</p>
                 <div className="flex flex-wrap gap-1" role="list">
                   {Array.from(drawnNumbers).sort((a, b) => a - b).map(num => (
                     <span
                       key={num}
                       role="listitem"
-                      className="inline-flex h-7 w-7 items-center justify-center rounded bg-amber-500/20 text-xs font-medium text-amber-400"
+                      className="game-number-chip inline-flex h-7 w-7 items-center justify-center rounded bg-amber-500/20 text-xs font-medium text-amber-400"
+                      data-tone="achievement"
                     >
                       {num}
                     </span>
@@ -473,9 +482,9 @@ export function BingoCards() {
 
         {/* Cards Grid */}
         {cards.length === 0 ? (
-          <Card className="border-white/10 bg-card/70">
+          <Card className="bingo-cards-library game-stage border-white/10 bg-card/70">
             <CardContent className="flex flex-col items-center justify-center py-16">
-              <p className="mb-4 text-slate-400">{t("noCards")}</p>
+              <p className="mb-4 text-muted-foreground">{t("noCards")}</p>
               <Button onClick={addCard}>
                 <Plus className="mr-2 h-4 w-4" aria-hidden="true" />
                 {t("addFirstCard")}
@@ -483,7 +492,10 @@ export function BingoCards() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div
+            className="bingo-cards-library game-stage grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+            data-slot="game-stage"
+          >
             {cards.map((card) => {
               const hasBingo = checkBingo(card.numbers, drawnNumbers)
               return (
@@ -495,7 +507,7 @@ export function BingoCards() {
                 >
                   <CardHeader className="pb-2">
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-lg text-white">
+                      <CardTitle className="text-lg text-foreground">
                         {card.name}
                         {hasBingo && (
                           <span className="ml-2 rounded bg-amber-500 px-2 py-0.5 text-xs font-bold text-black" role="status" aria-live="assertive">
@@ -506,9 +518,10 @@ export function BingoCards() {
                       <Button
                         variant="ghost"
                         size="icon"
+                        data-tone="danger"
                         onClick={() => removeCard(card.id)}
                         aria-label={`${t("delete")} ${card.name}`}
-                        className="size-10 text-slate-400 hover:bg-red-500/20 hover:text-red-400"
+                        className="size-10 text-muted-foreground hover:bg-red-500/20 hover:text-red-400"
                       >
                         <Trash2 className="h-4 w-4" aria-hidden="true" />
                       </Button>
@@ -541,7 +554,7 @@ export function BingoCards() {
                                 ? "bg-amber-500/30 text-amber-400"
                                 : isMarked
                                 ? "bg-green-500 text-white"
-                                : "bg-slate-700 text-slate-300"
+                                : "bg-muted text-muted-foreground"
                             }`}
                           >
                             {isFree ? "FREE" : num}
