@@ -223,7 +223,7 @@ export function NeonBreakerGame() {
           data-slot="game-stage"
         >
           <div className="pointer-events-none absolute inset-x-12 top-0 h-28 rounded-full bg-cyan-400/10 blur-3xl" />
-          <div className="relative aspect-[39/64] w-full overflow-hidden rounded-[1.35rem] border border-cyan-200/15 bg-[#050816] shadow-[0_22px_70px_rgba(3,7,24,0.58)]">
+          <div className="neon-canvas-shell relative aspect-[39/64] w-full overflow-hidden rounded-[1.35rem] border border-cyan-200/15 bg-[#050816] shadow-[0_22px_70px_rgba(3,7,24,0.58)]">
             {storageReady && (
               <NeonBreakerCanvas
                 key={retryKey}
@@ -382,7 +382,7 @@ export function NeonBreakerGame() {
             </GameRulesDialog>
           </div>
 
-          <p className="text-center text-xs leading-5 text-muted-foreground lg:text-left">
+          <p className="neon-footer-copy text-center text-xs leading-5 text-muted-foreground lg:text-left">
             {t("neonBreakerInstructions")} · {t("highScore")}: {highScore} · {t("level")}: {record.highestLevel}/{levelCount}
           </p>
         </section>

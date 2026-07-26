@@ -481,7 +481,10 @@ export function ChineseChessGame() {
             )}
 
             {/* Undo status */}
-            <div className="flex items-center justify-center gap-4 text-xs">
+            <div
+              className="game-undo-status flex items-center justify-center gap-4 text-xs"
+              data-slot="undo-status"
+            >
               <div className="flex items-center gap-1">
                 <span className="game-status-copy text-red-400" data-tone="danger">
                   {redUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}

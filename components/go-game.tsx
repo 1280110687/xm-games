@@ -224,7 +224,10 @@ export function GoGame() {
               </div>
             )}
 
-            <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground">
+            <div
+              className="game-undo-status flex items-center justify-center gap-4 text-xs text-muted-foreground"
+              data-slot="undo-status"
+            >
               <span>{blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
               <div className="h-3 w-px bg-border" />
               <span>{whiteUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>

@@ -284,6 +284,7 @@ export function MinesweeperGame() {
         <div 
           className="game-stage overflow-auto rounded-lg border-2 border-slate-600 bg-slate-300 p-1"
           data-slot="game-stage"
+          data-difficulty={difficulty}
           style={{ maxWidth: "100%", maxHeight: "60vh" }}
         >
           <div 
@@ -304,7 +305,7 @@ export function MinesweeperGame() {
                   aria-label={getCellLabel(rowIndex, colIndex)}
                   aria-pressed={cell.isFlagged}
                   className={`
-                    flex items-center justify-center font-bold transition-all
+                    minesweeper-cell flex items-center justify-center font-bold transition-all
                     ${difficulty === "hard" ? "h-5 w-5 text-xs sm:h-6 sm:w-6" : "h-7 w-7 text-sm sm:h-8 sm:w-8"}
                     ${cell.isRevealed
                       ? cell.isMine

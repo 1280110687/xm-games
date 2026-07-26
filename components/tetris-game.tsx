@@ -148,7 +148,7 @@ export function TetrisGame() {
                   row.map((cell, x) => (
                     <div
                       key={`${y}-${x}`}
-                      className={`h-[clamp(1.05rem,5.2vw,1.5rem)] w-[clamp(1.05rem,5.2vw,1.5rem)] rounded-sm ${getCellColor(cell)}`}
+                      className={`tetris-board-cell h-[clamp(1.05rem,5.2vw,1.5rem)] w-[clamp(1.05rem,5.2vw,1.5rem)] rounded-sm ${getCellColor(cell)}`}
                       aria-hidden="true"
                     />
                   ))

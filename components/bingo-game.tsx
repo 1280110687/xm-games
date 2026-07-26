@@ -6,7 +6,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Slider } from "@/components/ui/slider"
 import { Label } from "@/components/ui/label"
-import { Volume2, VolumeX, Play, Pause, RotateCcw } from "lucide-react"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
+import {
+  Grid3X3,
+  Pause,
+  Play,
+  RotateCcw,
+  Settings2,
+  Volume2,
+  VolumeX,
+} from "lucide-react"
 import { useLocale } from "@/lib/locale-context"
 import { GameHeader } from "@/components/game-header"
 
@@ -220,6 +236,145 @@ export function BingoGame() {
     return "O"
   }
 
+  const renderSettingsControls = (surface: "desktop" | "mobile") => {
+    const soundId = surface === "desktop" ? "sound" : "bingo-mobile-sound"
+    const autoId = surface === "desktop" ? "auto" : "bingo-mobile-auto"
+    const intervalId = surface === "desktop"
+      ? "auto-interval"
+      : "bingo-mobile-auto-interval"
+
+    return (
+      <div className="bingo-settings-controls space-y-4">
+        <div className="flex min-h-11 items-center justify-between gap-4">
+          <Label
+            htmlFor={soundId}
+            className="flex min-h-11 flex-1 cursor-pointer items-center gap-2.5 text-sm text-foreground sm:text-base"
+          >
+            {isSoundEnabled ? (
+              <Volume2 className="h-5 w-5 text-primary" aria-hidden="true" />
+            ) : (
+              <VolumeX className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
+            )}
+            {t("voiceBroadcast")}
+          </Label>
+          <Switch
+            id={soundId}
+            checked={isSoundEnabled}
+            onCheckedChange={setIsSoundEnabled}
+            className="h-6 w-11 [&_[data-slot=switch-thumb]]:size-5"
+          />
+        </div>
+
+        <div className="flex min-h-11 items-center justify-between gap-4 border-t border-white/[0.06] pt-3">
+          <Label
+            htmlFor={autoId}
+            className="flex min-h-11 flex-1 cursor-pointer items-center text-sm text-foreground sm:text-base"
+          >
+            {t("autoDrawMode")}
+          </Label>
+          <Switch
+            id={autoId}
+            checked={isAutoMode}
+            onCheckedChange={(checked) => {
+              setIsAutoMode(checked)
+              if (!checked) setIsPlaying(false)
+            }}
+            className="h-6 w-11 [&_[data-slot=switch-thumb]]:size-5"
+          />
+        </div>
+
+        {isAutoMode && (
+          <div className="space-y-3 rounded-xl border border-primary/15 bg-primary/[0.055] p-3.5">
+            <div className="flex items-center justify-between gap-3">
+              <Label htmlFor={intervalId} className="text-sm text-foreground">
+                {t("drawInterval")}
+              </Label>
+              <span className="rounded-md bg-white/[0.06] px-2 py-1 text-xs font-semibold tabular-nums text-foreground">
+                {autoInterval} {t("seconds")}
+              </span>
+            </div>
+            <Slider
+              id={intervalId}
+              aria-label={`${t("drawInterval")}: ${autoInterval} ${t("seconds")}`}
+              value={[autoInterval]}
+              onValueChange={([value]) => setAutoInterval(value)}
+              min={1}
+              max={20}
+              step={1}
+              className="h-7 w-full"
+            />
+          </div>
+        )}
+
+        {drawnNumbers.length > 0 && (
+          <div className="space-y-3 border-t border-white/[0.06] pt-4">
+            <Label className="text-sm text-foreground">{t("recentDraws")}</Label>
+            <div className="flex flex-wrap gap-2" role="list">
+              {drawnNumbers.slice(-10).reverse().map((num, index) => (
+                <div
+                  key={`recent-${num}`}
+                  role="listitem"
+                  className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white ${getLetterColor(num)} ${
+                    index === 0 ? "ring-2 ring-white" : "opacity-70"
+                  }`}
+                >
+                  {num}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
+
+  const renderNumberGrid = () => (
+    <div
+      className="bingo-number-grid grid grid-cols-5 gap-2"
+      role="group"
+      aria-label={t("numberBoard")}
+    >
+      {["B", "I", "N", "G", "O"].map((letter, idx) => (
+        <div
+          key={letter}
+          className={`py-2 text-center text-xl font-bold text-white ${
+            idx === 0
+              ? "text-red-500"
+              : idx === 1
+              ? "text-orange-500"
+              : idx === 2
+              ? "text-yellow-500"
+              : idx === 3
+              ? "text-green-500"
+              : "text-blue-500"
+          }`}
+        >
+          {letter}
+        </div>
+      ))}
+      {Array.from({ length: 15 }, (_, row) =>
+        [1, 2, 3, 4, 5].map((col) => {
+          const num = row + 1 + (col - 1) * 15
+          const isDrawn = drawnNumbers.includes(num)
+          return (
+            <div
+              key={num}
+              role="img"
+              aria-label={`${getLetter(num)} ${num}, ${isDrawn ? t("drawn") : t("remaining")}`}
+              className={`flex h-10 items-center justify-center rounded-md text-sm font-medium transition-all duration-300 md:h-12 md:text-base ${
+                isDrawn
+                  ? `${getLetterColor(num)} text-white shadow-lg`
+                  : "bg-muted text-muted-foreground"
+              }`}
+            >
+              {num}
+            </div>
+          )
+        })
+      )}
+    </div>
+  )
+
   return (
     <div className="bingo-shell game-page" data-page="bingo">
       <div
@@ -345,86 +500,70 @@ export function BingoGame() {
           </Card>
 
           {/* 设置面板 */}
-          <Card className="bingo-settings game-settings gap-0 overflow-hidden border-white/10 bg-card/70 py-0">
+          <Card className="bingo-settings game-settings hidden gap-0 overflow-hidden border-white/10 bg-card/70 py-0 lg:flex">
             <CardHeader className="border-b border-white/[0.07] px-4 py-4 sm:px-6">
               <CardTitle className="text-base text-foreground sm:text-lg">{t("settings")}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4 px-4 py-4 sm:px-6 sm:py-5">
-              <div className="flex min-h-11 items-center justify-between gap-4">
-                <Label htmlFor="sound" className="flex min-h-11 flex-1 cursor-pointer items-center gap-2.5 text-sm text-foreground sm:text-base">
-                  {isSoundEnabled ? (
-                    <Volume2 className="h-5 w-5 text-primary" aria-hidden="true" />
-                  ) : (
-                    <VolumeX className="h-5 w-5 text-muted-foreground" aria-hidden="true" />
-                  )}
-                  {t("voiceBroadcast")}
-                </Label>
-                <Switch
-                  id="sound"
-                  checked={isSoundEnabled}
-                  onCheckedChange={setIsSoundEnabled}
-                  className="h-6 w-11 [&_[data-slot=switch-thumb]]:size-5"
-                />
-              </div>
-
-              <div className="flex min-h-11 items-center justify-between gap-4 border-t border-white/[0.06] pt-3">
-                <Label htmlFor="auto" className="flex min-h-11 flex-1 cursor-pointer items-center text-sm text-foreground sm:text-base">
-                  {t("autoDrawMode")}
-                </Label>
-                <Switch
-                  id="auto"
-                  checked={isAutoMode}
-                  onCheckedChange={(checked) => {
-                    setIsAutoMode(checked)
-                    if (!checked) setIsPlaying(false)
-                  }}
-                  className="h-6 w-11 [&_[data-slot=switch-thumb]]:size-5"
-                />
-              </div>
-
-              {isAutoMode && (
-                <div className="space-y-3 rounded-xl border border-primary/15 bg-primary/[0.055] p-3.5">
-                  <div className="flex items-center justify-between gap-3">
-                    <Label htmlFor="auto-interval" className="text-sm text-foreground">
-                      {t("drawInterval")}
-                    </Label>
-                    <span className="rounded-md bg-white/[0.06] px-2 py-1 text-xs font-semibold tabular-nums text-foreground">
-                      {autoInterval} {t("seconds")}
-                    </span>
-                  </div>
-                  <Slider
-                    id="auto-interval"
-                    aria-label={`${t("drawInterval")}: ${autoInterval} ${t("seconds")}`}
-                    value={[autoInterval]}
-                    onValueChange={([value]) => setAutoInterval(value)}
-                    min={1}
-                    max={20}
-                    step={1}
-                    className="h-7 w-full"
-                  />
-                </div>
-              )}
-
-              {drawnNumbers.length > 0 && (
-                <div className="space-y-3 border-t border-white/[0.06] pt-4">
-                  <Label className="text-sm text-foreground">{t("recentDraws")}</Label>
-                  <div className="flex flex-wrap gap-2" role="list">
-                    {drawnNumbers.slice(-10).reverse().map((num, index) => (
-                      <div
-                        key={`recent-${num}`}
-                        role="listitem"
-                        className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white ${getLetterColor(num)} ${
-                          index === 0 ? "ring-2 ring-white" : "opacity-70"
-                        }`}
-                      >
-                        {num}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {renderSettingsControls("desktop")}
             </CardContent>
           </Card>
+
+          <div className="bingo-mobile-tools order-2 grid grid-cols-2 gap-2 lg:hidden">
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="bingo-mobile-settings-trigger min-h-11 w-full border-white/10 bg-card/70"
+                >
+                  <Settings2 className="size-4" aria-hidden="true" />
+                  {t("settings")}
+                </Button>
+              </DialogTrigger>
+              <DialogContent
+                closeLabel={t("close")}
+                className="bingo-mobile-dialog max-h-[calc(100svh-1.5rem)] grid-rows-[auto_minmax(0,1fr)] overflow-hidden sm:max-w-lg"
+              >
+                <DialogHeader>
+                  <DialogTitle>{t("settings")}</DialogTitle>
+                  <DialogDescription className="sr-only">
+                    {t("settings")}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="bingo-mobile-dialog-scroll min-h-0 overflow-y-auto overscroll-contain pr-1">
+                  {renderSettingsControls("mobile")}
+                </div>
+              </DialogContent>
+            </Dialog>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="bingo-mobile-board-trigger min-h-11 w-full border-white/10 bg-card/70"
+                >
+                  <Grid3X3 className="size-4" aria-hidden="true" />
+                  {t("numberBoard")}
+                </Button>
+              </DialogTrigger>
+              <DialogContent
+                closeLabel={t("close")}
+                className="bingo-mobile-dialog max-h-[calc(100svh-1.5rem)] grid-rows-[auto_minmax(0,1fr)] overflow-hidden sm:max-w-lg"
+              >
+                <DialogHeader>
+                  <DialogTitle>{t("numberBoard")}</DialogTitle>
+                  <DialogDescription className="sr-only">
+                    {t("numberBoard")}
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="bingo-mobile-dialog-scroll min-h-0 overflow-y-auto overscroll-contain pr-1">
+                  {renderNumberGrid()}
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
         </div>
 
         <div className="sr-only" role="status" aria-live="polite">
@@ -432,52 +571,11 @@ export function BingoGame() {
         </div>
 
         {/* 所有数字网格 */}
-        <Card className="bingo-board game-stage mt-4 border-white/10 bg-card/70 sm:mt-6">
+        <Card className="bingo-board game-stage mt-4 hidden border-white/10 bg-card/70 sm:mt-6 lg:flex">
           <CardHeader>
             <CardTitle className="text-foreground">{t("numberBoard")}</CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-5 gap-2" role="group" aria-label={t("numberBoard")}>
-              {["B", "I", "N", "G", "O"].map((letter, idx) => (
-                <div
-                  key={letter}
-                  className={`py-2 text-center text-xl font-bold text-white ${
-                    idx === 0
-                      ? "text-red-500"
-                      : idx === 1
-                      ? "text-orange-500"
-                      : idx === 2
-                      ? "text-yellow-500"
-                      : idx === 3
-                      ? "text-green-500"
-                      : "text-blue-500"
-                  }`}
-                >
-                  {letter}
-                </div>
-              ))}
-              {Array.from({ length: 15 }, (_, row) =>
-                [1, 2, 3, 4, 5].map((col) => {
-                  const num = row + 1 + (col - 1) * 15
-                  const isDrawn = drawnNumbers.includes(num)
-                  return (
-                    <div
-                      key={num}
-                      role="img"
-                      aria-label={`${getLetter(num)} ${num}, ${isDrawn ? t("drawn") : t("remaining")}`}
-                      className={`flex h-10 items-center justify-center rounded-md text-sm font-medium transition-all duration-300 md:h-12 md:text-base ${
-                        isDrawn
-                          ? `${getLetterColor(num)} text-white shadow-lg`
-                          : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {num}
-                    </div>
-                  )
-                })
-              )}
-            </div>
-          </CardContent>
+          <CardContent>{renderNumberGrid()}</CardContent>
         </Card>
       </div>
     </div>

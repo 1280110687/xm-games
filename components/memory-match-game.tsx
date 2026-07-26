@@ -288,7 +288,7 @@ export function MemoryMatchGame() {
         <section className="game-summary memory-dashboard surface-panel w-full max-w-3xl overflow-hidden p-3 sm:p-5">
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <div>
+              <div className="memory-intro">
                 <p className="memory-kicker text-xs font-bold uppercase tracking-[0.16em] text-cyan-200/75">
                   {t("memoryMatchDescription")}
                 </p>
@@ -326,7 +326,7 @@ export function MemoryMatchGame() {
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+            <div className="memory-stats grid grid-cols-2 gap-2 sm:grid-cols-4">
               <div className="surface-card flex min-h-16 items-center gap-3 px-3 py-2.5">
                 <span
                   className="memory-accent flex size-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-200"
