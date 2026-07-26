@@ -48,6 +48,7 @@ export interface TetrisState {
   score: number
   lines: number
   level: number
+  piecesPlaced: number
   phase: GamePhase
 }
 
@@ -59,6 +60,7 @@ export type TetrisAction =
     }
   | { type: "tick"; nextPiece: TetrominoType }
   | { type: "move"; dx: number; dy: number }
+  | { type: "softDrop"; nextPiece: TetrominoType }
   | { type: "rotate" }
   | { type: "hardDrop"; nextPiece: TetrominoType }
   | { type: "pause" }
@@ -83,6 +85,7 @@ export function createInitialState(): TetrisState {
     score: 0,
     lines: 0,
     level: 1,
+    piecesPlaced: 0,
     phase: "idle",
   }
 }
@@ -187,6 +190,7 @@ function settlePiece(
     score,
     lines,
     level,
+    piecesPlaced: state.piecesPlaced + 1,
     phase: currentPiece ? "playing" : "gameOver",
   }
 }
@@ -238,6 +242,7 @@ export function tetrisReducer(
         score: 0,
         lines: 0,
         level: 1,
+        piecesPlaced: 0,
         phase: "playing",
       }
     }
@@ -257,6 +262,18 @@ export function tetrisReducer(
     case "move":
       return movePiece(state, action.dx, action.dy)
 
+    case "softDrop": {
+      if (state.phase !== "playing" || !state.currentPiece) return state
+
+      const currentPiece = {
+        ...state.currentPiece,
+        y: state.currentPiece.y + 1,
+      }
+      return isValidPosition(currentPiece, state.board)
+        ? { ...state, currentPiece, score: state.score + 1 }
+        : settlePiece(state, state.currentPiece, action.nextPiece)
+    }
+
     case "rotate":
       return rotatePiece(state)
 
@@ -264,12 +281,18 @@ export function tetrisReducer(
       if (state.phase !== "playing" || !state.currentPiece) return state
 
       let currentPiece = state.currentPiece
+      let distance = 0
       while (
         isValidPosition({ ...currentPiece, y: currentPiece.y + 1 }, state.board)
       ) {
         currentPiece = { ...currentPiece, y: currentPiece.y + 1 }
+        distance += 1
       }
-      return settlePiece(state, currentPiece, action.nextPiece)
+      return settlePiece(
+        { ...state, score: state.score + distance * 2 },
+        currentPiece,
+        action.nextPiece
+      )
     }
 
     case "pause":

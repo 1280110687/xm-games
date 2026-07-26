@@ -9,6 +9,9 @@ import { themeBootstrapScript } from '@/lib/theme'
 import './globals.css'
 import './theme-one.css'
 import './theme-two.css'
+import './classic-games.css'
+import './theme-one-classic-games.css'
+import './theme-two-classic-games.css'
 
 const geist = Geist({
   subsets: ['latin'],
@@ -29,6 +32,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: '#101421',
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({

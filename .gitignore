@@ -13,6 +13,7 @@
 # local browser validation artifacts
 /.playwright-cli/
 /output/
+/.design-qa-evidence/
 
 # debug
 npm-debug.log*

@@ -1,388 +1,414 @@
 "use client"
 
-import { useState, useCallback, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { useLocale } from "@/lib/locale-context"
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type PointerEvent as ReactPointerEvent,
+} from "react"
+import {
+  ArrowDown,
+  ArrowLeft,
+  ArrowRight,
+  ArrowUp,
+  RotateCcw,
+} from "lucide-react"
+
 import { GameHeader } from "@/components/game-header"
 import { GameRulesDialog } from "@/components/game-rules-dialog"
+import { Button } from "@/components/ui/button"
+import {
+  addRandomTile,
+  canMove,
+  createInitialBoard,
+  createRandomBoard,
+  hasWon,
+  moveBoard,
+  type Board2048,
+  type MoveDirection,
+} from "@/features/game-2048/engine"
 import { shouldIgnoreGameKeyboardEvent } from "@/lib/game-keyboard"
-import { RotateCcw, ChevronUp, ChevronDown, ChevronLeft, ChevronRight } from "lucide-react"
+import type { Locale } from "@/lib/i18n"
+import { useLocale } from "@/lib/locale-context"
 
-type Board = (number | null)[][]
+type GameStatus = "playing" | "won" | "gameOver"
 
-function createEmptyBoard(): Board {
-  return Array(4).fill(null).map(() => Array(4).fill(null))
+interface PointerOrigin {
+  id: number
+  x: number
+  y: number
 }
 
-function addRandomTile(board: Board): Board {
-  const newBoard = board.map(row => [...row])
-  const emptyCells: [number, number][] = []
-  
-  for (let r = 0; r < 4; r++) {
-    for (let c = 0; c < 4; c++) {
-      if (newBoard[r][c] === null) {
-        emptyCells.push([r, c])
-      }
-    }
+const COPY: Record<
+  Locale,
+  {
+    board: string
+    continue: string
+    empty: string
+    join: string
+    keepGoing: string
+    move: Record<MoveDirection, string>
+    swipe: string
+    tryAgain: string
   }
-  
-  if (emptyCells.length === 0) return newBoard
-  
-  const [row, col] = emptyCells[Math.floor(Math.random() * emptyCells.length)]
-  newBoard[row][col] = Math.random() < 0.9 ? 2 : 4
-  
-  return newBoard
+> = {
+  zh: {
+    board: "2048 棋盘",
+    continue: "继续挑战",
+    empty: "空白",
+    join: "合并相同数字，获得 2048 方块！",
+    keepGoing: "你已获得 2048！",
+    move: {
+      up: "向上移动",
+      down: "向下移动",
+      left: "向左移动",
+      right: "向右移动",
+    },
+    swipe: "滑动棋盘或使用方向键",
+    tryAgain: "再来一局",
+  },
+  en: {
+    board: "2048 board",
+    continue: "Keep going",
+    empty: "empty",
+    join: "Join the numbers and get to the 2048 tile!",
+    keepGoing: "You reached 2048!",
+    move: {
+      up: "Move up",
+      down: "Move down",
+      left: "Move left",
+      right: "Move right",
+    },
+    swipe: "Swipe the board or use the arrow keys",
+    tryAgain: "Try again",
+  },
+  th: {
+    board: "กระดาน 2048",
+    continue: "เล่นต่อ",
+    empty: "ว่าง",
+    join: "รวมตัวเลขเพื่อสร้างแผ่น 2048!",
+    keepGoing: "คุณสร้าง 2048 ได้แล้ว!",
+    move: {
+      up: "เลื่อนขึ้น",
+      down: "เลื่อนลง",
+      left: "เลื่อนไปซ้าย",
+      right: "เลื่อนไปขวา",
+    },
+    swipe: "ปัดกระดานหรือใช้ปุ่มลูกศร",
+    tryAgain: "ลองอีกครั้ง",
+  },
 }
 
-function createRandomBoard(): Board {
-  let board = createEmptyBoard()
-  board = addRandomTile(board)
-  board = addRandomTile(board)
-  return board
+function tileClass(value: number): string {
+  return value > 2048 ? "tile-super" : `tile-${value}`
 }
 
-function createInitialBoard(): Board {
-  const board = createEmptyBoard()
-  board[1][1] = 2
-  board[2][2] = 2
-  return board
-}
-
-function slideRow(row: (number | null)[]): { newRow: (number | null)[]; score: number } {
-  // Remove nulls
-  const tiles = row.filter(x => x !== null) as number[]
-  const newRow: (number | null)[] = []
-  let score = 0
-  
-  let i = 0
-  while (i < tiles.length) {
-    if (i + 1 < tiles.length && tiles[i] === tiles[i + 1]) {
-      const merged = tiles[i] * 2
-      newRow.push(merged)
-      score += merged
-      i += 2
-    } else {
-      newRow.push(tiles[i])
-      i++
-    }
+function readBestScore(): number {
+  try {
+    const saved = window.localStorage.getItem("2048-best")
+    if (saved === null) return 0
+    const parsed = Number(saved)
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : 0
+  } catch {
+    return 0
   }
-  
-  while (newRow.length < 4) {
-    newRow.push(null)
-  }
-  
-  return { newRow, score }
 }
 
-function moveLeft(board: Board): { newBoard: Board; score: number; moved: boolean } {
-  const newBoard: Board = []
-  let totalScore = 0
-  let moved = false
-  
-  for (let r = 0; r < 4; r++) {
-    const { newRow, score } = slideRow(board[r])
-    newBoard.push(newRow)
-    totalScore += score
-    if (JSON.stringify(newRow) !== JSON.stringify(board[r])) {
-      moved = true
-    }
+function writeBestScore(score: number) {
+  try {
+    window.localStorage.setItem("2048-best", String(score))
+  } catch {
+    // The game remains playable when storage is unavailable.
   }
-  
-  return { newBoard, score: totalScore, moved }
-}
-
-function rotateBoard(board: Board): Board {
-  const newBoard: Board = createEmptyBoard()
-  for (let r = 0; r < 4; r++) {
-    for (let c = 0; c < 4; c++) {
-      newBoard[c][3 - r] = board[r][c]
-    }
-  }
-  return newBoard
-}
-
-function moveInDirection(board: Board, direction: "left" | "right" | "up" | "down"): { newBoard: Board; score: number; moved: boolean } {
-  let rotated = board
-  const rotations = { left: 0, up: 1, right: 2, down: 3 }
-  
-  for (let i = 0; i < rotations[direction]; i++) {
-    rotated = rotateBoard(rotated)
-  }
-  
-  const { newBoard, score, moved } = moveLeft(rotated)
-  
-  let result = newBoard
-  for (let i = 0; i < (4 - rotations[direction]) % 4; i++) {
-    result = rotateBoard(result)
-  }
-  
-  return { newBoard: result, score, moved }
-}
-
-function canMove(board: Board): boolean {
-  // Check for empty cells
-  for (let r = 0; r < 4; r++) {
-    for (let c = 0; c < 4; c++) {
-      if (board[r][c] === null) return true
-    }
-  }
-  
-  // Check for adjacent equal cells
-  for (let r = 0; r < 4; r++) {
-    for (let c = 0; c < 4; c++) {
-      const val = board[r][c]
-      if (c < 3 && board[r][c + 1] === val) return true
-      if (r < 3 && board[r + 1][c] === val) return true
-    }
-  }
-  
-  return false
-}
-
-function hasWon(board: Board): boolean {
-  return board.some(row => row.some(cell => cell === 2048))
-}
-
-const TILE_COLORS: Record<number, string> = {
-  2: "bg-amber-100 text-amber-900",
-  4: "bg-amber-200 text-amber-900",
-  8: "bg-orange-300 text-white",
-  16: "bg-orange-400 text-white",
-  32: "bg-orange-500 text-white",
-  64: "bg-orange-600 text-white",
-  128: "bg-yellow-400 text-white",
-  256: "bg-yellow-500 text-white",
-  512: "bg-yellow-600 text-white",
-  1024: "bg-yellow-700 text-white",
-  2048: "bg-yellow-500 text-white",
-  4096: "bg-red-500 text-white",
-  8192: "bg-red-600 text-white",
 }
 
 export function Game2048() {
   const { t, locale } = useLocale()
-  const directionLabels = locale === "zh"
-    ? { up: "向上移动", down: "向下移动", left: "向左移动", right: "向右移动", empty: "空白" }
-    : locale === "th"
-      ? { up: "เลื่อนขึ้น", down: "เลื่อนลง", left: "เลื่อนไปซ้าย", right: "เลื่อนไปขวา", empty: "ว่าง" }
-      : { up: "Move up", down: "Move down", left: "Move left", right: "Move right", empty: "empty" }
-  const [board, setBoard] = useState<Board>(createInitialBoard)
+  const copy = COPY[locale]
+  const [board, setBoard] = useState<Board2048>(createInitialBoard)
   const [score, setScore] = useState(0)
   const [bestScore, setBestScore] = useState(0)
-  const [gameOver, setGameOver] = useState(false)
-  const [won, setWon] = useState(false)
+  const [status, setStatus] = useState<GameStatus>("playing")
+  const [keepPlaying, setKeepPlaying] = useState(false)
+  const [newTile, setNewTile] = useState<[number, number] | null>(null)
+  const pointerOrigin = useRef<PointerOrigin | null>(null)
 
   useEffect(() => {
-    const saved = localStorage.getItem("2048-best")
-    if (saved) setBestScore(parseInt(saved))
+    setBestScore(readBestScore())
   }, [])
 
-  const handleMove = useCallback((direction: "left" | "right" | "up" | "down") => {
-    if (gameOver) return
+  const updateBestScore = useCallback((nextScore: number) => {
+    setBestScore((currentBest) => {
+      if (nextScore <= currentBest) return currentBest
+      writeBestScore(nextScore)
+      return nextScore
+    })
+  }, [])
 
-    const { newBoard, score: addedScore, moved } = moveInDirection(board, direction)
-    
-    if (!moved) return
-    
-    const boardWithNewTile = addRandomTile(newBoard)
-    setBoard(boardWithNewTile)
-    
-    const newScore = score + addedScore
-    setScore(newScore)
-    
-    if (newScore > bestScore) {
-      setBestScore(newScore)
-      localStorage.setItem("2048-best", String(newScore))
-    }
-    
-    if (hasWon(boardWithNewTile) && !won) {
-      setWon(true)
-    }
-    
-    if (!canMove(boardWithNewTile)) {
-      setGameOver(true)
-    }
-  }, [board, score, bestScore, gameOver, won])
+  const handleMove = useCallback(
+    (direction: MoveDirection) => {
+      if (status !== "playing") return
+
+      const move = moveBoard(board, direction)
+      if (!move.moved) return
+
+      const placement = addRandomTile(move.board)
+      const nextScore = score + move.score
+      setBoard(placement.board)
+      setNewTile(placement.position)
+      setScore(nextScore)
+      updateBestScore(nextScore)
+
+      if (!keepPlaying && hasWon(placement.board)) {
+        setStatus("won")
+      } else if (!canMove(placement.board)) {
+        setStatus("gameOver")
+      }
+    },
+    [board, keepPlaying, score, status, updateBestScore]
+  )
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (gameOver || shouldIgnoreGameKeyboardEvent(e)) return
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (shouldIgnoreGameKeyboardEvent(event)) return
 
-      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "W", "a", "A", "s", "S", "d", "D"].includes(e.key)) {
-        e.preventDefault()
-        const directionMap: Record<string, "left" | "right" | "up" | "down"> = {
-          ArrowUp: "up", w: "up", W: "up",
-          ArrowDown: "down", s: "down", S: "down",
-          ArrowLeft: "left", a: "left", A: "left",
-          ArrowRight: "right", d: "right", D: "right",
-        }
-        const direction = directionMap[e.key]
-        if (direction) handleMove(direction)
+      const directionMap: Partial<Record<string, MoveDirection>> = {
+        ArrowUp: "up",
+        ArrowDown: "down",
+        ArrowLeft: "left",
+        ArrowRight: "right",
+        w: "up",
+        W: "up",
+        s: "down",
+        S: "down",
+        a: "left",
+        A: "left",
+        d: "right",
+        D: "right",
       }
+      const direction = directionMap[event.key]
+      if (!direction) return
+
+      event.preventDefault()
+      handleMove(direction)
     }
-    
+
     window.addEventListener("keydown", handleKeyDown)
     return () => window.removeEventListener("keydown", handleKeyDown)
-  }, [gameOver, handleMove])
+  }, [handleMove])
 
-  const resetGame = () => {
+  const resetGame = useCallback(() => {
     setBoard(createRandomBoard())
     setScore(0)
-    setGameOver(false)
-    setWon(false)
+    setStatus("playing")
+    setKeepPlaying(false)
+    setNewTile(null)
+  }, [])
+
+  const continueGame = () => {
+    setKeepPlaying(true)
+    setStatus("playing")
+  }
+
+  const handlePointerDown = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (event.pointerType === "mouse" && event.button !== 0) return
+    pointerOrigin.current = {
+      id: event.pointerId,
+      x: event.clientX,
+      y: event.clientY,
+    }
+  }
+
+  const handlePointerUp = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const origin = pointerOrigin.current
+    pointerOrigin.current = null
+    if (!origin || origin.id !== event.pointerId) return
+
+    const deltaX = event.clientX - origin.x
+    const deltaY = event.clientY - origin.y
+    if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < 24) return
+
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      handleMove(deltaX > 0 ? "right" : "left")
+    } else {
+      handleMove(deltaY > 0 ? "down" : "up")
+    }
+  }
+
+  const clearPointer = () => {
+    pointerOrigin.current = null
   }
 
   return (
-    <div className="game-page" data-page="2048">
+    <div className="game-page classic-2048-page" data-page="2048">
       <GameHeader
         layout="centered"
+        homeIcon="back"
         homeLabel={t("appName")}
         homeLabelMode="sr-only"
-        title="2048"
+        title={t("game2048")}
         titleClassName="text-xl font-bold text-foreground sm:text-2xl"
         homeButtonClassName="text-muted-foreground hover:text-foreground"
       />
 
       <main
-        className="game-content flex flex-1 flex-col items-center gap-4 py-4"
+        className="game-content classic-2048-content"
         data-slot="game-content"
       >
-        {/* Score cards */}
-        <div
-          className="game-summary flex gap-4"
-          data-slot="game-summary"
-          role="status"
-          aria-live="polite"
-        >
-          <Card className="border-white/10 bg-card/70 px-5 py-2 text-center">
-            <div className="text-xs text-muted-foreground">{t("score")}</div>
-            <div className="text-2xl font-bold text-foreground">{score}</div>
-          </Card>
-          <Card className="border-white/10 bg-card/70 px-5 py-2 text-center">
-            <div className="text-xs text-muted-foreground">{t("highScore")}</div>
-            <div className="text-2xl font-bold text-foreground">{bestScore}</div>
-          </Card>
-        </div>
-
-        {/* Game status */}
-        {(gameOver || won) && (
-          <div
-            role="status"
-            aria-live="assertive"
-            data-tone={won ? "success" : "danger"}
-            className={`game-status-banner rounded-lg px-4 py-2 text-lg font-bold ${
-            won ? "bg-yellow-500/20 text-yellow-300" : "bg-red-500/20 text-red-300"
-          }`}
-          >
-            {won ? t("youWin") : t("gameOver")}
+        <section className="classic-2048-shell" aria-label={copy.board}>
+          <div className="classic-2048-heading">
+            <div className="classic-2048-logo" aria-hidden="true">
+              2048
+            </div>
+            <div
+              className="classic-2048-scores"
+              role="status"
+              aria-live="polite"
+            >
+              <div className="classic-2048-score">
+                <span>{t("score")}</span>
+                <strong>{score}</strong>
+              </div>
+              <div className="classic-2048-score">
+                <span>{t("highScore")}</span>
+                <strong>{bestScore}</strong>
+              </div>
+            </div>
           </div>
-        )}
 
-        {/* Game board */}
-        <div
-          className="game-stage rounded-lg bg-amber-700 p-3"
-          data-slot="game-stage"
-        >
-          <div className="grid grid-cols-4 gap-2" role="group" aria-label="2048">
-            {board.map((row, rowIndex) =>
-              row.map((cell, colIndex) => (
-                <div
-                  key={`${rowIndex}-${colIndex}`}
-                  role="img"
-                  aria-label={`${rowIndex + 1}, ${colIndex + 1}, ${cell || directionLabels.empty}`}
-                  className={`
-                    flex size-[clamp(3.35rem,18vw,5rem)] items-center justify-center rounded-md font-bold transition-all
-                    ${cell ? TILE_COLORS[cell] || "bg-amber-800 text-white" : "bg-amber-600/50"}
-                    ${cell && cell >= 100 ? "text-xl sm:text-2xl" : "text-2xl sm:text-3xl"}
-                    ${cell && cell >= 1000 ? "text-lg sm:text-xl" : ""}
-                  `}
-                >
-                  {cell}
+          <div className="classic-2048-intro">
+            <p>{copy.join}</p>
+            <Button
+              type="button"
+              className="classic-2048-new-game"
+              onClick={resetGame}
+            >
+              {t("newGame")}
+            </Button>
+          </div>
+
+          <div
+            className="classic-2048-board"
+            role="group"
+            aria-label={`${copy.board}. ${t("score")}: ${score}.`}
+            tabIndex={0}
+            onPointerDown={handlePointerDown}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={clearPointer}
+            onPointerLeave={(event) => {
+              if (event.pointerType === "mouse") clearPointer()
+            }}
+          >
+            <div className="classic-2048-grid" aria-hidden="true">
+              {board.map((row, rowIndex) =>
+                row.map((cell, columnIndex) => (
+                  <div
+                    key={`${rowIndex}-${columnIndex}`}
+                    className={`classic-2048-cell ${
+                      cell ? `classic-2048-tile ${tileClass(cell)}` : ""
+                    } ${
+                      newTile?.[0] === rowIndex &&
+                      newTile?.[1] === columnIndex
+                        ? "is-new"
+                        : ""
+                    }`}
+                    data-value={cell ?? undefined}
+                  >
+                    {cell}
+                  </div>
+                ))
+              )}
+            </div>
+
+            {status !== "playing" && (
+              <div
+                className={`game-message classic-2048-message is-${status}`}
+                role="status"
+                aria-live="assertive"
+              >
+                <strong>
+                  {status === "won" ? copy.keepGoing : t("gameOver")}
+                </strong>
+                <div className="classic-2048-message-actions">
+                  {status === "won" && (
+                    <Button type="button" onClick={continueGame}>
+                      {copy.continue}
+                    </Button>
+                  )}
+                  <Button type="button" onClick={resetGame}>
+                    {copy.tryAgain}
+                  </Button>
                 </div>
-              ))
+              </div>
             )}
           </div>
-        </div>
 
-        {/* Mobile controls */}
-        <div
-          className="mobile-controls grid grid-cols-3 gap-2 sm:hidden"
-          data-slot="mobile-controls"
-        >
-          <div />
-          <Button
-            onClick={() => handleMove("up")}
-            aria-label={directionLabels.up}
-            variant="outline"
-            size="lg"
-            className="border-white/10 bg-white/[0.04] text-foreground"
+          <div
+            className="mobile-controls classic-2048-controls"
+            data-slot="mobile-controls"
+            aria-label={copy.swipe}
           >
-            <ChevronUp className="h-6 w-6" aria-hidden="true" />
-          </Button>
-          <div />
-          <Button
-            onClick={() => handleMove("left")}
-            aria-label={directionLabels.left}
-            variant="outline"
-            size="lg"
-            className="border-white/10 bg-white/[0.04] text-foreground"
-          >
-            <ChevronLeft className="h-6 w-6" aria-hidden="true" />
-          </Button>
-          <Button
-            onClick={() => handleMove("down")}
-            aria-label={directionLabels.down}
-            variant="outline"
-            size="lg"
-            className="border-white/10 bg-white/[0.04] text-foreground"
-          >
-            <ChevronDown className="h-6 w-6" aria-hidden="true" />
-          </Button>
-          <Button
-            onClick={() => handleMove("right")}
-            aria-label={directionLabels.right}
-            variant="outline"
-            size="lg"
-            className="border-white/10 bg-white/[0.04] text-foreground"
-          >
-            <ChevronRight className="h-6 w-6" aria-hidden="true" />
-          </Button>
-        </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => handleMove("left")}
+              aria-label={copy.move.left}
+            >
+              <ArrowLeft aria-hidden="true" />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => handleMove("up")}
+              aria-label={copy.move.up}
+            >
+              <ArrowUp aria-hidden="true" />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => handleMove("down")}
+              aria-label={copy.move.down}
+            >
+              <ArrowDown aria-hidden="true" />
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => handleMove("right")}
+              aria-label={copy.move.right}
+            >
+              <ArrowRight aria-hidden="true" />
+            </Button>
+          </div>
 
-        {/* Controls */}
-        <div
-          className="game-actions flex gap-2"
-          data-slot="game-actions"
-        >
-          <Button
-            onClick={resetGame}
-            variant="outline"
-            className="border-white/10 bg-white/[0.04] text-foreground"
-          >
-            <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
-            {t("restart")}
-          </Button>
-          <GameRulesDialog
-            triggerLabel={t("howToPlay")}
-            closeLabel={t("close")}
-            titleClassName="text-lg font-bold"
-          >
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>{t("game2048Rule1")}</li>
-              <li>{t("game2048Rule2")}</li>
-              <li>{t("game2048Rule3")}</li>
-            </ul>
-          </GameRulesDialog>
-        </div>
+          <div className="game-actions classic-2048-actions" data-slot="game-actions">
+            <Button type="button" variant="outline" onClick={resetGame}>
+              <RotateCcw aria-hidden="true" />
+              {t("restart")}
+            </Button>
+            <GameRulesDialog
+              triggerLabel={t("howToPlay")}
+              closeLabel={t("close")}
+              titleClassName="text-lg font-bold"
+            >
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>{t("game2048Rule1")}</li>
+                <li>{t("game2048Rule2")}</li>
+                <li>{t("game2048Rule3")}</li>
+              </ul>
+            </GameRulesDialog>
+          </div>
 
-        <p
-          className="game-help max-w-md text-center text-xs text-muted-foreground"
-          data-slot="game-help"
-        >
-          {t("game2048Instructions")}
-        </p>
-
+          <p className="game-help classic-2048-help" data-slot="game-help">
+            {copy.swipe}
+          </p>
+        </section>
       </main>
     </div>
   )

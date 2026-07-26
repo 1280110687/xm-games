@@ -26,6 +26,7 @@ describe("tetrisReducer", () => {
       score: 0,
       lines: 0,
       level: 1,
+      piecesPlaced: 0,
       phase: "playing",
     }
     const originalBoard = state.board.map((row) => [...row])
@@ -38,6 +39,7 @@ describe("tetrisReducer", () => {
     expect(next.phase).toBe("playing")
     expect(next.currentPiece?.type).toBe("T")
     expect(next.nextPiece).toBe("O")
+    expect(next.piecesPlaced).toBe(1)
     expect(next.board.every((row) => row.every((cell) => cell === 0))).toBe(
       true
     )
@@ -89,5 +91,36 @@ describe("tetrisReducer", () => {
     })
     expect(started.currentPiece?.type).toBe("L")
     expect(started.nextPiece).toBe("S")
+  })
+
+  it("locks immediately on a blocked soft drop and scores drop distance", () => {
+    const started = tetrisReducer(createInitialState(), {
+      type: "start",
+      firstPiece: "O",
+      nextPiece: "I",
+    })
+    const landed = {
+      ...started,
+      currentPiece: {
+        ...started.currentPiece!,
+        y: BOARD_HEIGHT - 2,
+      },
+    }
+
+    const softDropped = tetrisReducer(landed, {
+      type: "softDrop",
+      nextPiece: "T",
+    })
+
+    expect(softDropped.piecesPlaced).toBe(1)
+    expect(softDropped.currentPiece?.type).toBe("I")
+    expect(softDropped.nextPiece).toBe("T")
+
+    const hardDropped = tetrisReducer(started, {
+      type: "hardDrop",
+      nextPiece: "T",
+    })
+    expect(hardDropped.score).toBeGreaterThan(0)
+    expect(hardDropped.piecesPlaced).toBe(1)
   })
 })

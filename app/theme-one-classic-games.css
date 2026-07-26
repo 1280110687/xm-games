@@ -1,0 +1,820 @@
+/*
+ * Theme One classic games: a dark arcade cabinet with tactile controls.
+ * Layout is intentionally independent from the Theme Two handheld treatment.
+ */
+
+html[data-theme='theme-one'] .classic-2048-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem 0 0.5rem;
+}
+
+html[data-theme='theme-one'] .classic-2048-shell {
+  display: grid;
+  width: min(100%, 31rem);
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid oklch(1 0 0 / 0.1);
+  border-radius: 1.4rem;
+  color: #f7f4ed;
+  background:
+    linear-gradient(145deg, oklch(0.235 0.04 265 / 0.96), oklch(0.16 0.03 267 / 0.96));
+  box-shadow:
+    0 28px 80px oklch(0.055 0.025 270 / 0.48),
+    inset 0 1px 0 oklch(1 0 0 / 0.06);
+}
+
+html[data-theme='theme-one'] .classic-2048-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+html[data-theme='theme-one'] .classic-2048-logo {
+  color: #f7f4ed;
+  font-size: clamp(3rem, 8vw, 4.6rem);
+  font-weight: 900;
+  line-height: 0.88;
+  letter-spacing: -0.075em;
+  text-shadow: 0 5px 24px oklch(0.72 0.16 65 / 0.18);
+}
+
+html[data-theme='theme-one'] .classic-2048-scores {
+  display: flex;
+  gap: 0.45rem;
+}
+
+html[data-theme='theme-one'] .classic-2048-score {
+  display: grid;
+  min-width: 4.4rem;
+  min-height: 3.55rem;
+  place-items: center;
+  align-content: center;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid oklch(1 0 0 / 0.08);
+  border-radius: 0.8rem;
+  background: oklch(0.31 0.045 66 / 0.52);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.06);
+}
+
+html[data-theme='theme-one'] .classic-2048-score span {
+  color: #ddd3c7;
+  font-size: 0.62rem;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+html[data-theme='theme-one'] .classic-2048-score strong {
+  margin-top: 0.18rem;
+  color: white;
+  font-size: 1.35rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+html[data-theme='theme-one'] .classic-2048-intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  color: #c9c5be;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+html[data-theme='theme-one'] .classic-2048-intro p {
+  max-width: 18rem;
+}
+
+html[data-theme='theme-one'] .classic-2048-new-game {
+  min-height: 2.7rem;
+  border: 1px solid #a8846d;
+  color: #fffaf2;
+  background: #8f725f;
+  box-shadow: 0 8px 20px rgb(0 0 0 / 0.2);
+}
+
+html[data-theme='theme-one'] .classic-2048-new-game:hover {
+  background: #a0836f;
+}
+
+html[data-theme='theme-one'] .classic-2048-board {
+  width: min(100%, 22rem);
+  aspect-ratio: 1;
+  justify-self: center;
+  padding: 0.7rem;
+  border: 1px solid #cfb49c;
+  border-radius: 0.9rem;
+  background: #bbada0;
+  box-shadow:
+    0 20px 48px rgb(0 0 0 / 0.34),
+    0 0 0 0.2rem rgb(255 255 255 / 0.025);
+}
+
+html[data-theme='theme-one'] .classic-2048-grid {
+  gap: 0.65rem;
+}
+
+html[data-theme='theme-one'] .classic-2048-cell {
+  border-radius: 0.42rem;
+  color: transparent;
+  background: rgb(238 228 218 / 0.35);
+  font-size: clamp(1.45rem, 7vw, 2.5rem);
+  line-height: 1;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.24);
+}
+
+html[data-theme='theme-one'] .classic-2048-cell[data-value] {
+  color: inherit;
+}
+
+html[data-theme='theme-one'] .classic-2048-cell[data-value='128'],
+html[data-theme='theme-one'] .classic-2048-cell[data-value='256'],
+html[data-theme='theme-one'] .classic-2048-cell[data-value='512'] {
+  font-size: clamp(1.15rem, 5.7vw, 2rem);
+}
+
+html[data-theme='theme-one'] .classic-2048-cell[data-value='1024'],
+html[data-theme='theme-one'] .classic-2048-cell[data-value='2048'] {
+  font-size: clamp(0.95rem, 4.8vw, 1.7rem);
+}
+
+html[data-theme='theme-one'] .classic-2048-message {
+  gap: 1rem;
+  border-radius: inherit;
+  color: #5d534a;
+  background: rgb(238 228 218 / 0.9);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+}
+
+html[data-theme='theme-one'] .classic-2048-message strong {
+  font-size: clamp(1.65rem, 7vw, 2.5rem);
+}
+
+html[data-theme='theme-one'] .classic-2048-message-actions {
+  gap: 0.5rem;
+}
+
+html[data-theme='theme-one'] .classic-2048-message [data-slot='button'] {
+  color: white;
+  background: #8f725f;
+}
+
+html[data-theme='theme-one'] .classic-2048-controls {
+  display: grid !important;
+  grid-template-columns: repeat(4, 3rem) !important;
+  justify-content: center;
+  gap: 0.5rem !important;
+}
+
+html[data-theme='theme-one'] .classic-2048-controls > [data-slot='button'] {
+  width: 3rem !important;
+  min-width: 3rem;
+  height: 3rem !important;
+  min-height: 3rem !important;
+  padding: 0 !important;
+  border-color: oklch(1 0 0 / 0.12);
+  color: #eee8df;
+  background: oklch(1 0 0 / 0.055);
+}
+
+html[data-theme='theme-one'] .classic-2048-actions {
+  justify-content: center;
+}
+
+html[data-theme='theme-one'] .classic-2048-help {
+  margin: 0;
+  color: #aaa6a0;
+  font-size: 0.75rem;
+  text-align: center;
+}
+
+html[data-theme='theme-one'] .classic-tetris-content {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 1rem 0 0.5rem;
+}
+
+html[data-theme='theme-one'] .tetris-handheld {
+  --tetris-cell: clamp(0.85rem, 2.25vw, 1.08rem);
+  width: min(100%, 34rem);
+  padding: 0.9rem 1rem 1rem;
+  border: 1px solid oklch(0.76 0.12 275 / 0.22);
+  border-radius: 1.8rem;
+  color: #e9edf8;
+  background:
+    radial-gradient(circle at 75% 14%, oklch(0.58 0.17 278 / 0.13), transparent 15rem),
+    linear-gradient(155deg, #1b2131, #0e1320 68%);
+  box-shadow:
+    0 30px 90px rgb(0 0 0 / 0.46),
+    inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+html[data-theme='theme-one'] .tetris-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 1.8rem;
+  margin-bottom: 0.55rem;
+  color: #aeb8d2;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+}
+
+html[data-theme='theme-one'] .tetris-brand-blocks {
+  width: 1rem;
+  height: 1rem;
+  color: #7f8cff;
+}
+
+html[data-theme='theme-one'] .tetris-screen-frame {
+  width: fit-content;
+  margin-inline: auto;
+  padding: 0.7rem;
+  border: 0.3rem solid #070a11;
+  border-radius: 0.55rem;
+  background: #222938;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.08),
+    0 12px 24px rgb(0 0 0 / 0.36);
+}
+
+html[data-theme='theme-one'] .tetris-lcd {
+  display: flex;
+  gap: 0.55rem;
+  padding: 0.45rem;
+  border: 0.2rem solid #39443b;
+  color: #1b2c22;
+  background: #a8b899;
+  box-shadow:
+    inset 0 0 24px rgb(57 73 55 / 0.2),
+    inset 0 0 0 1px rgb(255 255 255 / 0.22);
+}
+
+html[data-theme='theme-one'] .tetris-board {
+  border: 1px solid rgb(35 53 39 / 0.42);
+  background: #9dab8f;
+}
+
+html[data-theme='theme-one'] .tetris-cell {
+  width: var(--tetris-cell);
+  height: var(--tetris-cell);
+  border: 1px solid rgb(37 54 40 / 0.16);
+  background: rgb(46 65 49 / 0.045);
+  box-shadow: inset 0 0 0 1px rgb(215 229 199 / 0.08);
+}
+
+html[data-theme='theme-one'] .tetris-cell.is-filled,
+html[data-theme='theme-one'] .tetris-preview-cell.is-filled {
+  border-color: #1b2c22;
+  background: #23372a;
+  box-shadow: inset 0 0 0 1px #7f9274;
+}
+
+html[data-theme='theme-one'] .tetris-cell::after,
+html[data-theme='theme-one'] .tetris-preview-cell::after {
+  background: #15251b;
+}
+
+html[data-theme='theme-one'] .tetris-screen-message {
+  color: #1b2c22;
+  background: rgb(157 171 143 / 0.72);
+  text-shadow: 1px 1px 0 rgb(255 255 255 / 0.12);
+}
+
+html[data-theme='theme-one'] .tetris-screen-message strong {
+  font-size: clamp(0.8rem, 3.2vw, 1.2rem);
+}
+
+html[data-theme='theme-one'] .tetris-screen-message small {
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+}
+
+html[data-theme='theme-one'] .tetris-lcd-panel {
+  display: flex;
+  width: calc(var(--tetris-cell) * 5.25);
+  flex-direction: column;
+  gap: 0.48rem;
+  padding-top: 0.1rem;
+  font-family: var(--font-geist-mono), monospace;
+}
+
+html[data-theme='theme-one'] .tetris-lcd-stat {
+  display: grid;
+  gap: 0.08rem;
+}
+
+html[data-theme='theme-one'] .tetris-lcd-stat span,
+html[data-theme='theme-one'] .tetris-next > span {
+  font-size: clamp(0.48rem, 1.4vw, 0.65rem);
+  line-height: 1;
+}
+
+html[data-theme='theme-one'] .tetris-lcd-stat strong {
+  overflow: hidden;
+  font-size: clamp(0.7rem, 2.1vw, 0.95rem);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: right;
+}
+
+html[data-theme='theme-one'] .tetris-lcd-stat-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.3rem;
+}
+
+html[data-theme='theme-one'] .tetris-next {
+  display: grid;
+  gap: 0.28rem;
+}
+
+html[data-theme='theme-one'] .tetris-preview-shape {
+  min-height: calc(var(--tetris-cell) * 2.2);
+  align-content: center;
+  justify-content: center;
+  gap: 1px;
+}
+
+html[data-theme='theme-one'] .tetris-preview-cell {
+  width: calc(var(--tetris-cell) * 0.72);
+  height: calc(var(--tetris-cell) * 0.72);
+  border: 1px solid rgb(37 54 40 / 0.16);
+}
+
+html[data-theme='theme-one'] .tetris-lcd-sound {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  margin-top: auto;
+  font-size: clamp(0.45rem, 1.2vw, 0.58rem);
+  white-space: nowrap;
+}
+
+html[data-theme='theme-one'] .tetris-lcd-sound svg {
+  width: 0.72rem;
+  height: 0.72rem;
+}
+
+html[data-theme='theme-one'] .tetris-control-deck {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(10rem, 1fr);
+  gap: 1rem;
+  align-items: center;
+  margin-top: 0.85rem;
+}
+
+html[data-theme='theme-one'] .tetris-left-controls {
+  display: grid;
+  gap: 0.65rem;
+  justify-items: center;
+}
+
+html[data-theme='theme-one'] .tetris-function-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+html[data-theme='theme-one'] .tetris-function-button {
+  display: grid;
+  min-width: 2.9rem;
+  justify-items: center;
+  gap: 0.28rem;
+  color: #aeb8cc;
+  background: transparent;
+}
+
+html[data-theme='theme-one'] .tetris-function-button > span {
+  display: grid;
+  width: 2.35rem;
+  height: 2.35rem;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 50%;
+  color: white;
+  background: #2fba75;
+  box-shadow:
+    inset 0 -0.28rem 0 rgb(0 0 0 / 0.18),
+    0 0.3rem 0.6rem rgb(0 0 0 / 0.28);
+}
+
+html[data-theme='theme-one'] .tetris-function-button.is-red > span {
+  background: #ef4d5f;
+}
+
+html[data-theme='theme-one'] .tetris-function-button svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+html[data-theme='theme-one'] .tetris-function-button small {
+  font-size: 0.58rem;
+  line-height: 1;
+}
+
+html[data-theme='theme-one'] .tetris-drop-button {
+  display: grid;
+  width: 5.4rem;
+  height: 5.4rem;
+  place-items: center;
+  align-content: center;
+  gap: 0.15rem;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 50%;
+  color: white;
+  background: linear-gradient(145deg, #7785ff, #505ad5);
+  box-shadow:
+    inset 0 -0.55rem 0 rgb(0 0 0 / 0.16),
+    0 0.55rem 1.1rem rgb(0 0 0 / 0.32);
+}
+
+html[data-theme='theme-one'] .tetris-drop-button:active,
+html[data-theme='theme-one'] .tetris-dpad-button:active:not(:disabled),
+html[data-theme='theme-one'] .tetris-function-button:active:not(:disabled) > span {
+  transform: translateY(2px);
+}
+
+html[data-theme='theme-one'] .tetris-drop-button svg {
+  width: 1.6rem;
+  height: 1.6rem;
+}
+
+html[data-theme='theme-one'] .tetris-drop-button span {
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+html[data-theme='theme-one'] .tetris-dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 3.45rem);
+  grid-template-rows: repeat(3, 3.45rem);
+  justify-content: center;
+  align-items: center;
+}
+
+html[data-theme='theme-one'] .tetris-dpad-button {
+  display: grid;
+  width: 3.2rem;
+  height: 3.2rem;
+  place-items: center;
+  align-content: center;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 50%;
+  color: white;
+  background: linear-gradient(145deg, #7785ff, #505ad5);
+  box-shadow:
+    inset 0 -0.35rem 0 rgb(0 0 0 / 0.16),
+    0 0.42rem 0.85rem rgb(0 0 0 / 0.3);
+}
+
+html[data-theme='theme-one'] .tetris-dpad-button svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+html[data-theme='theme-one'] .tetris-dpad-button small {
+  font-size: 0.5rem;
+}
+
+html[data-theme='theme-one'] .tetris-dpad-button.is-rotate {
+  grid-column: 2;
+  grid-row: 1;
+}
+
+html[data-theme='theme-one'] .tetris-dpad-button.is-left {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+html[data-theme='theme-one'] .tetris-dpad-button.is-right {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+html[data-theme='theme-one'] .tetris-dpad-button.is-down {
+  grid-column: 2;
+  grid-row: 3;
+}
+
+html[data-theme='theme-one'] .classic-tetris-help {
+  margin: 0.5rem 0 0;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+@media (min-width: 900px) {
+  html[data-theme='theme-one'] .classic-2048-shell {
+    width: min(100%, 54rem);
+    grid-template-columns: minmax(20rem, 24rem) minmax(15rem, 1fr);
+    grid-template-areas:
+      'board heading'
+      'board intro'
+      'board controls'
+      'board actions'
+      'board help';
+    align-items: start;
+    gap: 1rem 1.5rem;
+    padding: 1.25rem;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-board {
+    grid-area: board;
+    width: min(38vw, 24rem);
+  }
+
+  html[data-theme='theme-one'] .classic-2048-heading {
+    grid-area: heading;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-intro {
+    grid-area: intro;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-controls {
+    grid-area: controls;
+    justify-content: start;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-actions {
+    grid-area: actions;
+    justify-content: flex-start;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-help {
+    grid-area: help;
+    text-align: left;
+  }
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-one'] .classic-2048-page .game-header,
+  html[data-theme='theme-one'] .classic-tetris-page .game-header {
+    flex: 0 0 auto;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-content,
+  html[data-theme='theme-one'] .classic-tetris-content {
+    min-height: 0;
+    flex: 1;
+    padding: 0 !important;
+    overflow: hidden;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-shell {
+    width: 100%;
+    height: 100%;
+    align-content: start;
+    justify-items: center;
+    gap: 0.42rem;
+    padding: 0.5rem;
+    overflow: hidden;
+    border-radius: 1rem;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-heading,
+  html[data-theme='theme-one'] .classic-2048-intro {
+    width: min(100%, 22rem);
+  }
+
+  html[data-theme='theme-one'] .classic-2048-logo {
+    font-size: 2.5rem;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-score {
+    min-width: 3.6rem;
+    min-height: 2.65rem;
+    padding: 0.25rem 0.4rem;
+    border-radius: 0.65rem;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-score span {
+    font-size: 0.5rem;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-score strong {
+    font-size: 1rem;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-intro {
+    font-size: 0.68rem;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-new-game {
+    min-height: 2.25rem;
+    padding-inline: 0.75rem;
+    font-size: 0.72rem;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-board {
+    width: min(calc(100vw - 1.9rem), calc(100svh - 15.5rem), 19rem);
+    padding: 0.45rem;
+    border-radius: 0.72rem;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-grid {
+    gap: 0.42rem;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-cell {
+    border-radius: 0.3rem;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-controls {
+    grid-template-columns: repeat(4, 2.75rem) !important;
+    gap: 0.38rem !important;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-controls > [data-slot='button'] {
+    width: 2.75rem !important;
+    height: 2.75rem !important;
+    min-height: 2.75rem !important;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-actions {
+    gap: 0.35rem;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-actions [data-slot='button'] {
+    min-height: 2.25rem;
+    padding-inline: 0.65rem;
+    font-size: 0.7rem;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-help {
+    display: none;
+  }
+
+  html[data-theme='theme-one'] .tetris-handheld {
+    --tetris-cell: min(3.7vw, 0.9rem);
+    width: min(100%, 28rem);
+    max-height: 100%;
+    padding: 0.45rem 0.55rem 0.55rem;
+    overflow: hidden;
+    border-radius: 1.05rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-brand {
+    min-height: 1.1rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.62rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-brand-blocks {
+    width: 0.8rem;
+    height: 0.8rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-screen-frame {
+    padding: 0.35rem;
+    border-width: 0.2rem;
+    border-radius: 0.38rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-lcd {
+    gap: 0.35rem;
+    padding: 0.28rem;
+    border-width: 0.12rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-lcd-panel {
+    width: 4.7rem;
+    gap: 0.27rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-lcd-stat span,
+  html[data-theme='theme-one'] .tetris-next > span {
+    font-size: 0.43rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-lcd-stat strong {
+    font-size: 0.62rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-preview-shape {
+    min-height: 1.55rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-lcd-sound {
+    font-size: 0.42rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-control-deck {
+    grid-template-columns: minmax(0, 1fr) 9.25rem;
+    gap: 0.45rem;
+    margin-top: 0.35rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-left-controls {
+    gap: 0.3rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-function-row {
+    gap: 0.08rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-function-button {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    gap: 0.12rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-function-button > span {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-function-button small {
+    font-size: 0.48rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-drop-button {
+    width: 4rem;
+    height: 4rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-drop-button svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-drop-button span {
+    font-size: 0.55rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-dpad {
+    grid-template-columns: repeat(3, 2.9rem);
+    grid-template-rows: repeat(3, 2.9rem);
+  }
+
+  html[data-theme='theme-one'] .tetris-dpad-button {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-dpad-button svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  html[data-theme='theme-one'] .classic-tetris-help {
+    display: none;
+  }
+}
+
+@media (max-width: 767px) and (max-height: 700px) {
+  html[data-theme='theme-one'] .classic-2048-shell {
+    gap: 0.28rem;
+    padding: 0.35rem;
+  }
+
+  html[data-theme='theme-one'] .classic-2048-board {
+    width: min(calc(100vw - 2.25rem), calc(100svh - 16.8rem), 17.25rem);
+  }
+
+  html[data-theme='theme-one'] .classic-2048-actions {
+    display: none;
+  }
+
+  html[data-theme='theme-one'] .tetris-handheld {
+    --tetris-cell: min(3.35vw, 0.75rem);
+  }
+
+  html[data-theme='theme-one'] .tetris-brand {
+    display: none;
+  }
+
+  html[data-theme='theme-one'] .tetris-control-deck {
+    margin-top: 0.2rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-function-button > span {
+    width: 1.8rem;
+    height: 1.8rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-drop-button {
+    width: 3.5rem;
+    height: 3.5rem;
+  }
+
+  html[data-theme='theme-one'] .tetris-dpad {
+    grid-template-columns: repeat(3, 2.75rem);
+    grid-template-rows: repeat(3, 2.75rem);
+  }
+
+  html[data-theme='theme-one'] .tetris-dpad-button {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
