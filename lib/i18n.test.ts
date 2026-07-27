@@ -14,4 +14,10 @@ describe("translations", () => {
   it("returns the localized value for a known key", () => {
     expect(getTranslation("en", "start")).toBe("Start")
   })
+
+  it("does not contain Unicode replacement characters", () => {
+    for (const locale of locales) {
+      expect(Object.values(translations[locale]).join("")).not.toContain("\uFFFD")
+    }
+  })
 })

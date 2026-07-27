@@ -73,6 +73,10 @@ export const translations = {
     resetMarks: "清除标记",
     markedCount: "已标记",
     markedNumbers: "已标记数字",
+    removeMarkedNumber: "撤回数字标记",
+    cardLayout: "卡片排版",
+    singleCardLayout: "单列排版 1×1",
+    doubleCardLayout: "双列排版 2×2",
 
     // Tetris
     tetris: "俄罗斯方块",
@@ -356,6 +360,10 @@ export const translations = {
     resetMarks: "Clear Marks",
     markedCount: "Marked",
     markedNumbers: "Marked Numbers",
+    removeMarkedNumber: "Remove marked number",
+    cardLayout: "Card Layout",
+    singleCardLayout: "Single column 1×1",
+    doubleCardLayout: "Two columns 2×2",
 
     // Tetris
     tetris: "Tetris",
@@ -593,7 +601,7 @@ export const translations = {
     gameOver: "จบเกม",
     score: "คะแนน",
     highScore: "คะแนนสูงสุด",
-    finalScore: "คะแนนสุ���ท้าย",
+    finalScore: "คะแนนสุดท้าย",
     level: "ระดับ",
     lines: "เส้น",
     nextPiece: "ถัดไป",
@@ -638,7 +646,11 @@ export const translations = {
     stopListening: "หยุดรับเสียง",
     resetMarks: "ล้างเครื่องหมาย",
     markedCount: "ทำเครื่องหมายแล้ว",
-    markedNumbers: "ตัวเลขที่ทำเครื่องหมา���",
+    markedNumbers: "ตัวเลขที่ทำเครื่องหมาย",
+    removeMarkedNumber: "ยกเลิกเครื่องหมายตัวเลข",
+    cardLayout: "รูปแบบบัตร",
+    singleCardLayout: "หนึ่งคอลัมน์ 1×1",
+    doubleCardLayout: "สองคอลัมน์ 2×2",
 
     // Tetris
     tetris: "เทตริส",
@@ -700,7 +712,7 @@ export const translations = {
     totalEpisodes: "จำนวนตอนทั้งหมด",
     ongoing: "ยังไม่จบ",
     rating: "คะแนน",
-    ratingPlaceholder: "คะแนนเส��ิม",
+    ratingPlaceholder: "คะแนน (ไม่บังคับ)",
     coverImage: "ภาพปก",
     notes: "บันทึก",
     notesPlaceholder: "เพิ่มบันทึก...",

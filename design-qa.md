@@ -4,7 +4,7 @@
 
 - Tetris: https://chvin.github.io/react-tetris/
 - 2048: https://mgarciaisaia.github.io/2048/
-- Local production preview: `http://127.0.0.1:3100`
+- Local production preview: `http://127.0.0.1:3900`
 
 The implementation reproduces the references' core visual language and
 interactions inside the existing XM-Games navigation, locale, theme and offline
@@ -30,14 +30,38 @@ constraints. No remote assets are hot-linked.
   `.design-qa-evidence/2048-local-theme2-390x844.png`
 - 2048 side-by-side comparison:
   `.design-qa-evidence/2048-reference-vs-local-390x844.png`
+- Mobile re-audit evidence:
+  `.design-qa-evidence/mobile-audit/`
+- Mobile before/after comparisons:
+  `18-tetris-before-after.png`, `19-bingo-before-after.png`,
+  `20-bingo-cards-before-after.png`, `23-mobile-before-after-overview.png`
+- Restored Bingo inline layout:
+  `.design-qa-evidence/mobile-audit/25-bingo-restored-final-390x844.png`
+- Bingo cards Theme 1, single-column mode, 390×844:
+  `.design-qa-evidence/mobile-audit/30-bingo-cards-theme-one-single-390x844.png`
+- Bingo cards Theme 1, two-column mode, 390×844:
+  `.design-qa-evidence/mobile-audit/31-bingo-cards-theme-one-double-390x844.png`
+- Bingo cards reference and final two-column comparison, normalized to
+  375×855 CSS pixels:
+  `.design-qa-evidence/mobile-audit/33-bingo-cards-reference-vs-double-375x855.png`
+- Bingo cards Theme 2, 320×700:
+  `.design-qa-evidence/mobile-audit/28-bingo-cards-theme-two-double-320x700.png`,
+  `.design-qa-evidence/mobile-audit/29-bingo-cards-theme-two-single-320x700.png`
+- Bingo cards reversible marks and completed-card treatment:
+  `.design-qa-evidence/mobile-audit/37-bingo-cards-mark-undo-final-theme-one-390x844.png`,
+  `.design-qa-evidence/mobile-audit/38-bingo-cards-mark-undo-final-theme-two-390x844.png`,
+  `.design-qa-evidence/mobile-audit/39-bingo-cards-mark-undo-final-theme-two-320x700.png`
+- Bingo cards mark/Bingo reference and final comparison:
+  `.design-qa-evidence/mobile-audit/41-bingo-cards-mark-undo-reference-vs-final-375x855.png`
 
 ## Viewport and layout checks
 
 | Surface | Viewport | Key measurements | Result |
 | --- | --- | --- | --- |
-| Tetris Theme 1 | 320×568 | Device 305.6×398.7; board 109.2×216.4 | No overflow or clipping |
-| Tetris Theme 2 | 320×568 | Device 305.6×390.9; board 107.5×213.1; tab bar begins at y=496.8 | No overlap with tab bar |
-| Tetris Theme 2 | 390×844 | Device 375.6×502.8; board 149.2×296.4 | Full 10×20 board visible |
+| Tetris Theme 1 | 320×568 | Device 305.6×494.8; board 109.2×216.4 | Fills the available game viewport |
+| Tetris Theme 1 | 390×844 | Device 375.6×770.8; board 189.2×376.4 | Fills the available game viewport |
+| Tetris Theme 2 | 320×568 | Full viewport and controls remain visible | No overlap with tab bar |
+| Tetris Theme 2 | 390×844 | Device 375.6×716.8; board 189.2×376.4; tab bar begins at y=772.8 | Full 10×20 board visible |
 | 2048 Theme 1 | 320×568 | Board 276×276 | No overflow or clipping |
 | 2048 Theme 2 | 320×568 | Board 240×240; tab bar begins at y=496.8 | Controls and board visible |
 | 2048 Theme 2 | 390×844 | Board 320×320; tab bar begins at y=772.8 | Full page remains one screen |
@@ -45,6 +69,161 @@ constraints. No remote assets are hot-linked.
 All checked pages reported document dimensions equal to the viewport. Tetris
 direction and utility controls measure at least 44×44 CSS pixels; 2048
 direction controls measure 48×44 CSS pixels.
+
+## Mobile layout re-audit
+
+- The user-provided Tetris, Bingo draw and Bingo cards captures were retained
+  alongside final screenshots in `.design-qa-evidence/mobile-audit/`.
+- Tetris now stretches its handheld shell through the available mobile game
+  viewport while preserving a complete 10×20 board on short screens.
+- Bingo draw is forced into a single-column mobile flow. Bingo cards now uses
+  the full content width and its empty state no longer expands into a tall
+  blank panel.
+- Theme 1 header controls use matching 44×44 circular targets. Compact language
+  mode shows one globe icon without a redundant select chevron.
+- All 14 game routes were checked at 320×568 and 390×844 in both themes.
+  Theme 1 and Theme 2 reported viewport-matched document dimensions, no clipped
+  focusable controls and no button-label overflow. Theme 2 fixed-play surfaces
+  end above its bottom navigation.
+- Chinese and Thai locale checks included the narrow Go action row; its compact
+  layout no longer overflows at 320 pixels.
+
+## Bingo inline layout restoration
+
+- Restored the last pre-dialog information structure from `eede7b5`: current
+  draw, settings, automatic interval, recent draws and the full number board
+  are all rendered directly in the page.
+- Removed the mobile settings and number-board dialogs without changing the
+  draw, speech, timer or reset state model.
+- Bingo remains a single mobile column, but now uses an intentional internal
+  page scroll instead of stretching an empty draw card to the viewport.
+- Verified direct draw and automatic-mode interaction at 320×568 and 390×844
+  in both themes. Chinese and Thai labels produced no horizontal overflow.
+- Theme 2 retains a 71-pixel clear area between the number board and its fixed
+  bottom navigation at the end of the scroll region.
+
+## Bingo cards responsive layout QA
+
+### Comparison target and normalization
+
+- Source visual truth:
+  `/var/folders/n3/hfzr5zl578v260_gjmv9br580000gn/T/codex-clipboard-8c30d1e5-bad5-4ce2-9557-df02df44ca5c.png`
+  (750×1710 pixels, treated as a 375×855 CSS-pixel capture at 2× density).
+- Final implementation:
+  `.design-qa-evidence/mobile-audit/32-bingo-cards-theme-one-double-375x855.png`
+  (375×855 pixels, 375×855 CSS viewport at 1× density).
+- Full-view normalized comparison:
+  `.design-qa-evidence/mobile-audit/33-bingo-cards-reference-vs-double-375x855.png`
+  (source downsampled to 375×855 and placed beside the 1× implementation).
+- State: Theme 1, Chinese, four generated cards, two-column `2×2` mode.
+  Secondary captures cover single-column `1×1` mode and Theme 2 at 320 pixels.
+- A separate focused crop was not needed: the normalized 375-pixel comparison
+  keeps the complete toolbar, layout selector, card headings and all 5×5 cells
+  legible. The 320-pixel Theme 2 captures provide the narrowest focused check.
+
+### Findings and comparison history
+
+- Initial reference finding (P1): the number input and four actions occupied one
+  crowded row; the second card was clipped by an implicit horizontal carousel.
+- Initial reference finding (P2): the controls card reserved excessive empty
+  vertical space while offering no explicit layout choice.
+- Fix: split input/confirmation, utility actions and summary/layout selection
+  into three compact rows; removed inherited card padding; replaced the
+  horizontal flow with persistent explicit `1×1` and `2×2` grid modes.
+- Post-fix evidence: the normalized comparison shows both cards fully contained,
+  balanced action spacing and materially reduced dead space. No actionable
+  P0/P1/P2 finding remains.
+- Required fidelity surfaces:
+  - Typography keeps the existing XM-Games font hierarchy and remains legible
+    in both layouts.
+  - Spacing uses 44-pixel controls, consistent row gaps and centered single-card
+    columns.
+  - Theme 1 dark-neon and Theme 2 iOS-light tokens remain independent.
+  - No raster imagery is present; existing icon-library glyphs remain sharp.
+  - Chinese, English and Thai layout labels are complete; Thai replacement
+    characters were removed.
+
+### Responsive and interaction checks
+
+| Theme / viewport | Mode | Measured result |
+| --- | --- | --- |
+| Theme 1, 390×844 | `1×1` | One 375.6-pixel card column; no document overflow |
+| Theme 1, 390×844 | `2×2` | Two 183.8-pixel columns; 44-pixel layout controls |
+| Theme 1, 768×900 | `1×1` / `2×2` | Centered 672-pixel single column / two 360-pixel columns |
+| Theme 2, 320×700 | `1×1` | One 305.6-pixel column; internal list scroll remains above tab bar |
+| Theme 2, 320×700 | `2×2` | Two 148.8-pixel columns; list bottom equals tab-bar top |
+| Theme 2, 768×900 | `1×1` / `2×2` | Centered 672-pixel single column / two 361.2-pixel columns |
+
+- Exercised adding four cards and switching both layouts without recreating
+  card or marked-number state.
+- Reload retained the selected layout through the versioned local preference.
+- Chinese and Thai narrow-width checks produced no label or document overflow.
+- Final browser console inspection returned no warnings or errors.
+
+## Bingo cards mark undo and completion QA
+
+### Comparison target and normalization
+
+- Source visual truth:
+  `/var/folders/n3/hfzr5zl578v260_gjmv9br580000gn/T/codex-clipboard-ba0176e8-60a5-455f-a3e6-e0477ab2e090.png`
+  (750×1710 pixels, treated as 375×855 CSS pixels at 2× density).
+- Final Theme 1 implementation:
+  `.design-qa-evidence/mobile-audit/40-bingo-cards-mark-undo-final-theme-one-375x855.png`
+  (375×855 pixels, 375×855 CSS viewport at 1× density).
+- Full-view normalized comparison:
+  `.design-qa-evidence/mobile-audit/41-bingo-cards-mark-undo-reference-vs-final-375x855.png`.
+- State: Chinese, Theme 1, four cards, two-column mode, five marked
+  numbers and one completed Bingo card. Random card contents differ between the
+  source and implementation, so comparison focuses on equivalent marked and
+  completed states rather than matching number values.
+- The direct 390×844 Theme 1 and Theme 2 captures serve as focused evidence:
+  the 27.4-pixel circular markers, badge, inset border and undo buttons are all
+  readable at 1× density. A separate crop was not required.
+
+### Findings and comparison history
+
+- Initial reference finding (P1): marked numbers had no individual undo path;
+  correcting one mistake required clearing every mark.
+- Initial reference finding (P2): a full green cell background made marked
+  numbers visually heavy and did not match the requested red circular marker.
+- Initial reference finding (P2): the completed-card ring and offset were drawn
+  outside the card, so the scroll container clipped the top and side edges.
+- Fix: marked-list entries and marked card cells are now localized buttons that
+  remove only their number. Card cells retain their neutral square surface and
+  render a solid red circular number marker. Completed cards use a semantic
+  `data-bingo` state with a two-pixel border inset by one pixel, plus a separate
+  non-truncating Bingo badge.
+- Post-fix evidence: every edge of the completed card is visible in Theme 1 and
+  Theme 2 at 320, 375 and 390 pixels. No actionable P0/P1/P2 finding remains.
+- Required fidelity surfaces:
+  - Typography keeps the existing hierarchy; compact Bingo badges remain
+    legible without reducing the 44-pixel delete target.
+  - Spacing preserves the 1×1/2×2 grids and keeps the completion border inside
+    each card.
+  - Theme 1 uses red arcade markers and an illuminated amber inset; Theme 2
+    uses iOS red and iOS orange with a lighter shadow treatment.
+  - No new raster assets were required; all icons remain from the existing
+    icon library.
+  - Chinese, English and Thai undo labels are available to assistive
+    technologies.
+
+### Responsive and interaction checks
+
+| Theme / viewport | Measured result |
+| --- | --- |
+| Theme 1, 390×844 | Red marker 27.4×27.4 with 50% radius; 2px inset Bingo border; no document overflow |
+| Theme 2, 390×844 | iOS red marker 27.4×27.4; all five 44–47px undo pills visible |
+| Theme 2, 320×700 | Red marker 20.4×20.4; 44×44 delete controls; list bottom equals tab-bar top |
+| Theme 2, 768×900 | Two 361.2px card columns; 30.4×30.4 red markers; no overflow |
+
+- Clicking a marked-number undo pill removed that number from every card,
+  changed the count from five to four and removed the affected Bingo state.
+- Clicking the red marker inside the card produced the same global, idempotent
+  undo behavior.
+- Re-entering the withdrawn number restored the mark and Bingo state.
+- Pure tests cover immutable single-number removal, repeated removal, final
+  number removal and Bingo loss after withdrawing a completed-row number.
+- Final browser console inspection returned no warnings or errors.
 
 ## Fidelity comparison
 
@@ -79,9 +258,7 @@ direction controls measure 48×44 CSS pixels.
 
 - `pnpm lint`
 - `pnpm typecheck`
-- `pnpm test` — 16 files, 97 tests
-- `pnpm build` — all 18 application routes statically generated
+- `pnpm test` — 17 files, 102 tests
+- `pnpm build` — all 19 application routes statically generated
 
-## Result
-
-passed
+final result: passed
