@@ -1,22 +1,36 @@
 "use client"
 
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react"
 import Link from "next/link"
 import {
+  Activity,
   ArrowUpRight,
   Blocks,
   Bomb,
   BrainCircuit,
   BrickWall,
   Castle,
+  ChevronRight,
   CircleDot,
+  Command,
   Crown,
   Dices,
   Gamepad2,
+  Gauge,
   Grid3X3,
   Layers3,
+  LibraryBig,
   RefreshCw,
   Route,
+  Search,
   Settings2,
+  ShieldCheck,
   Sparkles,
   TicketCheck,
   Tv,
@@ -29,6 +43,7 @@ import { ThemeSwitcher } from "@/components/theme-switcher"
 import { Button } from "@/components/ui/button"
 import { useLocale } from "@/lib/locale-context"
 import type { Locale, TranslationKey } from "@/lib/i18n"
+import { cn } from "@/lib/utils"
 
 const HOME_COPY: Record<
   Locale,
@@ -68,6 +83,101 @@ const HOME_COPY: Record<
     instantPlay: "ไม่ต้องติดตั้ง · เล่นได้ทันที",
     openGame: "เปิด",
     featuredTool: "เครื่องมือแนะนำ",
+  },
+}
+
+const THEME_THREE_HOME_COPY: Record<
+  Locale,
+  {
+    title: string
+    subtitle: string
+    searchPlaceholder: string
+    searchHint: string
+    systemOnline: string
+    overview: string
+    experiences: string
+    categories: string
+    offlineReady: string
+    featuredTools: string
+    library: string
+    libraryDescription: string
+    deck: string
+    deckDescription: string
+    inspector: string
+    inspectorDescription: string
+    openTracker: string
+    quickLaunch: string
+    empty: string
+    ready: string
+  }
+> = {
+  zh: {
+    title: "游戏控制台",
+    subtitle: "沉浸娱乐 · 本地优先 · 即开即玩",
+    searchPlaceholder: "筛选任务板中的游戏或分类…",
+    searchHint: "筛选游戏任务板",
+    systemOnline: "系统就绪",
+    overview: "运行概览",
+    experiences: "游戏与工具",
+    categories: "内容分类",
+    offlineReady: "本地运行",
+    featuredTools: "精选工具",
+    library: "游戏任务板",
+    libraryDescription: "按类型快速进入你的下一局",
+    deck: "体验堆栈",
+    deckDescription: "从控制台直接启动",
+    inspector: "智能详情",
+    inspectorDescription: "记录进度、管理片单，并缓存封面供离线使用。",
+    openTracker: "打开追番助手",
+    quickLaunch: "快速启动时间线",
+    empty: "没有匹配的游戏或工具",
+    ready: "已就绪",
+  },
+  en: {
+    title: "Game Console",
+    subtitle: "Immersive play · Local first · Instant launch",
+    searchPlaceholder: "Filter games or categories on the board…",
+    searchHint: "Filter the game board",
+    systemOnline: "System ready",
+    overview: "Runtime overview",
+    experiences: "Games & tools",
+    categories: "Collections",
+    offlineReady: "Local runtime",
+    featuredTools: "Featured tools",
+    library: "Game task board",
+    libraryDescription: "Jump into the next session by category",
+    deck: "Experience stack",
+    deckDescription: "Launch directly from the console",
+    inspector: "Smart details",
+    inspectorDescription:
+      "Track progress, manage your watchlist and keep covers available offline.",
+    openTracker: "Open anime tracker",
+    quickLaunch: "Quick-launch timeline",
+    empty: "No matching games or tools",
+    ready: "Ready",
+  },
+  th: {
+    title: "คอนโซลเกม",
+    subtitle: "เล่นเต็มอารมณ์ · เน้นในเครื่อง · เปิดได้ทันที",
+    searchPlaceholder: "กรองเกมหรือหมวดหมู่บนบอร์ด…",
+    searchHint: "กรองบอร์ดเกม",
+    systemOnline: "ระบบพร้อม",
+    overview: "ภาพรวมการทำงาน",
+    experiences: "เกมและเครื่องมือ",
+    categories: "หมวดหมู่",
+    offlineReady: "ทำงานในเครื่อง",
+    featuredTools: "เครื่องมือแนะนำ",
+    library: "บอร์ดเกม",
+    libraryDescription: "เข้าเกมถัดไปอย่างรวดเร็วตามหมวดหมู่",
+    deck: "ชุดประสบการณ์",
+    deckDescription: "เปิดจากคอนโซลได้ทันที",
+    inspector: "รายละเอียดอัจฉริยะ",
+    inspectorDescription:
+      "บันทึกความคืบหน้า จัดการรายการ และเก็บปกไว้ใช้แบบออฟไลน์",
+    openTracker: "เปิดตัวช่วยติดตามอนิเมะ",
+    quickLaunch: "ไทม์ไลน์เปิดด่วน",
+    empty: "ไม่พบเกมหรือเครื่องมือที่ตรงกัน",
+    ready: "พร้อม",
   },
 }
 
@@ -329,12 +439,349 @@ function GameCard({
   )
 }
 
+function ThemeThreeHome() {
+  const { locale, t } = useLocale()
+  const copy = THEME_THREE_HOME_COPY[locale]
+  const [query, setQuery] = useState("")
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  const normalizedQuery = query.trim().toLocaleLowerCase()
+
+  useEffect(() => {
+    const focusSearch = (event: KeyboardEvent) => {
+      if (
+        document.documentElement.dataset.theme !== "theme-three" ||
+        (!event.metaKey && !event.ctrlKey) ||
+        event.key.toLocaleLowerCase() !== "k"
+      ) {
+        return
+      }
+
+      event.preventDefault()
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    }
+
+    window.addEventListener("keydown", focusSearch)
+    return () => window.removeEventListener("keydown", focusSearch)
+  }, [])
+
+  const filteredCategories = useMemo(
+    () =>
+      CATEGORIES.map((category) => ({
+        ...category,
+        games: category.games.filter((game) => {
+          if (!normalizedQuery) return true
+          const haystack = [
+            t(category.titleKey),
+            t(game.titleKey),
+            t(game.descKey),
+          ]
+            .join(" ")
+            .toLocaleLowerCase()
+          return haystack.includes(normalizedQuery)
+        }),
+      })).filter((category) => category.games.length > 0),
+    [normalizedQuery, t],
+  )
+
+  const deckGames = CATEGORIES.flatMap((category) => category.games).slice(0, 9)
+  const timelineGames = CATEGORIES.flatMap((category) => category.games).slice(
+    2,
+    9,
+  )
+  const featuredTool = CATEGORIES.at(-1)?.games[0]
+
+  return (
+    <div
+      data-page="home"
+      className="theme-three-home app-shell"
+    >
+      <div className="theme-three-dashboard">
+        <header className="theme-three-command-bar">
+          <div className="theme-three-command-title">
+            <span className="theme-three-command-mark">
+              <Gauge aria-hidden="true" />
+            </span>
+            <span>
+              <strong>{copy.title}</strong>
+              <small>{copy.subtitle}</small>
+            </span>
+          </div>
+
+          <label className="theme-three-search">
+            <Search aria-hidden="true" />
+            <span className="sr-only">{copy.searchHint}</span>
+            <input
+              ref={searchInputRef}
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder={copy.searchPlaceholder}
+              aria-keyshortcuts="Meta+K Control+K"
+            />
+            <kbd>
+              <Command aria-hidden="true" />
+              K
+            </kbd>
+          </label>
+
+          <div className="theme-three-command-status">
+            <i aria-hidden="true" />
+            <span>{copy.systemOnline}</span>
+          </div>
+        </header>
+
+        <main>
+          <section
+            className="theme-three-overview"
+            aria-labelledby="theme-three-overview-title"
+          >
+            <div className="theme-three-section-heading">
+              <div>
+                <p>{copy.overview}</p>
+                <h1 id="theme-three-overview-title">{t("appName")}</h1>
+              </div>
+              <span>
+                <Activity aria-hidden="true" />
+                {copy.ready}
+              </span>
+            </div>
+
+            <div className="theme-three-metrics">
+              <article className="theme-three-metric-card">
+                <span className="theme-three-metric-icon">
+                  <Gamepad2 aria-hidden="true" />
+                </span>
+                <p>{copy.experiences}</p>
+                <strong>{TOTAL_EXPERIENCES}</strong>
+                <small>+ {CATEGORIES[2].games.length}</small>
+              </article>
+              <article className="theme-three-metric-card">
+                <span className="theme-three-metric-icon">
+                  <LibraryBig aria-hidden="true" />
+                </span>
+                <p>{copy.categories}</p>
+                <strong>{CATEGORIES.length}</strong>
+                <small>100%</small>
+              </article>
+              <article className="theme-three-metric-card">
+                <span className="theme-three-metric-icon">
+                  <ShieldCheck aria-hidden="true" />
+                </span>
+                <p>{copy.offlineReady}</p>
+                <strong>LOCAL</strong>
+                <small>{copy.ready}</small>
+              </article>
+              <article className="theme-three-metric-card is-compact">
+                <span className="theme-three-metric-icon">
+                  <Sparkles aria-hidden="true" />
+                </span>
+                <p>{copy.featuredTools}</p>
+                <strong>01</strong>
+                <small>{copy.ready}</small>
+              </article>
+            </div>
+          </section>
+
+          <section className="theme-three-workbench">
+            <section
+              id="theme-three-game-library"
+              className="theme-three-board"
+              aria-labelledby="theme-three-library-title"
+            >
+              <div className="theme-three-panel-heading">
+                <div>
+                  <p id="theme-three-library-title">{copy.library}</p>
+                  <span>{copy.libraryDescription}</span>
+                </div>
+                <LibraryBig aria-hidden="true" />
+              </div>
+
+              <div className="theme-three-board-content">
+                {filteredCategories.length === 0 ? (
+                  <p className="theme-three-empty">{copy.empty}</p>
+                ) : (
+                  filteredCategories.map((category, categoryIndex) => (
+                    <section
+                      key={category.titleKey}
+                      className="theme-three-board-group"
+                      data-group={categoryIndex + 1}
+                    >
+                      <header>
+                        <span aria-hidden="true" />
+                        <strong>{t(category.titleKey)}</strong>
+                        <small>
+                          {String(category.games.length).padStart(2, "0")}
+                        </small>
+                      </header>
+                      <div>
+                        {category.games.map((game) => {
+                          const Icon = game.icon
+                          return (
+                            <Link key={game.href} href={game.href}>
+                              <span className="theme-three-board-game-icon">
+                                <Icon aria-hidden="true" />
+                              </span>
+                              <span>
+                                <strong>{t(game.titleKey)}</strong>
+                                <small>{t(game.descKey)}</small>
+                              </span>
+                              <ChevronRight aria-hidden="true" />
+                            </Link>
+                          )
+                        })}
+                      </div>
+                    </section>
+                  ))
+                )}
+              </div>
+            </section>
+
+            <section
+              className="theme-three-deck-panel"
+              aria-labelledby="theme-three-deck-title"
+            >
+              <div className="theme-three-panel-heading">
+                <div>
+                  <p id="theme-three-deck-title">{copy.deck}</p>
+                  <span>{copy.deckDescription}</span>
+                </div>
+                <span className="theme-three-panel-tools" aria-hidden="true">
+                  <span />
+                  <span />
+                  <span />
+                </span>
+              </div>
+
+              <div className="theme-three-card-stack">
+                {deckGames.map((game, index) => {
+                  const Icon = game.icon
+                  const isActive = index === 4
+
+                  return (
+                    <Link
+                      key={game.href}
+                      href={game.href}
+                      className={cn(
+                        "theme-three-stack-card",
+                        isActive && "is-active",
+                      )}
+                      style={{ "--deck-index": index } as CSSProperties}
+                    >
+                      <span className="theme-three-stack-card-icon">
+                        <Icon aria-hidden="true" />
+                      </span>
+                      <span>
+                        <small>XM-{String(index + 1).padStart(2, "0")}</small>
+                        <strong>{t(game.titleKey)}</strong>
+                      </span>
+                    </Link>
+                  )
+                })}
+              </div>
+
+              <div className="theme-three-deck-progress">
+                <span>XM · PLAY DECK</span>
+                <strong>87%</strong>
+                <div aria-hidden="true">
+                  <i />
+                </div>
+              </div>
+            </section>
+
+            {featuredTool && (
+              <aside
+                className="theme-three-inspector"
+                aria-labelledby="theme-three-inspector-title"
+              >
+                <div className="theme-three-panel-heading">
+                  <div>
+                    <p id="theme-three-inspector-title">{copy.inspector}</p>
+                    <span>XM-TOOL-01</span>
+                  </div>
+                  <Sparkles aria-hidden="true" />
+                </div>
+
+                <div className="theme-three-inspector-body">
+                  <span className="theme-three-inspector-badge">
+                    <Tv aria-hidden="true" />
+                    {copy.featuredTools}
+                  </span>
+                  <h2>{t(featuredTool.titleKey)}</h2>
+                  <p>{copy.inspectorDescription}</p>
+
+                  <dl>
+                    <div>
+                      <dt>{copy.offlineReady}</dt>
+                      <dd>{copy.ready}</dd>
+                    </div>
+                    <div>
+                      <dt>{copy.systemOnline}</dt>
+                      <dd>{copy.ready}</dd>
+                    </div>
+                  </dl>
+
+                  <div className="theme-three-assistant-note">
+                    <Sparkles aria-hidden="true" />
+                    <span>{t(featuredTool.descKey)}</span>
+                  </div>
+                </div>
+
+                <Link
+                  href={featuredTool.href}
+                  className="theme-three-inspector-action"
+                >
+                  {copy.openTracker}
+                  <ArrowUpRight aria-hidden="true" />
+                </Link>
+              </aside>
+            )}
+          </section>
+
+          <section
+            className="theme-three-timeline"
+            aria-labelledby="theme-three-timeline-title"
+          >
+            <header>
+              <div>
+                <Zap aria-hidden="true" />
+                <strong id="theme-three-timeline-title">
+                  {copy.quickLaunch}
+                </strong>
+              </div>
+              <span>XM · 2026</span>
+            </header>
+            <div className="theme-three-timeline-track">
+              {timelineGames.map((game, index) => {
+                const Icon = game.icon
+                return (
+                  <Link
+                    key={game.href}
+                    href={game.href}
+                    className={index === 3 ? "is-active" : undefined}
+                  >
+                    <Icon aria-hidden="true" />
+                    <span>{t(game.titleKey)}</span>
+                    <small>{String(index + 1).padStart(2, "0")}</small>
+                  </Link>
+                )
+              })}
+            </div>
+          </section>
+        </main>
+      </div>
+    </div>
+  )
+}
+
 export default function Home() {
   const { locale, t } = useLocale()
   const copy = HOME_COPY[locale]
 
   return (
-    <div data-page="home" className="home-shell app-shell py-4 sm:py-6 lg:py-8">
+    <>
+      <ThemeThreeHome />
+      <div data-page="home" className="home-shell app-shell py-4 sm:py-6 lg:py-8">
       <div className="app-container">
         <header className="home-header mb-4 flex items-center justify-between gap-4 px-1 sm:mb-6">
           <div className="flex min-w-0 items-center gap-3">
@@ -448,6 +895,7 @@ export default function Home() {
           </div>
         </main>
       </div>
-    </div>
+      </div>
+    </>
   )
 }

@@ -4,14 +4,17 @@ import { Analytics } from '@vercel/analytics/next'
 import { LocaleProvider } from '@/lib/locale-context'
 import { ThemeProvider } from '@/components/theme-provider'
 import { ThemeTwoTabBar } from '@/components/theme-two-tab-bar'
+import { ThemeThreeNavigation } from '@/components/theme-three-navigation'
 import { getPageMetadata } from '@/lib/page-metadata'
 import { themeBootstrapScript } from '@/lib/theme'
 import './globals.css'
 import './theme-one.css'
 import './theme-two.css'
+import './theme-three.css'
 import './classic-games.css'
 import './theme-one-classic-games.css'
 import './theme-two-classic-games.css'
+import './theme-three-classic-games.css'
 
 const geist = Geist({
   subsets: ['latin'],
@@ -57,6 +60,7 @@ export default function RootLayout({
           <LocaleProvider>
             {children}
             <ThemeTwoTabBar />
+            <ThemeThreeNavigation />
           </LocaleProvider>
         </ThemeProvider>
         {process.env.VERCEL === '1' && <Analytics />}

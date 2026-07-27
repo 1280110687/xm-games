@@ -7,6 +7,7 @@ import {
   normalizeTheme,
   themeBootstrapScript,
   themeUsesDarkChrome,
+  themes,
 } from "./theme"
 
 function runBootstrap(storedTheme: string | null, storageError = false) {
@@ -46,22 +47,26 @@ function runBootstrap(storedTheme: string | null, storageError = false) {
 }
 
 describe("theme configuration", () => {
-  it("accepts the two supported themes", () => {
+  it("accepts the three supported themes", () => {
     expect(isThemeId("theme-one")).toBe(true)
     expect(isThemeId("theme-two")).toBe(true)
+    expect(isThemeId("theme-three")).toBe(true)
+    expect(Object.keys(THEME_CONFIG)).toEqual([...themes])
   })
 
   it("falls back safely for missing or legacy values", () => {
     expect(normalizeTheme(null)).toBe(DEFAULT_THEME)
     expect(normalizeTheme("dark")).toBe(DEFAULT_THEME)
-    expect(normalizeTheme("theme-three")).toBe(DEFAULT_THEME)
+    expect(normalizeTheme("theme-four")).toBe(DEFAULT_THEME)
   })
 
-  it("keeps the current theme as the dark chrome theme", () => {
+  it("keeps dark browser chrome aligned with every theme config", () => {
     expect(themeUsesDarkChrome("theme-one")).toBe(true)
     expect(themeUsesDarkChrome("theme-two")).toBe(false)
+    expect(themeUsesDarkChrome("theme-three")).toBe(true)
     expect(THEME_CONFIG["theme-one"].colorScheme).toBe("dark")
     expect(THEME_CONFIG["theme-two"].colorScheme).toBe("light")
+    expect(THEME_CONFIG["theme-three"].colorScheme).toBe("dark")
   })
 
   it("applies a saved Theme Two before the application renders", () => {
@@ -71,6 +76,15 @@ describe("theme configuration", () => {
     expect(root.style.colorScheme).toBe("light")
     expect(classes.has("dark")).toBe(false)
     expect(themeColor.content).toBe(THEME_CONFIG["theme-two"].themeColor)
+  })
+
+  it("applies a saved Theme Three before the application renders", () => {
+    const { root, classes, themeColor } = runBootstrap("theme-three")
+
+    expect(root.dataset.theme).toBe("theme-three")
+    expect(root.style.colorScheme).toBe("dark")
+    expect(classes.has("dark")).toBe(true)
+    expect(themeColor.content).toBe(THEME_CONFIG["theme-three"].themeColor)
   })
 
   it("keeps the default theme when storage is invalid or unavailable", () => {

@@ -1,4 +1,4 @@
-export const themes = ["theme-one", "theme-two"] as const
+export const themes = ["theme-one", "theme-two", "theme-three"] as const
 
 export type ThemeId = (typeof themes)[number]
 
@@ -20,6 +20,10 @@ export const THEME_CONFIG: Record<
     colorScheme: "light",
     themeColor: "#f3f5f8",
   },
+  "theme-three": {
+    colorScheme: "dark",
+    themeColor: "#030604",
+  },
 }
 
 export function isThemeId(value: unknown): value is ThemeId {
@@ -38,10 +42,7 @@ export const themeBootstrapScript = `(() => {
   const fallback = ${JSON.stringify(DEFAULT_THEME)};
   const key = ${JSON.stringify(THEME_STORAGE_KEY)};
   const allowed = ${JSON.stringify(themes)};
-  const themeColors = ${JSON.stringify({
-    "theme-one": THEME_CONFIG["theme-one"].themeColor,
-    "theme-two": THEME_CONFIG["theme-two"].themeColor,
-  })};
+  const config = ${JSON.stringify(THEME_CONFIG)};
   let theme = fallback;
   try {
     const stored = localStorage.getItem(key);
@@ -49,9 +50,9 @@ export const themeBootstrapScript = `(() => {
   } catch {}
   const root = document.documentElement;
   root.dataset.theme = theme;
-  root.classList.toggle("dark", theme === "theme-one");
-  root.style.colorScheme = theme === "theme-one" ? "dark" : "light";
+  root.classList.toggle("dark", config[theme].colorScheme === "dark");
+  root.style.colorScheme = config[theme].colorScheme;
   document
     .querySelector('meta[name="theme-color"]')
-    ?.setAttribute("content", themeColors[theme]);
+    ?.setAttribute("content", config[theme].themeColor);
 })();`

@@ -258,7 +258,123 @@ direction controls measure 48×44 CSS pixels.
 
 - `pnpm lint`
 - `pnpm typecheck`
-- `pnpm test` — 17 files, 102 tests
+- `pnpm test` — 17 files, 103 tests
 - `pnpm build` — all 19 application routes statically generated
+
+## Theme 3: obsidian glass workspace
+
+### Source and implementation evidence
+
+- Source visual truth:
+  `.design-qa-evidence/theme-three/source-reference-landscape.jpg`
+  (2291×1440 pixels).
+- Final desktop implementation:
+  `.design-qa-evidence/theme-three/theme-three-home-desktop-final.png`
+  (1440×900 CSS pixels at 1× density).
+- Normalized full-view comparison:
+  `.design-qa-evidence/theme-three/theme-three-comparison.png`
+  (reference and implementation, each normalized to 1440×900).
+- Focused metrics, workbench and stacked-card comparison:
+  `.design-qa-evidence/theme-three/theme-three-comparison-focused.png`.
+- Responsive evidence:
+  `.design-qa-evidence/theme-three/theme-three-home-tablet-1024.png`,
+  `.design-qa-evidence/theme-three/theme-three-home-mobile-final.png`,
+  `.design-qa-evidence/theme-three/theme-three-home-mobile-320-final.png`.
+- Game cockpit evidence includes final 390×844 captures for Bingo, Tetris,
+  Neon Breaker, Memory Match, Sudoku and Snake in the same directory.
+- State: Theme 3, Chinese locale, initial local game state and empty tracker.
+  The reference and implementation contain different product data, so the
+  comparison evaluates the requested visual system, hierarchy and composition.
+
+### Comparison history and fixes
+
+- First pass matched the black canvas, silver-edged glass, restrained neon
+  green, permanent sidebar, dense metrics and central stacked-card focal point.
+- P1 responsive finding: Bingo and Neon Breaker extended beneath the mobile
+  dock, while Memory Match, Snake, Minesweeper and Sudoku were close to or over
+  the viewport boundary. Fix: each game now has an independent compact cockpit;
+  the complete Bingo number board scrolls inside its visible panel.
+- P1 layout finding: the desktop dashboard was 39 pixels taller than the
+  reference viewport. Fix: reduced the workbench and card-stack height while
+  keeping the same information density. Final document size is exactly
+  1440×900.
+- P1 first-paint finding: a saved Theme 3 preference could initially mount the
+  Theme 1 home DOM before hydration. Fix: both home compositions remain stable
+  in the tree and CSS selects the correct shell from the bootstrapped root
+  theme; refresh shows Theme 3 immediately without duplicate IDs.
+- P2 accessibility finding: the library region lacked its referenced heading,
+  game-detail navigation announced the library as the current page, several
+  tiny labels were low contrast and stacked links lacked consistent focus
+  rings. All were corrected; game routes now use
+  `aria-current="location"`.
+- P2 content finding: static online and cache percentages implied unavailable
+  live telemetry. They were replaced with accurate local-runtime and ready
+  labels. The visible Command/Control+K search shortcut is implemented.
+- Final full and focused comparisons retain the source's composition: one
+  black-green workspace, luminous metallic card edges, restrained green status
+  color, low-radius dense panels and a clear sidebar/workbench/inspector
+  hierarchy. No actionable P0/P1/P2 mismatch remains.
+
+### Required fidelity surfaces
+
+- Typography uses bundled Geist plus system Chinese/Thai fallbacks, with compact
+  mono metadata and higher-contrast functional labels.
+- Layout is independently authored for Theme 3: fixed desktop sidebar,
+  responsive two/three-column workbench, mobile glass dock, settings console,
+  tracker library and per-game cockpit layouts.
+- Colors use an obsidian `#030504` canvas, translucent `#101412` glass,
+  silver-white borders and one semantic `#00d65a` accent.
+- Icons come from the existing Lucide family; no emoji, remote font, hot-linked
+  image or placeholder asset was introduced.
+- Focus rings, keyboard navigation, 44-pixel game controls, reduced-motion and
+  reduced-transparency fallbacks are covered.
+
+### Responsive and interaction checks
+
+| Surface | Viewport | Measured result |
+| --- | --- | --- |
+| Theme 3 home | 1440×900 | Document 1440×900; fixed sidebar and full timeline visible |
+| Theme 3 home | 1024×768 | No horizontal overflow; two-column workbench and sidebar |
+| Theme 3 home | 390×844 | No horizontal overflow; two-column metrics and floating dock |
+| Theme 3 home | 320×700 | Document width 320; dock width 304 with 8-pixel side insets |
+| All 14 game routes | 390×844 | Every document is 390×844; content ends above dock |
+
+- Search input filtered the task board to the single matching Tetris entry and
+  cleared without remounting the page.
+- Theme 3 → Theme 2 → Theme 3 switching was exercised in Settings; reload
+  retained Theme 3, dark chrome and the matching browser color scheme.
+- Anime Tracker opened and closed the add-title dialog without the previous
+  pointer-capture error.
+- Browser console inspection after navigation and dialogs returned no warnings
+  or errors.
+
+### Theme 3 automated checks
+
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test` — 17 files, 103 tests
+- `pnpm build` — all 19 application routes statically generated
+- `git diff --check`
+
+### Theme 3 glow refinement
+
+- Final desktop glow pass:
+  `.design-qa-evidence/theme-three/theme-three-home-desktop-glow-final.png`
+  at 1440×900 CSS pixels.
+- Full and focused comparisons:
+  `.design-qa-evidence/theme-three/theme-three-glow-comparison.png` and
+  `.design-qa-evidence/theme-three/theme-three-glow-comparison-focused.png`.
+- The central active card now carries the reference-style localized emerald
+  energy field, layered outer bloom, bright rim and darker lower reflection.
+  Adjacent silver cards received stronger metallic edge light without adding
+  animated effects or text glow.
+- Sidebar, metric cards and primary workspace panels now use brighter specular
+  borders, deeper shadows and narrower reflections. The green treatment remains
+  limited to active and ready states instead of tinting the full interface.
+- At 390×844 the expensive deck bloom is disabled. Home has no horizontal
+  overflow, and Bingo remains exactly 390×844 with all primary panels visible.
+- Final browser console inspection returned no warnings or errors. Lint,
+  typecheck, 103 tests, the 19-route production build and `git diff --check`
+  all pass after the glow refinement.
 
 final result: passed
