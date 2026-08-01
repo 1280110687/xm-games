@@ -241,6 +241,12 @@ export const translations = {
     textCryptoDescription: "使用 AES-GCM 在本机加密和解密文字内容",
     qrCodeTool: "文字二维码",
     qrCodeToolDescription: "把文字、文案或链接生成为可下载的二维码",
+    jsonTool: "JSON 工具",
+    jsonToolDescription: "在本机格式化、压缩并校验 JSON 数据",
+    base64Tool: "Base64 编解码",
+    base64ToolDescription: "按 UTF-8 转换文本与标准 Base64 内容",
+    textTool: "文本整理与统计",
+    textToolDescription: "统计文字并清理空白行或重复内容",
 
     // Minesweeper
     minesweeper: "扫雷",
@@ -534,6 +540,12 @@ export const translations = {
     textCryptoDescription: "Encrypt and decrypt text locally with AES-GCM",
     qrCodeTool: "Text QR Code",
     qrCodeToolDescription: "Turn text, copy, or links into downloadable QR codes",
+    jsonTool: "JSON Tool",
+    jsonToolDescription: "Format, minify, and validate JSON locally",
+    base64Tool: "Base64 Codec",
+    base64ToolDescription: "Convert UTF-8 text and standard Base64 content",
+    textTool: "Text Cleanup & Stats",
+    textToolDescription: "Measure text and clean blank or duplicate lines",
 
     // Minesweeper
     minesweeper: "Minesweeper",
@@ -827,6 +839,12 @@ export const translations = {
     textCryptoDescription: "เข้ารหัสและถอดรหัสข้อความบนอุปกรณ์ด้วย AES-GCM",
     qrCodeTool: "คิวอาร์โค้ดจากข้อความ",
     qrCodeToolDescription: "สร้างคิวอาร์โค้ดดาวน์โหลดได้จากข้อความหรือลิงก์",
+    jsonTool: "เครื่องมือ JSON",
+    jsonToolDescription: "จัดรูปแบบ ย่อ และตรวจสอบ JSON บนอุปกรณ์นี้",
+    base64Tool: "แปลง Base64",
+    base64ToolDescription: "แปลงข้อความ UTF-8 และ Base64 อย่างปลอดภัย",
+    textTool: "จัดระเบียบและนับข้อความ",
+    textToolDescription: "นับข้อความและล้างบรรทัดว่างหรือข้อมูลซ้ำ",
 
     // Minesweeper
     minesweeper: "กู้ระเบิด",

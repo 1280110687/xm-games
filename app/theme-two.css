@@ -3649,3 +3649,132 @@ html[data-theme='theme-two'] .utility-status {
     width: min(76vw, 17rem);
   }
 }
+
+/* Expanded offline tools: centered iOS-style grouped sheets. */
+html[data-theme='theme-two'] .utility-intro-icon[data-tone='emerald'] {
+  background: linear-gradient(145deg, #30d158, #1aa542);
+  box-shadow: 0 12px 26px rgb(48 209 88 / 0.22);
+}
+
+html[data-theme='theme-two'] .utility-intro-icon[data-tone='rose'] {
+  background: linear-gradient(145deg, #ff6482, #ff375f);
+  box-shadow: 0 12px 26px rgb(255 55 95 / 0.2);
+}
+
+html[data-theme='theme-two'] .offline-tool-workspace {
+  width: min(100%, 48rem);
+  margin-inline: auto;
+  grid-template-areas:
+    'editor'
+    'command'
+    'output';
+  grid-template-columns: minmax(0, 1fr);
+}
+
+html[data-theme='theme-two'] .offline-tool-editor {
+  grid-area: editor;
+}
+
+html[data-theme='theme-two'] .offline-tool-command {
+  grid-area: command;
+}
+
+html[data-theme='theme-two'] .offline-tool-output {
+  grid-area: output;
+}
+
+html[data-theme='theme-two'] .offline-tool-command .utility-panel-heading > svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--muted-foreground);
+}
+
+html[data-theme='theme-two'] .offline-tool-command-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+html[data-theme='theme-two'] .offline-tool-command-grid [data-slot='button'] {
+  min-width: 0;
+  min-height: 2.75rem;
+  height: auto;
+  padding-block: 0.6rem;
+  white-space: normal;
+}
+
+html[data-theme='theme-two'] .offline-tool-mode-switch {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+html[data-theme='theme-two'] .offline-tool-mode-switch button {
+  flex: 1 1 0;
+  justify-content: center;
+}
+
+html[data-theme='theme-two'] .offline-tool-stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-bottom: 0.8rem;
+}
+
+html[data-theme='theme-two'] .offline-tool-stat {
+  min-width: 0;
+  padding: 0.72rem 0.7rem;
+  border-radius: 0.9rem;
+  background: var(--muted);
+  text-align: center;
+}
+
+html[data-theme='theme-two'] .offline-tool-stat dt {
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 0.64rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html[data-theme='theme-two'] .offline-tool-stat dd {
+  margin-top: 0.25rem;
+  color: var(--foreground);
+  font-size: 1.15rem;
+  font-weight: 740;
+}
+
+html[data-theme='theme-two'] .offline-tool-code-input {
+  font-family: var(--font-geist-mono), monospace;
+}
+
+html[data-theme='theme-two'] .offline-tool-code-result {
+  overflow-wrap: normal;
+  white-space: pre;
+}
+
+html[data-theme='theme-two'] .offline-tool-text-result {
+  white-space: pre-wrap;
+}
+
+html[data-theme='theme-two'] .offline-tool-status {
+  min-height: 1.1rem;
+  color: #248a3d;
+  text-align: left;
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-two'] .offline-tool-editor,
+  html[data-theme='theme-two'] .offline-tool-command,
+  html[data-theme='theme-two'] .offline-tool-output {
+    grid-area: auto;
+  }
+
+  html[data-theme='theme-two'] .offline-tool-command-grid,
+  html[data-theme='theme-two'] .offline-tool-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html[data-theme='theme-two'] .offline-tool-command-grid > [data-slot='button']:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}

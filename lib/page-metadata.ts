@@ -56,6 +56,21 @@ export const PAGE_METADATA_KEYS = {
     descriptionKey: "qrCodeToolDescription",
     includeAppName: true,
   },
+  "/json-tool": {
+    titleKey: "jsonTool",
+    descriptionKey: "jsonToolDescription",
+    includeAppName: true,
+  },
+  "/base64-tool": {
+    titleKey: "base64Tool",
+    descriptionKey: "base64ToolDescription",
+    includeAppName: true,
+  },
+  "/text-tool": {
+    titleKey: "textTool",
+    descriptionKey: "textToolDescription",
+    includeAppName: true,
+  },
   "/settings": {
     titleKey: "settings",
     descriptionKey: "settingsDescription",

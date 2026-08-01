@@ -421,4 +421,49 @@ direction controls measure 48×44 CSS pixels.
 - `pnpm build` — all 21 application routes statically generated
 - `git diff --check`
 
+## Expanded offline utility toolkit QA
+
+- Added three fully client-side tools: lossless JSON formatting/minification
+  and validation, UTF-8 Base64 encoding/decoding, and text cleanup with live
+  character, non-whitespace, word and line statistics.
+- JSON processing validates through the platform parser but formats from the
+  original token stream. Browser and pure tests confirm that duplicate keys,
+  integer literals beyond JavaScript's safe range, escapes and numeric literal
+  spelling are not rewritten.
+- Base64 round-trip testing used Chinese, English, Thai and Emoji. Invalid
+  padding, non-canonical input and bytes that are not valid UTF-8 are rejected.
+- Text cleanup preserves first-seen order while trimming line edges,
+  compressing consecutive blank lines and removing exact duplicate lines.
+- All tools keep input and output in component state only; no tool content is
+  uploaded or persisted. Base64 is described as encoding rather than
+  encryption.
+
+### Expanded utility responsive and interaction checks
+
+| Theme / surface | Viewport | Measured result |
+| --- | --- | --- |
+| Theme 1 JSON | 390×844 | Single-column input → commands → output flow; four 168×44 controls; document width 390 |
+| Theme 1 JSON | 1440×900 | 584px editor and output columns; command bay sits below editor; no overflow |
+| Theme 2 Base64 | 390×844 | Centered grouped sheets with persistent four-item dock; document width 390 |
+| Theme 2 Base64 | 1440×900 | Independent centered 768px single-column iOS composition; no overflow |
+| Theme 3 JSON/Text | 390×844 | Single-column console; Thai controls are at least 44px high and do not clip or overflow |
+| Theme 3 Text | 1440×900 | Distinct 433px input, 268px command and 391px output console columns |
+
+- Exercised lossless JSON formatting and a localized line/column syntax error
+  in the browser.
+- Exercised the Base64 “use as next input” path and confirmed the decoded
+  multilingual result exactly matched the original value.
+- Exercised live text statistics and combined cleanup; the cleaned result kept
+  the expected Thai and Emoji content.
+- Chinese and Thai mobile layouts produced no horizontal document overflow.
+  Final browser console inspection returned no warnings or errors.
+
+### Expanded utility automated checks
+
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test` — 21 files, 123 tests
+- `pnpm build` — all 24 static pages generated
+- `git diff --check`
+
 final result: passed

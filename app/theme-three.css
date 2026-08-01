@@ -3472,3 +3472,174 @@ html[data-theme='theme-three'] .utility-status {
     width: min(74vw, 16.5rem);
   }
 }
+
+/* Expanded offline tools: an input-command-output obsidian console. */
+html[data-theme='theme-three'] .utility-intro-icon[data-tone='emerald'] {
+  border-color: rgb(0 214 90 / 0.34);
+  color: #8df7b8;
+  background: rgb(0 214 90 / 0.11);
+  box-shadow:
+    0 0 26px rgb(0 214 90 / 0.12),
+    inset 0 1px 0 rgb(255 255 255 / 0.12);
+}
+
+html[data-theme='theme-three'] .utility-intro-icon[data-tone='rose'] {
+  border-color: rgb(255 94 125 / 0.34);
+  color: #ffb1c0;
+  background: rgb(255 55 95 / 0.1);
+  box-shadow:
+    0 0 26px rgb(255 55 95 / 0.1),
+    inset 0 1px 0 rgb(255 255 255 / 0.12);
+}
+
+html[data-theme='theme-three'] .offline-tool-workspace {
+  grid-template-areas: 'editor command output';
+  grid-template-columns: minmax(18rem, 1.05fr) minmax(14rem, 0.65fr) minmax(18rem, 0.95fr);
+  align-items: stretch;
+}
+
+html[data-theme='theme-three'] .offline-tool-editor {
+  grid-area: editor;
+}
+
+html[data-theme='theme-three'] .offline-tool-command {
+  grid-area: command;
+}
+
+html[data-theme='theme-three'] .offline-tool-output {
+  grid-area: output;
+}
+
+html[data-theme='theme-three'] .offline-tool-command .utility-panel-heading > svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--primary);
+}
+
+html[data-theme='theme-three'] .offline-tool-command-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.5rem;
+}
+
+html[data-theme='theme-three'] .offline-tool-command-grid [data-slot='button'] {
+  min-width: 0;
+  min-height: 2.75rem;
+  height: auto;
+  padding-block: 0.55rem;
+  white-space: normal;
+}
+
+html[data-theme='theme-three'] .offline-tool-mode-switch {
+  width: 100%;
+  margin-bottom: 0.7rem;
+}
+
+html[data-theme='theme-three'] .offline-tool-mode-switch button {
+  flex: 1 1 0;
+  justify-content: center;
+}
+
+html[data-theme='theme-three'] .offline-tool-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.45rem;
+  margin-bottom: 0.7rem;
+}
+
+html[data-theme='theme-three'] .offline-tool-stat {
+  min-width: 0;
+  padding: 0.6rem;
+  border: 1px solid rgb(226 239 232 / 0.09);
+  border-radius: 0.72rem;
+  background: rgb(0 0 0 / 0.22);
+}
+
+html[data-theme='theme-three'] .offline-tool-stat dt {
+  overflow: hidden;
+  color: #737e77;
+  font-size: 0.56rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html[data-theme='theme-three'] .offline-tool-stat dd {
+  margin-top: 0.18rem;
+  color: var(--primary);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 1rem;
+  font-weight: 720;
+}
+
+html[data-theme='theme-three'] .offline-tool-code-input {
+  min-height: 24rem;
+}
+
+html[data-theme='theme-three'] .offline-tool-code-result {
+  min-height: 24rem;
+  overflow-wrap: normal;
+  white-space: pre;
+}
+
+html[data-theme='theme-three'] .offline-tool-text-result {
+  min-height: 24rem;
+  white-space: pre-wrap;
+}
+
+html[data-theme='theme-three'] .offline-tool-status {
+  min-height: 1rem;
+  color: #79efa8;
+  text-align: left;
+}
+
+@media (max-width: 1279px) {
+  html[data-theme='theme-three'] .offline-tool-workspace {
+    grid-template-areas:
+      'editor output'
+      'command command';
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html[data-theme='theme-three'] .offline-tool-command-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html[data-theme='theme-three'] .offline-tool-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-three'] .offline-tool-workspace {
+    grid-template-areas:
+      'editor'
+      'command'
+      'output';
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html[data-theme='theme-three'] .offline-tool-editor,
+  html[data-theme='theme-three'] .offline-tool-command,
+  html[data-theme='theme-three'] .offline-tool-output {
+    grid-area: auto;
+  }
+
+  html[data-theme='theme-three'] .offline-tool-stats,
+  html[data-theme='theme-three'] .offline-tool-command-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html[data-theme='theme-three'] .offline-tool-mode-switch button {
+    min-height: 2.75rem;
+  }
+
+  html[data-theme='theme-three'] .offline-tool-command-grid > [data-slot='button']:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  html[data-theme='theme-three'] .offline-tool-code-input,
+  html[data-theme='theme-three'] .offline-tool-code-result,
+  html[data-theme='theme-three'] .offline-tool-text-result {
+    min-height: 10rem;
+  }
+}

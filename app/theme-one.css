@@ -1648,3 +1648,150 @@ html[data-theme='theme-one'] .utility-status {
     width: min(78vw, 18rem);
   }
 }
+
+/* Expanded offline tools: a two-column neon workbench with a dedicated command bay. */
+html[data-theme='theme-one'] .utility-intro-icon[data-tone='emerald'] {
+  border-color: oklch(0.78 0.13 155 / 0.28);
+  color: oklch(0.9 0.14 155);
+  background: oklch(0.68 0.15 155 / 0.12);
+  box-shadow: 0 14px 34px oklch(0.62 0.16 155 / 0.14);
+}
+
+html[data-theme='theme-one'] .utility-intro-icon[data-tone='rose'] {
+  border-color: oklch(0.76 0.15 18 / 0.28);
+  color: oklch(0.88 0.13 18);
+  background: oklch(0.64 0.2 18 / 0.12);
+  box-shadow: 0 14px 34px oklch(0.58 0.2 18 / 0.14);
+}
+
+html[data-theme='theme-one'] .offline-tool-workspace {
+  grid-template-areas:
+    'editor output'
+    'command output';
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+}
+
+html[data-theme='theme-one'] .offline-tool-editor {
+  grid-area: editor;
+}
+
+html[data-theme='theme-one'] .offline-tool-command {
+  grid-area: command;
+}
+
+html[data-theme='theme-one'] .offline-tool-output {
+  grid-area: output;
+  align-self: stretch;
+}
+
+html[data-theme='theme-one'] .offline-tool-command .utility-panel-heading > svg {
+  width: 1rem;
+  height: 1rem;
+  color: oklch(0.82 0.1 278);
+}
+
+html[data-theme='theme-one'] .offline-tool-command-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+html[data-theme='theme-one'] .offline-tool-command-grid [data-slot='button'] {
+  min-width: 0;
+  min-height: 2.75rem;
+  height: auto;
+  padding-block: 0.6rem;
+  white-space: normal;
+}
+
+html[data-theme='theme-one'] .offline-tool-mode-switch {
+  width: 100%;
+  margin-bottom: 0.75rem;
+}
+
+html[data-theme='theme-one'] .offline-tool-mode-switch button {
+  flex: 1 1 0;
+  justify-content: center;
+}
+
+html[data-theme='theme-one'] .offline-tool-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  margin-bottom: 0.75rem;
+}
+
+html[data-theme='theme-one'] .offline-tool-stat {
+  min-width: 0;
+  padding: 0.65rem 0.7rem;
+  border: 1px solid var(--separator);
+  border-radius: 0.78rem;
+  background: oklch(1 0 0 / 0.035);
+}
+
+html[data-theme='theme-one'] .offline-tool-stat dt {
+  overflow: hidden;
+  color: var(--muted-foreground);
+  font-size: 0.65rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html[data-theme='theme-one'] .offline-tool-stat dd {
+  margin-top: 0.2rem;
+  color: oklch(0.88 0.11 278);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 1.15rem;
+  font-weight: 740;
+}
+
+html[data-theme='theme-one'] .offline-tool-code-input {
+  font-family: var(--font-geist-mono), monospace;
+}
+
+html[data-theme='theme-one'] .offline-tool-code-result {
+  min-height: 23rem;
+  overflow-wrap: normal;
+  white-space: pre;
+}
+
+html[data-theme='theme-one'] .offline-tool-text-result {
+  min-height: 23rem;
+  white-space: pre-wrap;
+}
+
+html[data-theme='theme-one'] .offline-tool-status {
+  min-height: 1.1rem;
+  color: oklch(0.78 0.13 150);
+  text-align: left;
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-one'] .offline-tool-workspace {
+    grid-template-areas:
+      'editor'
+      'command'
+      'output';
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html[data-theme='theme-one'] .offline-tool-editor,
+  html[data-theme='theme-one'] .offline-tool-command,
+  html[data-theme='theme-one'] .offline-tool-output {
+    grid-area: auto;
+  }
+
+  html[data-theme='theme-one'] .offline-tool-command-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  html[data-theme='theme-one'] .offline-tool-command-grid > [data-slot='button']:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  html[data-theme='theme-one'] .offline-tool-code-result,
+  html[data-theme='theme-one'] .offline-tool-text-result {
+    min-height: 11rem;
+  }
+}

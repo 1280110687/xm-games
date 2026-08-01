@@ -64,12 +64,14 @@ const NAVIGATION_COPY: Record<
 
 const GAME_ROUTES = new Set([
   "/2048",
+  "/base64-tool",
   "/bingo",
   "/bingo-cards",
   "/chess",
   "/chinese-chess",
   "/go",
   "/gomoku",
+  "/json-tool",
   "/memory-match",
   "/minesweeper",
   "/neon-breaker",
@@ -79,6 +81,7 @@ const GAME_ROUTES = new Set([
   "/sudoku",
   "/tetris",
   "/text-crypto",
+  "/text-tool",
 ])
 
 type NavigationItem = {
