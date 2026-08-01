@@ -46,6 +46,16 @@ export const PAGE_METADATA_KEYS = {
     descriptionKey: "animeTrackerDescription",
     includeAppName: true,
   },
+  "/text-crypto": {
+    titleKey: "textCrypto",
+    descriptionKey: "textCryptoDescription",
+    includeAppName: true,
+  },
+  "/qr-code": {
+    titleKey: "qrCodeTool",
+    descriptionKey: "qrCodeToolDescription",
+    includeAppName: true,
+  },
   "/settings": {
     titleKey: "settings",
     descriptionKey: "settingsDescription",

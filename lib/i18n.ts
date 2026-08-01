@@ -236,6 +236,12 @@ export const translations = {
     categoryArcade: "休闲街机",
     categoryTools: "实用工具",
 
+    // Offline Tools
+    textCrypto: "文本加解密",
+    textCryptoDescription: "使用 AES-GCM 在本机加密和解密文字内容",
+    qrCodeTool: "文字二维码",
+    qrCodeToolDescription: "把文字、文案或链接生成为可下载的二维码",
+
     // Minesweeper
     minesweeper: "扫雷",
     minesweeperDescription: "经典扫雷游戏，避开地雷清除所有安全格子",
@@ -523,6 +529,12 @@ export const translations = {
     categoryArcade: "Arcade Games",
     categoryTools: "Tools",
 
+    // Offline Tools
+    textCrypto: "Text Encryption",
+    textCryptoDescription: "Encrypt and decrypt text locally with AES-GCM",
+    qrCodeTool: "Text QR Code",
+    qrCodeToolDescription: "Turn text, copy, or links into downloadable QR codes",
+
     // Minesweeper
     minesweeper: "Minesweeper",
     minesweeperDescription: "Classic Minesweeper - avoid mines and clear the board",
@@ -809,6 +821,12 @@ export const translations = {
     categoryPuzzle: "เกมปริศนา",
     categoryArcade: "เกมอาร์เคด",
     categoryTools: "เครื่องมือ",
+
+    // Offline Tools
+    textCrypto: "เข้ารหัสข้อความ",
+    textCryptoDescription: "เข้ารหัสและถอดรหัสข้อความบนอุปกรณ์ด้วย AES-GCM",
+    qrCodeTool: "คิวอาร์โค้ดจากข้อความ",
+    qrCodeToolDescription: "สร้างคิวอาร์โค้ดดาวน์โหลดได้จากข้อความหรือลิงก์",
 
     // Minesweeper
     minesweeper: "กู้ระเบิด",

@@ -73,10 +73,12 @@ const GAME_ROUTES = new Set([
   "/memory-match",
   "/minesweeper",
   "/neon-breaker",
+  "/qr-code",
   "/reversi",
   "/snake",
   "/sudoku",
   "/tetris",
+  "/text-crypto",
 ])
 
 type NavigationItem = {

@@ -26,6 +26,8 @@ import {
   Grid3X3,
   Layers3,
   LibraryBig,
+  LockKeyhole,
+  QrCode,
   RefreshCw,
   Route,
   Search,
@@ -42,6 +44,7 @@ import { LanguageSwitcher } from "@/components/language-switcher"
 import { ThemeSwitcher } from "@/components/theme-switcher"
 import { Button } from "@/components/ui/button"
 import { useLocale } from "@/lib/locale-context"
+import { orderHomeCategories } from "@/lib/home-catalog"
 import type { Locale, TranslationKey } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
@@ -351,9 +354,33 @@ const CATEGORIES: Category[] = [
         tone: "rose",
         featured: true,
       },
+      {
+        href: "/text-crypto",
+        titleKey: "textCrypto",
+        descKey: "textCryptoDescription",
+        icon: LockKeyhole,
+        tone: "amber",
+      },
+      {
+        href: "/qr-code",
+        titleKey: "qrCodeTool",
+        descKey: "qrCodeToolDescription",
+        icon: QrCode,
+        tone: "cyan",
+      },
     ],
   },
 ]
+
+const HOME_CATEGORIES = orderHomeCategories(CATEGORIES)
+
+const TOOL_CATEGORY = CATEGORIES.find(
+  (category) => category.titleKey === "categoryTools",
+)
+
+const ARCADE_CATEGORY = CATEGORIES.find(
+  (category) => category.titleKey === "categoryArcade",
+)
 
 const TOTAL_EXPERIENCES = CATEGORIES.reduce(
   (total, category) => total + category.games.length,
@@ -467,7 +494,7 @@ function ThemeThreeHome() {
 
   const filteredCategories = useMemo(
     () =>
-      CATEGORIES.map((category) => ({
+      HOME_CATEGORIES.map((category) => ({
         ...category,
         games: category.games.filter((game) => {
           if (!normalizedQuery) return true
@@ -489,7 +516,7 @@ function ThemeThreeHome() {
     2,
     9,
   )
-  const featuredTool = CATEGORIES.at(-1)?.games[0]
+  const featuredTool = TOOL_CATEGORY?.games.find((game) => game.featured)
 
   return (
     <div
@@ -554,7 +581,7 @@ function ThemeThreeHome() {
                 </span>
                 <p>{copy.experiences}</p>
                 <strong>{TOTAL_EXPERIENCES}</strong>
-                <small>+ {CATEGORIES[2].games.length}</small>
+                <small>+ {ARCADE_CATEGORY?.games.length ?? 0}</small>
               </article>
               <article className="theme-three-metric-card">
                 <span className="theme-three-metric-icon">
@@ -577,7 +604,9 @@ function ThemeThreeHome() {
                   <Sparkles aria-hidden="true" />
                 </span>
                 <p>{copy.featuredTools}</p>
-                <strong>01</strong>
+                <strong>
+                  {String(TOOL_CATEGORY?.games.length ?? 0).padStart(2, "0")}
+                </strong>
                 <small>{copy.ready}</small>
               </article>
             </div>
@@ -857,7 +886,7 @@ export default function Home() {
             id="game-library"
             className="home-sections mt-8 space-y-9 pb-8 sm:mt-10 sm:space-y-11 sm:pb-12"
           >
-            {CATEGORIES.map((category) => {
+            {HOME_CATEGORIES.map((category) => {
               const headingId = `category-${category.titleKey}`
 
               return (

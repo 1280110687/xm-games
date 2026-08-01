@@ -377,4 +377,48 @@ direction controls measure 48×44 CSS pixels.
   typecheck, 103 tests, the 19-route production build and `git diff --check`
   all pass after the glow refinement.
 
+## Bingo-first catalog and offline utility QA
+
+- Theme 1, Theme 2 and Theme 3 all render the Bingo category first on the
+  homepage. On Theme 3 H5 the Bingo-first task board stays ahead of the
+  experience deck; the deck and timeline keep their existing internal sequence.
+- The utility catalog now contains Anime Tracker, Text Encryption and Text QR
+  Code. Theme 3's tool metric is derived from the catalog instead of a fixed
+  value.
+- Text Encryption uses a versioned `XMG1` payload, AES-256-GCM and
+  PBKDF2-HMAC-SHA-256. No text, password or history is persisted.
+- Text QR Code generates PNG images locally with 256, 512 and 1024-pixel
+  exports, four error-correction levels and a fixed four-module quiet zone.
+- The utility pages reuse one semantic DOM but have independently authored
+  Theme 1 workstation, Theme 2 grouped-sheet and Theme 3 console compositions.
+
+### Responsive and interaction checks
+
+| Theme / surface | Viewport | Measured result |
+| --- | --- | --- |
+| Theme 1 utilities | 390×844 | Document width 390; no horizontal overflow; stacked input-first flow |
+| Theme 1 utilities | 1440×900 | Two-column crypto workspace and split QR editor/preview composition |
+| Theme 2 utilities | 390×844 | Document width 390; no horizontal overflow; compact title bar clears all content |
+| Theme 2 utilities | 1440×900 | Fixed iOS-style sidebar; crypto uses two sheets and QR preview leads the workspace |
+| Theme 3 utilities | 390×844 | Document width 390; console panels collapse to one scrollable column above the dock |
+| Theme 3 utilities | 1440×900 | Crypto uses two equal panels; QR uses separate editor, preview and export columns |
+
+- Exercised an encrypt/decrypt round trip containing Chinese, Thai, Emoji and
+  a URL; the decrypted text matched the original exactly.
+- Generated a mixed-language QR code at 512 pixels, then generated a
+  1024×1024 PNG with high error correction. Changing an export option cleared
+  the stale preview until regeneration.
+- The Theme 2 utility header initially inherited a one-row game header and
+  clipped its duplicated description. The final mobile-specific rule hides
+  that duplicate description while retaining the full title and intro copy.
+- Final browser console inspection returned no errors.
+
+### Utility automated checks
+
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test` — 20 files, 111 tests
+- `pnpm build` — all 21 application routes statically generated
+- `git diff --check`
+
 final result: passed

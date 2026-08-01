@@ -3200,3 +3200,452 @@ html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-marked-n
 html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-marked-number-chip svg {
   opacity: 0.72;
 }
+
+/* Offline utility suite: Theme Two uses calm iOS-style grouped sheets. */
+html[data-theme='theme-two'] .utility-page {
+  gap: 0.9rem;
+  padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+}
+
+html[data-theme='theme-two'] .utility-main {
+  display: grid;
+  gap: 1rem;
+}
+
+html[data-theme='theme-two'] .utility-intro {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.9rem;
+  padding: 1.15rem;
+  border-radius: 1.45rem;
+}
+
+html[data-theme='theme-two'] .utility-intro-icon {
+  display: grid;
+  width: 3.5rem;
+  height: 3.5rem;
+  place-items: center;
+  border-radius: 1.05rem;
+  color: white;
+  background: linear-gradient(145deg, #34c759, #20a944);
+  box-shadow: 0 12px 26px rgb(52 199 89 / 0.22);
+}
+
+html[data-theme='theme-two'] .utility-intro-icon[data-tone='cyan'] {
+  background: linear-gradient(145deg, #32ade6, #0a84ff);
+  box-shadow: 0 12px 26px rgb(10 132 255 / 0.22);
+}
+
+html[data-theme='theme-two'] .utility-intro-icon svg {
+  width: 1.55rem;
+  height: 1.55rem;
+}
+
+html[data-theme='theme-two'] .utility-eyebrow {
+  color: var(--primary);
+  font-size: 0.7rem;
+  font-weight: 760;
+}
+
+html[data-theme='theme-two'] .utility-intro h1 {
+  margin-top: 0.15rem;
+  font-size: clamp(1.55rem, 3vw, 2.3rem);
+  font-weight: 760;
+}
+
+html[data-theme='theme-two'] .utility-intro > div > p:last-child {
+  margin-top: 0.3rem;
+  color: var(--muted-foreground);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+html[data-theme='theme-two'] .utility-facts {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  padding-top: 0.2rem;
+}
+
+html[data-theme='theme-two'] .utility-facts > div {
+  padding: 0.75rem 0.85rem;
+  border-radius: 1rem;
+  background: var(--muted);
+}
+
+html[data-theme='theme-two'] .utility-facts dt {
+  font-size: 0.72rem;
+  font-weight: 720;
+}
+
+html[data-theme='theme-two'] .utility-facts dd {
+  margin-top: 0.18rem;
+  color: var(--muted-foreground);
+  font-size: 0.66rem;
+  line-height: 1.45;
+}
+
+html[data-theme='theme-two'] .utility-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 1rem;
+}
+
+html[data-theme='theme-two'] .utility-page[data-page='text-crypto'] .utility-workspace {
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+}
+
+html[data-theme='theme-two'] .qr-workspace {
+  grid-template-areas:
+    'preview editor'
+    'preview options';
+  grid-template-columns: minmax(18rem, 0.88fr) minmax(0, 1.12fr);
+  align-items: start;
+}
+
+html[data-theme='theme-two'] .qr-editor {
+  grid-area: editor;
+}
+
+html[data-theme='theme-two'] .qr-preview {
+  position: sticky;
+  top: 1rem;
+  grid-area: preview;
+}
+
+html[data-theme='theme-two'] .qr-options {
+  grid-area: options;
+}
+
+html[data-theme='theme-two'] .utility-panel {
+  min-width: 0;
+  gap: 0;
+  padding: 1rem;
+  border-radius: 1.35rem;
+  background: white;
+  box-shadow: var(--surface-shadow);
+}
+
+html[data-theme='theme-two'] .utility-panel-heading {
+  display: flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin-bottom: 0.8rem;
+}
+
+html[data-theme='theme-two'] .utility-panel-heading > div {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+html[data-theme='theme-two'] .utility-panel-heading h2 {
+  font-size: 1rem;
+  font-weight: 720;
+}
+
+html[data-theme='theme-two'] .utility-step {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--primary);
+  background: color-mix(in oklab, var(--primary) 10%, white);
+  font-size: 0.65rem;
+  font-weight: 760;
+}
+
+html[data-theme='theme-two'] .utility-result-count {
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+}
+
+html[data-theme='theme-two'] .utility-mode-switch {
+  display: flex;
+  gap: 0.2rem;
+  padding: 0.2rem;
+  border-radius: 0.8rem;
+  background: var(--muted);
+}
+
+html[data-theme='theme-two'] .utility-mode-switch button {
+  display: inline-flex;
+  min-height: 2.3rem;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0 0.75rem;
+  border-radius: 0.62rem;
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+  font-weight: 680;
+}
+
+html[data-theme='theme-two'] .utility-mode-switch button.is-active {
+  color: var(--foreground);
+  background: white;
+  box-shadow: 0 1px 4px rgb(15 23 42 / 0.12);
+}
+
+html[data-theme='theme-two'] .utility-mode-switch svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+html[data-theme='theme-two'] .utility-textarea {
+  width: 100%;
+  min-height: 13rem;
+  resize: vertical;
+  padding: 0.9rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 1rem;
+  color: var(--foreground);
+  background: oklch(0.975 0.004 255);
+  font-size: 0.88rem;
+  line-height: 1.65;
+  outline: none;
+}
+
+html[data-theme='theme-two'] .utility-textarea:focus {
+  border-color: color-mix(in oklab, var(--primary) 58%, var(--surface-border));
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 12%, transparent);
+}
+
+html[data-theme='theme-two'] .utility-password-field,
+html[data-theme='theme-two'] .utility-select-field {
+  display: grid;
+  gap: 0.42rem;
+  margin-top: 0.8rem;
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+  font-weight: 680;
+}
+
+html[data-theme='theme-two'] .utility-password-field > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+html[data-theme='theme-two'] .utility-password-field svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+html[data-theme='theme-two'] .utility-password-control {
+  position: relative;
+}
+
+html[data-theme='theme-two'] .utility-password-control input {
+  padding-right: 3rem;
+  border-color: var(--surface-border);
+  color: var(--foreground);
+  background: oklch(0.975 0.004 255);
+}
+
+html[data-theme='theme-two'] .utility-password-control > button {
+  position: absolute;
+  top: 50%;
+  right: 0.25rem;
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  border-radius: 0.72rem;
+  color: var(--muted-foreground);
+  transform: translateY(-50%);
+}
+
+html[data-theme='theme-two'] .utility-select-field select {
+  min-height: 2.75rem;
+  padding: 0 0.85rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 0.85rem;
+  color: var(--foreground);
+  background: oklch(0.975 0.004 255);
+  outline: none;
+}
+
+html[data-theme='theme-two'] .utility-error,
+html[data-theme='theme-two'] .utility-note,
+html[data-theme='theme-two'] .utility-status {
+  margin-top: 0.7rem;
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+html[data-theme='theme-two'] .utility-error {
+  color: #d70015;
+}
+
+html[data-theme='theme-two'] .utility-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  color: var(--muted-foreground);
+}
+
+html[data-theme='theme-two'] .utility-note svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: 0 0 auto;
+  margin-top: 0.1rem;
+  color: #34c759;
+}
+
+html[data-theme='theme-two'] .utility-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.85rem;
+}
+
+html[data-theme='theme-two'] .utility-actions--stacked {
+  display: grid;
+}
+
+html[data-theme='theme-two'] .utility-actions [data-slot='button'] {
+  min-height: 2.75rem;
+  flex: 1 1 10rem;
+}
+
+html[data-theme='theme-two'] .utility-result {
+  min-height: 18rem;
+  max-height: 25rem;
+  overflow: auto;
+  padding: 0.9rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 1rem;
+  color: var(--foreground);
+  background: oklch(0.975 0.004 255);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.76rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+html[data-theme='theme-two'] .utility-result.is-empty {
+  display: grid;
+  place-items: center;
+  color: var(--muted-foreground);
+  font-family: inherit;
+  text-align: center;
+}
+
+html[data-theme='theme-two'] .qr-preview-frame {
+  display: grid;
+  width: min(100%, 22rem);
+  aspect-ratio: 1;
+  margin: auto;
+  place-items: center;
+  padding: 1rem;
+  border: 1px solid var(--surface-border);
+  border-radius: 1.2rem;
+  background: white;
+  box-shadow: 0 18px 40px rgb(15 23 42 / 0.09);
+}
+
+html[data-theme='theme-two'] .qr-preview-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+html[data-theme='theme-two'] .qr-preview-frame.is-empty {
+  color: var(--muted-foreground);
+  background: var(--muted);
+}
+
+html[data-theme='theme-two'] .qr-preview-frame.is-empty span {
+  display: grid;
+  justify-items: center;
+  gap: 0.6rem;
+  padding: 1rem;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+html[data-theme='theme-two'] .qr-preview-frame.is-empty svg {
+  width: 2.4rem;
+  height: 2.4rem;
+}
+
+html[data-theme='theme-two'] .utility-status {
+  min-height: 1.1rem;
+  color: #248a3d;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-two'] .utility-page {
+    height: auto;
+    min-height: 100svh;
+    overflow-y: auto;
+  }
+
+  html[data-theme='theme-two'] .utility-page .game-header[data-layout='tool'] [data-layout-slot='description'] {
+    display: none;
+  }
+
+  html[data-theme='theme-two'] .utility-page .game-content {
+    min-height: auto;
+    overflow: visible;
+  }
+
+  html[data-theme='theme-two'] .utility-intro {
+    padding: 0.9rem;
+  }
+
+  html[data-theme='theme-two'] .utility-intro-icon {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  html[data-theme='theme-two'] .utility-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html[data-theme='theme-two'] .utility-page[data-page='text-crypto'] .utility-workspace,
+  html[data-theme='theme-two'] .qr-workspace {
+    grid-template-areas: none;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html[data-theme='theme-two'] .qr-editor,
+  html[data-theme='theme-two'] .qr-preview,
+  html[data-theme='theme-two'] .qr-options {
+    position: static;
+    grid-area: auto;
+  }
+
+  html[data-theme='theme-two'] .utility-panel {
+    padding: 0.9rem;
+  }
+
+  html[data-theme='theme-two'] .utility-panel-heading {
+    align-items: flex-start;
+  }
+
+  html[data-theme='theme-two'] .utility-mode-switch button {
+    min-height: 2.5rem;
+    padding-inline: 0.6rem;
+  }
+
+  html[data-theme='theme-two'] .utility-textarea {
+    min-height: 9.5rem;
+  }
+
+  html[data-theme='theme-two'] .utility-result {
+    min-height: 9.5rem;
+    max-height: 18rem;
+  }
+
+  html[data-theme='theme-two'] .qr-preview-frame {
+    width: min(76vw, 17rem);
+  }
+}
