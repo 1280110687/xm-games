@@ -109,6 +109,260 @@
   }
 }
 
+.gomoku-mode-switch {
+  display: grid;
+  width: min(100%, 24rem);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.25rem;
+  padding: 0.25rem;
+}
+
+  .gomoku-mode-switch button {
+    min-height: 2.75rem;
+  }
+
+  .gomoku-lan-panel,
+  .gomoku-lan-status {
+    width: min(100%, 42rem);
+  }
+
+  .gomoku-lan-panel__heading > span,
+  .gomoku-lan-room__connection,
+  .gomoku-lan-room__secure,
+  .gomoku-lan-status__identity,
+  .gomoku-dice-card__status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .gomoku-lan-panel__heading > span svg,
+  .gomoku-lan-room__connection svg,
+  .gomoku-lan-room__secure svg,
+  .gomoku-lan-status svg,
+  .gomoku-dice-card__status svg {
+    width: 1rem;
+    height: 1rem;
+  }
+
+  .gomoku-lan-panel__entry,
+  .gomoku-lan-room,
+  .gomoku-lan-panel__intro {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .gomoku-lan-panel__join {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .gomoku-lan-panel__join > div {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+  }
+
+  .gomoku-lan-panel__join > p,
+  .gomoku-lan-panel__error {
+    color: var(--destructive);
+  }
+
+  .gomoku-lan-panel__error {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .gomoku-lan-panel__error > span {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .gomoku-lan-room__topline,
+  .gomoku-lan-room__players,
+  .gomoku-lan-room__actions,
+  .gomoku-lan-status {
+    display: flex;
+    align-items: center;
+  }
+
+  .gomoku-lan-room__topline,
+  .gomoku-lan-status {
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .gomoku-lan-room__topline > div,
+  .gomoku-lan-status__room {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .gomoku-lan-room__players {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 0.75rem;
+  }
+
+  .gomoku-lan-room__players > div {
+    display: grid;
+    gap: 0.3rem;
+    min-width: 0;
+  }
+
+  .gomoku-lan-room__players > div:last-child {
+    text-align: right;
+  }
+
+  .gomoku-lan-room__invite {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .gomoku-lan-room__qr {
+    display: grid;
+    width: 7.25rem;
+    height: 7.25rem;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 1rem;
+    background: #fff;
+  }
+
+  .gomoku-lan-room__qr > svg {
+    width: 2rem;
+    height: 2rem;
+    color: #111827;
+  }
+
+  .gomoku-lan-room__invite > div:last-child {
+    display: grid;
+    gap: 0.45rem;
+    justify-items: start;
+  }
+
+  .gomoku-lan-room__actions {
+    gap: 0.5rem;
+  }
+
+  .gomoku-lan-room__actions > :first-child {
+    flex: 1;
+  }
+
+  .gomoku-lan-status {
+    flex: 0 0 auto;
+    padding: 0.65rem 0.8rem;
+  }
+
+  .gomoku-lan-status > [data-slot='button'] {
+    width: 2.75rem;
+    min-width: 2.75rem;
+    height: 2.75rem;
+    min-height: 2.75rem;
+  }
+
+  .gomoku-lan-status__identity > div {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .gomoku-lan-status__identity span,
+  .gomoku-lan-status__room span {
+    font-size: 0.7rem;
+  }
+
+  .gomoku-lan-status__signal {
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    border-radius: 999px;
+  }
+
+  .gomoku-dice-overlay {
+    position: fixed;
+    z-index: 80;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: max(1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+    background: color-mix(in oklab, var(--background) 82%, transparent);
+    backdrop-filter: blur(18px);
+  }
+
+  .gomoku-dice-card {
+    display: grid;
+    width: min(100%, 27rem);
+    justify-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .gomoku-dice-card__icon {
+    display: grid;
+    width: 3.5rem;
+    height: 3.5rem;
+    place-items: center;
+    border-radius: 1.15rem;
+  }
+
+  .gomoku-dice-card__icon svg {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .gomoku-dice-card__rolls {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+  }
+
+  .gomoku-dice-card__rolls > div {
+    display: grid;
+    min-height: 7.5rem;
+    place-items: center;
+    align-content: center;
+    gap: 0.35rem;
+  }
+
+  .gomoku-dice-card__rolls strong {
+    font-size: clamp(2.75rem, 12vw, 4.5rem);
+    line-height: 1;
+  }
+
+  .gomoku-dice-card__rolls[data-rolling='true'] strong {
+    animation: gomoku-dice-pulse 0.72s ease-in-out infinite alternate;
+  }
+@keyframes gomoku-dice-pulse {
+  from { transform: translateY(-0.16rem) rotate(-2deg); }
+  to { transform: translateY(0.16rem) rotate(2deg); }
+}
+
+@media (max-width: 420px) {
+  .gomoku-lan-panel__join > div {
+    grid-template-columns: 1fr;
+  }
+
+  .gomoku-lan-room__invite {
+    grid-template-columns: 5.25rem minmax(0, 1fr);
+  }
+
+  .gomoku-lan-room__qr {
+    width: 5.25rem;
+    height: 5.25rem;
+  }
+
+  .gomoku-lan-room__qr img {
+    width: 5.25rem;
+    height: 5.25rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

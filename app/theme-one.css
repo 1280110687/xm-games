@@ -1094,6 +1094,201 @@ html[data-theme='theme-one'] .game-page[data-page='bingo-cards'] .bingo-cards-li
   }
 }
 
+/* Gomoku LAN — neon game lobby */
+html[data-theme='theme-one'] .gomoku-mode-switch {
+  border: 1px solid oklch(0.47 0.1 274 / 0.42);
+  border-radius: 1rem;
+  background: oklch(0.15 0.035 269 / 0.88);
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.05);
+}
+
+html[data-theme='theme-one'] .gomoku-mode-switch button[aria-selected='true'] {
+  color: #fff;
+  background: linear-gradient(135deg, oklch(0.62 0.22 286), oklch(0.66 0.16 243));
+  box-shadow: 0 0 1.75rem oklch(0.61 0.22 281 / 0.35);
+}
+
+html[data-theme='theme-one'] .gomoku-lan-panel,
+html[data-theme='theme-one'] .gomoku-lan-status {
+  border: 1px solid oklch(0.53 0.11 273 / 0.42);
+  border-radius: 1.35rem;
+  color: var(--foreground);
+  background:
+    radial-gradient(circle at 8% 0%, oklch(0.59 0.2 286 / 0.2), transparent 38%),
+    linear-gradient(145deg, oklch(0.19 0.05 273 / 0.96), oklch(0.14 0.03 263 / 0.98));
+  box-shadow: 0 1.4rem 3.5rem oklch(0.07 0.05 273 / 0.44), inset 0 1px 0 oklch(1 0 0 / 0.06);
+}
+
+html[data-theme='theme-one'] .gomoku-lan-status {
+  min-height: 4rem;
+  flex: 0 0 auto;
+  padding: 0.6rem 0.75rem;
+}
+
+html[data-theme='theme-one'] .gomoku-lan-status > button {
+  width: 2.75rem;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  min-height: 2.75rem;
+}
+
+html[data-theme='theme-one'] .gomoku-lan-panel {
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+html[data-theme='theme-one'] .gomoku-lan-panel__intro {
+  grid-template-columns: minmax(0, 0.9fr) minmax(16rem, 1.1fr);
+  align-items: center;
+  gap: 1.5rem;
+}
+
+html[data-theme='theme-one'] .gomoku-lan-panel__heading > span {
+  color: oklch(0.78 0.15 282);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+html[data-theme='theme-one'] .gomoku-lan-panel__heading h2 {
+  margin-top: 0.55rem;
+  font-size: clamp(1.45rem, 4vw, 2.2rem);
+  font-weight: 780;
+  letter-spacing: -0.04em;
+}
+
+html[data-theme='theme-one'] .gomoku-lan-panel__heading p,
+html[data-theme='theme-one'] .gomoku-lan-room__invite p,
+html[data-theme='theme-one'] .gomoku-lan-room__secure {
+  color: var(--muted-foreground);
+  font-size: 0.76rem;
+}
+
+html[data-theme='theme-one'] .gomoku-lan-panel__entry {
+  padding: 0.85rem;
+  border: 1px solid oklch(0.54 0.1 275 / 0.22);
+  border-radius: 1rem;
+  background: oklch(0.12 0.025 267 / 0.55);
+}
+
+html[data-theme='theme-one'] .gomoku-lan-panel__divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, oklch(0.55 0.08 273 / 0.44), transparent);
+}
+
+html[data-theme='theme-one'] .gomoku-lan-panel__join label,
+html[data-theme='theme-one'] .gomoku-lan-room__topline span,
+html[data-theme='theme-one'] .gomoku-lan-status__room span {
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+}
+
+html[data-theme='theme-one'] .gomoku-lan-room__topline strong,
+html[data-theme='theme-one'] .gomoku-lan-status__room strong {
+  color: oklch(0.83 0.15 284);
+  font-family: var(--font-geist-mono), monospace;
+  letter-spacing: 0.16em;
+}
+
+html[data-theme='theme-one'] .gomoku-lan-room__connection[data-connected='true'],
+html[data-theme='theme-one'] .gomoku-lan-status__signal[data-connected='true'] {
+  color: oklch(0.82 0.17 151);
+}
+
+html[data-theme='theme-one'] .gomoku-lan-room__players > div {
+  padding: 0.75rem;
+  border: 1px solid oklch(0.45 0.08 272 / 0.28);
+  border-radius: 0.9rem;
+  background: oklch(0.15 0.03 268 / 0.7);
+}
+
+html[data-theme='theme-one'] .gomoku-lan-room__players > div[data-ready='true'] {
+  border-color: oklch(0.72 0.16 151 / 0.5);
+  box-shadow: inset 0 0 1.35rem oklch(0.64 0.17 151 / 0.08);
+}
+
+html[data-theme='theme-one'] .gomoku-lan-room__versus {
+  color: oklch(0.73 0.13 281);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.72rem;
+}
+
+html[data-theme='theme-one'] .gomoku-lan-room__invite {
+  padding: 0.8rem;
+  border-radius: 1rem;
+  background: linear-gradient(125deg, oklch(0.3 0.12 283 / 0.35), oklch(0.19 0.05 247 / 0.3));
+}
+
+html[data-theme='theme-one'] .gomoku-lan-status__signal {
+  color: var(--muted-foreground);
+  background: oklch(1 0 0 / 0.05);
+}
+
+html[data-theme='theme-one'] .gomoku-dice-card {
+  border: 1px solid oklch(0.66 0.18 282 / 0.5);
+  border-radius: 1.75rem;
+  background:
+    radial-gradient(circle at 50% 0%, oklch(0.63 0.24 286 / 0.24), transparent 42%),
+    oklch(0.14 0.035 269 / 0.98);
+  box-shadow: 0 0 5rem oklch(0.58 0.22 282 / 0.24);
+}
+
+html[data-theme='theme-one'] .gomoku-dice-card__icon {
+  color: oklch(0.9 0.1 282);
+  background: oklch(0.55 0.22 286 / 0.35);
+}
+
+html[data-theme='theme-one'] .gomoku-dice-card__rolls > div {
+  border: 1px solid oklch(0.52 0.11 276 / 0.35);
+  border-radius: 1.25rem;
+  background: oklch(0.11 0.025 266 / 0.72);
+}
+
+html[data-theme='theme-one'] .gomoku-dice-card__rolls strong {
+  color: oklch(0.87 0.15 283);
+  text-shadow: 0 0 1.8rem oklch(0.67 0.2 283 / 0.5);
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-one'] .game-page[data-page='gomoku'] .game-header [data-slot='button'],
+  html[data-theme='theme-one'] .gomoku-lan-panel [data-slot='button'],
+  html[data-theme='theme-one'] .game-page[data-page='gomoku'] .game-actions [data-slot='dialog-trigger'] {
+    min-height: 2.75rem;
+  }
+
+  html[data-theme='theme-one'] .game-page[data-page='gomoku'] .game-header [data-slot='button'],
+  html[data-theme='theme-one'] .gomoku-lan-panel [data-size^='icon'] {
+    min-width: 2.75rem;
+  }
+
+  html[data-theme='theme-one'] .gomoku-lan-panel__intro {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  html[data-theme='theme-one'] .gomoku-lan-panel__heading h2 {
+    font-size: 1.4rem;
+  }
+
+  html[data-theme='theme-one'] .game-page[data-page='gomoku'][data-game-mode='lan'] .game-content {
+    gap: 0.65rem;
+  }
+
+  html[data-theme='theme-one'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .game-stage {
+    width: min(calc(100vw - 1rem), calc(100svh - 16.5rem), 22rem);
+  }
+
+  html[data-theme='theme-one'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .game-message {
+    position: absolute;
+    z-index: 5;
+    top: 50%;
+    left: 50%;
+    width: min(88%, 18rem);
+    text-align: center;
+    transform: translate(-50%, -50%);
+  }
+}
+
 @media (max-width: 359px) {
   html[data-theme='theme-one'] .game-page[data-page='go'] .game-actions {
     gap: 0.25rem;
@@ -1110,6 +1305,11 @@ html[data-theme='theme-one'] .game-page[data-page='bingo-cards'] .bingo-cards-li
 }
 
 @media (max-width: 767px) and (max-height: 700px) {
+  html[data-theme='theme-one'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .gomoku-mode-switch,
+  html[data-theme='theme-one'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .game-summary {
+    display: none;
+  }
+
   html[data-theme='theme-one'] .game-page[data-page='2048'] .game-stage {
     padding: 0.45rem;
   }

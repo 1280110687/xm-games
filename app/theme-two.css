@@ -1557,6 +1557,288 @@ html[data-theme='theme-two'] .game-actions {
   }
 }
 
+/* Gomoku LAN — iOS grouped game flow */
+html[data-theme='theme-two'] .gomoku-mode-switch {
+  padding: 0.2rem;
+  border: 0;
+  border-radius: 0.85rem;
+  background: #e9e9ee;
+}
+
+html[data-theme='theme-two'] .gomoku-mode-switch button {
+  min-height: 2.35rem;
+  border-radius: 0.68rem;
+  color: #68686e;
+  box-shadow: none;
+}
+
+html[data-theme='theme-two'] .gomoku-mode-switch button[aria-selected='true'] {
+  color: #111114;
+  background: #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.13);
+}
+
+html[data-theme='theme-two'] .gomoku-lan-panel,
+html[data-theme='theme-two'] .gomoku-lan-status {
+  border: 1px solid rgb(60 60 67 / 0.14);
+  border-radius: 1.45rem;
+  color: #111114;
+  background: rgb(255 255 255 / 0.9);
+  box-shadow: 0 1.2rem 3rem rgb(30 38 55 / 0.09);
+  backdrop-filter: blur(28px) saturate(1.35);
+}
+
+html[data-theme='theme-two'] .gomoku-lan-status {
+  min-height: 4rem;
+  flex: 0 0 auto;
+  padding: 0.6rem 0.75rem;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-status > button {
+  width: 2.75rem;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  min-height: 2.75rem;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-panel {
+  padding: clamp(1rem, 3vw, 1.45rem);
+}
+
+html[data-theme='theme-two'] .gomoku-lan-panel__intro {
+  grid-template-columns: minmax(13rem, 0.8fr) minmax(18rem, 1.2fr);
+  align-items: end;
+  gap: 1.4rem;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-panel__heading > span {
+  color: #007aff;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-panel__heading h2 {
+  margin-top: 0.55rem;
+  color: #111114;
+  font-size: clamp(1.45rem, 4vw, 2rem);
+  font-weight: 760;
+  letter-spacing: -0.04em;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-panel__heading p,
+html[data-theme='theme-two'] .gomoku-lan-room__invite p,
+html[data-theme='theme-two'] .gomoku-lan-room__secure {
+  color: #73737a;
+  font-size: 0.78rem;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-panel__entry {
+  padding: 0.8rem;
+  border-radius: 1.05rem;
+  background: #f2f2f7;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-panel__entry [data-variant='default'] {
+  background: #007aff;
+  box-shadow: none;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-panel__entry [data-variant='secondary'] {
+  color: #fff;
+  background: #1c1c1e;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-panel__divider {
+  height: 1px;
+  background: rgb(60 60 67 / 0.16);
+}
+
+html[data-theme='theme-two'] .gomoku-lan-panel__join label,
+html[data-theme='theme-two'] .gomoku-lan-room__topline span,
+html[data-theme='theme-two'] .gomoku-lan-status__room span {
+  color: #77777e;
+  font-size: 0.7rem;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-panel__join input {
+  color: #111114;
+  border-color: rgb(60 60 67 / 0.16);
+  background: #fff;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-room__topline strong,
+html[data-theme='theme-two'] .gomoku-lan-status__room strong {
+  color: #007aff;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.12em;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-room__connection {
+  color: #77777e;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-room__connection[data-connected='true'],
+html[data-theme='theme-two'] .gomoku-lan-status__signal[data-connected='true'] {
+  color: #248a3d;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-room__players {
+  padding: 0.3rem;
+  border-radius: 1rem;
+  background: #f2f2f7;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-room__players > div {
+  padding: 0.7rem;
+  border-radius: 0.78rem;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-room__players > div[data-ready='true'] {
+  background: #fff;
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.08);
+}
+
+html[data-theme='theme-two'] .gomoku-lan-room__players span {
+  color: #77777e;
+  font-size: 0.68rem;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-room__invite {
+  padding: 0.85rem;
+  border-radius: 1.1rem;
+  background: linear-gradient(140deg, #e4f1ff, #f3eefe);
+}
+
+html[data-theme='theme-two'] .gomoku-lan-room__invite [data-variant='outline'] {
+  color: #007aff;
+  border-color: rgb(0 122 255 / 0.18);
+  background: rgb(255 255 255 / 0.76);
+}
+
+html[data-theme='theme-two'] .gomoku-lan-room__actions [data-variant='default'] {
+  background: #007aff;
+  box-shadow: none;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-room__actions [data-variant='ghost'] {
+  color: #ff3b30;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-status__signal {
+  color: #77777e;
+  background: #f2f2f7;
+}
+
+html[data-theme='theme-two'] .gomoku-dice-overlay {
+  background: rgb(230 232 238 / 0.72);
+  backdrop-filter: blur(32px) saturate(1.4);
+}
+
+html[data-theme='theme-two'] .gomoku-dice-card {
+  color: #111114;
+  border: 1px solid rgb(60 60 67 / 0.16);
+  border-radius: 1.75rem;
+  background: rgb(255 255 255 / 0.92);
+  box-shadow: 0 1.7rem 5rem rgb(30 38 55 / 0.18);
+}
+
+html[data-theme='theme-two'] .gomoku-dice-card > p:not(.gomoku-dice-card__status) {
+  color: #77777e;
+}
+
+html[data-theme='theme-two'] .gomoku-dice-card__icon {
+  color: #007aff;
+  background: #e5f1ff;
+}
+
+html[data-theme='theme-two'] .gomoku-dice-card__rolls > div {
+  border-radius: 1.25rem;
+  background: #f2f2f7;
+}
+
+html[data-theme='theme-two'] .gomoku-dice-card__rolls strong {
+  color: #007aff;
+}
+
+html[data-theme='theme-two'] .gomoku-dice-card__status {
+  color: #248a3d;
+}
+
+@media (min-width: 768px) {
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .gomoku-mode-switch,
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .gomoku-lan-status {
+    grid-column: 2;
+    width: 100%;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .gomoku-lan-panel {
+    grid-column: 1 / -1;
+    width: min(100%, 48rem);
+    justify-self: center;
+  }
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .game-header [data-slot='button'],
+  html[data-theme='theme-two'] .gomoku-lan-panel [data-slot='button'],
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .game-actions [data-slot='dialog-trigger'] {
+    min-height: 2.75rem;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .game-header [data-slot='button'],
+  html[data-theme='theme-two'] .gomoku-lan-panel [data-size^='icon'] {
+    min-width: 2.75rem;
+  }
+
+  html[data-theme='theme-two'] .gomoku-mode-switch button {
+    min-height: 2.75rem;
+  }
+
+  html[data-theme='theme-two'] .gomoku-lan-panel__intro {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .gomoku-mode-switch {
+    order: initial;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .gomoku-lan-panel,
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'] .gomoku-lan-status {
+    order: initial;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'][data-game-mode='lan'] .game-stage {
+    order: initial;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .game-stage {
+    width: min(calc(100vw - 2rem), calc(100svh - 20rem), 22rem);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .game-message {
+    position: absolute;
+    z-index: 5;
+    top: 50%;
+    left: 50%;
+    width: min(88%, 18rem);
+    text-align: center;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@media (max-width: 767px) and (max-height: 700px) {
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .gomoku-mode-switch,
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .game-summary {
+    display: none;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .game-stage {
+    width: min(100%, calc(100svh - 22.25rem), 19.5rem);
+  }
+
+}
+
 @media (min-width: 1024px) {
   html[data-theme='theme-two'] .home-shell .app-container {
     display: grid;

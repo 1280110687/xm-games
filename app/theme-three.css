@@ -2965,6 +2965,294 @@ html[data-theme='theme-three'] .game-page[data-page='neon-breaker'] canvas {
   }
 }
 
+/* Gomoku LAN — obsidian peer console */
+html[data-theme='theme-three'] .gomoku-mode-switch {
+  border: 1px solid rgb(151 166 159 / 0.25);
+  border-radius: 999px;
+  background: rgb(9 13 12 / 0.88);
+  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.025);
+}
+
+html[data-theme='theme-three'] .gomoku-mode-switch button {
+  border-radius: 999px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+}
+
+html[data-theme='theme-three'] .gomoku-mode-switch button[aria-selected='true'] {
+  color: #03150b;
+  background: linear-gradient(135deg, #7bf4a7, #31d87a);
+  box-shadow: 0 0 1.75rem rgb(49 216 122 / 0.22);
+}
+
+html[data-theme='theme-three'] .gomoku-lan-panel,
+html[data-theme='theme-three'] .gomoku-lan-status {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgb(176 194 184 / 0.25);
+  border-radius: 1.2rem;
+  color: #edf5f0;
+  background:
+    linear-gradient(90deg, transparent 49.8%, rgb(116 255 167 / 0.035) 50%, transparent 50.2%),
+    linear-gradient(rgb(255 255 255 / 0.018) 1px, transparent 1px),
+    rgb(9 13 12 / 0.94);
+  background-size: 100% 100%, 100% 1.75rem, 100% 100%;
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.42), inset 0 1px 0 rgb(255 255 255 / 0.045);
+}
+
+html[data-theme='theme-three'] .gomoku-lan-status {
+  min-height: 4rem;
+  flex: 0 0 auto;
+  padding: 0.6rem 0.75rem;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-status > button {
+  width: 2.75rem;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  min-height: 2.75rem;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-panel::before,
+html[data-theme='theme-three'] .gomoku-lan-status::before {
+  position: absolute;
+  content: '';
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: linear-gradient(transparent, #40e681, transparent);
+  box-shadow: 0 0 1.25rem #40e681;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-panel {
+  padding: clamp(1rem, 3vw, 1.5rem);
+}
+
+html[data-theme='theme-three'] .gomoku-lan-panel__intro {
+  grid-template-columns: minmax(0, 1fr) minmax(18rem, 0.82fr);
+  align-items: start;
+  gap: 2rem;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-panel__heading > span {
+  color: #63eda0;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-panel__heading h2 {
+  margin-top: 0.65rem;
+  color: #f4f8f5;
+  font-size: clamp(1.5rem, 4vw, 2.15rem);
+  font-weight: 620;
+  letter-spacing: -0.045em;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-panel__heading p,
+html[data-theme='theme-three'] .gomoku-lan-room__invite p,
+html[data-theme='theme-three'] .gomoku-lan-room__secure {
+  color: #87928c;
+  font-size: 0.74rem;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-panel__entry {
+  padding: 0.8rem;
+  border: 1px solid rgb(151 166 159 / 0.2);
+  border-radius: 0.85rem;
+  background: rgb(255 255 255 / 0.025);
+}
+
+html[data-theme='theme-three'] .gomoku-lan-panel__entry [data-variant='default'] {
+  color: #06160d;
+  background: #53e890;
+  box-shadow: 0 0 1.8rem rgb(65 228 133 / 0.17);
+}
+
+html[data-theme='theme-three'] .gomoku-lan-panel__divider {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-panel__divider::before {
+  content: 'OR';
+  color: #66716b;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.55rem;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-panel__divider span {
+  height: 1px;
+  flex: 1;
+  background: rgb(151 166 159 / 0.2);
+}
+
+html[data-theme='theme-three'] .gomoku-lan-panel__join label,
+html[data-theme='theme-three'] .gomoku-lan-room__topline span,
+html[data-theme='theme-three'] .gomoku-lan-status__room span {
+  color: #77827c;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-panel__join input {
+  color: #f4f8f5;
+  border-color: rgb(151 166 159 / 0.24);
+  background: rgb(3 7 5 / 0.7);
+  font-family: var(--font-geist-mono), monospace;
+  letter-spacing: 0.14em;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-room__topline strong,
+html[data-theme='theme-three'] .gomoku-lan-status__room strong {
+  color: #61f19f;
+  font-family: var(--font-geist-mono), monospace;
+  letter-spacing: 0.18em;
+  text-shadow: 0 0 1rem rgb(74 237 141 / 0.3);
+}
+
+html[data-theme='theme-three'] .gomoku-lan-room__connection[data-connected='true'],
+html[data-theme='theme-three'] .gomoku-lan-status__signal[data-connected='true'] {
+  color: #66f0a1;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-room__players {
+  gap: 0;
+  border: 1px solid rgb(151 166 159 / 0.2);
+  border-radius: 0.85rem;
+  background: rgb(0 0 0 / 0.18);
+}
+
+html[data-theme='theme-three'] .gomoku-lan-room__players > div {
+  min-height: 4.25rem;
+  padding: 0.75rem;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-room__players > div[data-ready='true'] strong {
+  color: #62ee9d;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-room__versus {
+  color: #58625d;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.62rem;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-room__invite {
+  padding: 0.8rem;
+  border: 1px dashed rgb(93 232 151 / 0.3);
+  border-radius: 0.85rem;
+  background: linear-gradient(110deg, rgb(55 221 124 / 0.07), transparent);
+}
+
+html[data-theme='theme-three'] .gomoku-lan-room__actions [data-variant='default'] {
+  color: #06160d;
+  background: #53e890;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-room__actions [data-variant='ghost'] {
+  color: #96a39c;
+}
+
+html[data-theme='theme-three'] .gomoku-lan-status__signal {
+  color: #78847e;
+  background: rgb(255 255 255 / 0.04);
+}
+
+html[data-theme='theme-three'] .gomoku-dice-overlay {
+  background: rgb(0 4 2 / 0.86);
+  backdrop-filter: blur(22px);
+}
+
+html[data-theme='theme-three'] .gomoku-dice-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgb(139 161 149 / 0.32);
+  border-radius: 1.2rem;
+  color: #edf5f0;
+  background: rgb(8 13 10 / 0.98);
+  box-shadow: 0 0 5rem rgb(44 223 119 / 0.13), inset 0 1px 0 rgb(255 255 255 / 0.05);
+}
+
+html[data-theme='theme-three'] .gomoku-dice-card::after {
+  position: absolute;
+  content: '';
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, transparent 0 3px, rgb(91 244 155 / 0.018) 3px 4px);
+}
+
+html[data-theme='theme-three'] .gomoku-dice-card__icon {
+  color: #61f19f;
+  border: 1px solid rgb(87 237 151 / 0.24);
+  background: rgb(58 224 128 / 0.08);
+}
+
+html[data-theme='theme-three'] .gomoku-dice-card__rolls > div {
+  border: 1px solid rgb(151 166 159 / 0.2);
+  border-radius: 0.8rem;
+  background: rgb(0 0 0 / 0.22);
+}
+
+html[data-theme='theme-three'] .gomoku-dice-card__rolls strong,
+html[data-theme='theme-three'] .gomoku-dice-card__status {
+  color: #62ef9e;
+  font-family: var(--font-geist-mono), monospace;
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-three'] .game-page[data-page='gomoku'] .game-header [data-slot='button'],
+  html[data-theme='theme-three'] .gomoku-lan-panel [data-slot='button'],
+  html[data-theme='theme-three'] .game-page[data-page='gomoku'] .game-actions [data-slot='dialog-trigger'] {
+    min-height: 2.75rem;
+  }
+
+  html[data-theme='theme-three'] .game-page[data-page='gomoku'] .game-header [data-slot='button'],
+  html[data-theme='theme-three'] .gomoku-lan-panel [data-size^='icon'] {
+    min-width: 2.75rem;
+  }
+
+  html[data-theme='theme-three'] .gomoku-lan-panel__intro {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  html[data-theme='theme-three'] .game-page[data-page='gomoku'][data-game-mode='lan'] .game-content {
+    gap: 0.65rem;
+  }
+
+  html[data-theme='theme-three'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .game-stage {
+    width: min(100%, calc(100svh - 21rem), 22rem);
+  }
+
+  html[data-theme='theme-three'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .game-message {
+    position: absolute;
+    z-index: 5;
+    top: 50%;
+    left: 50%;
+    width: min(88%, 18rem);
+    text-align: center;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@media (max-width: 767px) and (max-height: 700px) {
+  html[data-theme='theme-three'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .gomoku-mode-switch,
+  html[data-theme='theme-three'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .game-summary {
+    display: none;
+  }
+
+  html[data-theme='theme-three'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .game-stage {
+    width: min(100%, calc(100svh - 22.25rem), 19.5rem);
+  }
+
+}
+
 @media (max-width: 359px) {
   html[data-theme='theme-three'] .theme-three-command-title small {
     display: none;

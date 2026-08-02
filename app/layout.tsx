@@ -5,6 +5,7 @@ import { LocaleProvider } from '@/lib/locale-context'
 import { ThemeProvider } from '@/components/theme-provider'
 import { ThemeTwoTabBar } from '@/components/theme-two-tab-bar'
 import { ThemeThreeNavigation } from '@/components/theme-three-navigation'
+import { PwaRegister } from '@/components/pwa-register'
 import { getPageMetadata } from '@/lib/page-metadata'
 import { themeBootstrapScript } from '@/lib/theme'
 import './globals.css'
@@ -27,9 +28,22 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   ...getPageMetadata('/', 'zh'),
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'XM-Games',
+  },
+  formatDetection: {
+    telephone: false,
+  },
   icons: {
-    icon: '/icon.svg',
-    apple: '/icon.svg',
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/pwa-icon-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/pwa-icon-512.png', sizes: '512x512', type: 'image/png' },
+    ],
+    apple: '/pwa-icon-192.png',
   },
 }
 
@@ -51,6 +65,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
+        <PwaRegister />
         <script
           id="xm-games-theme-bootstrap"
           suppressHydrationWarning
