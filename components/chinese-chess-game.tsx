@@ -1,429 +1,237 @@
 "use client"
 
-import { useState, useCallback } from "react"
-import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
-import { useLocale } from "@/lib/locale-context"
+import { useEffect, useMemo, useState } from "react"
+import { Bot, Flag, RotateCcw, SlidersHorizontal, Undo2, Users } from "lucide-react"
+
+import {
+  ChineseChessAiSetup,
+  type AiDifficulty,
+} from "@/components/chinese-chess-ai-setup"
 import { GameHeader } from "@/components/game-header"
 import { GameRulesDialog } from "@/components/game-rules-dialog"
-import { RotateCcw, Flag, Undo2 } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import {
+  generateLegalMoves,
+  type Piece,
+  type PieceColor,
+  type PieceType,
+  type Position,
+} from "@/features/chinese-chess/engine"
+import { useChineseChess } from "@/features/chinese-chess/use-chinese-chess"
+import { useLocale } from "@/lib/locale-context"
 
-// Piece types
-type PieceType = "king" | "advisor" | "elephant" | "horse" | "chariot" | "cannon" | "pawn"
-type PieceColor = "red" | "black"
-
-interface Piece {
-  type: PieceType
-  color: PieceColor
-}
-
-interface Position {
-  row: number
-  col: number
-}
-
-// Piece names in different languages
 const pieceNames: Record<PieceColor, Record<PieceType, Record<string, string>>> = {
   red: {
-    king: { zh: "帅", en: "K", th: "จอม" },
-    advisor: { zh: "仕", en: "A", th: "ที่" },
-    elephant: { zh: "相", en: "E", th: "ช้าง" },
-    horse: { zh: "馬", en: "H", th: "ม้า" },
-    chariot: { zh: "車", en: "R", th: "รถ" },
-    cannon: { zh: "炮", en: "C", th: "ปืน" },
-    pawn: { zh: "兵", en: "P", th: "เบี้ย" },
+    king: { zh: "帅", en: "King", th: "จอม" },
+    advisor: { zh: "仕", en: "Advisor", th: "ที่ปรึกษา" },
+    elephant: { zh: "相", en: "Elephant", th: "ช้าง" },
+    horse: { zh: "馬", en: "Horse", th: "ม้า" },
+    chariot: { zh: "車", en: "Chariot", th: "รถ" },
+    cannon: { zh: "炮", en: "Cannon", th: "ปืน" },
+    pawn: { zh: "兵", en: "Pawn", th: "เบี้ย" },
   },
   black: {
-    king: { zh: "将", en: "K", th: "จอม" },
-    advisor: { zh: "士", en: "A", th: "ที่" },
-    elephant: { zh: "象", en: "E", th: "ช้าง" },
-    horse: { zh: "馬", en: "H", th: "ม้า" },
-    chariot: { zh: "車", en: "R", th: "รถ" },
-    cannon: { zh: "砲", en: "C", th: "ปืน" },
-    pawn: { zh: "卒", en: "P", th: "เบี้ย" },
+    king: { zh: "将", en: "General", th: "จอม" },
+    advisor: { zh: "士", en: "Advisor", th: "ที่ปรึกษา" },
+    elephant: { zh: "象", en: "Elephant", th: "ช้าง" },
+    horse: { zh: "馬", en: "Horse", th: "ม้า" },
+    chariot: { zh: "車", en: "Chariot", th: "รถ" },
+    cannon: { zh: "砲", en: "Cannon", th: "ปืน" },
+    pawn: { zh: "卒", en: "Pawn", th: "เบี้ย" },
   },
 }
 
-// Initial board setup
-function createInitialBoard(): (Piece | null)[][] {
-  const board: (Piece | null)[][] = Array(10).fill(null).map(() => Array(9).fill(null))
-  
-  // Black pieces (top)
-  board[0][0] = { type: "chariot", color: "black" }
-  board[0][1] = { type: "horse", color: "black" }
-  board[0][2] = { type: "elephant", color: "black" }
-  board[0][3] = { type: "advisor", color: "black" }
-  board[0][4] = { type: "king", color: "black" }
-  board[0][5] = { type: "advisor", color: "black" }
-  board[0][6] = { type: "elephant", color: "black" }
-  board[0][7] = { type: "horse", color: "black" }
-  board[0][8] = { type: "chariot", color: "black" }
-  board[2][1] = { type: "cannon", color: "black" }
-  board[2][7] = { type: "cannon", color: "black" }
-  board[3][0] = { type: "pawn", color: "black" }
-  board[3][2] = { type: "pawn", color: "black" }
-  board[3][4] = { type: "pawn", color: "black" }
-  board[3][6] = { type: "pawn", color: "black" }
-  board[3][8] = { type: "pawn", color: "black" }
-
-  // Red pieces (bottom)
-  board[9][0] = { type: "chariot", color: "red" }
-  board[9][1] = { type: "horse", color: "red" }
-  board[9][2] = { type: "elephant", color: "red" }
-  board[9][3] = { type: "advisor", color: "red" }
-  board[9][4] = { type: "king", color: "red" }
-  board[9][5] = { type: "advisor", color: "red" }
-  board[9][6] = { type: "elephant", color: "red" }
-  board[9][7] = { type: "horse", color: "red" }
-  board[9][8] = { type: "chariot", color: "red" }
-  board[7][1] = { type: "cannon", color: "red" }
-  board[7][7] = { type: "cannon", color: "red" }
-  board[6][0] = { type: "pawn", color: "red" }
-  board[6][2] = { type: "pawn", color: "red" }
-  board[6][4] = { type: "pawn", color: "red" }
-  board[6][6] = { type: "pawn", color: "red" }
-  board[6][8] = { type: "pawn", color: "red" }
-
-  return board
+const pieceGlyphs: Record<PieceColor, Record<PieceType, string>> = {
+  red: {
+    king: "帅",
+    advisor: "仕",
+    elephant: "相",
+    horse: "馬",
+    chariot: "車",
+    cannon: "炮",
+    pawn: "兵",
+  },
+  black: {
+    king: "将",
+    advisor: "士",
+    elephant: "象",
+    horse: "馬",
+    chariot: "車",
+    cannon: "砲",
+    pawn: "卒",
+  },
 }
 
-// Check if position is within palace
-function isInPalace(row: number, col: number, color: PieceColor): boolean {
-  if (col < 3 || col > 5) return false
-  if (color === "red") return row >= 7 && row <= 9
-  return row >= 0 && row <= 2
+const difficultyKeys: Record<AiDifficulty, "chineseChessDifficultyEasy" | "chineseChessDifficultyMedium" | "chineseChessDifficultyHard"> = {
+  easy: "chineseChessDifficultyEasy",
+  medium: "chineseChessDifficultyMedium",
+  hard: "chineseChessDifficultyHard",
 }
 
-// Check if position is on own side
-function isOnOwnSide(row: number, color: PieceColor): boolean {
-  if (color === "red") return row >= 5
-  return row <= 4
-}
-
-// Count pieces between two positions
-function countPiecesBetween(
-  board: (Piece | null)[][],
-  from: Position,
-  to: Position
-): number {
-  let count = 0
-  if (from.row === to.row) {
-    const minCol = Math.min(from.col, to.col)
-    const maxCol = Math.max(from.col, to.col)
-    for (let c = minCol + 1; c < maxCol; c++) {
-      if (board[from.row][c]) count++
-    }
-  } else if (from.col === to.col) {
-    const minRow = Math.min(from.row, to.row)
-    const maxRow = Math.max(from.row, to.row)
-    for (let r = minRow + 1; r < maxRow; r++) {
-      if (board[r][from.col]) count++
-    }
-  }
-  return count
-}
-
-// Check if a move is valid
-function isValidMove(
-  board: (Piece | null)[][],
-  from: Position,
-  to: Position,
-  piece: Piece
-): boolean {
-  const targetPiece = board[to.row][to.col]
-  
-  // Cannot capture own piece
-  if (targetPiece && targetPiece.color === piece.color) return false
-  
-  const rowDiff = to.row - from.row
-  const colDiff = to.col - from.col
-  const absRowDiff = Math.abs(rowDiff)
-  const absColDiff = Math.abs(colDiff)
-
-  switch (piece.type) {
-    case "king":
-      // Must stay in palace, move one step
-      if (!isInPalace(to.row, to.col, piece.color)) return false
-      return (absRowDiff === 1 && absColDiff === 0) || (absRowDiff === 0 && absColDiff === 1)
-
-    case "advisor":
-      // Must stay in palace, move diagonally one step
-      if (!isInPalace(to.row, to.col, piece.color)) return false
-      return absRowDiff === 1 && absColDiff === 1
-
-    case "elephant":
-      // Cannot cross river, move diagonally two steps
-      if (!isOnOwnSide(to.row, piece.color)) return false
-      if (absRowDiff !== 2 || absColDiff !== 2) return false
-      // Check blocking piece at center
-      const elephantBlockRow = from.row + rowDiff / 2
-      const elephantBlockCol = from.col + colDiff / 2
-      return !board[elephantBlockRow][elephantBlockCol]
-
-    case "horse":
-      // Move in L shape, can be blocked
-      if (!((absRowDiff === 2 && absColDiff === 1) || (absRowDiff === 1 && absColDiff === 2))) return false
-      // Check blocking piece
-      if (absRowDiff === 2) {
-        const blockRow = from.row + (rowDiff > 0 ? 1 : -1)
-        return !board[blockRow][from.col]
-      } else {
-        const blockCol = from.col + (colDiff > 0 ? 1 : -1)
-        return !board[from.row][blockCol]
-      }
-
-    case "chariot":
-      // Move in straight line
-      if (from.row !== to.row && from.col !== to.col) return false
-      return countPiecesBetween(board, from, to) === 0
-
-    case "cannon":
-      // Move in straight line, capture by jumping over one piece
-      if (from.row !== to.row && from.col !== to.col) return false
-      const piecesBetween = countPiecesBetween(board, from, to)
-      if (targetPiece) {
-        return piecesBetween === 1
-      }
-      return piecesBetween === 0
-
-    case "pawn":
-      // Before crossing river: only forward
-      // After crossing river: forward or sideways
-      const forward = piece.color === "red" ? -1 : 1
-      if (isOnOwnSide(from.row, piece.color)) {
-        return rowDiff === forward && colDiff === 0
-      } else {
-        return (rowDiff === forward && colDiff === 0) || (rowDiff === 0 && absColDiff === 1)
-      }
-
-    default:
-      return false
-  }
-}
-
-// Get all valid moves for a piece
-function getValidMoves(board: (Piece | null)[][], from: Position): Position[] {
-  const piece = board[from.row][from.col]
-  if (!piece) return []
-
-  const validMoves: Position[] = []
-  for (let row = 0; row < 10; row++) {
-    for (let col = 0; col < 9; col++) {
-      if (isValidMove(board, from, { row, col }, piece)) {
-        validMoves.push({ row, col })
-      }
-    }
-  }
-  return validMoves
-}
-
-// Check if king is in check
-function isKingInCheck(board: (Piece | null)[][], color: PieceColor): boolean {
-  // Find king position
-  let kingPos: Position | null = null
-  for (let row = 0; row < 10; row++) {
-    for (let col = 0; col < 9; col++) {
-      const piece = board[row][col]
-      if (piece && piece.type === "king" && piece.color === color) {
-        kingPos = { row, col }
-        break
-      }
-    }
-    if (kingPos) break
-  }
-  if (!kingPos) return true // King captured
-
-  // Check if any opponent piece can capture king
-  const opponentColor = color === "red" ? "black" : "red"
-  for (let row = 0; row < 10; row++) {
-    for (let col = 0; col < 9; col++) {
-      const piece = board[row][col]
-      if (piece && piece.color === opponentColor) {
-        if (isValidMove(board, { row, col }, kingPos, piece)) {
-          return true
-        }
-      }
-    }
-  }
-
-  // Check flying general (kings facing each other)
-  let redKingPos: Position | null = null
-  let blackKingPos: Position | null = null
-  for (let row = 0; row < 10; row++) {
-    for (let col = 0; col < 9; col++) {
-      const piece = board[row][col]
-      if (piece && piece.type === "king") {
-        if (piece.color === "red") redKingPos = { row, col }
-        else blackKingPos = { row, col }
-      }
-    }
-  }
-  if (redKingPos && blackKingPos && redKingPos.col === blackKingPos.col) {
-    if (countPiecesBetween(board, redKingPos, blackKingPos) === 0) {
-      return true
-    }
-  }
-
-  return false
-}
-
-// Check if game is over (checkmate or stalemate)
-function isGameOver(board: (Piece | null)[][], currentTurn: PieceColor): { over: boolean; winner: PieceColor | null } {
-  // Check if current player has any valid moves
-  for (let row = 0; row < 10; row++) {
-    for (let col = 0; col < 9; col++) {
-      const piece = board[row][col]
-      if (piece && piece.color === currentTurn) {
-        const moves = getValidMoves(board, { row, col })
-        for (const move of moves) {
-          // Try the move
-          const newBoard = board.map(r => [...r])
-          newBoard[move.row][move.col] = piece
-          newBoard[row][col] = null
-          // Check if king is still in check after move
-          if (!isKingInCheck(newBoard, currentTurn)) {
-            return { over: false, winner: null }
-          }
-        }
-      }
-    }
-  }
-  // No valid moves - game over
-  const winner = currentTurn === "red" ? "black" : "red"
-  return { over: true, winner }
+function isSamePosition(left: Position | null, right: Position): boolean {
+  return left?.row === right.row && left.col === right.col
 }
 
 export function ChineseChessGame() {
   const { t, locale } = useLocale()
-  const [board, setBoard] = useState<(Piece | null)[][]>(createInitialBoard)
+  const game = useChineseChess()
   const [selectedPos, setSelectedPos] = useState<Position | null>(null)
-  const [validMoves, setValidMoves] = useState<Position[]>([])
-  const [currentTurn, setCurrentTurn] = useState<PieceColor>("red")
-  const [gameStatus, setGameStatus] = useState<"playing" | "check" | "checkmate" | "stalemate">("playing")
-  const [winner, setWinner] = useState<PieceColor | null>(null)
-  const [moveHistory, setMoveHistory] = useState<{ from: Position; to: Position; piece: Piece; capturedPiece: Piece | null }[]>([])
-  const [redUndoUsed, setRedUndoUsed] = useState(false)
-  const [blackUndoUsed, setBlackUndoUsed] = useState(false)
+  const [aiSetupOpen, setAiSetupOpen] = useState(false)
+  const [draftPlayerColor, setDraftPlayerColor] = useState<PieceColor>(game.playerColor)
+  const [draftDifficulty, setDraftDifficulty] = useState<AiDifficulty>(game.difficulty)
 
-  const resetGame = useCallback(() => {
-    setBoard(createInitialBoard())
+  const legalMovesFromSelection = useMemo(
+    () => selectedPos ? generateLegalMoves(game.state, selectedPos) : [],
+    [game.state, selectedPos],
+  )
+  const validTargetKeys = useMemo(
+    () => new Set(legalMovesFromSelection.map((move) => `${move.to.row}:${move.to.col}`)),
+    [legalMovesFromSelection],
+  )
+  const lastMove = game.state.moveHistory.at(-1)
+  const isBoardFlipped = game.mode === "ai" && game.playerColor === "black"
+  const canInteractWithBoard = !game.gameResult.over
+    && game.aiStatus !== "thinking"
+    && game.isHumanTurn
+
+  useEffect(() => {
     setSelectedPos(null)
-    setValidMoves([])
-    setCurrentTurn("red")
-    setGameStatus("playing")
-    setWinner(null)
-    setMoveHistory([])
-    setRedUndoUsed(false)
-    setBlackUndoUsed(false)
-  }, [])
-
-  const handleUndo = useCallback(() => {
-    if (moveHistory.length === 0) return
-    if (gameStatus === "checkmate") return
-
-    // The player who wants to undo is the one whose turn it is NOT
-    // Because the last move was made by the opponent
-    const lastMove = moveHistory[moveHistory.length - 1]
-    const undoingPlayer = lastMove.piece.color
-
-    // Check if this player has already used their undo
-    if (undoingPlayer === "red" && redUndoUsed) return
-    if (undoingPlayer === "black" && blackUndoUsed) return
-
-    // Restore the board state
-    const newBoard = board.map(r => [...r])
-    newBoard[lastMove.from.row][lastMove.from.col] = lastMove.piece
-    newBoard[lastMove.to.row][lastMove.to.col] = lastMove.capturedPiece
-
-    setBoard(newBoard)
-    setMoveHistory(prev => prev.slice(0, -1))
-    setCurrentTurn(undoingPlayer)
-    setSelectedPos(null)
-    setValidMoves([])
-    setGameStatus("playing")
-
-    // Mark this player's undo as used
-    if (undoingPlayer === "red") {
-      setRedUndoUsed(true)
-    } else {
-      setBlackUndoUsed(true)
-    }
-  }, [moveHistory, board, gameStatus, redUndoUsed, blackUndoUsed])
-
-  const handleCellClick = useCallback((row: number, col: number) => {
-    if (gameStatus === "checkmate" || gameStatus === "stalemate") return
-
-    const clickedPiece = board[row][col]
-
-    if (selectedPos) {
-      // Check if clicking on own piece to reselect
-      if (clickedPiece && clickedPiece.color === currentTurn) {
-        setSelectedPos({ row, col })
-        setValidMoves(getValidMoves(board, { row, col }))
-        return
-      }
-
-      // Try to move
-      const movingPiece = board[selectedPos.row][selectedPos.col]
-      if (movingPiece && isValidMove(board, selectedPos, { row, col }, movingPiece)) {
-        // Create new board with move
-        const newBoard = board.map(r => [...r])
-        newBoard[row][col] = movingPiece
-        newBoard[selectedPos.row][selectedPos.col] = null
-
-        // Check if this move puts own king in check
-        if (isKingInCheck(newBoard, currentTurn)) {
-          // Invalid move - would put king in check
-          setSelectedPos(null)
-          setValidMoves([])
-          return
-        }
-
-        // Valid move - record captured piece for undo
-        const capturedPiece = board[row][col]
-        setBoard(newBoard)
-        setMoveHistory(prev => [...prev, { from: selectedPos, to: { row, col }, piece: movingPiece, capturedPiece }])
-        
-        const nextTurn = currentTurn === "red" ? "black" : "red"
-        setCurrentTurn(nextTurn)
-        setSelectedPos(null)
-        setValidMoves([])
-
-        // Check game state
-        const gameResult = isGameOver(newBoard, nextTurn)
-        if (gameResult.over) {
-          setGameStatus("checkmate")
-          setWinner(gameResult.winner)
-        } else if (isKingInCheck(newBoard, nextTurn)) {
-          setGameStatus("check")
-        } else {
-          setGameStatus("playing")
-        }
-      } else {
-        // Invalid move, deselect
-        setSelectedPos(null)
-        setValidMoves([])
-      }
-    } else {
-      // Select piece
-      if (clickedPiece && clickedPiece.color === currentTurn) {
-        setSelectedPos({ row, col })
-        setValidMoves(getValidMoves(board, { row, col }))
-      }
-    }
-  }, [board, selectedPos, currentTurn, gameStatus])
-
-  const isValidMoveTarget = (row: number, col: number) => {
-    return validMoves.some(m => m.row === row && m.col === col)
-  }
+  }, [game.state])
 
   const getPieceName = (piece: Piece) => {
-    const lang = locale === "zh" ? "zh" : locale === "th" ? "th" : "en"
-    return pieceNames[piece.color][piece.type][lang]
+    const language = locale === "zh" ? "zh" : locale === "th" ? "th" : "en"
+    return pieceNames[piece.color][piece.type][language]
+  }
+
+  const getSideLabel = (color: PieceColor) =>
+    color === "red" ? t("chineseChessRedSide") : t("chineseChessBlackSide")
+
+  const getSideOwner = (color: PieceColor) => {
+    if (game.mode !== "ai") return null
+    return color === game.playerColor ? t("chineseChessHuman") : t("chineseChessComputer")
+  }
+
+  const openAiSetup = () => {
+    setDraftPlayerColor(game.playerColor)
+    setDraftDifficulty(game.difficulty)
+    setAiSetupOpen(true)
+  }
+
+  const handleLocalMode = () => {
+    if (game.mode === "local") return
+    if (game.hasMoves && !window.confirm(t("chineseChessRestartDescription"))) return
+    game.startLocalGame()
+  }
+
+  const handleStartAiGame = () => {
+    game.startAiGame(draftPlayerColor, draftDifficulty)
+  }
+
+  const handleCellClick = (row: number, col: number) => {
+    if (!canInteractWithBoard) return
+
+    const clickedPiece = game.state.board[row][col]
+
+    if (!selectedPos) {
+      if (clickedPiece?.color === game.state.currentTurn) {
+        setSelectedPos({ row, col })
+      }
+      return
+    }
+
+    if (clickedPiece?.color === game.state.currentTurn) {
+      setSelectedPos({ row, col })
+      return
+    }
+
+    const move = legalMovesFromSelection.find(
+      (candidate) => candidate.to.row === row && candidate.to.col === col,
+    )
+    if (move) game.makeMove(move)
+    setSelectedPos(null)
+  }
+
+  const renderStatusMessage = () => {
+    if (game.aiStatus === "thinking") {
+      return (
+        <div className="game-message flex justify-center" data-slot="game-message">
+          <span className="chinese-chess-ai-thinking" role="status">
+            {t("chineseChessAiThinking")}
+          </span>
+        </div>
+      )
+    }
+
+    if (game.aiStatus === "error") {
+      return (
+        <div className="game-message flex justify-center" data-slot="game-message">
+          <span
+            className="game-status-banner rounded-full bg-red-500/15 px-3 py-1 text-center text-xs font-bold text-red-400 sm:text-sm"
+            data-tone="danger"
+          >
+            {t("chineseChessAiError")}
+          </span>
+        </div>
+      )
+    }
+
+    if (game.gameResult.over && game.gameResult.winner === null) {
+      return (
+        <div className="game-message flex justify-center" data-slot="game-message">
+          <span
+            className="game-status-banner rounded-full bg-sky-500/15 px-3 py-1 text-sm font-bold text-sky-400"
+            data-tone="info"
+          >
+            {game.gameResult.reason === "repetition"
+              ? t("chineseChessRepetitionDraw")
+              : t("chineseChessDraw")}
+          </span>
+        </div>
+      )
+    }
+
+    if (game.gameResult.over && game.gameResult.winner) {
+      return (
+        <div className="game-message flex flex-col items-center justify-center gap-1" data-slot="game-message">
+          <span
+            className="game-status-banner rounded-full bg-red-500/20 px-3 py-1 text-sm font-bold text-red-400"
+            data-tone="danger"
+          >
+            {game.gameResult.winner === "red" ? t("redWins") : t("blackWins")}
+          </span>
+          {game.gameResult.reason === "no-legal-move" && (
+            <span className="text-xs text-muted-foreground">{t("chineseChessStalemate")}</span>
+          )}
+        </div>
+      )
+    }
+
+    if (game.gameResult.inCheck) {
+      return (
+        <div className="game-message flex justify-center" data-slot="game-message">
+          <span
+            className="game-status-banner animate-pulse rounded-full bg-yellow-500/20 px-3 py-1 text-sm font-bold text-yellow-400"
+            data-tone="warning"
+          >
+            {t("check")}
+          </span>
+        </div>
+      )
+    }
+
+    return null
   }
 
   return (
-    <div className="game-page" data-page="chinese-chess">
+    <div
+      className="game-page"
+      data-page="chinese-chess"
+      data-game-mode={game.mode}
+      data-player-color={game.mode === "ai" ? game.playerColor : undefined}
+      data-ai-state={game.aiStatus}
+      data-difficulty={game.mode === "ai" ? game.difficulty : undefined}
+    >
       <GameHeader
         layout="centered"
         homeLabel={t("appName")}
@@ -438,230 +246,203 @@ export function ChineseChessGame() {
         className="game-content flex flex-1 flex-col items-center gap-4 py-1 sm:py-3"
         data-slot="game-content"
       >
-        {/* Game Status */}
-        <Card className="game-summary surface-panel border-white/10 bg-card/70 p-3 sm:p-4" role="status" aria-live="polite">
-          <div className="flex flex-col gap-3">
-            {/* Turn indicator and status */}
-            <div className="flex items-center justify-center gap-4">
-              <div className="flex items-center gap-2">
-                <div className={`h-4 w-4 rounded-full ${currentTurn === "red" ? "bg-red-500 ring-2 ring-red-300" : "bg-slate-700"}`} />
-                <span className={`text-sm font-medium sm:text-base ${currentTurn === "red" ? "text-foreground" : "text-muted-foreground"}`}>
-                  {t("redTurn")}
-                </span>
-              </div>
-              <div className="h-4 w-px bg-border" />
-              <div className="flex items-center gap-2">
-                <div className={`h-4 w-4 rounded-full ${currentTurn === "black" ? "bg-slate-800 ring-2 ring-slate-400" : "bg-slate-600"}`} />
-                <span className={`text-sm font-medium sm:text-base ${currentTurn === "black" ? "text-foreground" : "text-muted-foreground"}`}>
-                  {t("blackTurn")}
-                </span>
-              </div>
-            </div>
-
-            {/* Check/Checkmate status */}
-            {gameStatus === "check" && (
-              <div className="game-message flex justify-center" data-slot="game-message">
-                <span
-                  className="game-status-banner animate-pulse rounded-full bg-yellow-500/20 px-3 py-1 text-sm font-bold text-yellow-400"
-                  data-tone="warning"
-                >
-                  {t("check")}
-                </span>
-              </div>
-            )}
-            {gameStatus === "checkmate" && (
-              <div className="game-message flex justify-center" data-slot="game-message">
-                <span
-                  className="game-status-banner rounded-full bg-red-500/20 px-3 py-1 text-sm font-bold text-red-400"
-                  data-tone="danger"
-                >
-                  {winner === "red" ? t("redWins") : t("blackWins")}
-                </span>
-              </div>
-            )}
-
-            {/* Undo status */}
-            <div
-              className="game-undo-status flex items-center justify-center gap-4 text-xs"
-              data-slot="undo-status"
+        <div className="chinese-chess-mode-bar" data-slot="game-mode" role="group" aria-label={t("chineseChessAiSetupTitle")}>
+          <Button
+            type="button"
+            variant="ghost"
+            className="chinese-chess-mode-option"
+            aria-pressed={game.mode === "local"}
+            data-active={game.mode === "local" ? "true" : "false"}
+            onClick={handleLocalMode}
+          >
+            <Users aria-hidden="true" />
+            {t("chineseChessLocalMode")}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            className="chinese-chess-mode-option"
+            aria-pressed={game.mode === "ai"}
+            data-active={game.mode === "ai" ? "true" : "false"}
+            onClick={openAiSetup}
+          >
+            <Bot aria-hidden="true" />
+            {t("chineseChessAiMode")}
+          </Button>
+          {game.mode === "ai" && (
+            <Button
+              type="button"
+              variant="ghost"
+              className="chinese-chess-ai-summary"
+              aria-label={`${t("chineseChessAiSettingsSummary")}: ${getSideLabel(game.playerColor)}, ${t(difficultyKeys[game.difficulty])}`}
+              onClick={openAiSetup}
             >
-              <div className="flex items-center gap-1">
-                <span className="game-status-copy text-red-400" data-tone="danger">
-                  {redUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}
-                </span>
-              </div>
-              <div className="h-3 w-px bg-border" />
-              <div className="flex items-center gap-1">
-                <span className="game-status-copy text-slate-400" data-tone="neutral">
-                  {blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}
-                </span>
-              </div>
+              <SlidersHorizontal aria-hidden="true" />
+              <span>{getSideLabel(game.playerColor)} · {t(difficultyKeys[game.difficulty])}</span>
+            </Button>
+          )}
+        </div>
+
+        <Card className="game-summary surface-panel border-white/10 bg-card/70 p-3 sm:p-4" role="status" aria-live="polite">
+          <span className="sr-only">
+            {game.mode === "ai"
+              ? game.isHumanTurn ? t("chineseChessYourTurn") : t("chineseChessAiTurn")
+              : game.state.currentTurn === "red" ? t("redTurn") : t("blackTurn")}
+          </span>
+          <div className="flex flex-col gap-3">
+            <div className="flex items-center justify-center gap-4">
+              {(["red", "black"] as const).map((color, index) => {
+                const active = game.state.currentTurn === color
+                const owner = getSideOwner(color)
+
+                return (
+                  <div key={color} className="contents">
+                    {index > 0 && <div className="h-4 w-px bg-border" aria-hidden="true" />}
+                    <div className="flex items-center gap-2" aria-current={active ? "true" : undefined}>
+                      <div
+                        className={`h-4 w-4 rounded-full ${color === "red"
+                          ? active ? "bg-red-500 ring-2 ring-red-300" : "bg-red-950/70"
+                          : active ? "bg-slate-800 ring-2 ring-slate-400" : "bg-slate-600"
+                        }`}
+                        aria-hidden="true"
+                      />
+                      <span className={`text-sm font-medium sm:text-base ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                        {getSideLabel(color)}{owner ? ` · ${owner}` : ""}
+                      </span>
+                    </div>
+                  </div>
+                )
+              })}
             </div>
+
+            {renderStatusMessage()}
+
+            {game.mode === "local" ? (
+              <div className="game-undo-status flex items-center justify-center gap-4 text-xs" data-slot="undo-status">
+                <span className="game-status-copy text-red-400" data-tone="danger">
+                  {game.localUndoUsage.red ? t("undoUsed") : `${t("undoRemaining")}: 1`}
+                </span>
+                <div className="h-3 w-px bg-border" aria-hidden="true" />
+                <span className="game-status-copy text-slate-400" data-tone="neutral">
+                  {game.localUndoUsage.black ? t("undoUsed") : `${t("undoRemaining")}: 1`}
+                </span>
+              </div>
+            ) : (
+              <div className="game-undo-status text-center text-xs text-muted-foreground" data-slot="undo-status">
+                {t("chineseChessAiUndoRound")}: {game.aiUndoUsed ? t("undoUsed") : "1"}
+              </div>
+            )}
           </div>
         </Card>
 
-        {/* Chess Board */}
         <div
           className="game-stage relative aspect-[80/89] w-full max-w-80 rounded-xl border-4 border-amber-800 bg-[#d4a574] p-4 shadow-2xl shadow-black/30"
           data-slot="game-stage"
+          aria-busy={game.aiStatus === "thinking"}
         >
           <div className="relative h-full w-full">
-          {/* SVG Board Lines - positioned to match intersections */}
-          <svg 
-            className="absolute inset-0 h-full w-full"
-            aria-hidden="true"
-            focusable="false"
-            viewBox="0 0 288 324"
-            preserveAspectRatio="none"
-          >
-            {/* Horizontal lines - 10 lines for 10 rows */}
-            {Array.from({ length: 10 }).map((_, i) => (
-              <line
-                key={`h-${i}`}
-                x1={0}
-                y1={i * 36}
-                x2={288}
-                y2={i * 36}
-                stroke="#8b6914"
-                strokeWidth="1.5"
-              />
-            ))}
-            
-            {/* Vertical lines - top half (rows 0-4) */}
-            {Array.from({ length: 9 }).map((_, i) => (
-              <line
-                key={`vt-${i}`}
-                x1={i * 36}
-                y1={0}
-                x2={i * 36}
-                y2={144}
-                stroke="#8b6914"
-                strokeWidth="1.5"
-              />
-            ))}
-            
-            {/* Vertical lines - bottom half (rows 5-9) */}
-            {Array.from({ length: 9 }).map((_, i) => (
-              <line
-                key={`vb-${i}`}
-                x1={i * 36}
-                y1={180}
-                x2={i * 36}
-                y2={324}
-                stroke="#8b6914"
-                strokeWidth="1.5"
-              />
-            ))}
-            
-            {/* Border lines through river (left and right edges only) */}
-            <line x1={0} y1={144} x2={0} y2={180} stroke="#8b6914" strokeWidth="1.5" />
-            <line x1={288} y1={144} x2={288} y2={180} stroke="#8b6914" strokeWidth="1.5" />
-            
-            {/* Palace diagonals - top (columns 3-5, rows 0-2) */}
-            <line x1={108} y1={0} x2={180} y2={72} stroke="#8b6914" strokeWidth="1.5" />
-            <line x1={180} y1={0} x2={108} y2={72} stroke="#8b6914" strokeWidth="1.5" />
-            
-            {/* Palace diagonals - bottom (columns 3-5, rows 7-9) */}
-            <line x1={108} y1={252} x2={180} y2={324} stroke="#8b6914" strokeWidth="1.5" />
-            <line x1={180} y1={252} x2={108} y2={324} stroke="#8b6914" strokeWidth="1.5" />
-          </svg>
+            <svg
+              className="absolute inset-0 h-full w-full"
+              aria-hidden="true"
+              focusable="false"
+              viewBox="0 0 288 324"
+              preserveAspectRatio="none"
+            >
+              {Array.from({ length: 10 }).map((_, index) => (
+                <line key={`h-${index}`} x1={0} y1={index * 36} x2={288} y2={index * 36} stroke="#8b6914" strokeWidth="1.5" />
+              ))}
+              {Array.from({ length: 9 }).map((_, index) => (
+                <line key={`vt-${index}`} x1={index * 36} y1={0} x2={index * 36} y2={144} stroke="#8b6914" strokeWidth="1.5" />
+              ))}
+              {Array.from({ length: 9 }).map((_, index) => (
+                <line key={`vb-${index}`} x1={index * 36} y1={180} x2={index * 36} y2={324} stroke="#8b6914" strokeWidth="1.5" />
+              ))}
+              <line x1={0} y1={144} x2={0} y2={180} stroke="#8b6914" strokeWidth="1.5" />
+              <line x1={288} y1={144} x2={288} y2={180} stroke="#8b6914" strokeWidth="1.5" />
+              <line x1={108} y1={0} x2={180} y2={72} stroke="#8b6914" strokeWidth="1.5" />
+              <line x1={180} y1={0} x2={108} y2={72} stroke="#8b6914" strokeWidth="1.5" />
+              <line x1={108} y1={252} x2={180} y2={324} stroke="#8b6914" strokeWidth="1.5" />
+              <line x1={180} y1={252} x2={108} y2={324} stroke="#8b6914" strokeWidth="1.5" />
+            </svg>
 
-          {/* River text */}
-          <div 
-            className="pointer-events-none absolute flex items-center justify-center"
-            style={{ left: 0, right: 0, top: "44.444%", height: "11.111%" }}
-          >
-            <span className="text-[clamp(0.7rem,3.6vw,1rem)] font-bold tracking-[0.24em] text-amber-900/55 sm:tracking-[0.5em]">
-              {locale === "zh" ? "楚河      汉界" : locale === "th" ? "แม่น้ำ" : "RIVER"}
-            </span>
-          </div>
+            <div
+              className="pointer-events-none absolute flex items-center justify-center"
+              style={{ left: 0, right: 0, top: "44.444%", height: "11.111%" }}
+            >
+              <span className="text-[clamp(0.7rem,3.6vw,1rem)] font-bold tracking-[0.24em] text-amber-900/55 sm:tracking-[0.5em]">
+                {locale === "zh" ? "楚河      汉界" : locale === "th" ? "แม่น้ำ" : "RIVER"}
+              </span>
+            </div>
 
-          {/* Pieces layer - absolute positioned on intersections */}
-          <div
-            className="relative h-full w-full"
-            role="group"
-            aria-label={t("chineseChess")}
-          >
-            {board.map((row, rowIndex) => (
-              row.map((piece, colIndex) => {
-                const isSelected = selectedPos?.row === rowIndex && selectedPos?.col === colIndex
-                const isValidTarget = isValidMoveTarget(rowIndex, colIndex)
-                const lastMove = moveHistory[moveHistory.length - 1]
-                const isLastMoveFrom = lastMove?.from.row === rowIndex && lastMove?.from.col === colIndex
-                const isLastMoveTo = lastMove?.to.row === rowIndex && lastMove?.to.col === colIndex
+            <div className="relative h-full w-full" role="group" aria-label={t("chineseChess")}>
+              {Array.from({ length: 10 }).map((_, displayRow) =>
+                Array.from({ length: 9 }).map((__, displayCol) => {
+                  const row = isBoardFlipped ? 9 - displayRow : displayRow
+                  const col = isBoardFlipped ? 8 - displayCol : displayCol
+                  const piece = game.state.board[row][col]
+                  const position = { row, col }
+                  const isSelected = isSamePosition(selectedPos, position)
+                  const isValidTarget = validTargetKeys.has(`${row}:${col}`)
+                  const isLastMoveFrom = isSamePosition(lastMove?.from ?? null, position)
+                  const isLastMoveTo = isSamePosition(lastMove?.to ?? null, position)
+                  const sideName = piece ? getSideLabel(piece.color) : ""
+                  const targetLabel = isValidTarget ? `, ${t("chineseChessValidDestination")}` : ""
 
-                return (
-                  <button
-                    key={`${rowIndex}-${colIndex}`}
-                    onClick={() => handleCellClick(rowIndex, colIndex)}
-                    aria-label={`${rowIndex + 1}, ${colIndex + 1}, ${piece ? `${piece.color === "red" ? t("redTurn") : t("blackTurn")} ${getPieceName(piece)}` : "empty"}${isValidTarget ? ", valid move" : ""}`}
-                    aria-pressed={isSelected}
-                    className="absolute flex h-[11.111%] w-[12.5%] -translate-x-1/2 -translate-y-1/2 items-center justify-center touch-manipulation transition-all"
-                    style={{
-                      left: `${(colIndex / 8) * 100}%`,
-                      top: `${(rowIndex / 9) * 100}%`,
-                      zIndex: isSelected ? 10 : 1,
-                    }}
-                  >
-                    {/* Last move highlight */}
-                    {(isLastMoveFrom || isLastMoveTo) && (
-                      <div className="absolute h-[88%] w-[88%] rounded bg-yellow-400/40" aria-hidden="true" />
-                    )}
-                    
-                    {/* Valid move indicator */}
-                    {isValidTarget && !piece && (
-                      <div className="absolute h-[44%] w-[44%] rounded-full bg-green-500/70 shadow" aria-hidden="true" />
-                    )}
-                    
-                    {/* Piece */}
-                    {piece && (
-                      <div
-                        aria-hidden="true"
-                        className={`
-                          flex items-center justify-center rounded-full border-2
-                          aspect-square w-[88%] text-[clamp(0.65rem,3.5vw,0.875rem)] font-bold
-                          shadow-lg transition-transform
-                          ${piece.color === "red" 
-                            ? "border-red-700 bg-gradient-to-br from-amber-50 to-amber-100 text-red-600" 
+                  return (
+                    <button
+                      key={`${row}-${col}`}
+                      type="button"
+                      disabled={!canInteractWithBoard}
+                      onClick={() => handleCellClick(row, col)}
+                      aria-label={`${displayRow + 1}, ${displayCol + 1}, ${piece ? `${sideName} ${getPieceName(piece)}` : t("chineseChessEmptyIntersection")}${targetLabel}`}
+                      aria-pressed={isSelected}
+                      className="absolute flex h-[11.111%] w-[12.5%] -translate-x-1/2 -translate-y-1/2 items-center justify-center touch-manipulation transition-all disabled:cursor-default"
+                      style={{
+                        left: `${(displayCol / 8) * 100}%`,
+                        top: `${(displayRow / 9) * 100}%`,
+                        zIndex: isSelected ? 10 : 1,
+                      }}
+                    >
+                      {(isLastMoveFrom || isLastMoveTo) && (
+                        <span className="absolute h-[88%] w-[88%] rounded bg-yellow-400/40" aria-hidden="true" />
+                      )}
+                      {isValidTarget && !piece && (
+                        <span className="absolute h-[44%] w-[44%] rounded-full bg-green-500/70 shadow" aria-hidden="true" />
+                      )}
+                      {piece && (
+                        <span
+                          aria-hidden="true"
+                          className={`flex aspect-square w-[88%] items-center justify-center rounded-full border-2 text-[clamp(0.65rem,3.5vw,0.875rem)] font-bold shadow-lg transition-transform ${piece.color === "red"
+                            ? "border-red-700 bg-gradient-to-br from-amber-50 to-amber-100 text-red-600"
                             : "border-slate-600 bg-gradient-to-br from-slate-50 to-slate-200 text-slate-800"
-                          }
-                          ${isSelected ? "scale-110 ring-2 ring-yellow-400" : ""}
-                          ${isValidTarget ? "ring-2 ring-green-400" : ""}
-                        `}
-                      >
-                        {getPieceName(piece)}
-                      </div>
-                    )}
-                  </button>
-                )
-              })
-            ))}
-          </div>
+                          } ${isSelected ? "scale-110 ring-2 ring-yellow-400" : ""} ${isValidTarget ? "ring-2 ring-green-400" : ""}`}
+                        >
+                          {pieceGlyphs[piece.color][piece.type]}
+                        </span>
+                      )}
+                    </button>
+                  )
+                }),
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Controls */}
         <div className="game-actions flex flex-wrap justify-center gap-2" data-slot="game-actions">
-          <Button
-            onClick={handleUndo}
-            variant="outline"
-            disabled={
-              moveHistory.length === 0 ||
-              gameStatus === "checkmate" ||
-              (moveHistory.length > 0 && moveHistory[moveHistory.length - 1].piece.color === "red" && redUndoUsed) ||
-              (moveHistory.length > 0 && moveHistory[moveHistory.length - 1].piece.color === "black" && blackUndoUsed)
-            }
-          >
+          <Button onClick={game.undo} variant="outline" disabled={!game.canUndo}>
             <Undo2 className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
-            {t("undo")}
+            {game.mode === "ai" ? t("chineseChessAiUndoRound") : t("undo")}
           </Button>
-          <Button
-            onClick={resetGame}
-            variant="outline"
-          >
+          <Button onClick={game.resetGame} variant="outline">
             <RotateCcw className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
             {t("restart")}
           </Button>
+          {game.aiStatus === "error" && (
+            <Button onClick={game.retryAi} variant="outline">
+              <Bot className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
+              {t("chineseChessAiRetry")}
+            </Button>
+          )}
           <GameRulesDialog
             triggerLabel={t("howToPlay")}
             closeLabel={t("close")}
@@ -672,58 +453,53 @@ export function ChineseChessGame() {
               <div>
                 <h3 className="mb-2 font-semibold text-foreground">{t("pieceRules")}</h3>
                 <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li className="flex gap-2">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">帅</span>
-                    <span>{t("kingRule")}</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">仕</span>
-                    <span>{t("advisorRule")}</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">相</span>
-                    <span>{t("elephantRule")}</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">馬</span>
-                    <span>{t("horseRule")}</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">車</span>
-                    <span>{t("chariotRule")}</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">炮</span>
-                    <span>{t("cannonRule")}</span>
-                  </li>
-                  <li className="flex gap-2">
-                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">兵</span>
-                    <span>{t("pawnRule")}</span>
-                  </li>
+                  {([
+                    ["帅", "kingRule"],
+                    ["仕", "advisorRule"],
+                    ["相", "elephantRule"],
+                    ["馬", "horseRule"],
+                    ["車", "chariotRule"],
+                    ["炮", "cannonRule"],
+                    ["兵", "pawnRule"],
+                  ] as const).map(([glyph, ruleKey]) => (
+                    <li key={ruleKey} className="flex gap-2">
+                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">
+                        {glyph}
+                      </span>
+                      <span>{t(ruleKey)}</span>
+                    </li>
+                  ))}
                 </ul>
               </div>
-
               <div className="border-t border-border pt-4">
                 <h3 className="mb-2 font-semibold text-foreground">{t("winCondition")}</h3>
+                <p className="text-sm text-muted-foreground">{t("chineseChessRepetitionDraw")}</p>
               </div>
             </div>
           </GameRulesDialog>
-          {gameStatus === "checkmate" && (
-            <Button
-              onClick={resetGame}
-            >
+          {game.gameResult.over && (
+            <Button onClick={game.resetGame}>
               <Flag className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
               {t("newGame")}
             </Button>
           )}
         </div>
 
-        {/* Instructions */}
         <p className="game-help max-w-md text-center text-xs text-muted-foreground sm:text-sm" data-slot="game-help">
-          {t("chessInstructions")}
+          {game.mode === "ai" ? t("chineseChessAiUndoHint") : t("chessInstructions")}
         </p>
-
       </main>
+
+      <ChineseChessAiSetup
+        open={aiSetupOpen}
+        onOpenChange={setAiSetupOpen}
+        playerColor={draftPlayerColor}
+        difficulty={draftDifficulty}
+        onPlayerColorChange={setDraftPlayerColor}
+        onDifficultyChange={setDraftDifficulty}
+        onStart={handleStartAiGame}
+        hasMoves={game.hasMoves}
+      />
     </div>
   )
 }

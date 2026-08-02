@@ -2031,3 +2031,252 @@ html[data-theme='theme-one'] .offline-tool-status {
     min-height: 11rem;
   }
 }
+
+/* Chinese Chess AI: neon arena controls with a compact H5 setup sheet. */
+html[data-theme='theme-one'] .chinese-chess-mode-bar {
+  display: flex;
+  width: min(100%, 28rem);
+  min-height: 2.75rem;
+  align-items: stretch;
+  gap: 0.3rem;
+  padding: 0.25rem;
+  border: 1px solid oklch(0.73 0.17 278 / 0.24);
+  border-radius: 0.9rem;
+  background: oklch(0.16 0.035 268 / 0.88);
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.06),
+    0 14px 36px oklch(0.48 0.2 278 / 0.1);
+}
+
+html[data-theme='theme-one'] .chinese-chess-mode-option,
+html[data-theme='theme-one'] .chinese-chess-ai-summary {
+  min-width: 0;
+  min-height: 2.75rem;
+  border: 1px solid transparent;
+  border-radius: 0.7rem;
+  color: oklch(0.72 0.025 270);
+  background: transparent;
+  box-shadow: none;
+  font-size: 0.78rem;
+}
+
+html[data-theme='theme-one'] .chinese-chess-mode-option {
+  flex: 1 1 0;
+}
+
+html[data-theme='theme-one'] .chinese-chess-mode-option:is(
+  [aria-selected='true'],
+  [aria-pressed='true'],
+  [data-active='true']
+) {
+  border-color: oklch(0.75 0.18 278 / 0.42);
+  color: white;
+  background:
+    linear-gradient(145deg, oklch(0.68 0.2 278 / 0.24), transparent),
+    oklch(0.24 0.07 270 / 0.92);
+  box-shadow:
+    0 0 20px oklch(0.64 0.22 278 / 0.16),
+    inset 0 1px 0 oklch(1 0 0 / 0.1);
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-summary {
+  flex: 0 1 auto;
+  max-width: 10rem;
+  overflow: hidden;
+  border-color: oklch(0.76 0.13 214 / 0.28);
+  color: oklch(0.83 0.11 214);
+  background: oklch(0.67 0.15 214 / 0.09);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-thinking {
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  color: oklch(0.86 0.1 278);
+  font-weight: 700;
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-thinking::before {
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid oklch(0.73 0.17 278 / 0.24);
+  border-top-color: oklch(0.8 0.16 278);
+  border-radius: 999px;
+  content: '';
+  animation: chinese-chess-ai-spin 0.8s linear infinite;
+}
+
+html[data-theme='theme-one'] [data-slot='dialog-content'].chinese-chess-ai-setup {
+  border-color: oklch(0.76 0.16 278 / 0.26);
+  background:
+    radial-gradient(circle at 20% 0%, oklch(0.66 0.2 278 / 0.13), transparent 15rem),
+    oklch(0.155 0.035 268 / 0.98);
+  box-shadow:
+    0 32px 100px oklch(0.04 0.025 270 / 0.78),
+    inset 0 1px 0 oklch(1 0 0 / 0.08);
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-setup__icon {
+  display: grid;
+  width: 2.6rem;
+  height: 2.6rem;
+  place-items: center;
+  margin-bottom: 0.15rem;
+  border: 1px solid oklch(0.78 0.17 278 / 0.34);
+  border-radius: 0.8rem;
+  color: oklch(0.86 0.12 278);
+  background: oklch(0.67 0.2 278 / 0.13);
+  box-shadow: 0 0 24px oklch(0.62 0.22 278 / 0.16);
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-setup__icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-setup__warning {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.65rem 0.75rem;
+  border: 1px solid oklch(0.78 0.15 78 / 0.24);
+  border-radius: 0.75rem;
+  color: oklch(0.86 0.1 78);
+  background: oklch(0.7 0.16 78 / 0.08);
+  font-size: 0.76rem;
+  line-height: 1.45;
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-setup__warning svg {
+  width: 1rem;
+  height: 1rem;
+  flex: 0 0 auto;
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-setup__group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-setup__group legend {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 0.55rem;
+  color: oklch(0.78 0.025 270);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-setup__group legend svg {
+  width: 1rem;
+  height: 1rem;
+  color: oklch(0.78 0.14 278);
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-setup__choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-setup__choices--difficulty {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-choice {
+  min-width: 0;
+  min-height: 3rem;
+  border-color: oklch(1 0 0 / 0.08);
+  color: oklch(0.75 0.025 270);
+  background: oklch(1 0 0 / 0.035);
+  box-shadow: none;
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-choice[data-selected='true'] {
+  border-color: oklch(0.76 0.18 278 / 0.48);
+  color: white;
+  background: oklch(0.66 0.2 278 / 0.17);
+  box-shadow:
+    0 0 22px oklch(0.64 0.22 278 / 0.12),
+    inset 0 1px 0 oklch(1 0 0 / 0.1);
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-choice__piece {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  place-items: center;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  background: oklch(1 0 0 / 0.06);
+  font-family: serif;
+  font-size: 0.78rem;
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-choice--red .chinese-chess-ai-choice__piece {
+  color: oklch(0.72 0.19 25);
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-setup__footer {
+  display: grid;
+  grid-template-columns: minmax(0, 0.7fr) minmax(0, 1.3fr);
+}
+
+html[data-theme='theme-one'] .chinese-chess-ai-setup__footer [data-slot='button'] {
+  width: 100%;
+  min-height: 2.75rem;
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-one'] .chinese-chess-mode-bar {
+    width: 100%;
+    min-height: 2.75rem;
+    flex: 0 0 auto;
+  }
+
+  html[data-theme='theme-one'] .chinese-chess-mode-option,
+  html[data-theme='theme-one'] .chinese-chess-ai-summary {
+    height: 2.75rem;
+    min-height: 2.75rem;
+    padding-inline: 0.55rem;
+    font-size: 0.72rem;
+  }
+
+  html[data-theme='theme-one'] [data-slot='dialog-content'].chinese-chess-ai-setup {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-width: none;
+    max-height: min(88dvh, 42rem);
+    padding: 1.15rem max(1rem, env(safe-area-inset-right)) calc(1rem + env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
+    overflow-y: auto;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 0;
+    border-radius: 1.35rem 1.35rem 0 0;
+    translate: none;
+    transform: none !important;
+  }
+}
+
+@keyframes chinese-chess-ai-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme='theme-one'] .chinese-chess-ai-thinking::before {
+    animation: none;
+  }
+}

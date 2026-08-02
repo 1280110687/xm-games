@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v1"
+const CACHE_VERSION = "v2"
 const SHELL_CACHE = `xm-games-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `xm-games-runtime-${CACHE_VERSION}`
 const OWNED_CACHE_PREFIX = "xm-games-"
@@ -6,6 +6,7 @@ const OWNED_CACHE_PREFIX = "xm-games-"
 const APP_SHELL = [
   "/",
   "/gomoku",
+  "/chinese-chess",
   "/manifest.webmanifest",
   "/icon.svg",
   "/pwa-icon-192.png",
