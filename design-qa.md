@@ -466,4 +466,61 @@ direction controls measure 48×44 CSS pixels.
 - `pnpm build` — all 24 static pages generated
 - `git diff --check`
 
+## Bingo marked-number strip and Theme 2 tools H5 QA
+
+### Reference and final evidence
+
+- Theme 1 Bingo marked-number source:
+  `/tmp/codex-remote-attachments/019f78c3-d747-71b2-a9ad-11bd2824f6bd/545a21aa-f041-4852-80b5-3365cd2bb01e/1-Photo-1.jpg`
+- Theme 1 collapsed state, four cards and `2×2` layout:
+  `.design-qa-evidence/mobile-audit/48-bingo-cards-theme-one-marked-collapsed-double-390x844.png`
+- Theme 1 expanded state:
+  `.design-qa-evidence/mobile-audit/43-bingo-cards-theme-one-marked-expanded-390x844.png`
+- Theme 1 normalized source/final comparison:
+  `.design-qa-evidence/mobile-audit/46-bingo-marked-reference-vs-final-390x844.png`
+- Theme 2 tools source:
+  `/tmp/codex-remote-attachments/019f78c3-d747-71b2-a9ad-11bd2824f6bd/545a21aa-f041-4852-80b5-3365cd2bb01e/2-Photo-2.jpg`
+- Theme 2 tools final at 390×844 and 320×700:
+  `.design-qa-evidence/mobile-audit/44-theme-two-tools-390x844.png`,
+  `.design-qa-evidence/mobile-audit/45-theme-two-tools-320x700.png`
+- Theme 2 normalized source/final comparison:
+  `.design-qa-evidence/mobile-audit/47-theme-two-tools-reference-vs-final-390x844.png`
+
+### Findings and fixes
+
+- Initial Bingo finding (P2): the marked-number row sorted numerically and
+  exposed an always-wrapping list, so recent corrections were not immediately
+  visible. The final strip keeps one 44-pixel row by default, orders the
+  insertion history newest-first and exposes a localized, accessible
+  `aria-expanded` control. Expanded content wraps below the label and caps its
+  height before switching to internal vertical scrolling.
+- Initial Theme 2 tools finding (P1): a `col-span-2` featured card was placed in
+  a one-column H5 grid, creating an implicit second column and a large clipped
+  blank region. The final mobile category uses a vertical flow: the first item
+  remains a 128-pixel featured card while the other five tools become compact
+  iOS-style rows. The second featured item is deliberately normalized to a row
+  only on Theme 2 H5; desktop and the other themes keep their existing layouts.
+- The normalized comparisons show equivalent content density and state. The
+  Bingo comparison uses four cards, nine marks and `2×2`; the tools comparison
+  keeps all six tools in their source order.
+
+### Responsive and interaction checks
+
+| Surface | Viewport | Measured result |
+| --- | --- | --- |
+| Theme 1 Bingo | 390×844 | Collapsed list 44px high; newest sequence starts `10, 9, 8, 7`; expanded list wraps to two rows; no document overflow |
+| Theme 1 Bingo | 320×700 | Collapsed list 44px high; expanded list wraps; 39-mark stress state caps at 192px with internal scrolling; card library remains visible |
+| Theme 2 tools, Chinese | 390×844 | Six items; 332px featured card plus five 356px rows; final item scrolls 35.6px clear of the tab bar; no overflow |
+| Theme 2 tools, Chinese | 320×700 | Six items remain continuous at 262/286px widths; final item scrolls 35.2px clear of the tab bar; no overflow |
+| Theme 2 tools, Thai | 320×700 | Six items, no title or description overflow; no document overflow |
+| Theme 2 tools | 430×932 | Six items; 128px featured card and five 76px rows; no overflow |
+| Theme 2 tools | 1440×900 | Two-column desktop grid retained; both featured cards span the complete 1062px grid |
+
+- Removing one marked number changed the count from nine to eight; re-entering
+  it restored the count and moved that number to the front without changing the
+  expanded state.
+- Browser console inspection returned no warnings or errors.
+- `pnpm lint`, `pnpm typecheck`, `pnpm test` (21 files, 125 tests),
+  `pnpm build` (24 static pages) and `git diff --check` all passed.
+
 final result: passed

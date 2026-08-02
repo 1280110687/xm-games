@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { useLocale } from "@/lib/locale-context"
 import { GameHeader } from "@/components/game-header"
 import {
+  ChevronDown,
   Grid2X2,
   Mic,
   MicOff,
@@ -19,6 +20,7 @@ import {
 import { parseBingoNumbers } from "@/features/bingo/number-parser"
 import {
   checkBingo,
+  getMarkedNumbersNewestFirst,
   removeMarkedNumber,
   type BingoCardGrid,
 } from "@/features/bingo/card-rules"
@@ -94,6 +96,7 @@ export function BingoCards() {
   const [isListening, setIsListening] = useState(false)
   const [speechSupported, setSpeechSupported] = useState(false)
   const [cardLayout, setCardLayout] = useState<BingoCardLayout>("single")
+  const [markedNumbersExpanded, setMarkedNumbersExpanded] = useState(false)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const shouldListenRef = useRef(false)
   const mountedRef = useRef(false)
@@ -301,6 +304,7 @@ export function BingoCards() {
 
   const resetAll = useCallback(() => {
     setDrawnNumbers(new Set())
+    setMarkedNumbersExpanded(false)
   }, [])
 
   const undoMarkedNumber = useCallback((number: number) => {
@@ -345,6 +349,7 @@ export function BingoCards() {
   useEffect(() => {
     if (drawnNumbers.size === 0) {
       setBingoCards(new Set())
+      setMarkedNumbersExpanded(false)
     }
   }, [drawnNumbers.size])
 
@@ -480,10 +485,23 @@ export function BingoCards() {
 
             {/* Drawn Numbers Display */}
             {drawnNumbers.size > 0 && (
-              <div className="bingo-cards-marked-numbers mt-4 border-t border-slate-700 pt-4">
-                <p className="mb-2 text-sm text-muted-foreground">{t("markedNumbers")}:</p>
-                <ul className="flex flex-wrap gap-1" role="list">
-                  {Array.from(drawnNumbers).sort((a, b) => a - b).map(num => (
+              <div
+                className="bingo-cards-marked-numbers mt-4 grid min-w-0 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2 gap-y-2 border-t border-slate-700 pt-4"
+                data-expanded={markedNumbersExpanded}
+              >
+                <p className="bingo-marked-numbers-label col-start-1 row-start-1 m-0 text-sm text-muted-foreground">
+                  {t("markedNumbers")}:
+                </p>
+                <ul
+                  id="bingo-marked-numbers-list"
+                  className={`bingo-marked-numbers-list flex min-w-0 gap-1 ${
+                    markedNumbersExpanded
+                      ? "col-span-3 col-start-1 row-start-2 flex-wrap"
+                      : "col-start-2 row-start-1 flex-nowrap overflow-x-auto overflow-y-hidden"
+                  }`}
+                  role="list"
+                >
+                  {getMarkedNumbersNewestFirst(drawnNumbers).map(num => (
                     <li key={num}>
                       <Button
                         type="button"
@@ -499,6 +517,26 @@ export function BingoCards() {
                     </li>
                   ))}
                 </ul>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  className="bingo-marked-numbers-toggle col-start-3 row-start-1 h-11 shrink-0 gap-1 rounded-xl px-2.5 text-xs"
+                  aria-controls="bingo-marked-numbers-list"
+                  aria-expanded={markedNumbersExpanded}
+                  onClick={() => setMarkedNumbersExpanded((expanded) => !expanded)}
+                >
+                  <span>
+                    {markedNumbersExpanded
+                      ? t("collapseMarkedNumbers")
+                      : t("expandMarkedNumbers")}
+                  </span>
+                  <ChevronDown
+                    className={`size-4 transition-transform motion-reduce:transition-none ${
+                      markedNumbersExpanded ? "rotate-180" : ""
+                    }`}
+                    aria-hidden="true"
+                  />
+                </Button>
               </div>
             )}
           </CardContent>

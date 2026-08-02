@@ -442,7 +442,7 @@ function GameCard({
         </span>
 
         <span className="home-game-card-copy min-w-0 flex-1">
-          <span className="mb-2 block text-[0.68rem] font-bold uppercase tracking-[0.16em] text-rose-200/80">
+          <span className="home-game-card-featured-label mb-2 block text-[0.68rem] font-bold uppercase tracking-[0.16em] text-rose-200/80">
             {featuredLabel}
           </span>
           <span className="home-game-card-title block text-xl font-bold tracking-tight text-foreground sm:text-2xl">
@@ -915,7 +915,12 @@ export default function Home() {
               const headingId = `category-${category.titleKey}`
 
               return (
-                <section className="home-category" key={category.titleKey} aria-labelledby={headingId}>
+                <section
+                  className="home-category"
+                  data-category={category.titleKey}
+                  key={category.titleKey}
+                  aria-labelledby={headingId}
+                >
                   <div className="home-category-heading mb-4 flex items-end justify-between gap-4 px-1">
                     <h2
                       id={headingId}

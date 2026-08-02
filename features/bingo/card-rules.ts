@@ -82,3 +82,9 @@ export function removeMarkedNumber(
   nextMarkedNumbers.delete(number)
   return nextMarkedNumbers
 }
+
+export function getMarkedNumbersNewestFirst(
+  markedNumbers: ReadonlySet<number>,
+): number[] {
+  return Array.from(markedNumbers).reverse()
+}

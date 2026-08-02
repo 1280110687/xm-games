@@ -597,6 +597,81 @@ html[data-theme='theme-two'] .home-game-card--featured .home-game-card-arrow {
   background: oklch(1 0 0 / 0.14);
 }
 
+@media (max-width: 639px) {
+  html[data-theme='theme-two'] .home-category[data-category='categoryTools'] .home-game-grid {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+  }
+
+  html[data-theme='theme-two'] .home-category[data-category='categoryTools'] .home-game-card {
+    min-width: 0;
+  }
+
+  html[data-theme='theme-two'] .home-category[data-category='categoryTools'] .home-game-card:not(:first-child) {
+    display: grid;
+    min-height: 4.75rem;
+    grid-template-columns: 2.8rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border: 0;
+    border-bottom: 1px solid var(--separator);
+    border-radius: 0;
+    color: var(--foreground);
+    background: transparent;
+    box-shadow: none;
+  }
+
+  html[data-theme='theme-two'] .home-category[data-category='categoryTools'] .home-game-card:last-child {
+    border-bottom: 0;
+  }
+
+  html[data-theme='theme-two'] .home-category[data-category='categoryTools'] .home-game-card:not(:first-child):hover {
+    background: color-mix(in oklab, var(--primary) 5%, white);
+  }
+
+  html[data-theme='theme-two'] .home-category[data-category='categoryTools'] .home-game-card:not(:first-child) .home-game-card-copy {
+    grid-column: 2;
+    grid-row: 1;
+    margin: 0;
+    padding: 0;
+  }
+
+  html[data-theme='theme-two'] .home-category[data-category='categoryTools'] .home-game-card:not(:first-child) .home-game-card-title {
+    color: var(--foreground);
+    font-size: 0.98rem;
+    font-weight: 680;
+  }
+
+  html[data-theme='theme-two'] .home-category[data-category='categoryTools'] .home-game-card:not(:first-child) .home-game-card-description {
+    margin-top: 0.2rem;
+    color: var(--muted-foreground);
+    font-size: 0.78rem;
+    line-height: 1.15rem;
+  }
+
+  html[data-theme='theme-two'] .home-category[data-category='categoryTools'] .home-game-card:not(:first-child) .home-game-card-featured-label {
+    display: none;
+  }
+
+  html[data-theme='theme-two'] .home-category[data-category='categoryTools'] .home-game-card:not(:first-child) .home-game-card-arrow {
+    width: 1.1rem;
+    height: 1.1rem;
+    grid-column: 3;
+    grid-row: 1;
+    border: 0;
+    color: var(--muted-foreground);
+    background: transparent;
+  }
+
+  html[data-theme='theme-two'] .home-category[data-category='categoryTools'] .home-game-card:not(:first-child) .home-game-card-arrow > svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+}
+
 /* Route layout suite: every route can evolve independently under Theme Two. */
 html[data-theme='theme-two'] .game-page[data-page='2048'] main,
 html[data-theme='theme-two'] .game-page[data-page='snake'] main,
@@ -2833,27 +2908,63 @@ html[data-theme='theme-two'] .game-actions {
   }
 
   html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-cards-marked-numbers {
-    display: flex;
+    display: grid;
     min-width: 0;
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
-    gap: 0.5rem;
+    column-gap: 0.5rem;
+    row-gap: 0.5rem;
     margin-top: 0.5rem !important;
     padding-top: 0.5rem !important;
     border-color: var(--separator);
   }
 
-  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-cards-marked-numbers > p {
-    flex: 0 0 auto;
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-marked-numbers-label {
+    min-width: 0;
+    max-width: clamp(4.8rem, 23vw, 7rem);
     margin: 0;
+    overflow: hidden;
     font-size: 0.65rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-cards-marked-numbers [role='list'] {
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-marked-numbers-list {
     min-width: 0;
-    flex: 1;
+    scrollbar-width: none;
+    overscroll-behavior: contain;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-marked-numbers-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-marked-numbers-list > li {
+    flex: 0 0 auto;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-cards-marked-numbers[data-expanded='false'] .bingo-marked-numbers-list {
+    grid-column: 2;
+    grid-row: 1;
     flex-wrap: nowrap;
     overflow-x: auto;
     overflow-y: hidden;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-cards-marked-numbers[data-expanded='true'] .bingo-marked-numbers-list {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    flex-wrap: wrap;
+    max-height: min(12rem, 30svh);
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-marked-numbers-toggle {
+    min-width: 4.6rem;
+    min-height: 2.75rem;
+    color: var(--foreground);
+    background: var(--control-fill);
   }
 
   html[data-theme='theme-two'] .game-page[data-page='bingo-cards'] .bingo-cards-library {

@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 
 import {
   checkBingo,
+  getMarkedNumbersNewestFirst,
   removeMarkedNumber,
   type BingoCardGrid,
 } from "./card-rules"
@@ -44,5 +45,24 @@ describe("checkBingo after an undo", () => {
 
     expect(checkBingo(card, completedRow)).toBe(true)
     expect(checkBingo(card, removeMarkedNumber(completedRow, 31))).toBe(false)
+  })
+})
+
+describe("getMarkedNumbersNewestFirst", () => {
+  it("keeps the most recently marked number first", () => {
+    expect(getMarkedNumbersNewestFirst(new Set([2, 10, 75]))).toEqual([
+      75,
+      10,
+      2,
+    ])
+  })
+
+  it("moves a removed and re-added number back to the front", () => {
+    const markedNumbers = new Set([2, 10, 75])
+    const afterUndo = removeMarkedNumber(markedNumbers, 10)
+    const afterRemark = new Set([...afterUndo, 10])
+
+    expect(getMarkedNumbersNewestFirst(afterUndo)).toEqual([75, 2])
+    expect(getMarkedNumbersNewestFirst(afterRemark)).toEqual([10, 75, 2])
   })
 })
