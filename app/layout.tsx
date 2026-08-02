@@ -6,6 +6,7 @@ import { ThemeProvider } from '@/components/theme-provider'
 import { ThemeTwoTabBar } from '@/components/theme-two-tab-bar'
 import { ThemeThreeNavigation } from '@/components/theme-three-navigation'
 import { PwaRegister } from '@/components/pwa-register'
+import { PwaInstallPrompt } from '@/components/pwa-install-prompt'
 import { getPageMetadata } from '@/lib/page-metadata'
 import { themeBootstrapScript } from '@/lib/theme'
 import './globals.css'
@@ -28,6 +29,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   ...getPageMetadata('/', 'zh'),
+  applicationName: 'XM-Games',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
@@ -37,13 +39,20 @@ export const metadata: Metadata = {
   formatDetection: {
     telephone: false,
   },
+  other: {
+    'apple-mobile-web-app-capable': 'yes',
+  },
   icons: {
     icon: [
       { url: '/icon.svg', type: 'image/svg+xml' },
       { url: '/pwa-icon-192.png', sizes: '192x192', type: 'image/png' },
       { url: '/pwa-icon-512.png', sizes: '512x512', type: 'image/png' },
     ],
-    apple: '/pwa-icon-192.png',
+    apple: {
+      url: '/apple-touch-icon.png',
+      sizes: '180x180',
+      type: 'image/png',
+    },
   },
 }
 
@@ -76,6 +85,7 @@ export default function RootLayout({
             {children}
             <ThemeTwoTabBar />
             <ThemeThreeNavigation />
+            <PwaInstallPrompt />
           </LocaleProvider>
         </ThemeProvider>
         {process.env.VERCEL === '1' && <Analytics />}
