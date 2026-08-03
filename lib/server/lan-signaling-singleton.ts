@@ -105,6 +105,11 @@ export function createLanSignalStoreForEnvironment(
     const client = new Redis({
       ...credentials,
       automaticDeserialization: false,
+      // Lua EVAL replies are arrays of UTF-8 strings. The SDK's default
+      // base64 decoder treats nested array elements differently from scalar
+      // replies, which can turn a raw "OK" tuple status into another value.
+      // Requesting plain JSON keeps the atomic script tuple intact.
+      responseEncoding: false,
       readYourWrites: true,
     })
     return new RedisLanSignalStore({
