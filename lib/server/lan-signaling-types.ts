@@ -127,7 +127,7 @@ export interface LanSignalStore {
   pollSignals(input: LanPollSignalsInput): Promise<LanPollSignalsResult>
   heartbeat(input: LanAuthenticatedInput): Promise<LanHeartbeatResult>
   leaveRoom(input: LanAuthenticatedInput): Promise<LanLeaveRoomResult>
-  cleanupExpired(): number
+  cleanupExpired(): number | Promise<number>
 }
 
 export type LanErrorCode =
@@ -137,6 +137,7 @@ export type LanErrorCode =
   | "ROOM_FULL"
   | "ROOM_LIMIT_REACHED"
   | "ROOM_CODE_EXHAUSTED"
+  | "SERVICE_UNAVAILABLE"
   | "IDEMPOTENCY_CONFLICT"
   | "SIGNAL_LIMIT_REACHED"
   | "POLL_LIMIT_REACHED"

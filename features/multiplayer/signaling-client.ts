@@ -2,6 +2,7 @@ import type { JsonValue } from "./crypto"
 
 export const DEFAULT_LAN_SIGNALING_BASE_URL = "/api/lan"
 export const MAX_SIGNAL_WAIT_MS = 25_000
+export const DEFAULT_LAN_REQUEST_TIMEOUT_MS = 10_000
 
 export type LanRoomRole = "host" | "guest"
 
@@ -65,6 +66,7 @@ export type LanSignalingClientOptions = {
   baseUrl?: string
   fetch?: typeof fetch
   createId?: () => string
+  requestTimeoutMs?: number
 }
 
 export class LanSignalingError extends Error {
@@ -188,11 +190,16 @@ export class LanSignalingClient {
   private readonly baseUrl: string
   private readonly fetcher: typeof fetch
   private readonly createId: () => string
+  private readonly requestTimeoutMs: number
 
   constructor(options: LanSignalingClientOptions = {}) {
     this.baseUrl = (options.baseUrl ?? DEFAULT_LAN_SIGNALING_BASE_URL).replace(/\/$/u, "")
     this.fetcher = options.fetch ?? globalThis.fetch.bind(globalThis)
     this.createId = options.createId ?? defaultCreateId
+    this.requestTimeoutMs = options.requestTimeoutMs ?? DEFAULT_LAN_REQUEST_TIMEOUT_MS
+    if (!Number.isSafeInteger(this.requestTimeoutMs) || this.requestTimeoutMs <= 0) {
+      throw new RangeError("requestTimeoutMs must be a positive safe integer")
+    }
   }
 
   createRoom(requestId = this.createId()): Promise<LanRoomSession> {
@@ -246,7 +253,7 @@ export class LanSignalingClient {
         type,
         payload,
       }),
-    }, session.token)
+    }, session.token, this.requestTimeoutMs)
     const body: unknown = await response.json()
     if (!isRecord(body)) {
       throw new LanSignalingError("Invalid signal publish response", 502, "INVALID_RESPONSE")
@@ -260,7 +267,7 @@ export class LanSignalingClient {
     const response = await this.request(`${this.roomUrl(session.roomId)}/heartbeat`, {
       method: "POST",
       body: JSON.stringify({ peerId: session.peerId }),
-    }, session.token)
+    }, session.token, this.requestTimeoutMs)
     const body: unknown = await response.json()
     if (
       !isRecord(body)
@@ -280,7 +287,7 @@ export class LanSignalingClient {
       method: "DELETE",
       body: JSON.stringify({ peerId: session.peerId }),
       keepalive: true,
-    }, session.token)
+    }, session.token, this.requestTimeoutMs)
     const body: unknown = await response.json()
     if (
       !isRecord(body)
@@ -300,7 +307,7 @@ export class LanSignalingClient {
     const response = await this.request(url, {
       method: "POST",
       body: JSON.stringify({ requestId }),
-    })
+    }, undefined, this.requestTimeoutMs)
     return validateRoomSession(await response.json())
   }
 
@@ -316,21 +323,61 @@ export class LanSignalingClient {
     url: string,
     init: RequestInit,
     token?: string,
+    timeoutMs?: number,
   ): Promise<Response> {
     const headers = new Headers(init.headers)
     headers.set("Accept", "application/json")
     if (init.body !== undefined) headers.set("Content-Type", "application/json")
     if (token) headers.set("Authorization", `Bearer ${token}`)
 
+    const sourceSignal = init.signal
+    let requestSignal = sourceSignal
+    let timedOut = false
+    let timeoutId: ReturnType<typeof setTimeout> | undefined
+    let removeSourceAbortListener: (() => void) | undefined
+
+    if (timeoutMs !== undefined) {
+      const timeoutController = new AbortController()
+      requestSignal = timeoutController.signal
+
+      if (sourceSignal?.aborted) {
+        timeoutController.abort(sourceSignal.reason)
+      } else if (sourceSignal) {
+        const abortFromSource = () => timeoutController.abort(sourceSignal.reason)
+        sourceSignal.addEventListener("abort", abortFromSource, { once: true })
+        removeSourceAbortListener = () => sourceSignal.removeEventListener("abort", abortFromSource)
+      }
+
+      timeoutId = setTimeout(() => {
+        timedOut = true
+        timeoutController.abort()
+      }, timeoutMs)
+    }
+
     let response: Response
     try {
-      response = await this.fetcher(url, { ...init, headers, cache: "no-store" })
+      response = await this.fetcher(url, {
+        ...init,
+        headers,
+        cache: "no-store",
+        signal: requestSignal,
+      })
     } catch (error) {
+      if (timedOut) {
+        throw new LanSignalingError(
+          `Signaling request timed out after ${timeoutMs}ms`,
+          408,
+          "REQUEST_TIMEOUT",
+        )
+      }
       throw new LanSignalingError(
         error instanceof Error ? error.message : "Signaling request failed",
         0,
         "NETWORK_ERROR",
       )
+    } finally {
+      if (timeoutId !== undefined) clearTimeout(timeoutId)
+      removeSourceAbortListener?.()
     }
 
     if (response.ok) return response

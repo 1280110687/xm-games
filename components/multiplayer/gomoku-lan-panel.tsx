@@ -155,9 +155,9 @@ const COPY: Record<
     invalidRoom: "请输入完整的 6 位房间码",
     errors: {
       UNSUPPORTED_BROWSER: "当前浏览器不支持 H5 点对点连接，请升级 Safari 或 Chrome。",
-      ROOM_NOT_FOUND: "没有找到这个房间，请确认房间码是否正确。",
+      ROOM_NOT_FOUND: "房间不存在或已经失效，请重新输入房间码或创建新房间。",
       ROOM_FULL: "这个房间已经有两位玩家。",
-      ROOM_EXPIRED: "房间已经过期，请重新创建。",
+      ROOM_EXPIRED: "房间已经失效，请创建新房间或重新输入房间码。",
       NETWORK_ERROR: "暂时无法连接信令服务，请检查网络后重试。",
       CONNECTION_FAILED: "两台手机未能建立直连，请确认连接同一 Wi-Fi 且未开启访客隔离。",
       ENGINE_MISMATCH: "双方游戏版本不一致，请刷新页面后重试。",
@@ -212,9 +212,9 @@ const COPY: Record<
     invalidRoom: "Enter the complete 6-digit room code",
     errors: {
       UNSUPPORTED_BROWSER: "This browser does not support H5 peer connections. Update Safari or Chrome.",
-      ROOM_NOT_FOUND: "Room not found. Check the six-digit code.",
+      ROOM_NOT_FOUND: "This room no longer exists. Enter another code or create a new room.",
       ROOM_FULL: "This room already has two players.",
-      ROOM_EXPIRED: "The room has expired. Create a new one.",
+      ROOM_EXPIRED: "This room has expired. Create a new room or enter another code.",
       NETWORK_ERROR: "The signaling service is unavailable. Check your network and retry.",
       CONNECTION_FAILED: "The phones could not connect. Use the same Wi-Fi and disable guest isolation.",
       ENGINE_MISMATCH: "The game versions differ. Refresh both phones and retry.",
@@ -269,9 +269,9 @@ const COPY: Record<
     invalidRoom: "กรอกรหัสห้อง 6 หลักให้ครบ",
     errors: {
       UNSUPPORTED_BROWSER: "เบราว์เซอร์นี้ไม่รองรับการเชื่อมต่อ H5 โปรดอัปเดต Safari หรือ Chrome",
-      ROOM_NOT_FOUND: "ไม่พบห้อง โปรดตรวจสอบรหัส 6 หลัก",
+      ROOM_NOT_FOUND: "ห้องนี้ไม่มีอยู่แล้ว โปรดกรอกรหัสใหม่หรือสร้างห้องใหม่",
       ROOM_FULL: "ห้องนี้มีผู้เล่นสองคนแล้ว",
-      ROOM_EXPIRED: "ห้องหมดอายุแล้ว โปรดสร้างห้องใหม่",
+      ROOM_EXPIRED: "ห้องหมดอายุแล้ว โปรดสร้างห้องใหม่หรือกรอกรหัสอื่น",
       NETWORK_ERROR: "เชื่อมต่อบริการจับคู่ไม่ได้ โปรดตรวจสอบเครือข่าย",
       CONNECTION_FAILED: "มือถือเชื่อมต่อกันไม่ได้ โปรดใช้ Wi-Fi เดียวกันและปิด guest isolation",
       ENGINE_MISMATCH: "เวอร์ชันเกมไม่ตรงกัน โปรดรีเฟรชทั้งสองเครื่อง",
@@ -467,7 +467,9 @@ export function GomokuLanPanel({
               <div className="gomoku-lan-panel__error" role="alert">
                 <WifiOff aria-hidden="true" />
                 <span>{error}</span>
-                <Button variant="outline" size="sm" onClick={onRetry}>{copy.retry}</Button>
+                {roomId && (
+                  <Button variant="outline" size="sm" onClick={onRetry}>{copy.retry}</Button>
+                )}
               </div>
             )}
           </div>

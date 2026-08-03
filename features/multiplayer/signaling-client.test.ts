@@ -161,6 +161,84 @@ describe("LAN signaling client", () => {
     }
   })
 
+  it("aborts every finite signaling mutation and maps the timeout as retryable", async () => {
+    vi.useFakeTimers()
+    try {
+      const fetcher = vi.fn<typeof fetch>().mockImplementation((_input, init) => (
+        new Promise((_resolve, reject) => {
+          init?.signal?.addEventListener("abort", () => {
+            reject(init.signal?.reason ?? new DOMException("Aborted", "AbortError"))
+          }, { once: true })
+        })
+      ))
+      const client = new LanSignalingClient({
+        fetch: fetcher,
+        createId: () => requestId,
+        requestTimeoutMs: 250,
+      })
+
+      const requests = [
+        client.createRoom(),
+        client.joinRoom(session.roomId),
+        client.sendSignal(session, "renegotiate", {}, negotiationId),
+        client.heartbeat(session),
+        client.leaveRoom(session),
+      ]
+      const assertions = requests.map((request) => expect(request).rejects.toEqual(
+        expect.objectContaining<Partial<LanSignalingError>>({
+          status: 408,
+          code: "REQUEST_TIMEOUT",
+          message: "Signaling request timed out after 250ms",
+          retryable: true,
+        }),
+      ))
+      await vi.advanceTimersByTimeAsync(250)
+
+      await Promise.all(assertions)
+      expect(fetcher).toHaveBeenCalledTimes(requests.length)
+      for (const [, init] of fetcher.mock.calls) {
+        expect(init?.signal?.aborted).toBe(true)
+      }
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it("keeps poll cancellation owned by the caller instead of applying the write timeout", async () => {
+    const fetcher = vi.fn<typeof fetch>().mockImplementation((_input, init) => (
+      new Promise((_resolve, reject) => {
+        init?.signal?.addEventListener("abort", () => {
+          reject(new DOMException("The operation was aborted", "AbortError"))
+        }, { once: true })
+      })
+    ))
+    const client = new LanSignalingClient({
+      fetch: fetcher,
+      createId: () => requestId,
+      requestTimeoutMs: 1,
+    })
+    const controller = new AbortController()
+
+    const request = client.pollSignals(session, 0, 2_000, controller.signal)
+    expect(fetcher.mock.calls[0][1]?.signal).toBe(controller.signal)
+    controller.abort()
+
+    await expect(request).rejects.toEqual(
+      expect.objectContaining<Partial<LanSignalingError>>({
+        status: 0,
+        code: "NETWORK_ERROR",
+        retryable: true,
+      }),
+    )
+  })
+
+  it("rejects invalid finite request timeout configuration", () => {
+    expect(() => new LanSignalingClient({ requestTimeoutMs: 0 })).toThrow(RangeError)
+    expect(() => new LanSignalingClient({ requestTimeoutMs: Number.POSITIVE_INFINITY })).toThrow(
+      RangeError,
+    )
+  })
+
   it("requires a UUID negotiation generation for every signal", async () => {
     const published = {
       cursor: 2,

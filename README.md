@@ -64,8 +64,24 @@ lib/         国际化、页面元数据与通用工具
 - 每次落子都要经过对端规则校验与 ACK 后才提交；重连时会从落子历史重放棋盘并核对 revision 和状态哈希，非法快照不会覆盖本机状态。
 - 默认不配置公网 STUN / TURN，优先面向同一局域网内的设备。若部署环境需要额外 ICE Server，可设置逗号分隔的 `NEXT_PUBLIC_LAN_ICE_SERVERS`。真实手机访问应使用 HTTPS。
 - 房间有效期只由创建者心跳续期；加入者失联约 45 秒后会自动释放席位并清理旧协商信令，新的玩家可使用同一房间码加入。
-- 当前信令存储为单个 Next.js 进程内存实现，适合本地、内网或单实例服务；多实例 / Serverless 正式部署需要将 `LanSignalStore` 替换为 Redis 或数据库共享实现。
+- Vercel 部署使用 Upstash Redis 共享房间、租约和 WebRTC 信令，避免不同 Function 实例之间出现房间丢失。Redis 只保存短期建连信息，对局操作仍通过两台设备间的 `RTCDataChannel` 传输。
+- 本地开发和测试未配置 Redis 时使用进程内存实现；若同时配置 `UPSTASH_REDIS_REST_URL` 与 `UPSTASH_REDIS_REST_TOKEN`，本地也会使用 Redis。Vercel 环境缺少其中任一变量时接口会明确返回 `503`，不会静默回退到不可靠的进程内存。
 - PWA 离线缓存可以打开已缓存的页面和本机玩法，但创建或加入联机房间仍需要能够访问同一信令服务。
+
+### Vercel Hobby 免费部署
+
+本项目不要求升级 Vercel 套餐。Vercel Marketplace Storage 对 Hobby 计划开放，低频熟人对局可选择 Upstash Redis 的 Free 计划：
+
+1. 打开 Vercel 项目，在 **Storage / Create Database** 中选择 **Upstash Redis**；也可从 [Vercel Marketplace 的 Upstash 页面](https://vercel.com/marketplace/upstash)安装。
+2. 创建 Redis 数据库时明确选择 **Free**，并连接到当前 XM-Games 项目。数据库区域尽量选择接近 Vercel Function 的区域。
+3. 在项目的环境变量页面确认已自动注入 `UPSTASH_REDIS_REST_URL` 与 `UPSTASH_REDIS_REST_TOKEN`。这两个变量必须只存在于服务端环境，禁止改成 `NEXT_PUBLIC_*` 或写入代码。
+4. 环境变量只会对新部署生效；连接完成后重新部署一次，再用两个手机创建一个全新房间测试。部署前创建的内存房间不能迁移。
+
+需要在本地连接同一个 Redis 时，可将 `.env.example` 复制为 `.env.local` 后填写两项服务端变量，也可以在已关联 Vercel 项目的目录运行 `vercel env pull .env.local`。`.env.local` 已被 Git 忽略，不得提交或在日志中输出其内容。
+
+Upstash 当前 Free 计划包含每月 500,000 条命令、256 MB 数据和 10 GB 带宽，额度可能调整，请以 [Upstash Redis 实时价格页](https://upstash.com/pricing/redis)为准。信令客户端会在协商阶段快速轮询，并在空闲或连接稳定后降低频率；因此免费方案面向个人、测试和低频熟人对局，不适合大量房间长期同时在线。请在 Upstash 控制台查看 Commands 与 Bandwidth，用量接近上限时减少并发或结束闲置房间，而不是启用付费自动升级。
+
+部署后若加入或心跳返回 `503`，优先检查两项 Redis 环境变量是否同时存在并已重新部署；若返回 `404 ROOM_NOT_FOUND`，确认测试使用的是重新部署后新建的房间，并检查 Upstash 请求日志。所有信令接口为 `200` 但 WebRTC 仍无法连接时，再检查手机热点的客户端隔离以及 STUN/TURN 配置。
 
 ## 语音功能
 

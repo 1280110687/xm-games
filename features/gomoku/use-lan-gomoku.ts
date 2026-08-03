@@ -46,6 +46,12 @@ const GOMOKU_ENGINE_VERSION = "gomoku-free-v2"
 const SESSION_STORAGE_KEY = "xm-games:gomoku:lan-session:v2"
 const SIGNAL_HEARTBEAT_MS = 12_000
 const RECONNECT_DELAY_MS = 1_200
+const ROOM_REQUEST_RETRY_DELAY_MS = 900
+const SIGNAL_POLL_FAST_MS = 500
+const SIGNAL_POLL_BACKOFF_MAX_MS = 2_000
+const SIGNAL_POLL_CONNECTED_MS = 8_000
+const SIGNAL_POLL_HIDDEN_MS = 15_000
+const SIGNAL_POLL_JITTER_RATIO = 0.2
 const DICE_RESULT_HOLD_MS = 1_450
 const PROCESSED_MESSAGE_LIMIT = 512
 
@@ -472,6 +478,62 @@ export function shouldRetainPendingRoomRequest(error: unknown): boolean {
   return error instanceof LanSignalingError && error.retryable
 }
 
+export async function openRoomWithSingleRetry<T>(
+  openRoom: () => Promise<T>,
+  isStillActive: () => boolean,
+  waitForRetry: () => Promise<unknown> = () => new Promise(
+    (resolve) => setTimeout(resolve, ROOM_REQUEST_RETRY_DELAY_MS),
+  ),
+): Promise<T> {
+  try {
+    return await openRoom()
+  } catch (error) {
+    if (!shouldRetainPendingRoomRequest(error) || !isStillActive()) throw error
+    await waitForRetry()
+    if (!isStillActive()) throw error
+    return openRoom()
+  }
+}
+
+export function shouldClearRoomSession(code: LanGomokuErrorCode): boolean {
+  return code === "ROOM_NOT_FOUND" || code === "ROOM_EXPIRED"
+}
+
+export function getSignalPollDelay(
+  consecutiveEmptyPolls: number,
+  options: {
+    connected: boolean
+    hidden: boolean
+    random?: () => number
+  },
+): number {
+  const random = options.random ?? Math.random
+  const baseDelay = options.hidden
+    ? SIGNAL_POLL_HIDDEN_MS
+    : options.connected
+      ? SIGNAL_POLL_CONNECTED_MS
+      : Math.min(
+          SIGNAL_POLL_FAST_MS * 2 ** Math.min(Math.max(consecutiveEmptyPolls, 0), 2),
+          SIGNAL_POLL_BACKOFF_MAX_MS,
+        )
+  const jitter = Math.max(0, Math.min(1, random())) * SIGNAL_POLL_JITTER_RATIO
+  return Math.round(baseDelay * (1 + jitter))
+}
+
+function waitForSignalPollDelay(delayMs: number, signal: AbortSignal): Promise<void> {
+  if (signal.aborted) return Promise.resolve()
+
+  return new Promise((resolve) => {
+    const timeout = setTimeout(finish, delayMs)
+    function finish() {
+      clearTimeout(timeout)
+      signal.removeEventListener("abort", finish)
+      resolve()
+    }
+    signal.addEventListener("abort", finish, { once: true })
+  })
+}
+
 export function shouldHostNegotiate(
   role: LanRoomSession["role"],
   remotePeerId: string | null,
@@ -651,14 +713,14 @@ export function useLanGomoku(): UseLanGomokuResult {
     getPendingRoomRequestStore().clear()
   }
 
-  function getOrCreatePendingRoomRequest(
+  function createFreshPendingRoomRequest(
     kind: PendingRoomRequest["kind"],
     roomId?: string,
   ): PendingRoomRequest {
     const store = getPendingRoomRequestStore()
     return kind === "create"
-      ? store.getOrCreate("create")
-      : store.getOrCreate("join", roomId ?? "")
+      ? store.replace("create")
+      : store.replace("join", roomId ?? "")
   }
 
   function sendMessage(
@@ -694,6 +756,12 @@ export function useLanGomoku(): UseLanGomokuResult {
     setConnected(false)
     stopBackgroundWork()
     closePeerConnection()
+    if (shouldClearRoomSession(code)) {
+      clearPersistedSession()
+      clearPendingRoomRequest()
+      setCurrentSession(null)
+      resetMatchState()
+    }
     setErrorCode(code)
     setPhase("error")
   }
@@ -1194,6 +1262,7 @@ export function useLanGomoku(): UseLanGomokuResult {
     pollOwnerRef.current = owner
     const abortController = new AbortController()
     pollAbortRef.current = abortController
+    let consecutiveEmptyPolls = 0
 
     try {
       while (
@@ -1210,7 +1279,7 @@ export function useLanGomoku(): UseLanGomokuResult {
           const response = await signalingRef.current!.pollSignals(
             currentSession,
             currentSession.cursor,
-            20_000,
+            0,
             abortController.signal,
           )
           if (
@@ -1255,6 +1324,16 @@ export function useLanGomoku(): UseLanGomokuResult {
             })
           }
           persistSession()
+          if (response.messages.length === 0) {
+            const delayMs = getSignalPollDelay(consecutiveEmptyPolls, {
+              connected: connectedRef.current,
+              hidden: typeof document !== "undefined" && document.hidden,
+            })
+            consecutiveEmptyPolls += 1
+            await waitForSignalPollDelay(delayMs, abortController.signal)
+          } else {
+            consecutiveEmptyPolls = 0
+          }
         } catch (error) {
           if (
             abortController.signal.aborted
@@ -1267,7 +1346,12 @@ export function useLanGomoku(): UseLanGomokuResult {
             break
           }
           setErrorCode(code)
-          await new Promise((resolve) => setTimeout(resolve, 900))
+          const delayMs = getSignalPollDelay(consecutiveEmptyPolls, {
+            connected: connectedRef.current,
+            hidden: typeof document !== "undefined" && document.hidden,
+          })
+          consecutiveEmptyPolls += 1
+          await waitForSignalPollDelay(delayMs, abortController.signal)
         }
       }
     } finally {
@@ -1355,12 +1439,15 @@ export function useLanGomoku(): UseLanGomokuResult {
       setFailure("UNSUPPORTED_BROWSER")
       return
     }
-    leaveRoom(true)
-    const pendingRequest = getOrCreatePendingRoomRequest("create")
+    leaveRoom()
+    const pendingRequest = createFreshPendingRoomRequest("create")
     setPhase("creating")
     const requestEpoch = sessionEpochRef.current
     try {
-      const nextSession = await signalingRef.current!.createRoom(pendingRequest.requestId)
+      const nextSession = await openRoomWithSingleRetry(
+        () => signalingRef.current!.createRoom(pendingRequest.requestId),
+        () => !disposedRef.current && requestEpoch === sessionEpochRef.current,
+      )
       if (disposedRef.current || requestEpoch !== sessionEpochRef.current) {
         void signalingRef.current!.leaveRoom(nextSession).catch(() => {})
         return
@@ -1382,14 +1469,14 @@ export function useLanGomoku(): UseLanGomokuResult {
     }
     const normalized = normalizeRoomCode(roomId)
     if (normalized.length !== 6) return
-    leaveRoom(true)
-    const pendingRequest = getOrCreatePendingRoomRequest("join", normalized)
+    leaveRoom()
+    const pendingRequest = createFreshPendingRoomRequest("join", normalized)
     setPhase("connecting")
     const requestEpoch = sessionEpochRef.current
     try {
-      const nextSession = await signalingRef.current!.joinRoom(
-        normalized,
-        pendingRequest.requestId,
+      const nextSession = await openRoomWithSingleRetry(
+        () => signalingRef.current!.joinRoom(normalized, pendingRequest.requestId),
+        () => !disposedRef.current && requestEpoch === sessionEpochRef.current,
       )
       if (disposedRef.current || requestEpoch !== sessionEpochRef.current) {
         void signalingRef.current!.leaveRoom(nextSession).catch(() => {})
@@ -2379,6 +2466,7 @@ export function useLanGomoku(): UseLanGomokuResult {
   function retryConnection() {
     const currentSession = sessionRef.current
     if (!currentSession) {
+      setErrorCode(null)
       setPhase("idle")
       return
     }
@@ -2394,8 +2482,28 @@ export function useLanGomoku(): UseLanGomokuResult {
     } else scheduleReconnect()
   }
 
+  function restartSignalPolling() {
+    const expectedEpoch = sessionEpochRef.current
+    pollAbortRef.current?.abort()
+    window.setTimeout(() => {
+      if (
+        disposedRef.current
+        || expectedEpoch !== sessionEpochRef.current
+        || !sessionRef.current
+        || phaseRef.current === "error"
+      ) return
+      void pollSignals()
+    }, 0)
+  }
+
   useEffect(() => {
     disposedRef.current = false
+    const handleOnline = () => restartSignalPolling()
+    const handleVisibilityChange = () => {
+      if (!document.hidden) restartSignalPolling()
+    }
+    window.addEventListener("online", handleOnline)
+    document.addEventListener("visibilitychange", handleVisibilityChange)
     const restoreTimer = window.setTimeout(() => {
       if (disposedRef.current || !supportsLanMultiplayer()) return
 
@@ -2445,6 +2553,8 @@ export function useLanGomoku(): UseLanGomokuResult {
 
     return () => {
       window.clearTimeout(restoreTimer)
+      window.removeEventListener("online", handleOnline)
+      document.removeEventListener("visibilitychange", handleVisibilityChange)
       disposedRef.current = true
       negotiatingRef.current = false
       negotiationOwnerRef.current = null
