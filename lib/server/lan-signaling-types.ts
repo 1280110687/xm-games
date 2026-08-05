@@ -2,6 +2,10 @@ export const LAN_ROOM_CODE_PATTERN = /^\d{6}$/u
 export const LAN_PEER_ID_PATTERN = /^[A-Za-z0-9_-]{16,64}$/u
 export const LAN_TOKEN_PATTERN = /^[A-Za-z0-9_-]{43}$/u
 export const LAN_REQUEST_ID_PATTERN = /^[A-Za-z0-9_-]{16,128}$/u
+export const LAN_GAME_ID_PATTERN = /^[a-z0-9][a-z0-9-]{1,31}$/u
+export const LAN_ENGINE_VERSION_PATTERN = /^[A-Za-z0-9][A-Za-z0-9._-]{1,127}$/u
+export const DEFAULT_LAN_GAME_ID = "gomoku"
+export const DEFAULT_LAN_ENGINE_VERSION = "gomoku-free-v2"
 export const LAN_NEGOTIATION_ID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/iu
 
@@ -52,6 +56,8 @@ interface LanSignalMessageMetadata {
 export type LanSignalMessage = LanSignalInput & LanSignalMessageMetadata
 
 export interface LanPeerSession {
+  gameId: string
+  engineVersion: string
   roomId: string
   peerId: string
   role: LanRole
@@ -67,11 +73,24 @@ export interface LanIdempotentResult<T> {
 
 export interface LanCreateRoomInput {
   requestId: string
+  gameId?: string
+  engineVersion?: string
 }
 
 export interface LanJoinRoomInput {
   roomId: string
   requestId: string
+  gameId?: string
+  engineVersion?: string
+}
+
+export function normalizeLanGameIdentity(
+  input: Pick<LanCreateRoomInput, "gameId" | "engineVersion">,
+): { gameId: string; engineVersion: string } {
+  return {
+    gameId: input.gameId ?? DEFAULT_LAN_GAME_ID,
+    engineVersion: input.engineVersion ?? DEFAULT_LAN_ENGINE_VERSION,
+  }
 }
 
 export interface LanAuthenticatedInput {
@@ -137,6 +156,8 @@ export type LanErrorCode =
   | "ROOM_FULL"
   | "ROOM_LIMIT_REACHED"
   | "ROOM_CODE_EXHAUSTED"
+  | "GAME_MISMATCH"
+  | "ENGINE_MISMATCH"
   | "SERVICE_UNAVAILABLE"
   | "IDEMPOTENCY_CONFLICT"
   | "SIGNAL_LIMIT_REACHED"

@@ -13,6 +13,7 @@ import {
   LAN_ROOM_CODE_PATTERN,
   LAN_TOKEN_PATTERN,
   LanSignalError,
+  normalizeLanGameIdentity,
   type LanAuthenticatedInput,
   type LanCreateRoomInput,
   type LanErrorCode,
@@ -72,6 +73,20 @@ interface StoredRedisSignal {
 const LUA_ROOM_HELPERS = String.raw`
 local function isRoomExpired(room, now)
   return tonumber(room.expiresAt) <= now or tonumber(room.hardExpiresAt) <= now
+end
+
+local function roomGameId(room)
+  if room.gameId == nil or room.gameId == cjson.null then
+    return "gomoku"
+  end
+  return room.gameId
+end
+
+local function roomEngineVersion(room)
+  if room.engineVersion == nil or room.engineVersion == cjson.null then
+    return "gomoku-free-v2"
+  end
+  return room.engineVersion
 end
 
 local function deleteRoom(roomKey, indexKey, room)
@@ -144,8 +159,10 @@ local maxRooms = tonumber(ARGV[5])
 local peerId = ARGV[6]
 local tokenDigest = ARGV[7]
 local token = ARGV[8]
-local roomKeyPrefix = ARGV[9]
-local candidateCount = tonumber(ARGV[10])
+local gameId = ARGV[9]
+local engineVersion = ARGV[10]
+local roomKeyPrefix = ARGV[11]
+local candidateCount = tonumber(ARGV[12])
 
 redis.call("ZREMRANGEBYSCORE", KEYS[2], "-inf", tostring(now))
 
@@ -165,11 +182,18 @@ if existingEncoded then
         or existingRoom.host.tokenDigest ~= existing.tokenDigest then
         return { "ERR", "INTERNAL_ERROR" }
       end
+      if roomGameId(existingRoom) ~= gameId then
+        return { "ERR", "GAME_MISMATCH" }
+      end
+      if roomEngineVersion(existingRoom) ~= engineVersion then
+        return { "ERR", "ENGINE_MISMATCH" }
+      end
       touch(existingRoom, existingRoom.host, now, idleTtl)
       saveRoom(existingRoomKey, KEYS[2], existingRoom)
       return {
         "OK", "1", existing.roomId, existing.peerId, "host",
-        existing.token, tostring(existing.cursor), tostring(existingRoom.expiresAt)
+        existing.token, tostring(existing.cursor), tostring(existingRoom.expiresAt),
+        roomGameId(existingRoom), roomEngineVersion(existingRoom)
       }
     end
   else
@@ -186,7 +210,7 @@ local selectedRoomKey = nil
 for candidateIndex = 1, candidateCount do
   local keyIndex = candidateIndex + 2
   if redis.call("EXISTS", KEYS[keyIndex]) == 0 then
-    selectedRoomId = ARGV[candidateIndex + 10]
+    selectedRoomId = ARGV[candidateIndex + 12]
     selectedRoomKey = KEYS[keyIndex]
     break
   end
@@ -199,6 +223,8 @@ end
 local hardExpiresAt = now + hardTtl
 local expiresAt = math.min(now + idleTtl, hardExpiresAt)
 local room = {
+  gameId = gameId,
+  engineVersion = engineVersion,
   roomId = selectedRoomId,
   createdAt = now,
   hardExpiresAt = hardExpiresAt,
@@ -220,6 +246,8 @@ local room = {
   createRequestKey = KEYS[1]
 }
 local createRecord = {
+  gameId = gameId,
+  engineVersion = engineVersion,
   roomId = selectedRoomId,
   peerId = peerId,
   tokenDigest = tokenDigest,
@@ -234,7 +262,7 @@ redis.call(
 )
 return {
   "OK", "0", selectedRoomId, peerId, "host", token, "0",
-  tostring(expiresAt)
+  tostring(expiresAt), gameId, engineVersion
 }
 `
 
@@ -248,6 +276,8 @@ local requestId = ARGV[4]
 local peerId = ARGV[5]
 local tokenDigest = ARGV[6]
 local token = ARGV[7]
+local gameId = ARGV[8]
+local engineVersion = ARGV[9]
 local encoded = redis.call("GET", KEYS[1])
 if not encoded then
   return { "ERR", "ROOM_NOT_FOUND" }
@@ -256,6 +286,12 @@ local room = cjson.decode(encoded)
 if isRoomExpired(room, now) then
   deleteRoom(KEYS[1], KEYS[2], room)
   return { "ERR", "ROOM_NOT_FOUND" }
+end
+if roomGameId(room) ~= gameId then
+  return { "ERR", "GAME_MISMATCH" }
+end
+if roomEngineVersion(room) ~= engineVersion then
+  return { "ERR", "ENGINE_MISMATCH" }
 end
 releaseExpiredGuest(room, now, guestLeaseTtl)
 
@@ -266,7 +302,8 @@ if existing ~= nil and room.guest ~= nil and room.guest ~= cjson.null
   saveRoom(KEYS[1], KEYS[2], room)
   return {
     "OK", "1", roomId, existing.peerId, "guest", existing.token,
-    tostring(existing.cursor), tostring(room.expiresAt)
+    tostring(existing.cursor), tostring(room.expiresAt),
+    roomGameId(room), roomEngineVersion(room)
   }
 end
 
@@ -290,7 +327,7 @@ room.joinRequests[requestId] = {
 saveRoom(KEYS[1], KEYS[2], room)
 return {
   "OK", "0", roomId, peerId, "guest", token, tostring(cursor),
-  tostring(room.expiresAt)
+  tostring(room.expiresAt), roomGameId(room), roomEngineVersion(room)
 }
 `
 
@@ -534,6 +571,14 @@ const ERROR_DETAILS: Partial<
   },
   ROOM_NOT_FOUND: { status: 404, message: "Room not found." },
   ROOM_FULL: { status: 409, message: "The room already has two peers." },
+  GAME_MISMATCH: {
+    status: 409,
+    message: "The room belongs to another game.",
+  },
+  ENGINE_MISMATCH: {
+    status: 409,
+    message: "The room uses another engine version.",
+  },
   ROOM_LIMIT_REACHED: {
     status: 503,
     message: "The signaling service room limit has been reached.",
@@ -710,6 +755,7 @@ export class RedisLanSignalStore implements LanSignalStore {
   async createRoom(
     input: LanCreateRoomInput,
   ): Promise<LanIdempotentResult<LanPeerSession>> {
+    const { gameId, engineVersion } = normalizeLanGameIdentity(input)
     const token = this.allocateToken()
     const peerId = this.allocatePeerId()
     const candidates = this.allocateRoomCandidates()
@@ -732,6 +778,8 @@ export class RedisLanSignalStore implements LanSignalStore {
         peerId,
         digest(token),
         token,
+        gameId,
+        engineVersion,
         this.roomKeyPrefix,
         candidates.length,
         ...candidates,
@@ -747,6 +795,7 @@ export class RedisLanSignalStore implements LanSignalStore {
   async joinRoom(
     input: LanJoinRoomInput,
   ): Promise<LanIdempotentResult<LanPeerSession>> {
+    const { gameId, engineVersion } = normalizeLanGameIdentity(input)
     const token = this.allocateToken()
     const peerId = this.allocatePeerId()
     const tuple = parseEvalTuple(await this.client.eval(
@@ -760,6 +809,8 @@ export class RedisLanSignalStore implements LanSignalStore {
         peerId,
         digest(token),
         token,
+        gameId,
+        engineVersion,
       ],
     ))
 
@@ -887,6 +938,8 @@ export class RedisLanSignalStore implements LanSignalStore {
       token: String(tuple[5]),
       cursor: parseFiniteNumber(tuple[6]),
       expiresAt: new Date(parseFiniteNumber(tuple[7])).toISOString(),
+      gameId: String(tuple[8]),
+      engineVersion: String(tuple[9]),
     }
   }
 

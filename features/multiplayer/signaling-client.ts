@@ -3,10 +3,19 @@ import type { JsonValue } from "./crypto"
 export const DEFAULT_LAN_SIGNALING_BASE_URL = "/api/lan"
 export const MAX_SIGNAL_WAIT_MS = 25_000
 export const DEFAULT_LAN_REQUEST_TIMEOUT_MS = 10_000
+export const DEFAULT_LAN_GAME_ID = "gomoku"
+export const DEFAULT_LAN_ENGINE_VERSION = "gomoku-free-v2"
+
+export type LanGameIdentity = {
+  gameId: string
+  engineVersion: string
+}
 
 export type LanRoomRole = "host" | "guest"
 
 export type LanRoomSession = {
+  gameId: string
+  engineVersion: string
   roomId: string
   peerId: string
   role: LanRoomRole
@@ -67,6 +76,7 @@ export type LanSignalingClientOptions = {
   fetch?: typeof fetch
   createId?: () => string
   requestTimeoutMs?: number
+  gameIdentity?: LanGameIdentity
 }
 
 export class LanSignalingError extends Error {
@@ -104,6 +114,8 @@ function isUuid(value: string): boolean {
 function validateRoomSession(value: unknown): LanRoomSession {
   if (
     !isRecord(value)
+    || typeof value.gameId !== "string"
+    || typeof value.engineVersion !== "string"
     || typeof value.roomId !== "string"
     || typeof value.peerId !== "string"
     || (value.role !== "host" && value.role !== "guest")
@@ -191,12 +203,20 @@ export class LanSignalingClient {
   private readonly fetcher: typeof fetch
   private readonly createId: () => string
   private readonly requestTimeoutMs: number
+  private readonly gameIdentity: LanGameIdentity
 
   constructor(options: LanSignalingClientOptions = {}) {
     this.baseUrl = (options.baseUrl ?? DEFAULT_LAN_SIGNALING_BASE_URL).replace(/\/$/u, "")
     this.fetcher = options.fetch ?? globalThis.fetch.bind(globalThis)
     this.createId = options.createId ?? defaultCreateId
     this.requestTimeoutMs = options.requestTimeoutMs ?? DEFAULT_LAN_REQUEST_TIMEOUT_MS
+    this.gameIdentity = options.gameIdentity ?? {
+      gameId: DEFAULT_LAN_GAME_ID,
+      engineVersion: DEFAULT_LAN_ENGINE_VERSION,
+    }
+    if (!this.gameIdentity.gameId || !this.gameIdentity.engineVersion) {
+      throw new TypeError("gameIdentity must include gameId and engineVersion")
+    }
     if (!Number.isSafeInteger(this.requestTimeoutMs) || this.requestTimeoutMs <= 0) {
       throw new RangeError("requestTimeoutMs must be a positive safe integer")
     }
@@ -306,9 +326,20 @@ export class LanSignalingClient {
     this.assertRequestId(requestId)
     const response = await this.request(url, {
       method: "POST",
-      body: JSON.stringify({ requestId }),
+      body: JSON.stringify({ requestId, ...this.gameIdentity }),
     }, undefined, this.requestTimeoutMs)
-    return validateRoomSession(await response.json())
+    const session = validateRoomSession(await response.json())
+    if (
+      session.gameId !== this.gameIdentity.gameId
+      || session.engineVersion !== this.gameIdentity.engineVersion
+    ) {
+      throw new LanSignalingError(
+        "Room session identity does not match the requested game",
+        502,
+        "INVALID_RESPONSE",
+      )
+    }
+    return session
   }
 
   private assertRequestId(requestId: string): void {

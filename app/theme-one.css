@@ -1270,15 +1270,30 @@ html[data-theme='theme-one'] .gomoku-dice-card__rolls strong {
     font-size: 1.4rem;
   }
 
-  html[data-theme='theme-one'] .game-page[data-page='gomoku'][data-game-mode='lan'] .game-content {
+  html[data-theme='theme-one'] .game-page:is(
+    [data-page='gomoku'],
+    [data-page='chess'],
+    [data-page='go'],
+    [data-page='reversi']
+  )[data-game-mode='lan'] .game-content {
     gap: 0.65rem;
   }
 
-  html[data-theme='theme-one'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .game-stage {
+  html[data-theme='theme-one'] .game-page:is(
+    [data-page='gomoku'],
+    [data-page='chess'],
+    [data-page='go'],
+    [data-page='reversi']
+  )[data-lan-phase='playing'] .game-stage {
     width: min(calc(100vw - 1rem), calc(100svh - 16.5rem), 22rem);
   }
 
-  html[data-theme='theme-one'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .game-message {
+  html[data-theme='theme-one'] .game-page:is(
+    [data-page='gomoku'],
+    [data-page='chess'],
+    [data-page='go'],
+    [data-page='reversi']
+  )[data-lan-phase='playing'] .game-message {
     position: absolute;
     z-index: 5;
     top: 50%;
@@ -1305,8 +1320,18 @@ html[data-theme='theme-one'] .gomoku-dice-card__rolls strong {
 }
 
 @media (max-width: 767px) and (max-height: 700px) {
-  html[data-theme='theme-one'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .gomoku-mode-switch,
-  html[data-theme='theme-one'] .game-page[data-page='gomoku'][data-lan-phase='playing'] .game-summary {
+  html[data-theme='theme-one'] .game-page:is(
+    [data-page='gomoku'],
+    [data-page='chess'],
+    [data-page='go'],
+    [data-page='reversi']
+  )[data-lan-phase='playing'] .gomoku-mode-switch,
+  html[data-theme='theme-one'] .game-page:is(
+    [data-page='gomoku'],
+    [data-page='chess'],
+    [data-page='go'],
+    [data-page='reversi']
+  )[data-lan-phase='playing'] .game-summary {
     display: none;
   }
 

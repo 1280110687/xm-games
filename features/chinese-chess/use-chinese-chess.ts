@@ -20,7 +20,7 @@ import {
   type XiangqiState,
 } from "./engine"
 
-export type ChineseChessMode = "local" | "ai"
+export type ChineseChessMode = "local" | "ai" | "lan"
 export type ChineseChessAiStatus = "idle" | "thinking" | "error"
 
 type LocalUndoUsage = Record<PieceColor, boolean>
@@ -59,7 +59,8 @@ export function useChineseChess() {
   const aiColor = oppositeColor(playerColor)
   const hasMoves = state.moveHistory.length > 0
   const hasHumanMove = state.moveHistory.some((move) => move.piece.color === playerColor)
-  const isHumanTurn = mode === "local" || state.currentTurn === playerColor
+  const isHumanTurn = mode === "local"
+    || (mode === "ai" && state.currentTurn === playerColor)
 
   const replaceTimeline = useCallback((nextTimeline: readonly XiangqiState[]) => {
     timelineRef.current = nextTimeline
@@ -111,10 +112,15 @@ export function useChineseChess() {
     resetGame()
   }, [resetGame])
 
+  const startLanGame = useCallback(() => {
+    setMode("lan")
+    resetGame()
+  }, [resetGame])
+
   const makeMove = useCallback((move: XiangqiMove): boolean => {
     const currentState = stateRef.current
     const currentResult = evaluateGameResult(currentState)
-    if (currentResult.over || activeSearchIdRef.current) return false
+    if (mode === "lan" || currentResult.over || activeSearchIdRef.current) return false
     if (mode === "ai" && currentState.currentTurn !== playerColor) return false
     return commitMove(move)
   }, [commitMove, mode, playerColor])
@@ -280,6 +286,7 @@ export function useChineseChess() {
     resetGame,
     startLocalGame,
     startAiGame,
+    startLanGame,
     retryAi,
   }
 }

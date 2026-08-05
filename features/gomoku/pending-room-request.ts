@@ -90,6 +90,7 @@ export class PendingRoomRequestStore {
     private readonly createId: () => string = () => crypto.randomUUID(),
     private readonly now: () => number = () => Date.now(),
     private readonly ttlMs = PENDING_ROOM_REQUEST_TTL_MS,
+    private readonly storageKey = PENDING_ROOM_REQUEST_STORAGE_KEY,
   ) {}
 
   getOrCreate(kind: "create"): PendingRoomRequest
@@ -123,7 +124,7 @@ export class PendingRoomRequestStore {
         }
     this.current = request
     try {
-      this.storage?.setItem(PENDING_ROOM_REQUEST_STORAGE_KEY, JSON.stringify(request))
+      this.storage?.setItem(this.storageKey, JSON.stringify(request))
     } catch {
       // The current page can still reuse the request through memory.
     }
@@ -133,7 +134,7 @@ export class PendingRoomRequestStore {
   clear(): void {
     this.current = null
     try {
-      this.storage?.removeItem(PENDING_ROOM_REQUEST_STORAGE_KEY)
+      this.storage?.removeItem(this.storageKey)
     } catch {
       // Ignore restricted storage contexts.
     }
@@ -144,10 +145,10 @@ export class PendingRoomRequestStore {
     if (this.current && this.current.expiresAt > now) return this.current
     this.current = null
     try {
-      const raw = this.storage?.getItem(PENDING_ROOM_REQUEST_STORAGE_KEY)
+      const raw = this.storage?.getItem(this.storageKey)
       if (!raw) return null
       const parsed = parsePendingRoomRequest(raw, now, this.ttlMs)
-      if (!parsed) this.storage?.removeItem(PENDING_ROOM_REQUEST_STORAGE_KEY)
+      if (!parsed) this.storage?.removeItem(this.storageKey)
       this.current = parsed
       return parsed
     } catch {

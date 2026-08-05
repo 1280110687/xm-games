@@ -1,4 +1,8 @@
 import {
+  DEFAULT_LAN_ENGINE_VERSION,
+  DEFAULT_LAN_GAME_ID,
+  LAN_ENGINE_VERSION_PATTERN,
+  LAN_GAME_ID_PATTERN,
   LAN_NEGOTIATION_ID_PATTERN,
   LAN_PEER_ID_PATTERN,
   LAN_REQUEST_ID_PATTERN,
@@ -18,6 +22,8 @@ export const LAN_MAX_LONG_POLL_MS = 25_000
 
 interface CreateOrJoinBody {
   requestId: string
+  gameId: string
+  engineVersion: string
 }
 
 interface PeerBody {
@@ -182,7 +188,17 @@ function parseEmptyPayload(value: unknown): Record<string, never> {
 
 export function parseCreateOrJoinBody(value: unknown): CreateOrJoinBody {
   const body = assertRecord(value, "request body")
-  assertExactKeys(body, ["requestId"])
+  assertExactKeys(
+    body,
+    ["requestId", "gameId", "engineVersion"],
+    ["requestId"],
+  )
+
+  const hasGameId = Object.hasOwn(body, "gameId")
+  const hasEngineVersion = Object.hasOwn(body, "engineVersion")
+  if (hasGameId !== hasEngineVersion) {
+    invalid("gameId and engineVersion must be provided together.")
+  }
 
   return {
     requestId: assertPattern(
@@ -190,6 +206,16 @@ export function parseCreateOrJoinBody(value: unknown): CreateOrJoinBody {
       LAN_REQUEST_ID_PATTERN,
       "requestId",
     ),
+    gameId: hasGameId
+      ? assertPattern(body.gameId, LAN_GAME_ID_PATTERN, "gameId")
+      : DEFAULT_LAN_GAME_ID,
+    engineVersion: hasEngineVersion
+      ? assertPattern(
+          body.engineVersion,
+          LAN_ENGINE_VERSION_PATTERN,
+          "engineVersion",
+        )
+      : DEFAULT_LAN_ENGINE_VERSION,
   }
 }
 

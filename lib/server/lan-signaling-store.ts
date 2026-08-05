@@ -10,6 +10,7 @@ import {
   LAN_ROOM_CODE_PATTERN,
   LAN_TOKEN_PATTERN,
   LanSignalError,
+  normalizeLanGameIdentity,
   type LanAuthenticatedInput,
   type LanCreateRoomInput,
   type LanHeartbeatResult,
@@ -58,6 +59,8 @@ interface StoredSignalRequest {
 }
 
 interface Room {
+  gameId: string
+  engineVersion: string
   roomId: string
   createdAt: number
   hardExpiresAt: number
@@ -118,6 +121,8 @@ function copyMessage(message: LanSignalMessage): LanSignalMessage {
 
 function copySession(session: LanPeerSession): LanPeerSession {
   return {
+    gameId: session.gameId,
+    engineVersion: session.engineVersion,
     roomId: session.roomId,
     peerId: session.peerId,
     role: session.role,
@@ -208,10 +213,25 @@ export class InMemoryLanSignalStore implements LanSignalStore {
     input: LanCreateRoomInput,
   ): Promise<LanIdempotentResult<LanPeerSession>> {
     const now = this.now()
+    const { gameId, engineVersion } = normalizeLanGameIdentity(input)
     this.cleanupExpiredAt(now)
 
     const existing = this.createRequests.get(input.requestId)
     if (existing) {
+      if (existing.session.gameId !== gameId) {
+        throw new LanSignalError(
+          "GAME_MISMATCH",
+          409,
+          "The requestId belongs to another game.",
+        )
+      }
+      if (existing.session.engineVersion !== engineVersion) {
+        throw new LanSignalError(
+          "ENGINE_MISMATCH",
+          409,
+          "The requestId belongs to another engine version.",
+        )
+      }
       const room = this.rooms.get(existing.roomId)
       if (room) {
         this.touch(room, room.host, now)
@@ -248,6 +268,8 @@ export class InMemoryLanSignalStore implements LanSignalStore {
       acknowledgedCursor: 0,
     }
     const room: Room = {
+      gameId,
+      engineVersion,
       roomId,
       createdAt: now,
       hardExpiresAt,
@@ -262,6 +284,8 @@ export class InMemoryLanSignalStore implements LanSignalStore {
     }
     const session: StoredSession = {
       requestId: input.requestId,
+      gameId,
+      engineVersion,
       roomId,
       peerId,
       role: "host",
@@ -280,7 +304,23 @@ export class InMemoryLanSignalStore implements LanSignalStore {
     input: LanJoinRoomInput,
   ): Promise<LanIdempotentResult<LanPeerSession>> {
     const now = this.now()
+    const { gameId, engineVersion } = normalizeLanGameIdentity(input)
     const room = this.requireRoom(input.roomId, now)
+
+    if (room.gameId !== gameId) {
+      throw new LanSignalError(
+        "GAME_MISMATCH",
+        409,
+        "The room belongs to another game.",
+      )
+    }
+    if (room.engineVersion !== engineVersion) {
+      throw new LanSignalError(
+        "ENGINE_MISMATCH",
+        409,
+        "The room uses another engine version.",
+      )
+    }
 
     const existing = room.joinRequests.get(input.requestId)
     if (existing && room.guest?.peerId === existing.peerId) {
@@ -312,6 +352,8 @@ export class InMemoryLanSignalStore implements LanSignalStore {
 
     const session: StoredSession = {
       requestId: input.requestId,
+      gameId,
+      engineVersion,
       roomId: room.roomId,
       peerId,
       role: "guest",

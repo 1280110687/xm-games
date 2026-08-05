@@ -21,6 +21,8 @@ function createStoredSession(expiresAt: string): StoredLanSession {
   return {
     version: 2,
     session: {
+      gameId: "gomoku",
+      engineVersion: "gomoku-free-v2",
       roomId: "123456",
       peerId: "peer-host-0000001",
       role: "host",

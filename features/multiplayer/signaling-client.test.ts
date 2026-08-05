@@ -8,6 +8,8 @@ import {
 const requestId = "123e4567-e89b-42d3-a456-426614174000"
 const negotiationId = "123e4567-e89b-42d3-a456-426614174001"
 const session: LanRoomSession = {
+  gameId: "gomoku",
+  engineVersion: "gomoku-free-v2",
   roomId: "ROOM01",
   peerId: "peer-a",
   role: "host",
@@ -37,7 +39,51 @@ describe("LAN signaling client", () => {
     expect(url).toBe("/api/lan/rooms")
     expect(init?.method).toBe("POST")
     expect(init?.cache).toBe("no-store")
-    expect(JSON.parse(String(init?.body))).toEqual({ requestId })
+    expect(JSON.parse(String(init?.body))).toEqual({
+      requestId,
+      gameId: "gomoku",
+      engineVersion: "gomoku-free-v2",
+    })
+  })
+
+  it("sends the selected game identity when opening a room", async () => {
+    const chessSession = {
+      ...session,
+      gameId: "chess",
+      engineVersion: "chess-free-v1",
+    }
+    const fetcher = vi.fn<typeof fetch>().mockResolvedValue(jsonResponse(chessSession))
+    const client = new LanSignalingClient({
+      fetch: fetcher,
+      createId: () => requestId,
+      gameIdentity: {
+        gameId: chessSession.gameId,
+        engineVersion: chessSession.engineVersion,
+      },
+    })
+
+    await expect(client.createRoom()).resolves.toEqual(chessSession)
+    expect(JSON.parse(String(fetcher.mock.calls[0][1]?.body))).toEqual({
+      requestId,
+      gameId: "chess",
+      engineVersion: "chess-free-v1",
+    })
+  })
+
+  it("rejects a room response with a different game identity", async () => {
+    const client = new LanSignalingClient({
+      fetch: vi.fn<typeof fetch>().mockResolvedValue(jsonResponse({
+        ...session,
+        gameId: "reversi",
+        engineVersion: "reversi-free-v1",
+      })),
+      createId: () => requestId,
+    })
+
+    await expect(client.createRoom()).rejects.toMatchObject({
+      status: 502,
+      code: "INVALID_RESPONSE",
+    })
   })
 
   it("uses bearer auth for long polling and advances the global cursor", async () => {

@@ -1,10 +1,14 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { GameHeader } from "@/components/game-header"
 import { GameRulesDialog } from "@/components/game-rules-dialog"
+import {
+  GOMOKU_LAN_COPY,
+} from "@/components/multiplayer/gomoku-lan-panel"
+import { LanGamePanel } from "@/components/multiplayer/lan-game-panel"
 import { useLocale } from "@/lib/locale-context"
 import {
   INITIAL_CASTLING_RIGHTS,
@@ -19,51 +23,119 @@ import {
   type PieceType,
   type Position,
 } from "@/features/chess/engine"
-import { RotateCcw, Undo2 } from "lucide-react"
+import {
+  chessLanAdapter,
+  type LanChessAction,
+} from "@/features/chess/lan"
+import { getChessLanError } from "@/features/chess/lan-view"
+import {
+  useLanTurnGame,
+} from "@/features/multiplayer/use-lan-turn-game"
+import type { Locale } from "@/lib/i18n"
+import { Gamepad2, RotateCcw, Undo2, Wifi } from "lucide-react"
 
 const pieceSymbols: Record<Color, Record<PieceType, string>> = {
   white: { king: "♔", queen: "♕", rook: "♖", bishop: "♗", knight: "♘", pawn: "♙" },
   black: { king: "♚", queen: "♛", rook: "♜", bishop: "♝", knight: "♞", pawn: "♟" }
 }
 
-export function ChessGame() {
-  const { t } = useLocale()
+type ChessMode = "local" | "lan"
 
-  const [board, setBoard] = useState<ChessBoard>(() => createInitialBoard())
-  const [currentTurn, setCurrentTurn] = useState<Color>("white")
+const CHESS_LAN_GAME_TITLES: Record<Locale, string> = {
+  zh: "国际象棋",
+  en: "Chess",
+  th: "หมากรุกสากล",
+}
+
+export function ChessGame() {
+  const { t, locale } = useLocale()
+  const [mode, setMode] = useState<ChessMode>("local")
+  const lan = useLanTurnGame(chessLanAdapter)
+  const lanCopy = GOMOKU_LAN_COPY[locale]
+
+  const [localBoard, setLocalBoard] = useState<ChessBoard>(() => createInitialBoard())
+  const [localCurrentTurn, setLocalCurrentTurn] = useState<Color>("white")
   const [selectedPos, setSelectedPos] = useState<Position | null>(null)
   const [validMoves, setValidMoves] = useState<Position[]>([])
-  const [gameStatus, setGameStatus] = useState<"playing" | "check" | "checkmate" | "stalemate">("playing")
-  const [winner, setWinner] = useState<Color | null>(null)
-  const [history, setHistory] = useState<{
+  const [localGameStatus, setLocalGameStatus] = useState<"playing" | "check" | "checkmate" | "stalemate">("playing")
+  const [localWinner, setLocalWinner] = useState<Color | null>(null)
+  const [localHistory, setLocalHistory] = useState<{
     board: ChessBoard
     turn: Color
     castling: CastlingRights
     enPassant: Position | null
   }[]>([])
-  const [enPassantTarget, setEnPassantTarget] = useState<Position | null>(null)
-  const [castlingRights, setCastlingRights] = useState<CastlingRights>(() => ({ ...INITIAL_CASTLING_RIGHTS }))
-  const [lastMove, setLastMove] = useState<{ from: Position; to: Position } | null>(null)
+  const [localEnPassantTarget, setLocalEnPassantTarget] = useState<Position | null>(null)
+  const [localCastlingRights, setLocalCastlingRights] = useState<CastlingRights>(() => ({ ...INITIAL_CASTLING_RIGHTS }))
+  const [localLastMove, setLocalLastMove] = useState<{ from: Position; to: Position } | null>(null)
   const [whiteUndoUsed, setWhiteUndoUsed] = useState(false)
   const [blackUndoUsed, setBlackUndoUsed] = useState(false)
 
+  const isLanMode = mode === "lan"
+  const board = isLanMode ? lan.game.board : localBoard
+  const currentTurn = isLanMode ? lan.game.currentTurn : localCurrentTurn
+  const gameStatus = isLanMode ? lan.game.status : localGameStatus
+  const winner = isLanMode ? lan.game.winner : localWinner
+  const enPassantTarget = isLanMode ? lan.game.enPassantTarget : localEnPassantTarget
+  const castlingRights = isLanMode ? lan.game.castlingRights : localCastlingRights
+  const lastMove = isLanMode
+    ? (lan.game.moveHistory.at(-1) ?? null)
+    : localLastMove
+  const showBoard = mode === "local" || lan.phase === "playing"
+  const canPlayLan = (
+    isLanMode
+    && lan.connected
+    && lan.localSide === currentTurn
+    && gameStatus !== "checkmate"
+    && gameStatus !== "stalemate"
+  )
+
   const resetGame = useCallback(() => {
-    setBoard(createInitialBoard())
-    setCurrentTurn("white")
+    setLocalBoard(createInitialBoard())
+    setLocalCurrentTurn("white")
     setSelectedPos(null)
     setValidMoves([])
-    setGameStatus("playing")
-    setWinner(null)
-    setHistory([])
-    setEnPassantTarget(null)
-    setCastlingRights({ ...INITIAL_CASTLING_RIGHTS })
-    setLastMove(null)
+    setLocalGameStatus("playing")
+    setLocalWinner(null)
+    setLocalHistory([])
+    setLocalEnPassantTarget(null)
+    setLocalCastlingRights({ ...INITIAL_CASTLING_RIGHTS })
+    setLocalLastMove(null)
     setWhiteUndoUsed(false)
     setBlackUndoUsed(false)
   }, [])
 
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).has("room")) setMode("lan")
+  }, [])
+
+  useEffect(() => {
+    if (lan.roomId) setMode("lan")
+  }, [lan.roomId])
+
+  useEffect(() => {
+    if (mode !== "lan") return
+    setSelectedPos(null)
+    setValidMoves([])
+  }, [lan.game.moveHistory.length, mode])
+
+  const changeMode = (nextMode: ChessMode) => {
+    if (nextMode === "local" && mode === "lan" && lan.phase !== "idle") {
+      lan.leaveRoom()
+    }
+    setSelectedPos(null)
+    setValidMoves([])
+    setMode(nextMode)
+  }
+
   const handleCellClick = useCallback((row: number, col: number) => {
     if (gameStatus === "checkmate" || gameStatus === "stalemate") return
+
+    if (mode === "lan" && !canPlayLan) {
+      setSelectedPos(null)
+      setValidMoves([])
+      return
+    }
 
     const clickedPiece = board[row][col]
 
@@ -86,8 +158,20 @@ export function ChessGame() {
         return
       }
 
+      if (mode === "lan") {
+        const action: LanChessAction = {
+          type: "move",
+          from: selectedPos,
+          to: { row, col },
+        }
+        setSelectedPos(null)
+        setValidMoves([])
+        void lan.playAction(action)
+        return
+      }
+
       // Save history
-      setHistory(prev => [...prev, {
+      setLocalHistory(prev => [...prev, {
         board: board.map(r => [...r]),
         turn: currentTurn,
         castling: { ...castlingRights },
@@ -104,10 +188,10 @@ export function ChessGame() {
         { row, col },
       )
 
-      setBoard(newBoard)
-      setCastlingRights(newCastling)
-      setEnPassantTarget(newEnPassant)
-      setLastMove({ from: selectedPos, to: { row, col } })
+      setLocalBoard(newBoard)
+      setLocalCastlingRights(newCastling)
+      setLocalEnPassantTarget(newEnPassant)
+      setLocalLastMove({ from: selectedPos, to: { row, col } })
       setSelectedPos(null)
       setValidMoves([])
 
@@ -122,52 +206,84 @@ export function ChessGame() {
 
       if (!hasLegal) {
         if (inCheck) {
-          setGameStatus("checkmate")
-          setWinner(currentTurn)
+          setLocalGameStatus("checkmate")
+          setLocalWinner(currentTurn)
         } else {
-          setGameStatus("stalemate")
+          setLocalGameStatus("stalemate")
         }
       } else if (inCheck) {
-        setGameStatus("check")
+        setLocalGameStatus("check")
       } else {
-        setGameStatus("playing")
+        setLocalGameStatus("playing")
       }
 
-      setCurrentTurn(opponent)
+      setLocalCurrentTurn(opponent)
     }
-  }, [board, selectedPos, currentTurn, validMoves, gameStatus, enPassantTarget, castlingRights])
+  }, [
+    board,
+    canPlayLan,
+    castlingRights,
+    currentTurn,
+    enPassantTarget,
+    gameStatus,
+    lan,
+    mode,
+    selectedPos,
+    validMoves,
+  ])
 
   const handleUndo = useCallback(() => {
-    if (history.length === 0) return
-    if (gameStatus === "checkmate" || gameStatus === "stalemate") return
+    if (localHistory.length === 0) return
+    if (localGameStatus === "checkmate" || localGameStatus === "stalemate") return
 
-    const undoingPlayer = currentTurn === "white" ? "black" : "white"
+    const undoingPlayer = localCurrentTurn === "white" ? "black" : "white"
     if (undoingPlayer === "white" && whiteUndoUsed) return
     if (undoingPlayer === "black" && blackUndoUsed) return
 
-    const lastState = history[history.length - 1]
-    setBoard(lastState.board)
-    setCurrentTurn(lastState.turn)
-    setCastlingRights(lastState.castling)
-    setEnPassantTarget(lastState.enPassant)
-    setHistory(prev => prev.slice(0, -1))
+    const lastState = localHistory[localHistory.length - 1]
+    setLocalBoard(lastState.board)
+    setLocalCurrentTurn(lastState.turn)
+    setLocalCastlingRights(lastState.castling)
+    setLocalEnPassantTarget(lastState.enPassant)
+    setLocalHistory(prev => prev.slice(0, -1))
     setSelectedPos(null)
     setValidMoves([])
-    setGameStatus(isInCheck(lastState.board, lastState.turn) ? "check" : "playing")
-    setWinner(null)
-    setLastMove(null)
+    setLocalGameStatus(isInCheck(lastState.board, lastState.turn) ? "check" : "playing")
+    setLocalWinner(null)
+    setLocalLastMove(null)
 
     if (undoingPlayer === "white") {
       setWhiteUndoUsed(true)
     } else {
       setBlackUndoUsed(true)
     }
-  }, [history, gameStatus, currentTurn, whiteUndoUsed, blackUndoUsed])
+  }, [
+    blackUndoUsed,
+    localCurrentTurn,
+    localGameStatus,
+    localHistory,
+    whiteUndoUsed,
+  ])
 
   const isValidTarget = (row: number, col: number) => validMoves.some(m => m.row === row && m.col === col)
+  const lanInstructions = locale === "zh"
+    ? "双方准备后共同掷骰，胜者执白；每一步都由两台设备共同校验。"
+    : locale === "th"
+      ? "เมื่อพร้อมแล้ว ทั้งสองฝ่ายทอยลูกเต๋าร่วมกัน ผู้ชนะเล่นฝ่ายขาว และทั้งสองเครื่องตรวจสอบทุกตา"
+      : "Both players roll after ready. The winner takes white, and both devices verify every move."
+  const lanRule = locale === "zh"
+    ? "联机模式不提供单方悔棋或重开，避免双方棋盘状态不一致。"
+    : locale === "th"
+      ? "โหมด LAN ไม่ให้ถอยหรือเริ่มใหม่ฝ่ายเดียว เพื่อให้กระดานทั้งสองเครื่องตรงกัน"
+      : "LAN matches disable unilateral undo and restart so both boards stay in sync."
 
   return (
-    <div className="game-page" data-page="chess">
+    <div
+      className="game-page"
+      data-page="chess"
+      data-game-mode={mode}
+      data-lan-phase={mode === "lan" ? lan.phase : undefined}
+    >
       <GameHeader
         layout="centered"
         homeLabel={t("appName")}
@@ -182,6 +298,58 @@ export function ChessGame() {
         className="game-content flex flex-1 flex-col items-center gap-4 py-2 sm:py-4"
         data-slot="game-content"
       >
+        <div className="gomoku-mode-switch" role="tablist" aria-label={t("chess")}>
+          <Button
+            type="button"
+            role="tab"
+            variant="ghost"
+            aria-selected={mode === "local"}
+            onClick={() => changeMode("local")}
+          >
+            <Gamepad2 aria-hidden="true" />
+            {lanCopy.localMode}
+          </Button>
+          <Button
+            type="button"
+            role="tab"
+            variant="ghost"
+            aria-selected={mode === "lan"}
+            onClick={() => changeMode("lan")}
+          >
+            <Wifi aria-hidden="true" />
+            {lanCopy.lanMode}
+          </Button>
+        </div>
+
+        {mode === "lan" && (
+          <LanGamePanel<Color>
+            idPrefix="chess"
+            gameTitle={CHESS_LAN_GAME_TITLES[locale]}
+            phase={lan.phase}
+            roomId={lan.roomId}
+            role={lan.role}
+            connected={lan.connected}
+            localReady={lan.localReady}
+            remoteReady={lan.remoteReady}
+            localSide={lan.localSide}
+            currentSide={lan.currentSide}
+            sides={[
+              { value: "white", label: lanCopy.white, color: "#f8fafc" },
+              { value: "black", label: lanCopy.black, color: "#111827" },
+            ]}
+            dice={lan.dice}
+            error={getChessLanError(locale, lan.errorCode, lanCopy.errors)}
+            copy={lanCopy}
+            onCreateRoom={() => void lan.createRoom()}
+            onJoinRoom={(roomId) => void lan.joinRoom(roomId)}
+            onReady={lan.markReady}
+            onLeave={lan.leaveRoom}
+            onRetry={lan.retryConnection}
+          />
+        )}
+
+        {showBoard && (
+          <>
         {/* Game Status */}
         <Card
           className="game-summary surface-panel w-full max-w-lg border-white/10 bg-card/70 p-3"
@@ -236,14 +404,16 @@ export function ChessGame() {
             </div>
           )}
 
-            <div
-              className="game-undo-status flex items-center justify-center gap-4 text-xs text-muted-foreground"
-              data-slot="undo-status"
-            >
-              <span>{whiteUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
-              <div className="h-3 w-px bg-border" />
-              <span>{blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
-            </div>
+            {mode === "local" && (
+              <div
+                className="game-undo-status flex items-center justify-center gap-4 text-xs text-muted-foreground"
+                data-slot="undo-status"
+              >
+                <span>{whiteUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
+                <div className="h-3 w-px bg-border" />
+                <span>{blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
+              </div>
+            )}
           </div>
         </Card>
 
@@ -267,6 +437,7 @@ export function ChessGame() {
                 <button
                   key={`${rowIndex}-${colIndex}`}
                   onClick={() => handleCellClick(rowIndex, colIndex)}
+                  disabled={mode === "lan" && !canPlayLan}
                   aria-label={`${square}, ${cellContent}${isValid ? ", valid move" : ""}`}
                   aria-pressed={isSelected}
                   className={`
@@ -293,24 +464,28 @@ export function ChessGame() {
 
         {/* Controls */}
         <div className="game-actions flex flex-wrap justify-center gap-2" data-slot="game-actions">
-        <Button
-          onClick={handleUndo}
-          disabled={history.length === 0 || gameStatus === "checkmate" || gameStatus === "stalemate" ||
-            (currentTurn === "white" && blackUndoUsed) ||
-            (currentTurn === "black" && whiteUndoUsed)
-          }
-          variant="outline"
-        >
-          <Undo2 className="mr-1 h-4 w-4" aria-hidden="true" />
-          {t("undo")}
-        </Button>
-        <Button
-          onClick={resetGame}
-          variant="outline"
-        >
-          <RotateCcw className="mr-1 h-4 w-4" aria-hidden="true" />
-          {t("restart")}
-        </Button>
+        {mode === "local" && (
+          <>
+            <Button
+              onClick={handleUndo}
+              disabled={localHistory.length === 0 || localGameStatus === "checkmate" || localGameStatus === "stalemate" ||
+                (localCurrentTurn === "white" && blackUndoUsed) ||
+                (localCurrentTurn === "black" && whiteUndoUsed)
+              }
+              variant="outline"
+            >
+              <Undo2 className="mr-1 h-4 w-4" aria-hidden="true" />
+              {t("undo")}
+            </Button>
+            <Button
+              onClick={resetGame}
+              variant="outline"
+            >
+              <RotateCcw className="mr-1 h-4 w-4" aria-hidden="true" />
+              {t("restart")}
+            </Button>
+          </>
+        )}
         <GameRulesDialog
           triggerLabel={t("howToPlay")}
           closeLabel={t("close")}
@@ -344,6 +519,7 @@ export function ChessGame() {
             </div>
             <div className="mt-4 border-t border-border pt-4">
               <p>{t("chessSpecialRules")}</p>
+              {mode === "lan" && <p className="mt-2">{lanRule}</p>}
             </div>
           </div>
         </GameRulesDialog>
@@ -351,8 +527,10 @@ export function ChessGame() {
 
         {/* Instructions */}
         <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
-          {t("chessInstructionsInt")}
+          {mode === "lan" ? lanInstructions : t("chessInstructionsInt")}
         </p>
+          </>
+        )}
       </main>
 
     </div>

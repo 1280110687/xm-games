@@ -66,6 +66,35 @@ describe("InMemoryLanSignalStore", () => {
     expect(repeated.value).not.toHaveProperty("requestId")
   })
 
+  it("binds a room to one game and engine before reserving the guest seat", async () => {
+    const store = createTestStore()
+    const host = (await store.createRoom({
+      requestId: CREATE_REQUEST_ID,
+      gameId: "chess",
+      engineVersion: "chess-free-v1",
+    })).value
+
+    await expect(store.joinRoom({
+      roomId: host.roomId,
+      requestId: "wrong-game-request",
+      gameId: "go",
+      engineVersion: "go-9x9-v1",
+    })).rejects.toMatchObject({ code: "GAME_MISMATCH", status: 409 })
+    await expect(store.joinRoom({
+      roomId: host.roomId,
+      requestId: "wrong-engine-request",
+      gameId: "chess",
+      engineVersion: "chess-free-v2",
+    })).rejects.toMatchObject({ code: "ENGINE_MISMATCH", status: 409 })
+
+    await expect(store.joinRoom({
+      roomId: host.roomId,
+      requestId: JOIN_REQUEST_ID,
+      gameId: "chess",
+      engineVersion: "chess-free-v1",
+    })).resolves.toMatchObject({ value: { role: "guest" } })
+  })
+
   it("allows one guest, deduplicates its retry, and rejects a third peer", async () => {
     const store = createTestStore()
     const host = (await store.createRoom({ requestId: CREATE_REQUEST_ID })).value

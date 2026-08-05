@@ -431,6 +431,15 @@ export function evaluateGameResult(state: XiangqiState): XiangqiGameResult {
     }
   }
 
+  if (state.termination === "move-limit") {
+    return {
+      over: true,
+      winner: null,
+      reason: "move-limit",
+      inCheck,
+    }
+  }
+
   if (countCurrentPosition(state) >= 3) {
     return {
       over: true,
@@ -444,7 +453,7 @@ export function evaluateGameResult(state: XiangqiState): XiangqiGameResult {
 }
 
 export function applyMove(state: XiangqiState, move: XiangqiMove): XiangqiMoveResult {
-  if (countCurrentPosition(state) >= 3) {
+  if (state.termination === "move-limit" || countCurrentPosition(state) >= 3) {
     return { ok: false, error: "GAME_OVER", state }
   }
   if (!isPositionInside(move.from) || !isPositionInside(move.to)) {

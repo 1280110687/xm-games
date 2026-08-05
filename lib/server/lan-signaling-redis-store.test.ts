@@ -37,6 +37,8 @@ interface FakeSignal {
 }
 
 interface FakeRoom {
+  gameId: string
+  engineVersion: string
   roomId: string
   expiresAt: number
   hardExpiresAt: number
@@ -58,7 +60,14 @@ class SharedFakeRedis implements RedisLanSignalClient {
   readonly rooms = new Map<string, FakeRoom>()
   readonly createRequests = new Map<
     string,
-    { roomId: string; peerId: string; tokenDigest: string; token: string }
+    {
+      gameId: string
+      engineVersion: string
+      roomId: string
+      peerId: string
+      tokenDigest: string
+      token: string
+    }
   >()
   readonly calls: Array<{
     operation: string
@@ -101,12 +110,18 @@ class SharedFakeRedis implements RedisLanSignalClient {
     const peerId = String(args[5])
     const tokenDigest = String(args[6])
     const token = String(args[7])
-    const candidateCount = Number(args[9])
+    const gameId = String(args[8])
+    const engineVersion = String(args[9])
+    const candidateCount = Number(args[11])
     this.cleanup(now)
 
     const existing = this.createRequests.get(keys[0])
     const existingRoom = existing && this.rooms.get(existing.roomId)
     if (existing && existingRoom) {
+      if (existingRoom.gameId !== gameId) return ["ERR", "GAME_MISMATCH"]
+      if (existingRoom.engineVersion !== engineVersion) {
+        return ["ERR", "ENGINE_MISMATCH"]
+      }
       existingRoom.host.lastSeenAt = now
       existingRoom.expiresAt = Math.min(
         now + idleTtl,
@@ -121,13 +136,15 @@ class SharedFakeRedis implements RedisLanSignalClient {
         existing.token,
         "0",
         String(existingRoom.expiresAt),
+        gameId,
+        engineVersion,
       ]
     }
     if (this.rooms.size >= maxRooms) return ["ERR", "ROOM_LIMIT_REACHED"]
 
     let roomId: string | undefined
     for (let index = 0; index < candidateCount; index += 1) {
-      const candidate = String(args[10 + index])
+      const candidate = String(args[12 + index])
       if (!this.rooms.has(candidate)) {
         roomId = candidate
         break
@@ -138,6 +155,8 @@ class SharedFakeRedis implements RedisLanSignalClient {
     const hardExpiresAt = now + hardTtl
     const expiresAt = Math.min(now + idleTtl, hardExpiresAt)
     this.rooms.set(roomId, {
+      gameId,
+      engineVersion,
       roomId,
       expiresAt,
       hardExpiresAt,
@@ -149,8 +168,18 @@ class SharedFakeRedis implements RedisLanSignalClient {
       nextCursor: 1,
       prunedThroughCursor: 0,
     })
-    this.createRequests.set(keys[0], { roomId, peerId, tokenDigest, token })
-    return ["OK", "0", roomId, peerId, "host", token, "0", String(expiresAt)]
+    this.createRequests.set(keys[0], {
+      gameId,
+      engineVersion,
+      roomId,
+      peerId,
+      tokenDigest,
+      token,
+    })
+    return [
+      "OK", "0", roomId, peerId, "host", token, "0", String(expiresAt),
+      gameId, engineVersion,
+    ]
   }
 
   private join(args: Array<string | number>): unknown {
@@ -160,8 +189,12 @@ class SharedFakeRedis implements RedisLanSignalClient {
     const peerId = String(args[4])
     const tokenDigest = String(args[5])
     const token = String(args[6])
+    const gameId = String(args[7])
+    const engineVersion = String(args[8])
     const room = this.activeRoom(roomId, now)
     if (!room) return ["ERR", "ROOM_NOT_FOUND"]
+    if (room.gameId !== gameId) return ["ERR", "GAME_MISMATCH"]
+    if (room.engineVersion !== engineVersion) return ["ERR", "ENGINE_MISMATCH"]
     this.releaseExpiredGuest(room, now)
 
     const existing = room.joinRequests.get(requestId)
@@ -170,6 +203,7 @@ class SharedFakeRedis implements RedisLanSignalClient {
       return [
         "OK", "1", roomId, existing.peerId, "guest", existing.token,
         String(existing.cursor), String(room.expiresAt),
+        room.gameId, room.engineVersion,
       ]
     }
     if (room.guest) return ["ERR", "ROOM_FULL"]
@@ -180,6 +214,7 @@ class SharedFakeRedis implements RedisLanSignalClient {
     return [
       "OK", "0", roomId, peerId, "guest", token, String(cursor),
       String(room.expiresAt),
+      room.gameId, room.engineVersion,
     ]
   }
 
@@ -414,6 +449,40 @@ describe("RedisLanSignalStore", () => {
     expect(received.messages).toEqual([offer.value])
     expect(received.cursor).toBe(1)
     expect(backend.calls.filter((call) => call.operation === "poll")).toHaveLength(1)
+  })
+
+  it("checks game identity atomically before assigning the Redis guest seat", async () => {
+    const backend = new SharedFakeRedis()
+    const hostStore = createStore(backend)
+    const guestStore = createStore(backend, {
+      token: token("B"),
+      peerId: "peer-00000000002",
+    })
+    const host = (await hostStore.createRoom({
+      requestId: CREATE_REQUEST_ID,
+      gameId: "chinese-chess",
+      engineVersion: "xiangqi-free-v1",
+    })).value
+
+    await expect(guestStore.joinRoom({
+      roomId: host.roomId,
+      requestId: "wrong-game-request",
+      gameId: "chess",
+      engineVersion: "chess-free-v1",
+    })).rejects.toMatchObject({ code: "GAME_MISMATCH", status: 409 })
+    await expect(guestStore.joinRoom({
+      roomId: host.roomId,
+      requestId: "wrong-engine-request",
+      gameId: "chinese-chess",
+      engineVersion: "xiangqi-free-v2",
+    })).rejects.toMatchObject({ code: "ENGINE_MISMATCH", status: 409 })
+
+    await expect(guestStore.joinRoom({
+      roomId: host.roomId,
+      requestId: JOIN_REQUEST_ID,
+      gameId: "chinese-chess",
+      engineVersion: "xiangqi-free-v1",
+    })).resolves.toMatchObject({ value: { role: "guest" } })
   })
 
   it("deduplicates requests across instances and keeps participant tokens digested", async () => {

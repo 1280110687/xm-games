@@ -117,6 +117,22 @@
   padding: 0.25rem;
 }
 
+@media (max-width: 420px) {
+  html[data-theme] .chinese-chess-mode-bar[data-has-summary='true'] {
+    flex-wrap: wrap;
+  }
+
+  html[data-theme] .chinese-chess-mode-bar[data-has-summary='true'] .chinese-chess-mode-option {
+    flex: 1 1 calc((100% - 0.6rem) / 3);
+  }
+
+  html[data-theme] .chinese-chess-mode-bar[data-has-summary='true'] .chinese-chess-ai-summary {
+    width: 100%;
+    max-width: none;
+    flex: 1 0 100%;
+  }
+}
+
   .gomoku-mode-switch button {
     min-height: 2.75rem;
   }

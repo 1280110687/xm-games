@@ -44,10 +44,12 @@ export interface XiangqiState {
   readonly moveHistory: readonly XiangqiMoveRecord[]
   /** Position keys include the initial position and every position after a move. */
   readonly positionHistory: readonly string[]
+  /** LAN-only safety adjudication; local and AI games leave this unset. */
+  readonly termination?: "move-limit"
 }
 
 export type XiangqiWinReason = "checkmate" | "no-legal-move"
-export type XiangqiDrawReason = "repetition"
+export type XiangqiDrawReason = "repetition" | "move-limit"
 
 export type XiangqiGameResult =
   | {

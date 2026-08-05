@@ -55,6 +55,37 @@ async function responseJson<T>(response: Response): Promise<T> {
 }
 
 describe("LAN signaling HTTP contract", () => {
+  it("accepts explicit game identity and rejects a different game", async () => {
+    const store = createStore()
+    const createResponse = await handleCreateRoom(
+      jsonRequest("https://example.test/api/lan/rooms", {
+        requestId: CREATE_REQUEST_ID,
+        gameId: "reversi",
+        engineVersion: "reversi-free-v1",
+      }),
+      store,
+    )
+    const host = await responseJson<LanPeerSession>(createResponse)
+    expect(host).toMatchObject({
+      gameId: "reversi",
+      engineVersion: "reversi-free-v1",
+    })
+
+    const joinResponse = await handleJoinRoom(
+      jsonRequest(`https://example.test/api/lan/rooms/${host.roomId}/join`, {
+        requestId: JOIN_REQUEST_ID,
+        gameId: "chess",
+        engineVersion: "chess-free-v1",
+      }),
+      host.roomId,
+      store,
+    )
+    expect(joinResponse.status).toBe(409)
+    expect(await responseJson<{ error: { code: string } }>(joinResponse)).toMatchObject({
+      error: { code: "GAME_MISMATCH" },
+    })
+  })
+
   it("creates, joins, publishes, polls, and heartbeats with no-store responses", async () => {
     const store = createStore()
     const createResponse = await handleCreateRoom(
