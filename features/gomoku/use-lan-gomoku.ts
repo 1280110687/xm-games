@@ -52,6 +52,9 @@ const SIGNAL_POLL_BACKOFF_MAX_MS = 2_000
 const SIGNAL_POLL_CONNECTED_MS = 8_000
 const SIGNAL_POLL_HIDDEN_MS = 15_000
 const SIGNAL_POLL_JITTER_RATIO = 0.2
+const GUEST_RENEGOTIATION_RETRY_BASE_MS = 1_000
+const GUEST_RENEGOTIATION_RETRY_JITTER_RATIO = 0.2
+export const GUEST_RENEGOTIATION_MAX_RETRIES = 4
 const DICE_RESULT_HOLD_MS = 1_450
 const PROCESSED_MESSAGE_LIMIT = 512
 
@@ -103,6 +106,12 @@ interface CachedAcknowledgement {
   messageId: string
   nextRevision: number
   nextStateHash: string
+}
+
+export interface GuestRenegotiationOperation {
+  negotiationId: string
+  clientMessageId: string
+  attempts: number
 }
 
 interface DiceRuntime {
@@ -520,6 +529,42 @@ export function getSignalPollDelay(
   return Math.round(baseDelay * (1 + jitter))
 }
 
+export function createGuestRenegotiationOperation(
+  createId: () => string = () => crypto.randomUUID(),
+): GuestRenegotiationOperation {
+  return {
+    negotiationId: createId(),
+    clientMessageId: createId(),
+    attempts: 0,
+  }
+}
+
+export function recordGuestRenegotiationAttempt(
+  operation: GuestRenegotiationOperation,
+): GuestRenegotiationOperation {
+  return { ...operation, attempts: operation.attempts + 1 }
+}
+
+export function shouldRetryGuestRenegotiation(failedAttempts: number): boolean {
+  return Number.isSafeInteger(failedAttempts)
+    && failedAttempts > 0
+    && failedAttempts <= GUEST_RENEGOTIATION_MAX_RETRIES
+}
+
+export function getGuestRenegotiationRetryDelay(
+  failedAttempts: number,
+  random: () => number = Math.random,
+): number {
+  const retryNumber = Math.max(
+    1,
+    Math.min(GUEST_RENEGOTIATION_MAX_RETRIES, Math.floor(failedAttempts)),
+  )
+  const baseDelay = GUEST_RENEGOTIATION_RETRY_BASE_MS * 2 ** (retryNumber - 1)
+  const jitter = Math.max(0, Math.min(1, random()))
+    * GUEST_RENEGOTIATION_RETRY_JITTER_RATIO
+  return Math.round(baseDelay * (1 + jitter))
+}
+
 function waitForSignalPollDelay(delayMs: number, signal: AbortSignal): Promise<void> {
   if (signal.aborted) return Promise.resolve()
 
@@ -596,6 +641,7 @@ export function useLanGomoku(): UseLanGomokuResult {
     reconnect: boolean
     negotiationId: string
   } | null>(null)
+  const guestRenegotiationRef = useRef<GuestRenegotiationOperation | null>(null)
   const heartbeatRunningRef = useRef(false)
   const syncConfirmedRef = useRef(false)
   const movePreparingRef = useRef(false)
@@ -787,6 +833,7 @@ export function useLanGomoku(): UseLanGomokuResult {
     negotiationOwnerRef.current = null
     negotiatingRef.current = false
     pendingHostNegotiationRef.current = null
+    guestRenegotiationRef.current = null
     pollAbortRef.current?.abort()
     pollAbortRef.current = null
     pollOwnerRef.current = null
@@ -819,6 +866,7 @@ export function useLanGomoku(): UseLanGomokuResult {
     negotiatingRef.current = false
     negotiationOwnerRef.current = null
     pendingHostNegotiationRef.current = null
+    guestRenegotiationRef.current = null
     syncConfirmedRef.current = false
     movePreparingRef.current = false
     setDiceView(null)
@@ -856,6 +904,79 @@ export function useLanGomoku(): UseLanGomokuResult {
       negotiationId,
       clientMessageId,
     )
+  }
+
+  function guestRenegotiationIsCurrent(
+    operation: GuestRenegotiationOperation,
+  ): boolean {
+    const active = guestRenegotiationRef.current
+    return active?.negotiationId === operation.negotiationId
+      && active.clientMessageId === operation.clientMessageId
+  }
+
+  async function attemptGuestRenegotiation(
+    operation: GuestRenegotiationOperation,
+  ) {
+    const currentSession = sessionRef.current
+    const epoch = sessionEpochRef.current
+    if (
+      !currentSession
+      || currentSession.role !== "guest"
+      || !guestRenegotiationIsCurrent(operation)
+      || phaseRef.current === "error"
+    ) return
+
+    const attempted = recordGuestRenegotiationAttempt(operation)
+    guestRenegotiationRef.current = attempted
+    try {
+      await sendSignal(
+        "renegotiate",
+        {},
+        attempted.negotiationId,
+        attempted.clientMessageId,
+      )
+      if (
+        isCurrentSession(currentSession, epoch)
+        && guestRenegotiationIsCurrent(attempted)
+      ) guestRenegotiationRef.current = null
+    } catch (error) {
+      if (
+        !isCurrentSession(currentSession, epoch)
+        || !guestRenegotiationIsCurrent(attempted)
+      ) return
+
+      const code = mapSignalingError(error)
+      if (code === "ROOM_EXPIRED" || code === "ROOM_NOT_FOUND") {
+        guestRenegotiationRef.current = null
+        setFailure(code)
+        return
+      }
+      if (
+        error instanceof LanSignalingError
+        && !error.retryable
+      ) {
+        guestRenegotiationRef.current = null
+        setFailure(code)
+        persistSession()
+        return
+      }
+      if (shouldRetryGuestRenegotiation(attempted.attempts)) {
+        scheduleReconnect()
+        return
+      }
+
+      guestRenegotiationRef.current = null
+      setFailure("NETWORK_ERROR")
+      persistSession()
+    }
+  }
+
+  function startGuestRenegotiation() {
+    if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current)
+    reconnectTimerRef.current = null
+    const operation = createGuestRenegotiationOperation()
+    guestRenegotiationRef.current = operation
+    void attemptGuestRenegotiation(operation)
   }
 
   function queueRemoteIce(
@@ -912,6 +1033,16 @@ export function useLanGomoku(): UseLanGomokuResult {
     setConnected(false)
     setPhase("reconnecting")
 
+    const guestOperation = currentSession.role === "guest"
+      ? (guestRenegotiationRef.current ?? createGuestRenegotiationOperation())
+      : null
+    if (guestOperation) guestRenegotiationRef.current = guestOperation
+    const delayMs = guestOperation
+      ? guestOperation.attempts > 0
+        ? getGuestRenegotiationRetryDelay(guestOperation.attempts)
+        : RECONNECT_DELAY_MS
+      : RECONNECT_DELAY_MS
+
     reconnectTimerRef.current = setTimeout(() => {
       reconnectTimerRef.current = null
       if (!isCurrentSession(currentSession, epoch)) return
@@ -920,11 +1051,10 @@ export function useLanGomoku(): UseLanGomokuResult {
         return
       }
 
-      const negotiationId = crypto.randomUUID()
-      void sendSignal("renegotiate", {}, negotiationId).catch(() => {
-        if (isCurrentSession(currentSession, epoch)) scheduleReconnect()
-      })
-    }, currentSession.role === "guest" ? 350 : RECONNECT_DELAY_MS)
+      if (guestOperation && guestRenegotiationIsCurrent(guestOperation)) {
+        void attemptGuestRenegotiation(guestOperation)
+      }
+    }, delayMs)
   }
 
   function attachDataChannel(rawChannel: RTCDataChannel) {
@@ -1104,6 +1234,13 @@ export function useLanGomoku(): UseLanGomokuResult {
     ) return
     if (!bindRemoteSignalPeer(message)) return
     const epoch = sessionEpochRef.current
+
+    // A host offer proves that the guest's renegotiation request arrived even
+    // if its HTTP response was lost. Cancel any scheduled retry before it can
+    // start a second negotiation and replace this peer connection.
+    if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current)
+    reconnectTimerRef.current = null
+    guestRenegotiationRef.current = null
 
     const peerConnection = createPeerConnection(message.negotiationId)
     setPhase(blackPeerIdRef.current ? "reconnecting" : "connecting")
@@ -1425,11 +1562,7 @@ export function useLanGomoku(): UseLanGomokuResult {
         && shouldHostNegotiate(nextSession.role, remotePeerIdRef.current)
       ) void beginHostNegotiation(true)
     } else {
-      const epoch = sessionEpochRef.current
-      const negotiationId = crypto.randomUUID()
-      void sendSignal("renegotiate", {}, negotiationId).catch(() => {
-        if (isCurrentSession(nextSession, epoch)) scheduleReconnect()
-      })
+      startGuestRenegotiation()
     }
     persistSession()
   }
@@ -1497,6 +1630,7 @@ export function useLanGomoku(): UseLanGomokuResult {
     if (!currentSession || phaseRef.current === "error") return
     if (reconnectTimerRef.current) clearTimeout(reconnectTimerRef.current)
     reconnectTimerRef.current = null
+    guestRenegotiationRef.current = null
     rtcHeartbeatRef.current?.start()
     setConnected(true)
     setErrorCode(null)
@@ -2479,7 +2613,7 @@ export function useLanGomoku(): UseLanGomokuResult {
         void beginHostNegotiation(true)
       }
       else setPhase("waiting")
-    } else scheduleReconnect()
+    } else startGuestRenegotiation()
   }
 
   function restartSignalPolling() {

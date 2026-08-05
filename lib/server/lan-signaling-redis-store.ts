@@ -332,8 +332,15 @@ if existing ~= nil then
   if existing.fingerprint ~= fingerprint then
     return { "ERR", "IDEMPOTENCY_CONFLICT" }
   end
+  local existingMessageJson = existing.messageJson
+  if existingMessageJson == nil and existing.message ~= nil then
+    existingMessageJson = cjson.encode(existing.message)
+  end
+  if existingMessageJson == nil then
+    return { "ERR", "INTERNAL_ERROR" }
+  end
   saveRoom(KEYS[1], KEYS[2], room)
-  return { "OK", "1", cjson.encode(existing.message) }
+  return { "OK", "1", existingMessageJson }
 end
 
 local messageCount = tonumber(room.messageCount) or 0
@@ -351,17 +358,21 @@ local message = {
   payloadJson = payloadJson,
   createdAt = createdAt
 }
+local encodedMessage = cjson.encode(message)
+if encodedMessage == nil then
+  return { "ERR", "INTERNAL_ERROR" }
+end
 room.nextCursor = cursor + 1
 room.messages[tostring(cursor)] = message
 room.messageCount = messageCount + 1
 room.signalRequests[requestKey] = {
   fingerprint = fingerprint,
   cursor = cursor,
-  message = message
+  messageJson = encodedMessage
 }
 room.signalRequestCount = (tonumber(room.signalRequestCount) or 0) + 1
 saveRoom(KEYS[1], KEYS[2], room)
-return { "OK", "0", cjson.encode(message) }
+return { "OK", "0", encodedMessage }
 `
 
 export const REDIS_LAN_POLL_SCRIPT = String.raw`

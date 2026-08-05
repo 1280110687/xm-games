@@ -45,7 +45,7 @@ interface FakeRoom {
   guestLeaseTtl: number
   joinRequests: Map<string, { peerId: string; token: string; cursor: number }>
   signals: FakeSignal[]
-  signalRequests: Map<string, { fingerprint: string; message: FakeSignal }>
+  signalRequests: Map<string, { fingerprint: string; messageJson: string }>
   nextCursor: number
   prunedThroughCursor: number
 }
@@ -204,7 +204,7 @@ class SharedFakeRedis implements RedisLanSignalClient {
       if (existing.fingerprint !== fingerprint) {
         return ["ERR", "IDEMPOTENCY_CONFLICT"]
       }
-      return ["OK", "1", JSON.stringify(existing.message)]
+      return ["OK", "1", existing.messageJson]
     }
     if (room.signals.length >= Number(args[12])) {
       return ["ERR", "SIGNAL_LIMIT_REACHED"]
@@ -222,8 +222,9 @@ class SharedFakeRedis implements RedisLanSignalClient {
     }
     room.nextCursor += 1
     room.signals.push(message)
-    room.signalRequests.set(requestKey, { fingerprint, message })
-    return ["OK", "0", JSON.stringify(message)]
+    const messageJson = JSON.stringify(message)
+    room.signalRequests.set(requestKey, { fingerprint, messageJson })
+    return ["OK", "0", messageJson]
   }
 
   private poll(args: Array<string | number>): unknown {
@@ -394,12 +395,22 @@ describe("RedisLanSignalStore", () => {
         payload: { sdp: "v=0\r\n" },
       },
     })
+    const retriedOffer = await hostStore.publishSignal({
+      ...host,
+      clientMessageId: "host-message-00001",
+      signal: {
+        negotiationId: NEGOTIATION_ID,
+        type: "offer",
+        payload: { sdp: "v=0\r\n" },
+      },
+    })
     const received = await guestStore.pollSignals({
       ...guest,
       cursor: 0,
       waitMs: 20_000,
     })
 
+    expect(retriedOffer).toEqual({ value: offer.value, deduplicated: true })
     expect(received.messages).toEqual([offer.value])
     expect(received.cursor).toBe(1)
     expect(backend.calls.filter((call) => call.operation === "poll")).toHaveLength(1)
@@ -491,6 +502,8 @@ describe("RedisLanSignalStore", () => {
     expect(REDIS_LAN_CREATE_SCRIPT).toContain('"ZCARD"')
     expect(REDIS_LAN_JOIN_SCRIPT).toContain('"PXAT"')
     expect(REDIS_LAN_PUBLISH_SCRIPT).toContain('"PXAT"')
+    expect(REDIS_LAN_PUBLISH_SCRIPT).toContain("messageJson = encodedMessage")
+    expect(REDIS_LAN_PUBLISH_SCRIPT).not.toContain("message = message")
     expect(REDIS_LAN_POLL_SCRIPT).toContain('"PXAT"')
     expect(REDIS_LAN_HEARTBEAT_SCRIPT).toContain('"PXAT"')
     expect(REDIS_LAN_LEAVE_SCRIPT).toContain('"DEL"')

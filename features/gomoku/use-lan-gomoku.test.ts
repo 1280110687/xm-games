@@ -3,11 +3,16 @@ import { describe, expect, it } from "vitest"
 import { createGomokuState } from "./engine"
 import { LanSignalingError } from "../multiplayer/signaling-client"
 import {
+  GUEST_RENEGOTIATION_MAX_RETRIES,
+  createGuestRenegotiationOperation,
+  getGuestRenegotiationRetryDelay,
   getSignalPollDelay,
   openRoomWithSingleRetry,
   parseStoredSession,
+  recordGuestRenegotiationAttempt,
   shouldClearRoomSession,
   shouldHostNegotiate,
+  shouldRetryGuestRenegotiation,
   shouldRetainPendingRoomRequest,
   type StoredLanSession,
 } from "./use-lan-gomoku"
@@ -145,5 +150,36 @@ describe("host negotiation gating", () => {
     expect(shouldHostNegotiate("host", null)).toBe(false)
     expect(shouldHostNegotiate("host", "peer-guest-00001")).toBe(true)
     expect(shouldHostNegotiate("guest", "peer-host-000001")).toBe(false)
+  })
+})
+
+describe("guest renegotiation retry policy", () => {
+  it("keeps one negotiation and message ID across the finite retry budget", () => {
+    const ids = ["negotiation-id", "client-message-id"]
+    const operation = createGuestRenegotiationOperation(() => ids.shift()!)
+    let attempted = operation
+
+    expect(operation).toEqual({
+      negotiationId: "negotiation-id",
+      clientMessageId: "client-message-id",
+      attempts: 0,
+    })
+
+    for (let attempt = 1; attempt <= GUEST_RENEGOTIATION_MAX_RETRIES + 1; attempt += 1) {
+      attempted = recordGuestRenegotiationAttempt(attempted)
+      expect(attempted.negotiationId).toBe(operation.negotiationId)
+      expect(attempted.clientMessageId).toBe(operation.clientMessageId)
+      expect(shouldRetryGuestRenegotiation(attempted.attempts)).toBe(
+        attempt <= GUEST_RENEGOTIATION_MAX_RETRIES,
+      )
+    }
+  })
+
+  it("uses bounded zero-to-twenty-percent jitter on exponential delays", () => {
+    expect(getGuestRenegotiationRetryDelay(1, () => 0)).toBe(1_000)
+    expect(getGuestRenegotiationRetryDelay(1, () => 1)).toBe(1_200)
+    expect(getGuestRenegotiationRetryDelay(2, () => 0)).toBe(2_000)
+    expect(getGuestRenegotiationRetryDelay(4, () => 0)).toBe(8_000)
+    expect(getGuestRenegotiationRetryDelay(4, () => 1)).toBe(9_600)
   })
 })
