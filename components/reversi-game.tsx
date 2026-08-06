@@ -34,9 +34,9 @@ const LAN_INSTRUCTIONS = {
 } as const
 
 const LAN_RULE = {
-  zh: "联机模式不提供单方重开，避免两台设备的棋盘状态不一致。",
-  en: "LAN matches disable unilateral restart so both boards stay in sync.",
-  th: "โหมด LAN ไม่ให้เริ่มใหม่ฝ่ายเดียว เพื่อให้กระดานของทั้งสองเครื่องตรงกัน",
+  zh: "终局后双方确认可保留比分再来一局，并重新掷骰决定先手。",
+  en: "After the game, both players can confirm a rematch, keep score, and roll again.",
+  th: "หลังจบเกมทั้งสองฝ่ายยืนยันเพื่อเก็บคะแนน เล่นอีกครั้ง และทอยลูกเต๋าใหม่",
 } as const
 
 export function ReversiGame() {
@@ -103,6 +103,7 @@ export function ReversiGame() {
       data-page="reversi"
       data-game-mode={mode}
       data-lan-phase={mode === "lan" ? lan.phase : undefined}
+      data-lan-finished={mode === "lan" && lan.series.outcome !== "playing" ? "true" : undefined}
     >
       <GameHeader
         layout="centered"
@@ -158,6 +159,7 @@ export function ReversiGame() {
               { value: "white", label: lanCopy.white, color: "#f8fafc" },
             ]}
             dice={lan.dice}
+            series={lan.series}
             error={getReversiLanError(locale, lan.errorCode, lanCopy.errors)}
             copy={lanCopy}
             onCreateRoom={() => void lan.createRoom()}
@@ -165,6 +167,7 @@ export function ReversiGame() {
             onReady={lan.markReady}
             onLeave={lan.leaveRoom}
             onRetry={lan.retryConnection}
+            onRematch={() => void lan.requestRematch()}
           />
         )}
 

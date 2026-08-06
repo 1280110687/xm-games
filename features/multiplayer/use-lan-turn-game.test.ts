@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest"
 import { applyGoAction, createGoState } from "../go/engine"
 import { goLanAdapter } from "../go/lan"
 import { hashJson } from "./crypto"
+import { createLanMatchSeries } from "./match-series"
 import {
   parseStoredLanTurnGameSession,
   type StoredLanTurnGameSession,
@@ -14,7 +15,7 @@ const GUEST_PEER_ID = "peer-guest-000001"
 function createStoredSession(): StoredLanTurnGameSession {
   const game = createGoState()
   return {
-    version: 2,
+    version: 3,
     session: {
       gameId: goLanAdapter.gameId,
       engineVersion: goLanAdapter.engineVersion,
@@ -37,6 +38,7 @@ function createStoredSession(): StoredLanTurnGameSession {
     dice: null,
     pendingAction: null,
     acknowledgements: [],
+    matchSeries: null,
   }
 }
 
@@ -52,6 +54,7 @@ function preparePlayingSession(stored: StoredLanTurnGameSession): void {
     proof: "b".repeat(64),
   }
   stored.remotePeerId = GUEST_PEER_ID
+  stored.matchSeries = createLanMatchSeries([HOST_PEER_ID, GUEST_PEER_ID])
   stored.phase = "playing"
   stored.localReady = true
   stored.remoteReady = true

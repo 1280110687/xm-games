@@ -1729,6 +1729,28 @@ html[data-theme='theme-two'] .gomoku-lan-status__signal {
   background: #f2f2f7;
 }
 
+html[data-theme='theme-two'] .gomoku-lan-status__series > span,
+html[data-theme='theme-two'] .gomoku-dice-card__series > span,
+html[data-theme='theme-two'] .gomoku-lan-status__rematch > span {
+  color: #77777e;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-status__series > strong,
+html[data-theme='theme-two'] .gomoku-dice-card__series > strong {
+  color: #111114;
+}
+
+html[data-theme='theme-two'] .gomoku-lan-status__rematch [data-slot='button'] {
+  color: #fff;
+  background: #007aff;
+  box-shadow: none;
+}
+
+html[data-theme='theme-two'] .gomoku-dice-card__series {
+  color: #111114;
+  background: #f2f2f7;
+}
+
 html[data-theme='theme-two'] .gomoku-dice-overlay {
   background: rgb(230 232 238 / 0.72);
   backdrop-filter: blur(32px) saturate(1.4);
@@ -3532,6 +3554,19 @@ html[data-theme='theme-two'] .gomoku-dice-card__status {
   html[data-theme='theme-two'] .game-page[data-page='chinese-chess'] .game-stage {
     width: min(calc(100vw - 2rem), 17.25rem);
     padding: 0.6rem;
+  }
+
+  html[data-theme='theme-two'] .game-page:is(
+    [data-page='gomoku'],
+    [data-page='chess'],
+    [data-page='go'],
+    [data-page='reversi']
+  )[data-lan-phase='playing'][data-lan-finished='true'] .game-stage {
+    width: min(calc(100vw - 1rem), calc(100svh - 23.75rem), 16rem);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='chinese-chess'][data-lan-phase='playing'][data-lan-finished='true'] .game-stage {
+    width: min(calc(100vw - 2rem), 12rem);
   }
 
   html[data-theme='theme-two'] .game-page[data-page='memory-match'] .memory-board {

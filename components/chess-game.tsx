@@ -272,10 +272,10 @@ export function ChessGame() {
       ? "เมื่อพร้อมแล้ว ทั้งสองฝ่ายทอยลูกเต๋าร่วมกัน ผู้ชนะเล่นฝ่ายขาว และทั้งสองเครื่องตรวจสอบทุกตา"
       : "Both players roll after ready. The winner takes white, and both devices verify every move."
   const lanRule = locale === "zh"
-    ? "联机模式不提供单方悔棋或重开，避免双方棋盘状态不一致。"
+    ? "联机模式不提供单方悔棋；终局后双方确认即可保留比分再来一局，并重新掷骰决定先手。"
     : locale === "th"
-      ? "โหมด LAN ไม่ให้ถอยหรือเริ่มใหม่ฝ่ายเดียว เพื่อให้กระดานทั้งสองเครื่องตรงกัน"
-      : "LAN matches disable unilateral undo and restart so both boards stay in sync."
+      ? "โหมด LAN ไม่ให้ถอยฝ่ายเดียว หลังจบเกมทั้งสองฝ่ายยืนยันเพื่อเล่นอีกครั้งพร้อมเก็บคะแนนและทอยลูกเต๋าใหม่"
+      : "LAN disables unilateral undo. After the game, both players can confirm a rematch, keep score, and roll again."
 
   return (
     <div
@@ -283,6 +283,7 @@ export function ChessGame() {
       data-page="chess"
       data-game-mode={mode}
       data-lan-phase={mode === "lan" ? lan.phase : undefined}
+      data-lan-finished={mode === "lan" && lan.series.outcome !== "playing" ? "true" : undefined}
     >
       <GameHeader
         layout="centered"
@@ -338,6 +339,7 @@ export function ChessGame() {
               { value: "black", label: lanCopy.black, color: "#111827" },
             ]}
             dice={lan.dice}
+            series={lan.series}
             error={getChessLanError(locale, lan.errorCode, lanCopy.errors)}
             copy={lanCopy}
             onCreateRoom={() => void lan.createRoom()}
@@ -345,6 +347,7 @@ export function ChessGame() {
             onReady={lan.markReady}
             onLeave={lan.leaveRoom}
             onRetry={lan.retryConnection}
+            onRematch={() => void lan.requestRematch()}
           />
         )}
 

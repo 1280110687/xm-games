@@ -48,10 +48,10 @@ export function GomokuGame() {
       ? "เมื่อพร้อมแล้ว ทั้งสองฝ่ายทอยลูกเต๋าร่วมกัน ผู้ชนะเล่นหมากดำ และทั้งสองเครื่องตรวจสอบทุกตา"
       : "Both players roll after ready. The winner takes black, and both phones verify every move."
   const lanRule = locale === "zh"
-    ? "联机模式下暂不提供单方悔棋或重开，避免两台手机状态不一致。"
+    ? "联机模式不提供单方悔棋；终局后双方确认即可保留比分再来一局，并重新掷骰决定先手。"
     : locale === "th"
-      ? "โหมดออนไลน์ยังไม่ให้ถอยหรือเริ่มใหม่ฝ่ายเดียว เพื่อให้กระดานตรงกัน"
-      : "LAN matches disable unilateral undo and restart so both boards stay in sync."
+      ? "โหมด LAN ไม่ให้ถอยฝ่ายเดียว หลังจบเกมทั้งสองฝ่ายยืนยันเพื่อเล่นอีกครั้งพร้อมเก็บคะแนนและทอยลูกเต๋าใหม่"
+      : "LAN disables unilateral undo. After the game, both players can confirm a rematch, keep score, and roll again."
 
   useEffect(() => {
     if (new URLSearchParams(window.location.search).has("room")) setMode("lan")
@@ -97,6 +97,7 @@ export function GomokuGame() {
       data-page="gomoku"
       data-game-mode={mode}
       data-lan-phase={mode === "lan" ? lan.phase : undefined}
+      data-lan-finished={mode === "lan" && lan.series.outcome !== "playing" ? "true" : undefined}
     >
       <GameHeader
         layout="centered"
@@ -145,14 +146,16 @@ export function GomokuGame() {
             localReady={lan.localReady}
             remoteReady={lan.remoteReady}
             localStone={lan.localStone}
-            currentPlayer={lan.game.currentPlayer}
+            currentPlayer={lan.game.winner || lan.game.isDraw ? null : lan.game.currentPlayer}
             dice={lan.dice}
+            series={lan.series}
             error={getGomokuLanError(locale, lan.errorCode)}
             onCreateRoom={() => void lan.createRoom()}
             onJoinRoom={(roomId) => void lan.joinRoom(roomId)}
             onReady={lan.markReady}
             onLeave={lan.leaveRoom}
             onRetry={lan.retryConnection}
+            onRematch={() => void lan.requestRematch()}
           />
         )}
 

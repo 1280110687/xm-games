@@ -1,6 +1,12 @@
 import type { JsonValue } from "./crypto"
+import {
+  isLanMatchAdvance,
+  isLanMatchSeriesState,
+  type LanMatchAdvance,
+  type LanMatchSeriesState,
+} from "./match-series"
 
-export const MULTIPLAYER_PROTOCOL_VERSION = 1 as const
+export const MULTIPLAYER_PROTOCOL_VERSION = 2 as const
 export const MAX_MULTIPLAYER_MESSAGE_BYTES = 32 * 1024
 
 export const MULTIPLAYER_MESSAGE_TYPES = [
@@ -8,6 +14,10 @@ export const MULTIPLAYER_MESSAGE_TYPES = [
   "peer.heartbeat",
   "peer.heartbeat-ack",
   "room.ready",
+  "match.state",
+  "match.rematch-request",
+  "match.advance",
+  "match.advance-ack",
   "dice.commit",
   "dice.reveal",
   "dice.result",
@@ -26,33 +36,54 @@ type PayloadByType = {
   "peer.heartbeat": { nonce: string }
   "peer.heartbeat-ack": { nonce: string }
   "room.ready": { ready: boolean }
-  "dice.commit": { round: number; commitment: string }
-  "dice.reveal": { round: number; nonce: string }
+  "match.state": { series: LanMatchSeriesState }
+  "match.rematch-request": {
+    gameNumber: number
+    terminalRevision: number
+    terminalStateHash: string
+  }
+  "match.advance": { advance: LanMatchAdvance }
+  "match.advance-ack": {
+    advanceId: string
+    fromGameNumber: number
+    toGameNumber: number
+  }
+  "dice.commit": { gameNumber: number; round: number; commitment: string }
+  "dice.reveal": { gameNumber: number; round: number; nonce: string }
   "dice.result": {
+    gameNumber: number
     round: number
     rolls: Record<string, number>
     firstPlayerId: string | null
     tied: boolean
     proof: string
   }
-  "dice.result-ack": { round: number; proof: string }
+  "dice.result-ack": { gameNumber: number; round: number; proof: string }
   "action.propose": {
+    gameNumber: number
     actionId: string
     baseRevision: number
     action: JsonValue
   }
   "action.ack": {
+    gameNumber: number
     actionId: string
     baseRevision: number
     nextRevision: number
     nextStateHash: string
   }
   "action.reject": {
+    gameNumber: number
     actionId: string
     code: string
   }
-  "sync.request": { revision: number; stateHash?: string }
-  "sync.snapshot": { revision: number; stateHash: string; state: JsonValue }
+  "sync.request": { gameNumber: number; revision: number; stateHash?: string }
+  "sync.snapshot": {
+    gameNumber: number
+    revision: number
+    stateHash: string
+    state: JsonValue
+  }
 }
 
 export type MultiplayerMessage<T extends MultiplayerMessageType = MultiplayerMessageType> = {
@@ -138,18 +169,44 @@ function validatePayload(type: MultiplayerMessageType, payload: unknown): boolea
     case "room.ready":
       return hasExactKeys(payload, ["ready"])
         && typeof payload.ready === "boolean"
+    case "match.state":
+      return hasExactKeys(payload, ["series"])
+        && isLanMatchSeriesState(payload.series)
+    case "match.rematch-request":
+      return hasExactKeys(payload, [
+        "gameNumber",
+        "terminalRevision",
+        "terminalStateHash",
+      ])
+        && isRevision(payload.gameNumber)
+        && payload.gameNumber > 0
+        && isRevision(payload.terminalRevision)
+        && isHexDigest(payload.terminalStateHash)
+    case "match.advance":
+      return hasExactKeys(payload, ["advance"])
+        && isLanMatchAdvance(payload.advance)
+    case "match.advance-ack":
+      return hasExactKeys(payload, ["advanceId", "fromGameNumber", "toGameNumber"])
+        && isBoundedString(payload.advanceId, 128)
+        && isRevision(payload.fromGameNumber)
+        && payload.fromGameNumber > 0
+        && payload.toGameNumber === Number(payload.fromGameNumber) + 1
     case "dice.commit":
-      return hasExactKeys(payload, ["round", "commitment"])
+      return hasExactKeys(payload, ["gameNumber", "round", "commitment"])
+        && isRevision(payload.gameNumber) && payload.gameNumber > 0
         && isRevision(payload.round) && payload.round > 0 && isHexDigest(payload.commitment)
     case "dice.reveal":
-      return hasExactKeys(payload, ["round", "nonce"])
+      return hasExactKeys(payload, ["gameNumber", "round", "nonce"])
+        && isRevision(payload.gameNumber) && payload.gameNumber > 0
         && isRevision(payload.round)
         && payload.round > 0
         && isBoundedString(payload.nonce, 128)
         && /^[A-Za-z\d_-]+$/u.test(payload.nonce)
     case "dice.result": {
       if (
-        !hasExactKeys(payload, ["round", "rolls", "firstPlayerId", "tied", "proof"])
+        !hasExactKeys(payload, ["gameNumber", "round", "rolls", "firstPlayerId", "tied", "proof"])
+        || !isRevision(payload.gameNumber)
+        || payload.gameNumber <= 0
         || !isRevision(payload.round)
         || payload.round <= 0
         || !isRecord(payload.rolls)
@@ -178,31 +235,38 @@ function validatePayload(type: MultiplayerMessageType, payload: unknown): boolea
       return firstRoll !== secondRoll && payload.firstPlayerId === expectedWinner
     }
     case "dice.result-ack":
-      return hasExactKeys(payload, ["round", "proof"])
+      return hasExactKeys(payload, ["gameNumber", "round", "proof"])
+        && isRevision(payload.gameNumber)
+        && payload.gameNumber > 0
         && isRevision(payload.round)
         && payload.round > 0
         && isHexDigest(payload.proof)
     case "action.propose":
-      return hasExactKeys(payload, ["actionId", "baseRevision", "action"])
+      return hasExactKeys(payload, ["gameNumber", "actionId", "baseRevision", "action"])
+        && isRevision(payload.gameNumber) && payload.gameNumber > 0
         && isBoundedString(payload.actionId)
         && isRevision(payload.baseRevision)
         && isJsonValue(payload.action)
     case "action.ack":
-      return hasExactKeys(payload, ["actionId", "baseRevision", "nextRevision", "nextStateHash"])
+      return hasExactKeys(payload, ["gameNumber", "actionId", "baseRevision", "nextRevision", "nextStateHash"])
+        && isRevision(payload.gameNumber) && payload.gameNumber > 0
         && isBoundedString(payload.actionId)
         && isRevision(payload.baseRevision)
         && isRevision(payload.nextRevision)
         && payload.nextRevision === payload.baseRevision + 1
         && isHexDigest(payload.nextStateHash)
     case "action.reject":
-      return hasExactKeys(payload, ["actionId", "code"])
+      return hasExactKeys(payload, ["gameNumber", "actionId", "code"])
+        && isRevision(payload.gameNumber) && payload.gameNumber > 0
         && isBoundedString(payload.actionId) && isBoundedString(payload.code, 64)
     case "sync.request":
-      return hasExactKeys(payload, ["revision"], ["stateHash"])
+      return hasExactKeys(payload, ["gameNumber", "revision"], ["stateHash"])
+        && isRevision(payload.gameNumber) && payload.gameNumber > 0
         && isRevision(payload.revision)
         && (payload.stateHash === undefined || isHexDigest(payload.stateHash))
     case "sync.snapshot":
-      return hasExactKeys(payload, ["revision", "stateHash", "state"])
+      return hasExactKeys(payload, ["gameNumber", "revision", "stateHash", "state"])
+        && isRevision(payload.gameNumber) && payload.gameNumber > 0
         && isRevision(payload.revision)
         && isHexDigest(payload.stateHash)
         && isJsonValue(payload.state)

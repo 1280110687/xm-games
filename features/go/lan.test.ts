@@ -70,6 +70,10 @@ describe("Go LAN adapter", () => {
     let ended = apply(initial, { type: "pass" })
     ended = apply(ended, { type: "pass" })
     expect(goLanAdapter.getCurrentSide(ended)).toBeNull()
+    expect(goLanAdapter.getOutcome(ended)).toEqual({
+      status: "won",
+      winner: ended.result?.winner,
+    })
     expect(applyGoLanAction(ended, { type: "place", row: 0, col: 0 }, "black"))
       .toEqual({ ok: false, code: "GAME_FINISHED" })
   })

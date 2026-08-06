@@ -14,8 +14,8 @@ import {
   type Position,
 } from "./engine"
 
-export const CHESS_LAN_ENGINE_VERSION = "chess-free-v2"
-export const CHESS_LAN_SESSION_STORAGE_KEY = "xm-games:chess:lan-session:v2"
+export const CHESS_LAN_ENGINE_VERSION = "chess-free-v3"
+export const CHESS_LAN_SESSION_STORAGE_KEY = "xm-games:chess:lan-session:v3"
 export const CHESS_LAN_PENDING_REQUEST_STORAGE_KEY =
   "xm-games:chess:pending-room-request:v2"
 
@@ -330,4 +330,11 @@ export const chessLanAdapter: LanTurnGameAdapter<
   validateAndRebuildSnapshot: validateAndRebuildLanChessSnapshot,
   getRevision: (state) => state.moveHistory.length,
   getCurrentSide: (state) => isFinished(state.status) ? null : state.currentTurn,
+  getOutcome: (state) => {
+    if (state.status === "stalemate") return { status: "draw" }
+    if (state.status === "checkmate" && state.winner) {
+      return { status: "won", winner: state.winner }
+    }
+    return { status: "playing" }
+  },
 }

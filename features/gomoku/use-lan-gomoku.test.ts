@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 
 import { createGomokuState } from "./engine"
+import { gomokuLanAdapter } from "./lan"
 import { LanSignalingError } from "../multiplayer/signaling-client"
 import {
   GUEST_RENEGOTIATION_MAX_RETRIES,
@@ -19,10 +20,10 @@ import {
 
 function createStoredSession(expiresAt: string): StoredLanSession {
   return {
-    version: 2,
+    version: 3,
     session: {
       gameId: "gomoku",
-      engineVersion: "gomoku-free-v2",
+      engineVersion: gomokuLanAdapter.engineVersion,
       roomId: "123456",
       peerId: "peer-host-0000001",
       role: "host",
@@ -35,25 +36,31 @@ function createStoredSession(expiresAt: string): StoredLanSession {
     phase: "waiting",
     localReady: false,
     remoteReady: false,
-    game: createGomokuState(),
+    game: gomokuLanAdapter.encodeSnapshot(createGomokuState()),
     revision: 0,
-    blackPeerId: null,
+    firstPeerId: null,
     diceRuntime: null,
     dice: null,
-    pendingMove: null,
+    pendingAction: null,
     acknowledgements: [],
+    matchSeries: null,
   }
 }
 
 describe("parseStoredSession", () => {
-  it("keeps structurally valid credentials even when the cached room lease is stale", () => {
+  it("keeps structurally valid credentials even when the cached room lease is stale", async () => {
     const stored = createStoredSession("2020-01-01T00:00:00.000Z")
 
-    expect(parseStoredSession(JSON.stringify(stored))).toEqual(stored)
+    expect(await parseStoredSession(JSON.stringify(stored))).toMatchObject({
+      ...stored,
+      game: createGomokuState(),
+    })
   })
 
-  it("still rejects an invalid expiration timestamp", () => {
-    expect(parseStoredSession(JSON.stringify(createStoredSession("not-a-date")))).toBeNull()
+  it("still rejects an invalid expiration timestamp", async () => {
+    expect(await parseStoredSession(
+      JSON.stringify(createStoredSession("not-a-date")),
+    )).toBeNull()
   })
 })
 

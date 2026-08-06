@@ -12,9 +12,9 @@ import {
   type XiangqiState,
 } from "./engine"
 
-export const CHINESE_CHESS_LAN_ENGINE_VERSION = "xiangqi-free-v2"
+export const CHINESE_CHESS_LAN_ENGINE_VERSION = "xiangqi-free-v3"
 export const CHINESE_CHESS_LAN_SESSION_STORAGE_KEY =
-  "xm-games:chinese-chess:lan-session:v2"
+  "xm-games:chinese-chess:lan-session:v3"
 export const CHINESE_CHESS_LAN_PENDING_REQUEST_STORAGE_KEY =
   "xm-games:chinese-chess:pending-room-request:v2"
 
@@ -215,4 +215,11 @@ export const chineseChessLanAdapter: LanTurnGameAdapter<
   validateAndRebuildSnapshot: validateAndRebuildChineseChessLanSnapshot,
   getRevision: (state) => state.moveHistory.length,
   getCurrentSide: (state) => evaluateGameResult(state).over ? null : state.currentTurn,
+  getOutcome: (state) => {
+    const result = evaluateGameResult(state)
+    if (!result.over) return { status: "playing" }
+    return result.winner
+      ? { status: "won", winner: result.winner }
+      : { status: "draw" }
+  },
 }

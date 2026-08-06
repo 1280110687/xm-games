@@ -61,7 +61,7 @@ describe("LAN chess adapter", () => {
   it("assigns the dice winner to white and creates the standard initial state", () => {
     expect(chessLanAdapter.firstSide).toBe("white")
     expect(chessLanAdapter.secondSide).toBe("black")
-    expect(chessLanAdapter.engineVersion).toBe("chess-free-v2")
+    expect(chessLanAdapter.engineVersion).toBe("chess-free-v3")
 
     const state = chessLanAdapter.createInitialState()
     expect(state.currentTurn).toBe("white")
@@ -134,6 +134,7 @@ describe("LAN chess adapter", () => {
     expect(state.winner).toBe("black")
     expect(state.currentTurn).toBe("white")
     expect(chessLanAdapter.getCurrentSide(state)).toBeNull()
+    expect(chessLanAdapter.getOutcome(state)).toEqual({ status: "won", winner: "black" })
     expect(applyLanChessAction(state, {
       type: "move",
       from: { row: 6, col: 0 },
@@ -260,6 +261,7 @@ describe("LAN chess compact snapshots", () => {
       senderId: "sender-id",
       sentAt: 1,
       payload: {
+        gameNumber: 1,
         revision: CHESS_LAN_MAX_HALF_MOVES,
         stateHash: "a".repeat(64),
         state: encodeLanChessSnapshot(state),
@@ -300,6 +302,7 @@ describe("LAN chess compact snapshots", () => {
     expect(result.state.status).toBe("stalemate")
     expect(result.state.winner).toBeNull()
     expect(chessLanAdapter.getCurrentSide(result.state)).toBeNull()
+    expect(chessLanAdapter.getOutcome(result.state)).toEqual({ status: "draw" })
     expect(applyLanChessAction(result.state, {
       type: "move",
       from: { row: 1, col: 4 },

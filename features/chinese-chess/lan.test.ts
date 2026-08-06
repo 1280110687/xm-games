@@ -65,7 +65,7 @@ describe("Chinese chess LAN adapter", () => {
   it("assigns the dice winner to red, the only first-moving side", () => {
     expect(chineseChessLanAdapter.firstSide).toBe("red")
     expect(chineseChessLanAdapter.secondSide).toBe("black")
-    expect(chineseChessLanAdapter.engineVersion).toBe("xiangqi-free-v2")
+    expect(chineseChessLanAdapter.engineVersion).toBe("xiangqi-free-v3")
     expect(chineseChessLanAdapter.createInitialState().currentTurn).toBe("red")
 
     expect(sideForPeer(
@@ -255,6 +255,7 @@ describe("Chinese chess LAN snapshots", () => {
       senderId: "sender-id",
       sentAt: 1,
       payload: {
+        gameNumber: 1,
         revision: CHINESE_CHESS_LAN_MAX_HALF_MOVES,
         stateHash: "a".repeat(64),
         state: encodeChineseChessLanSnapshot(state),
@@ -297,6 +298,7 @@ describe("Chinese chess LAN snapshots", () => {
       inCheck: false,
     })
     expect(chineseChessLanAdapter.getCurrentSide(result.state)).toBeNull()
+    expect(chineseChessLanAdapter.getOutcome(result.state)).toEqual({ status: "draw" })
     expect(applyChineseChessLanAction(
       result.state,
       action(BLACK_HORSE_OUT),

@@ -15,8 +15,8 @@ import {
   type GoState,
 } from "./engine"
 
-export const GO_LAN_ENGINE_VERSION = "go-9x9-simple-ko-territory-v1"
-export const GO_LAN_SESSION_STORAGE_KEY = "xm-games:go:lan-session:v1"
+export const GO_LAN_ENGINE_VERSION = "go-9x9-simple-ko-territory-v2"
+export const GO_LAN_SESSION_STORAGE_KEY = "xm-games:go:lan-session:v2"
 export const GO_LAN_PENDING_REQUEST_STORAGE_KEY =
   "xm-games:go:pending-room-request:v1"
 export const GO_LAN_SNAPSHOT_VERSION = 1 as const
@@ -220,4 +220,7 @@ export const goLanAdapter: LanTurnGameAdapter<GoState, GoAction, GoPlayer> = {
   validateAndRebuildSnapshot: validateAndRebuildGoLanSnapshot,
   getRevision: (state) => state.actionHistory.length,
   getCurrentSide: (state) => state.status === "ended" ? null : state.currentPlayer,
+  getOutcome: (state) => state.status === "ended" && state.result
+    ? { status: "won", winner: state.result.winner }
+    : { status: "playing" },
 }

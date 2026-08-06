@@ -9,6 +9,7 @@ import {
   LoaderCircle,
   LogOut,
   QrCode,
+  RotateCcw,
   ShieldCheck,
   Users,
   Wifi,
@@ -22,6 +23,7 @@ import {
   findLanGameSide,
   formatLanGameCopy,
   getLanGameConnectionText,
+  getLanGameStatusText,
   type LanGamePanelProps,
 } from "./lan-game-panel-model"
 
@@ -40,6 +42,7 @@ export function LanGamePanel<Side extends string>({
   currentSide,
   sides,
   dice,
+  series,
   error,
   copy,
   onCreateRoom,
@@ -47,6 +50,7 @@ export function LanGamePanel<Side extends string>({
   onReady,
   onLeave,
   onRetry,
+  onRematch,
 }: LanGamePanelProps<Side>) {
   const [joinCode, setJoinCode] = useState("")
   const [qrDataUrl, setQrDataUrl] = useState("")
@@ -126,6 +130,8 @@ export function LanGamePanel<Side extends string>({
   if (phase === "playing") {
     const side = findLanGameSide(sides, localSide)
     const isMyTurn = localSide !== null && localSide === currentSide
+    const statusText = getLanGameStatusText(series, isMyTurn, copy)
+    const isFinished = series.outcome !== "playing"
 
     return (
       <section
@@ -153,16 +159,43 @@ export function LanGamePanel<Side extends string>({
                 stone: side?.label ?? "",
               })}
             </strong>
-            <span>{isMyTurn ? copy.yourTurn : copy.opponentTurn}</span>
+            <span>{statusText}</span>
           </div>
         </div>
-        <div className="gomoku-lan-status__room">
-          <span>{copy.roomCode}</span>
-          <strong>{roomId}</strong>
+        <div className="gomoku-lan-status__series">
+          <span>{formatLanGameCopy(copy.matchRound, { round: series.gameNumber })}</span>
+          <strong>
+            <span>{copy.you} {series.localWins}</span>
+            <i aria-hidden="true">·</i>
+            <span>{copy.draws} {series.draws}</span>
+            <i aria-hidden="true">·</i>
+            <span>{copy.opponent} {series.remoteWins}</span>
+          </strong>
         </div>
-        <Button variant="ghost" size="icon-sm" onClick={onLeave} aria-label={copy.leave}>
-          <LogOut aria-hidden="true" />
-        </Button>
+        <div className="gomoku-lan-status__actions">
+          <div className="gomoku-lan-status__room">
+            <span>{copy.roomCode}</span>
+            <strong>{roomId}</strong>
+          </div>
+          <Button variant="ghost" size="icon-sm" onClick={onLeave} aria-label={copy.leave}>
+            <LogOut aria-hidden="true" />
+          </Button>
+        </div>
+        {isFinished && (
+          <div className="gomoku-lan-status__rematch" data-remote-ready={series.remoteRematchReady}>
+            {series.remoteRematchReady && !series.localRematchReady
+              ? <span>{copy.opponentRequested}</span>
+              : null}
+            <Button
+              size="sm"
+              onClick={onRematch}
+              disabled={!series.canRequestRematch || series.localRematchReady || !connected}
+            >
+              <RotateCcw aria-hidden="true" />
+              {series.localRematchReady ? copy.rematchRequested : copy.rematch}
+            </Button>
+          </div>
+        )}
       </section>
     )
   }
@@ -303,6 +336,10 @@ export function LanGamePanel<Side extends string>({
             <p className="gomoku-dice-card__round">
               {formatLanGameCopy(copy.diceRound, { round: dice.round })}
             </p>
+            <div className="gomoku-dice-card__series" aria-label={formatLanGameCopy(copy.matchRound, { round: series.gameNumber })}>
+              <span>{formatLanGameCopy(copy.matchRound, { round: series.gameNumber })}</span>
+              <strong>{copy.you} {series.localWins} · {copy.draws} {series.draws} · {copy.opponent} {series.remoteWins}</strong>
+            </div>
             <h2 id={diceTitleId}>{copy.diceTitle}</h2>
             <p>{copy.diceDescription}</p>
             <div className="gomoku-dice-card__rolls" data-rolling={dice.status !== "resolved"}>

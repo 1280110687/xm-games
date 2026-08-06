@@ -31,9 +31,9 @@ const LAN_INSTRUCTIONS = {
 } as const
 
 const LAN_RULE = {
-  zh: "联机模式不提供单方悔棋或重开；连续两次停一手后自动结束并计分。",
-  en: "LAN matches disable unilateral undo and restart. Two consecutive passes end and score the game.",
-  th: "โหมด LAN ไม่ให้ย้อนหรือเริ่มใหม่ฝ่ายเดียว การผ่านสองครั้งติดกันจะจบเกมและนับคะแนน",
+  zh: "联机模式不提供单方悔棋；连续两次停一手后计分，双方确认可保留比分再来一局并重新掷骰。",
+  en: "LAN disables unilateral undo. Two passes score the game; both players can then confirm a scored rematch and roll again.",
+  th: "โหมด LAN ไม่ให้ถอยฝ่ายเดียว ผ่านสองครั้งจะนับคะแนน จากนั้นทั้งคู่ยืนยันเพื่อเก็บคะแนน เล่นใหม่ และทอยอีกครั้ง",
 } as const
 
 const GAME_MISMATCH = {
@@ -138,6 +138,7 @@ export function GoGame() {
       data-page="go"
       data-game-mode={mode}
       data-lan-phase={mode === "lan" ? lan.phase : undefined}
+      data-lan-finished={mode === "lan" && lan.series.outcome !== "playing" ? "true" : undefined}
     >
       <GameHeader
         layout="centered"
@@ -193,6 +194,7 @@ export function GoGame() {
               { value: "white", label: lanCopy.white, color: "#f8fafc" },
             ]}
             dice={lan.dice}
+            series={lan.series}
             error={lanError}
             copy={lanCopy}
             onCreateRoom={() => void lan.createRoom()}
@@ -200,6 +202,7 @@ export function GoGame() {
             onReady={lan.markReady}
             onLeave={lan.leaveRoom}
             onRetry={lan.retryConnection}
+            onRematch={() => void lan.requestRematch()}
           />
         )}
 

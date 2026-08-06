@@ -16,6 +16,23 @@ import {
   type MultiplayerMessage,
 } from "./protocol"
 import {
+  applyLanMatchAdvance,
+  bothPlayersRequestedRematch,
+  createLanMatchAdvance,
+  createLanMatchSeries,
+  isLanMatchSettlementAhead,
+  isLanMatchSeriesState,
+  mergeLanMatchRematchRequests,
+  requestLanMatchRematch,
+  sameLanMatchRematchRequests,
+  settleLanMatchSeries,
+  toLanMatchSeriesView,
+  withPendingLanMatchAdvance,
+  type LanMatchAdvance,
+  type LanMatchSeriesState,
+  type LanMatchSeriesView,
+} from "./match-series"
+import {
   ReliableRtcChannel,
   createReliableOrderedDataChannel,
 } from "./rtc-channel"
@@ -146,7 +163,7 @@ interface StoredCachedAcknowledgement {
 }
 
 export interface StoredLanTurnGameSession {
-  version: 2
+  version: 3
   session: LanRoomSession
   matchId: string
   remotePeerId: string | null
@@ -160,6 +177,7 @@ export interface StoredLanTurnGameSession {
   dice: LanTurnGameDiceView | null
   pendingAction: StoredPendingGameAction | null
   acknowledgements: StoredCachedAcknowledgement[]
+  matchSeries: LanMatchSeriesState | null
 }
 
 interface RestoredLanTurnGameSession<State, Action> extends Omit<
@@ -182,11 +200,13 @@ export interface UseLanTurnGameResult<State, Action, Side extends string> {
   currentSide: Side | null
   game: State
   dice: LanTurnGameDiceView | null
+  series: LanMatchSeriesView
   errorCode: LanTurnGameErrorCode | null
   createRoom: () => Promise<void>
   joinRoom: (roomId: string) => Promise<void>
   markReady: () => void
   playAction: (action: Action) => Promise<boolean>
+  requestRematch: () => Promise<boolean>
   leaveRoom: () => void
   retryConnection: () => void
 }
@@ -361,7 +381,7 @@ export async function parseStoredLanTurnGameSession<State, Action, Side extends 
 ): Promise<RestoredLanTurnGameSession<State, Action> | null> {
   try {
     const parsed: unknown = JSON.parse(value)
-    if (!isRecord(parsed) || parsed.version !== 2 || !isRecord(parsed.session)) return null
+    if (!isRecord(parsed) || parsed.version !== 3 || !isRecord(parsed.session)) return null
     if (
       parsed.session.gameId !== adapter.gameId
       || parsed.session.engineVersion !== adapter.engineVersion
@@ -439,6 +459,30 @@ export async function parseStoredLanTurnGameSession<State, Action, Side extends 
       parsed.matchId !== session.roomId
       || remotePeerId === session.peerId
     ) return null
+    const matchSeries = parsed.matchSeries
+    if (
+      (remotePeerId === null && matchSeries !== null)
+      || (
+        remotePeerId !== null
+        && !isLanMatchSeriesState(matchSeries, [session.peerId, remotePeerId])
+      )
+    ) return null
+    const validatedMatchSeries = matchSeries as LanMatchSeriesState | null
+    if (validatedMatchSeries) {
+      const outcome = adapter.getOutcome(validatedGame.state)
+      if (
+        (outcome.status === "playing" && validatedMatchSeries.settledGameNumber === validatedMatchSeries.gameNumber)
+        || (validatedMatchSeries.pendingAdvance !== null && session.role !== "host")
+      ) return null
+      if (validatedMatchSeries.pendingAdvance) {
+        if (
+          outcome.status === "playing"
+          || validatedMatchSeries.pendingAdvance.terminalRevision !== revision
+        ) return null
+        const terminalHash = await hashJson(adapter.encodeSnapshot(validatedGame.state))
+        if (terminalHash !== validatedMatchSeries.pendingAdvance.terminalStateHash) return null
+      }
+    }
     if (
       firstPeerId !== null
       && firstPeerId !== session.peerId
@@ -559,6 +603,7 @@ export async function parseStoredLanTurnGameSession<State, Action, Side extends 
       acknowledgements: acknowledgements as CachedAcknowledgement<Action>[],
       diceRuntime,
       dice: parsed.dice as LanTurnGameDiceView | null,
+      matchSeries: validatedMatchSeries,
     }
   } catch {
     return null
@@ -707,6 +752,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
   const [firstPeerId, setFirstPeerIdState] = useState<string | null>(null)
   const [game, setGameState] = useState<State>(() => adapter.createInitialState())
   const [dice, setDice] = useState<LanTurnGameDiceView | null>(null)
+  const [matchSeries, setMatchSeriesState] = useState<LanMatchSeriesState | null>(null)
   const [errorCode, setErrorCode] = useState<LanTurnGameErrorCode | null>(null)
 
   const phaseRef = useRef(phase)
@@ -718,6 +764,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
   const firstPeerIdRef = useRef(firstPeerId)
   const gameRef = useRef(game)
   const diceViewRef = useRef(dice)
+  const matchSeriesRef = useRef(matchSeries)
   const revisionRef = useRef(0)
   const matchIdRef = useRef("")
   const diceRuntimeRef = useRef<DiceRuntime | null>(null)
@@ -749,6 +796,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
   const heartbeatRunningRef = useRef(false)
   const syncConfirmedRef = useRef(false)
   const actionPreparingRef = useRef(false)
+  const advancePreparingRef = useRef(false)
   const sessionEpochRef = useRef(0)
   const disposedRef = useRef(false)
   const pendingRoomRequestStoreRef = useRef<PendingRoomRequestStore | null>(null)
@@ -798,6 +846,11 @@ export function useLanTurnGame<State, Action, Side extends string>(
     setDice(next)
   }
 
+  function setMatchSeries(next: LanMatchSeriesState | null) {
+    matchSeriesRef.current = next
+    setMatchSeriesState(next)
+  }
+
   function isCurrentSession(expected: LanRoomSession, epoch: number): boolean {
     const activeSession = sessionRef.current
     return !disposedRef.current
@@ -822,7 +875,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
 
     const pending = pendingActionRef.current
     const stored: StoredLanTurnGameSession = {
-      version: 2,
+      version: 3,
       session: currentSession,
       matchId: matchIdRef.current,
       remotePeerId: remotePeerIdRef.current,
@@ -845,6 +898,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
         ...acknowledgement,
         action: adapter.encodeAction(acknowledgement.action),
       })),
+      matchSeries: matchSeriesRef.current,
     }
 
     try {
@@ -972,6 +1026,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
     setRemotePeer(null)
     setFirstPeer(null)
     setCurrentGame(adapter.createInitialState())
+    setMatchSeries(null)
     revisionRef.current = 0
     matchIdRef.current = ""
     diceRuntimeRef.current = null
@@ -987,6 +1042,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
     guestRenegotiationRef.current = null
     syncConfirmedRef.current = false
     actionPreparingRef.current = false
+    advancePreparingRef.current = false
     setDiceView(null)
     setErrorCode(null)
   }
@@ -1398,6 +1454,10 @@ export function useLanTurnGame<State, Action, Side extends string>(
       }
 
       setRemotePeer(message.fromPeerId)
+      setMatchSeries(createLanMatchSeries([
+        currentSession.peerId,
+        message.fromPeerId,
+      ]))
       setConnected(false)
       closePeerConnection()
       setLocalReady(false)
@@ -1418,7 +1478,15 @@ export function useLanTurnGame<State, Action, Side extends string>(
       persistSession()
       return true
     }
-    if (!existing) setRemotePeer(message.fromPeerId)
+    if (!existing) {
+      const currentSession = sessionRef.current
+      if (!currentSession) return false
+      setRemotePeer(message.fromPeerId)
+      setMatchSeries(createLanMatchSeries([
+        currentSession.peerId,
+        message.fromPeerId,
+      ]))
+    }
     return true
   }
 
@@ -1665,6 +1733,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
       setRemotePeer(null)
       setFirstPeer(null)
       setCurrentGame(adapter.createInitialState())
+      setMatchSeries(null)
       revisionRef.current = 0
       diceRuntimeRef.current = null
       pendingActionRef.current = null
@@ -1762,6 +1831,16 @@ export function useLanTurnGame<State, Action, Side extends string>(
     try {
       sendMessage("peer.hello", { engineVersion: adapter.engineVersion })
       sendMessage("room.ready", { ready: localReadyRef.current })
+      sendMatchState()
+      const series = matchSeriesRef.current
+      if (currentSession.role === "host" && series?.pendingAdvance) {
+        sendMatchAdvance(series.pendingAdvance)
+        persistSession()
+        return
+      }
+      if (currentSession.role === "guest" && series?.lastAdvance) {
+        sendMatchAdvanceAcknowledgement(series.lastAdvance)
+      }
       if (diceRuntimeRef.current && !resendDiceState()) {
         persistSession()
         return
@@ -1793,10 +1872,11 @@ export function useLanTurnGame<State, Action, Side extends string>(
   function getDiceContext(round: number): DiceRoundContext | null {
     const currentSession = sessionRef.current
     const remoteId = remotePeerIdRef.current
-    if (!currentSession || !remoteId) return null
+    const series = matchSeriesRef.current
+    if (!currentSession || !remoteId || !series) return null
     return {
       roomId: currentSession.roomId,
-      matchId: matchIdRef.current,
+      matchId: `${matchIdRef.current}:game:${series.gameNumber}`,
       round,
       playerIds: [currentSession.peerId, remoteId],
     }
@@ -1847,6 +1927,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
     if (!connectedRef.current) return
     try {
       sendMessage("dice.commit", {
+        gameNumber: matchSeriesRef.current!.gameNumber,
         round: runtime.round,
         commitment: localCommit.commitment,
       })
@@ -1922,25 +2003,34 @@ export function useLanTurnGame<State, Action, Side extends string>(
 
     try {
       if (runtime.previousFinalizedResult) {
-        sendMessage("dice.result", toJsonValue(runtime.previousFinalizedResult))
+        sendMessage("dice.result", toJsonValue({
+          ...runtime.previousFinalizedResult,
+          gameNumber: matchSeriesRef.current!.gameNumber,
+        }))
         sendMessage("dice.result-ack", {
+          gameNumber: matchSeriesRef.current!.gameNumber,
           round: runtime.previousFinalizedResult.round,
           proof: runtime.previousFinalizedResult.proof,
         })
       }
       if (runtime.localCommit) {
         sendMessage("dice.commit", {
+          gameNumber: matchSeriesRef.current!.gameNumber,
           round: runtime.round,
           commitment: runtime.localCommit.commitment,
         })
         if (runtime.revealSent) {
           sendMessage("dice.reveal", {
+            gameNumber: matchSeriesRef.current!.gameNumber,
             round: runtime.round,
             nonce: runtime.localCommit.nonce,
           })
         }
         if (runtime.localResult) {
-          sendMessage("dice.result", toJsonValue(runtime.localResult))
+          sendMessage("dice.result", toJsonValue({
+            ...runtime.localResult,
+            gameNumber: matchSeriesRef.current!.gameNumber,
+          }))
           runtime.resultSent = true
         }
       }
@@ -1956,6 +2046,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
         )
       ) {
         sendMessage("dice.result-ack", {
+          gameNumber: matchSeriesRef.current!.gameNumber,
           round: runtime.round,
           proof: runtime.localResult.proof,
         })
@@ -1995,6 +2086,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
     if (connectedRef.current) {
       try {
         sendMessage("dice.result-ack", {
+          gameNumber: matchSeriesRef.current!.gameNumber,
           round: runtime.round,
           proof: localResult.proof,
         })
@@ -2055,7 +2147,11 @@ export function useLanTurnGame<State, Action, Side extends string>(
     const currentView = diceViewRef.current
     if (currentView) setDiceView({ ...currentView, status: "revealing" })
     try {
-      sendMessage("dice.reveal", { round: runtime.round, nonce: runtime.localCommit.nonce })
+      sendMessage("dice.reveal", {
+        gameNumber: matchSeriesRef.current!.gameNumber,
+        round: runtime.round,
+        nonce: runtime.localCommit.nonce,
+      })
     } catch {
       persistSession()
       scheduleReconnect()
@@ -2116,7 +2212,10 @@ export function useLanTurnGame<State, Action, Side extends string>(
     }
     setDiceView(nextView)
     try {
-      sendMessage("dice.result", toJsonValue(result))
+      sendMessage("dice.result", toJsonValue({
+        ...result,
+        gameNumber: matchSeriesRef.current!.gameNumber,
+      }))
       runtime.resultSent = true
       runtime.resolving = false
       finalizeConfirmedDice()
@@ -2130,7 +2229,13 @@ export function useLanTurnGame<State, Action, Side extends string>(
   }
 
   function maybeStartDice() {
+    const currentSession = sessionRef.current
+    const series = matchSeriesRef.current
     if (
+      currentSession?.role === "host" &&
+      series &&
+      series.settledGameNumber === series.gameNumber - 1 &&
+      !series.pendingAdvance &&
       connectedRef.current &&
       localReadyRef.current &&
       remoteReadyRef.current &&
@@ -2166,6 +2271,361 @@ export function useLanTurnGame<State, Action, Side extends string>(
     return null
   }
 
+  function currentPlayers(): [string, string] | null {
+    const currentSession = sessionRef.current
+    const remoteId = remotePeerIdRef.current
+    if (!currentSession || !remoteId) return null
+    return [currentSession.peerId, remoteId]
+  }
+
+  function peerIdForSide(side: Side): string | null {
+    const players = currentPlayers()
+    if (!players) return null
+    return players.find((peerId) => sideForPeerId(peerId) === side) ?? null
+  }
+
+  function settleCommittedGame(state: State): boolean {
+    const series = matchSeriesRef.current
+    if (!series) return false
+    const next = settleLanMatchSeries(series, adapter.getOutcome(state), peerIdForSide)
+    if (next !== series) setMatchSeries(next)
+    return next !== series
+  }
+
+  function sendMatchState(): void {
+    const series = matchSeriesRef.current
+    if (!series || !connectedRef.current) return
+    sendMessage("match.state", { series: toJsonValue(series) })
+  }
+
+  function sendMatchAdvance(advance: LanMatchAdvance): void {
+    sendMessage("match.advance", { advance: toJsonValue(advance) })
+  }
+
+  function sendMatchAdvanceAcknowledgement(advance: LanMatchAdvance): void {
+    sendMessage("match.advance-ack", {
+      advanceId: advance.advanceId,
+      fromGameNumber: advance.fromGameNumber,
+      toGameNumber: advance.toGameNumber,
+    })
+  }
+
+  function resetForNextGame(nextSeries: LanMatchSeriesState): void {
+    if (diceTimerRef.current) clearTimeout(diceTimerRef.current)
+    diceTimerRef.current = null
+    setMatchSeries(nextSeries)
+    setFirstPeer(null)
+    setCurrentGame(adapter.createInitialState())
+    revisionRef.current = 0
+    diceRuntimeRef.current = null
+    pendingActionRef.current = null
+    acknowledgementCacheRef.current = []
+    syncConfirmedRef.current = false
+    actionPreparingRef.current = false
+    advancePreparingRef.current = false
+    setDiceView(null)
+    setPhase("syncing")
+    persistSession()
+  }
+
+  async function terminalStateHash(): Promise<string | null> {
+    const series = matchSeriesRef.current
+    if (
+      !series
+      || series.settledGameNumber !== series.gameNumber
+      || adapter.getOutcome(gameRef.current).status === "playing"
+    ) return null
+    return hashJson(adapter.encodeSnapshot(gameRef.current))
+  }
+
+  async function maybePrepareHostAdvance(): Promise<void> {
+    const currentSession = sessionRef.current
+    const series = matchSeriesRef.current
+    const players = currentPlayers()
+    if (
+      !currentSession
+      || currentSession.role !== "host"
+      || !series
+      || !players
+      || series.pendingAdvance
+      || !bothPlayersRequestedRematch(series, players)
+      || advancePreparingRef.current
+    ) return
+
+    advancePreparingRef.current = true
+    const expectedGameNumber = series.gameNumber
+    const expectedRevision = revisionRef.current
+    try {
+      const stateHash = await terminalStateHash()
+      if (
+        !stateHash
+        || matchSeriesRef.current !== series
+        || revisionRef.current !== expectedRevision
+        || series.gameNumber !== expectedGameNumber
+      ) return
+      const advance = createLanMatchAdvance(
+        series,
+        players,
+        expectedRevision,
+        stateHash,
+        crypto.randomUUID(),
+      )
+      if (!advance) return
+      const pendingSeries = withPendingLanMatchAdvance(series, advance)
+      if (!pendingSeries) {
+        setFailure("DESYNC")
+        return
+      }
+      setMatchSeries(pendingSeries)
+      persistSession()
+      if (connectedRef.current) sendMatchAdvance(advance)
+    } catch {
+      scheduleReconnect()
+    } finally {
+      advancePreparingRef.current = false
+    }
+  }
+
+  async function applyGuestAdvance(advance: LanMatchAdvance): Promise<void> {
+    const currentSession = sessionRef.current
+    const series = matchSeriesRef.current
+    if (!currentSession || currentSession.role !== "guest" || !series) return
+
+    if (
+      series.gameNumber === advance.toGameNumber
+      && series.lastAdvance?.advanceId === advance.advanceId
+    ) {
+      try {
+        sendMatchAdvanceAcknowledgement(advance)
+        sendMatchState()
+      } catch {
+        scheduleReconnect()
+      }
+      return
+    }
+    if (
+      advance.fromGameNumber < series.gameNumber
+      || advance.toGameNumber <= series.gameNumber
+    ) return
+    if (
+      advance.fromGameNumber !== series.gameNumber
+      || advance.terminalRevision !== revisionRef.current
+    ) {
+      setFailure("DESYNC")
+      return
+    }
+
+    const stateHash = await terminalStateHash()
+    if (!stateHash || stateHash !== advance.terminalStateHash) {
+      setFailure("DESYNC")
+      return
+    }
+    const nextSeries = applyLanMatchAdvance(series, advance)
+    if (!nextSeries) {
+      setFailure("DESYNC")
+      return
+    }
+    resetForNextGame(nextSeries)
+    try {
+      sendMatchAdvanceAcknowledgement(advance)
+      sendMatchState()
+    } catch {
+      scheduleReconnect()
+    }
+  }
+
+  function completeHostAdvance(advance: LanMatchAdvance): void {
+    const currentSession = sessionRef.current
+    const series = matchSeriesRef.current
+    if (
+      !currentSession
+      || currentSession.role !== "host"
+      || !series?.pendingAdvance
+      || series.pendingAdvance.advanceId !== advance.advanceId
+    ) return
+    const nextSeries = applyLanMatchAdvance(series, advance)
+    if (!nextSeries) {
+      setFailure("DESYNC")
+      return
+    }
+    resetForNextGame(nextSeries)
+    try {
+      sendMatchState()
+      if (connectedRef.current) void beginDiceRound(1)
+    } catch {
+      scheduleReconnect()
+    }
+  }
+
+  async function requestRematch(): Promise<boolean> {
+    const currentSession = sessionRef.current
+    const series = matchSeriesRef.current
+    const epoch = sessionEpochRef.current
+    const expectedGameNumber = series?.gameNumber
+    const expectedRevision = revisionRef.current
+    if (
+      !currentSession
+      || !remotePeerIdRef.current
+      || !series
+      || !connectedRef.current
+      || series.settledGameNumber !== series.gameNumber
+    ) return false
+
+    const stateHash = await terminalStateHash()
+    const latest = matchSeriesRef.current
+    if (
+      !stateHash
+      || !isCurrentSession(currentSession, epoch)
+      || !latest
+      || latest.gameNumber !== expectedGameNumber
+      || latest.settledGameNumber !== latest.gameNumber
+      || revisionRef.current !== expectedRevision
+    ) return false
+    const next = requestLanMatchRematch(latest, currentSession.peerId)
+    if (next !== latest) {
+      setMatchSeries(next)
+      persistSession()
+    }
+    try {
+      sendMessage("match.rematch-request", {
+        gameNumber: next.gameNumber,
+        terminalRevision: revisionRef.current,
+        terminalStateHash: stateHash,
+      })
+      sendMatchState()
+      await maybePrepareHostAdvance()
+      return true
+    } catch {
+      persistSession()
+      scheduleReconnect()
+      return false
+    }
+  }
+
+  async function handleRematchRequest(
+    message: Extract<MultiplayerMessage, { type: "match.rematch-request" }>,
+  ): Promise<void> {
+    const series = matchSeriesRef.current
+    const currentSession = sessionRef.current
+    const epoch = sessionEpochRef.current
+    if (!series || message.payload.gameNumber < series.gameNumber) return
+    if (
+      message.payload.gameNumber > series.gameNumber
+      || message.payload.terminalRevision !== revisionRef.current
+    ) {
+      setFailure("DESYNC")
+      return
+    }
+    const stateHash = await terminalStateHash()
+    if (!stateHash || stateHash !== message.payload.terminalStateHash) {
+      setFailure("DESYNC")
+      return
+    }
+    const latest = matchSeriesRef.current
+    if (!currentSession || !isCurrentSession(currentSession, epoch) || !latest) return
+    if (message.payload.gameNumber < latest.gameNumber) return
+    if (
+      message.payload.gameNumber > latest.gameNumber
+      || message.payload.terminalRevision !== revisionRef.current
+      || latest.settledGameNumber !== latest.gameNumber
+    ) {
+      setFailure("DESYNC")
+      return
+    }
+    const next = requestLanMatchRematch(latest, message.senderId)
+    if (next !== latest) setMatchSeries(next)
+    persistSession()
+    await maybePrepareHostAdvance()
+  }
+
+  async function handleMatchState(
+    message: Extract<MultiplayerMessage, { type: "match.state" }>,
+  ): Promise<void> {
+    const currentSession = sessionRef.current
+    const local = matchSeriesRef.current
+    const players = currentPlayers()
+    const remote = message.payload.series
+    if (!currentSession || !local || !players || !isLanMatchSeriesState(remote, players)) {
+      setFailure("DESYNC")
+      return
+    }
+
+    if (remote.gameNumber === local.gameNumber) {
+      if (currentSession.role === "guest" && remote.pendingAdvance) {
+        const merged = mergeLanMatchRematchRequests(local, remote)
+        if (!merged) {
+          setFailure("DESYNC")
+          return
+        }
+        if (merged !== local) {
+          setMatchSeries(merged)
+          persistSession()
+        }
+        await applyGuestAdvance(remote.pendingAdvance)
+        return
+      }
+      if (currentSession.role === "host" && remote.pendingAdvance) {
+        setFailure("DESYNC")
+        return
+      }
+      const merged = mergeLanMatchRematchRequests(local, remote)
+      if (!merged) {
+        const settlementCanBeRecoveredByBoardSync = (
+          isLanMatchSettlementAhead(local, remote)
+          || isLanMatchSettlementAhead(remote, local)
+        ) && (!syncConfirmedRef.current || pendingActionRef.current !== null)
+        if (settlementCanBeRecoveredByBoardSync) return
+        setFailure("DESYNC")
+        return
+      }
+      if (merged !== local) setMatchSeries(merged)
+      persistSession()
+      if (!sameLanMatchRematchRequests(merged, remote)) {
+        try {
+          sendMatchState()
+        } catch {
+          scheduleReconnect()
+        }
+      }
+      await maybePrepareHostAdvance()
+      return
+    }
+
+    if (remote.gameNumber === local.gameNumber + 1) {
+      const advance = remote.lastAdvance
+      if (!advance) {
+        setFailure("DESYNC")
+        return
+      }
+      if (currentSession.role === "host") {
+        if (local.pendingAdvance?.advanceId !== advance.advanceId) {
+          setFailure("DESYNC")
+          return
+        }
+        completeHostAdvance(advance)
+      } else {
+        await applyGuestAdvance(advance)
+      }
+      return
+    }
+
+    if (remote.gameNumber < local.gameNumber) {
+      try {
+        sendMatchState()
+        if (currentSession.role === "host" && local.lastAdvance) {
+          sendMatchAdvance(local.lastAdvance)
+        } else if (currentSession.role === "guest" && local.lastAdvance) {
+          sendMatchAdvanceAcknowledgement(local.lastAdvance)
+        }
+      } catch {
+        scheduleReconnect()
+      }
+      return
+    }
+
+    setFailure("DESYNC")
+  }
+
   function actionsMatch(left: Action, right: Action): boolean {
     return JSON.stringify(adapter.encodeAction(left))
       === JSON.stringify(adapter.encodeAction(right))
@@ -2180,6 +2640,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
     const action = adapter.parseAction(message.payload.action)
     if (!action) {
       sendMessage("action.reject", {
+        gameNumber: matchSeriesRef.current!.gameNumber,
         actionId: message.payload.actionId,
         code: "INVALID_ACTION",
       })
@@ -2199,6 +2660,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
       }
       try {
         sendMessage("action.ack", {
+          gameNumber: matchSeriesRef.current!.gameNumber,
           actionId: cached.actionId,
           baseRevision: cached.baseRevision,
           nextRevision: cached.nextRevision,
@@ -2212,6 +2674,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
 
     if (phaseRef.current !== "playing" || !connectedRef.current) {
       sendMessage("action.reject", {
+        gameNumber: matchSeriesRef.current!.gameNumber,
         actionId: message.payload.actionId,
         code: "NOT_PLAYING",
       })
@@ -2222,6 +2685,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
       || pendingActionRef.current
     ) {
       sendMessage("action.reject", {
+        gameNumber: matchSeriesRef.current!.gameNumber,
         actionId: message.payload.actionId,
         code: "REVISION_MISMATCH",
       })
@@ -2233,6 +2697,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
     const result = adapter.applyAction(gameRef.current, action, side)
     if (!result.ok) {
       sendMessage("action.reject", {
+        gameNumber: matchSeriesRef.current!.gameNumber,
         actionId: message.payload.actionId,
         code: result.code,
       })
@@ -2268,9 +2733,11 @@ export function useLanTurnGame<State, Action, Side extends string>(
     ].slice(-128)
     setCurrentGame(result.state)
     revisionRef.current = acknowledgement.nextRevision
+    settleCommittedGame(result.state)
     persistSession()
     try {
       sendMessage("action.ack", {
+        gameNumber: matchSeriesRef.current!.gameNumber,
         actionId: acknowledgement.actionId,
         baseRevision: acknowledgement.baseRevision,
         nextRevision: acknowledgement.nextRevision,
@@ -2306,6 +2773,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
     pendingActionRef.current = null
     setCurrentGame(pending.state)
     revisionRef.current = message.payload.nextRevision
+    settleCommittedGame(pending.state)
     persistSession()
   }
 
@@ -2314,11 +2782,16 @@ export function useLanTurnGame<State, Action, Side extends string>(
     revision = revisionRef.current,
     expectedSession = sessionRef.current,
     expectedEpoch = sessionEpochRef.current,
+    expectedGameNumber = matchSeriesRef.current?.gameNumber,
   ): Promise<boolean> {
-    if (!expectedSession || !isCurrentSession(expectedSession, expectedEpoch)) return false
+    if (!expectedSession || !expectedGameNumber || !isCurrentSession(expectedSession, expectedEpoch)) return false
     const stateHash = await hashJson(adapter.encodeSnapshot(snapshot))
-    if (!isCurrentSession(expectedSession, expectedEpoch)) return false
+    if (
+      !isCurrentSession(expectedSession, expectedEpoch)
+      || matchSeriesRef.current?.gameNumber !== expectedGameNumber
+    ) return false
     sendMessage("sync.snapshot", {
+      gameNumber: expectedGameNumber,
       revision,
       stateHash,
       state: adapter.encodeSnapshot(snapshot),
@@ -2332,9 +2805,18 @@ export function useLanTurnGame<State, Action, Side extends string>(
     if (!currentSession) return false
     const snapshot = gameRef.current
     const revision = revisionRef.current
+    const gameNumber = matchSeriesRef.current?.gameNumber
+    if (!gameNumber) return false
     const stateHash = await hashJson(adapter.encodeSnapshot(snapshot))
-    if (!isCurrentSession(currentSession, epoch)) return false
-    sendMessage("sync.request", { revision, stateHash })
+    if (
+      !isCurrentSession(currentSession, epoch)
+      || matchSeriesRef.current?.gameNumber !== gameNumber
+    ) return false
+    sendMessage("sync.request", {
+      gameNumber,
+      revision,
+      stateHash,
+    })
     return true
   }
 
@@ -2358,15 +2840,20 @@ export function useLanTurnGame<State, Action, Side extends string>(
     if (!currentSession) return
     const snapshot = gameRef.current
     const revision = revisionRef.current
+    const gameNumber = matchSeriesRef.current?.gameNumber
+    if (!gameNumber) return
     syncConfirmedRef.current = false
     if (firstPeerIdRef.current) setPhase("syncing")
     const localHash = await hashJson(adapter.encodeSnapshot(snapshot))
-    if (!isCurrentSession(currentSession, epoch)) return
+    if (
+      !isCurrentSession(currentSession, epoch)
+      || matchSeriesRef.current?.gameNumber !== gameNumber
+    ) return
     const matchesLocalState = (
       message.payload.revision === revision
       && message.payload.stateHash === localHash
     )
-    if (!await sendSnapshot(snapshot, revision, currentSession, epoch)) return
+    if (!await sendSnapshot(snapshot, revision, currentSession, epoch, gameNumber)) return
     if (matchesLocalState) {
       syncConfirmedRef.current = true
       completeSync()
@@ -2376,6 +2863,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
   async function handleSnapshot(message: Extract<MultiplayerMessage, { type: "sync.snapshot" }>) {
     const currentSession = sessionRef.current
     const epoch = sessionEpochRef.current
+    const gameNumber = matchSeriesRef.current?.gameNumber
     if (!currentSession) return
     const validated = adapter.validateAndRebuildSnapshot(
       message.payload.state,
@@ -2386,7 +2874,10 @@ export function useLanTurnGame<State, Action, Side extends string>(
       return
     }
     const stateHash = await hashJson(adapter.encodeSnapshot(validated.state))
-    if (!isCurrentSession(currentSession, epoch)) return
+    if (
+      !isCurrentSession(currentSession, epoch)
+      || matchSeriesRef.current?.gameNumber !== gameNumber
+    ) return
     if (stateHash !== message.payload.stateHash) {
       setFailure("DESYNC")
       return
@@ -2394,15 +2885,26 @@ export function useLanTurnGame<State, Action, Side extends string>(
     if (message.payload.revision < revisionRef.current) return
     if (message.payload.revision === revisionRef.current) {
       const localHash = await hashJson(adapter.encodeSnapshot(gameRef.current))
-      if (!isCurrentSession(currentSession, epoch)) return
+      if (
+        !isCurrentSession(currentSession, epoch)
+        || matchSeriesRef.current?.gameNumber !== gameNumber
+      ) return
       if (localHash !== stateHash) {
         setFailure("DESYNC")
         return
       }
       pendingActionRef.current = null
+      const scoreChanged = settleCommittedGame(gameRef.current)
       syncConfirmedRef.current = true
       completeSync()
       persistSession()
+      if (scoreChanged) {
+        try {
+          sendMatchState()
+        } catch {
+          scheduleReconnect()
+        }
+      }
       return
     }
 
@@ -2420,10 +2922,21 @@ export function useLanTurnGame<State, Action, Side extends string>(
     pendingActionRef.current = null
     revisionRef.current = message.payload.revision
     setCurrentGame(validated.state)
+    const scoreChanged = settleCommittedGame(validated.state)
     syncConfirmedRef.current = true
     persistSession()
+    if (scoreChanged) {
+      try {
+        sendMatchState()
+      } catch {
+        scheduleReconnect()
+      }
+    }
     await sendSyncRequest()
-    if (!isCurrentSession(currentSession, epoch)) return
+    if (
+      !isCurrentSession(currentSession, epoch)
+      || matchSeriesRef.current?.gameNumber !== gameNumber
+    ) return
     completeSync()
   }
 
@@ -2447,6 +2960,30 @@ export function useLanTurnGame<State, Action, Side extends string>(
 
     if (!rememberMessage(message.messageId)) return
 
+    if ([
+      "dice.commit",
+      "dice.reveal",
+      "dice.result",
+      "dice.result-ack",
+      "action.propose",
+      "action.ack",
+      "action.reject",
+      "sync.request",
+      "sync.snapshot",
+    ].includes(message.type)) {
+      const currentGameNumber = matchSeriesRef.current?.gameNumber
+      const messageGameNumber = (message.payload as { gameNumber?: unknown }).gameNumber
+      if (!currentGameNumber || typeof messageGameNumber !== "number") {
+        setFailure("DESYNC")
+        return
+      }
+      if (messageGameNumber < currentGameNumber) return
+      if (messageGameNumber > currentGameNumber) {
+        setFailure("DESYNC")
+        return
+      }
+    }
+
     switch (message.type) {
       case "peer.hello":
         if (message.payload.engineVersion !== adapter.engineVersion) {
@@ -2455,6 +2992,40 @@ export function useLanTurnGame<State, Action, Side extends string>(
         }
         maybeStartDice()
         return
+
+      case "match.state":
+        await handleMatchState(message)
+        return
+
+      case "match.rematch-request":
+        await handleRematchRequest(message)
+        return
+
+      case "match.advance":
+        if (currentSession.role !== "guest") {
+          setFailure("DESYNC")
+          return
+        }
+        await applyGuestAdvance(message.payload.advance)
+        return
+
+      case "match.advance-ack": {
+        const pending = matchSeriesRef.current?.pendingAdvance
+        if (
+          currentSession.role !== "host"
+          || !pending
+          || pending.advanceId !== message.payload.advanceId
+          || pending.fromGameNumber !== message.payload.fromGameNumber
+          || pending.toGameNumber !== message.payload.toGameNumber
+        ) {
+          const last = matchSeriesRef.current?.lastAdvance
+          if (last?.advanceId === message.payload.advanceId) return
+          setFailure("DESYNC")
+          return
+        }
+        completeHostAdvance(pending)
+        return
+      }
 
       case "room.ready":
         setRemoteReady(message.payload.ready)
@@ -2576,6 +3147,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
           if (disposition === "match") {
             try {
               sendMessage("dice.result-ack", {
+                gameNumber: matchSeriesRef.current!.gameNumber,
                 round: result.round,
                 proof: result.proof,
               })
@@ -2742,6 +3314,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
       }
       persistSession()
       sendMessage("action.propose", {
+        gameNumber: matchSeriesRef.current!.gameNumber,
         actionId,
         baseRevision,
         action: adapter.encodeAction(action),
@@ -2823,11 +3396,13 @@ export function useLanTurnGame<State, Action, Side extends string>(
           matchIdRef.current = stored.matchId
           setCurrentSession(stored.session)
           setRemotePeer(stored.remotePeerId)
+          setMatchSeries(stored.matchSeries)
           setLocalReady(stored.localReady)
           setRemoteReady(stored.remoteReady)
           setCurrentGame(stored.game)
           revisionRef.current = stored.revision
           setFirstPeer(stored.firstPeerId)
+          settleCommittedGame(stored.game)
           diceRuntimeRef.current = stored.diceRuntime
             ? {
                 ...stored.diceRuntime,
@@ -2849,6 +3424,7 @@ export function useLanTurnGame<State, Action, Side extends string>(
             }
             else setPhase("waiting")
           } else scheduleReconnect()
+          persistSession()
         } else {
           clearPersistedSession()
         }
@@ -2873,6 +3449,13 @@ export function useLanTurnGame<State, Action, Side extends string>(
     ? (session.peerId === firstPeerId ? adapter.firstSide : adapter.secondSide)
     : null
   const currentSide = adapter.getCurrentSide(game)
+  const series = toLanMatchSeriesView(
+    matchSeries,
+    session?.peerId ?? null,
+    remotePeerId,
+    adapter.getOutcome(game),
+    peerIdForSide,
+  )
 
   return {
     phase,
@@ -2885,11 +3468,13 @@ export function useLanTurnGame<State, Action, Side extends string>(
     currentSide,
     game,
     dice,
+    series,
     errorCode,
     createRoom,
     joinRoom,
     markReady,
     playAction,
+    requestRematch,
     leaveRoom,
     retryConnection,
   }

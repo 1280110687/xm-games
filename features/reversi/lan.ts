@@ -10,8 +10,8 @@ import {
   type ReversiStone,
 } from "./engine"
 
-export const REVERSI_LAN_ENGINE_VERSION = "reversi-free-v1"
-export const REVERSI_LAN_SESSION_STORAGE_KEY = "xm-games:reversi:lan-session:v1"
+export const REVERSI_LAN_ENGINE_VERSION = "reversi-free-v2"
+export const REVERSI_LAN_SESSION_STORAGE_KEY = "xm-games:reversi:lan-session:v2"
 export const REVERSI_LAN_PENDING_REQUEST_STORAGE_KEY =
   "xm-games:reversi:pending-room-request:v1"
 
@@ -154,6 +154,12 @@ export const reversiLanAdapter: LanTurnGameAdapter<
   validateAndRebuildSnapshot: validateAndRebuildLanReversiSnapshot,
   getRevision: (state) => state.moveHistory.length,
   getCurrentSide: (state) => state.gameOver ? null : state.currentPlayer,
+  getOutcome: (state) => {
+    if (!state.gameOver || state.winner === null) return { status: "playing" }
+    return state.winner === "tie"
+      ? { status: "draw" }
+      : { status: "won", winner: state.winner }
+  },
 }
 
 export { REVERSI_BOARD_SIZE }

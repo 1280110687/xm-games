@@ -4,7 +4,10 @@ import {
   RtcHeartbeatController,
   getReconnectDelay,
 } from "./connection"
-import type { MultiplayerMessage } from "./protocol"
+import {
+  MULTIPLAYER_PROTOCOL_VERSION,
+  type MultiplayerMessage,
+} from "./protocol"
 import type { ReliableRtcChannel } from "./rtc-channel"
 
 class FakeReliableChannel {
@@ -54,7 +57,7 @@ describe("connection supervision", () => {
     expect(channel.sent[0].type).toBe("peer.heartbeat")
 
     channel.receive({
-      v: 1,
+      v: MULTIPLAYER_PROTOCOL_VERSION,
       type: "peer.heartbeat",
       messageId: "remote-heartbeat",
       roomId: "ROOM01",

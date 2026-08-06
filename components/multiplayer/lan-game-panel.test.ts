@@ -4,6 +4,7 @@ import {
   findLanGameSide,
   formatLanGameCopy,
   getLanGameConnectionText,
+  getLanGameStatusText,
   type LanGamePanelCopy,
 } from "./lan-game-panel-model"
 
@@ -48,5 +49,40 @@ describe("LAN game panel helpers", () => {
     expect(findLanGameSide(sides, "red")).toEqual(sides[0])
     expect(findLanGameSide(sides, "black")).toEqual(sides[1])
     expect(findLanGameSide(sides, null)).toBeNull()
+  })
+
+  it("shows the terminal result instead of a stale turn label", () => {
+    const copy = {
+      yourTurn: "your turn",
+      opponentTurn: "opponent turn",
+      youWon: "you won",
+      opponentWon: "opponent won",
+      drawGame: "draw",
+    }
+    const baseSeries = {
+      gameNumber: 1,
+      localWins: 1,
+      remoteWins: 0,
+      draws: 0,
+      localRematchReady: false,
+      remoteRematchReady: false,
+      canRequestRematch: true,
+    }
+
+    expect(getLanGameStatusText(
+      { ...baseSeries, outcome: "local-win" },
+      false,
+      copy,
+    )).toBe("you won")
+    expect(getLanGameStatusText(
+      { ...baseSeries, outcome: "draw" },
+      true,
+      copy,
+    )).toBe("draw")
+    expect(getLanGameStatusText(
+      { ...baseSeries, outcome: "playing" },
+      true,
+      copy,
+    )).toBe("your turn")
   })
 })

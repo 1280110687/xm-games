@@ -63,6 +63,25 @@ export interface LanGamePanelCopy {
   opponentTurn: string
   secure: string
   invalidRoom: string
+  matchRound: string
+  draws: string
+  youWon: string
+  opponentWon: string
+  drawGame: string
+  rematch: string
+  rematchRequested: string
+  opponentRequested: string
+}
+
+export interface LanGameSeriesView {
+  gameNumber: number
+  localWins: number
+  remoteWins: number
+  draws: number
+  outcome: "playing" | "local-win" | "remote-win" | "draw"
+  localRematchReady: boolean
+  remoteRematchReady: boolean
+  canRequestRematch: boolean
 }
 
 export interface LanGamePanelProps<Side extends string> {
@@ -78,6 +97,7 @@ export interface LanGamePanelProps<Side extends string> {
   currentSide: Side | null
   sides: readonly [LanGameSide<Side>, LanGameSide<Side>]
   dice: LanGameDiceView | null
+  series: LanGameSeriesView
   error: string
   copy: LanGamePanelCopy
   onCreateRoom: () => void
@@ -85,6 +105,21 @@ export interface LanGamePanelProps<Side extends string> {
   onReady: () => void
   onLeave: () => void
   onRetry: () => void
+  onRematch: () => void
+}
+
+export function getLanGameStatusText(
+  series: LanGameSeriesView,
+  isMyTurn: boolean,
+  copy: Pick<
+    LanGamePanelCopy,
+    "yourTurn" | "opponentTurn" | "youWon" | "opponentWon" | "drawGame"
+  >,
+): string {
+  if (series.outcome === "local-win") return copy.youWon
+  if (series.outcome === "remote-win") return copy.opponentWon
+  if (series.outcome === "draw") return copy.drawGame
+  return isMyTurn ? copy.yourTurn : copy.opponentTurn
 }
 
 export function formatLanGameCopy(

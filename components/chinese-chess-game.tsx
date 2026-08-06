@@ -111,9 +111,9 @@ const chineseChessLanPanelCopy = {
 } as const
 
 const chineseChessLanHelpCopy = {
-  zh: "双方准备后共同掷骰，点数高的一方执红先行；联机对局不提供单方悔棋或重开。",
-  en: "Both players roll after ready; the higher roll takes red. LAN matches disable unilateral undo and restart.",
-  th: "เมื่อพร้อมแล้วทั้งสองฝ่ายจะทอยลูกเต๋า ผู้ได้แต้มสูงเล่นฝ่ายแดง และไม่สามารถถอยหรือเริ่มใหม่ฝ่ายเดียวได้",
+  zh: "双方准备后共同掷骰，点数高的一方执红先行；终局后双方确认可保留比分再来一局并重新掷骰。",
+  en: "Both players roll for red. After the game, both can confirm a rematch, keep score, and roll again.",
+  th: "ทั้งสองฝ่ายทอยลูกเต๋าเลือกฝ่ายแดง หลังจบเกมให้ยืนยันทั้งคู่เพื่อเก็บคะแนน เล่นอีกครั้ง และทอยใหม่",
 } as const
 
 function getChineseChessLanError(
@@ -338,6 +338,7 @@ export function ChineseChessGame() {
       data-ai-state={game.mode === "ai" ? game.aiStatus : undefined}
       data-difficulty={game.mode === "ai" ? game.difficulty : undefined}
       data-lan-phase={isLanMode ? lan.phase : undefined}
+      data-lan-finished={isLanMode && lan.series.outcome !== "playing" ? "true" : undefined}
     >
       <GameHeader
         layout="centered"
@@ -424,6 +425,7 @@ export function ChineseChessGame() {
               { value: "black", label: t("chineseChessBlackSide"), color: "#1f2937" },
             ]}
             dice={lan.dice}
+            series={lan.series}
             error={getChineseChessLanError(locale, lan.errorCode)}
             copy={lanPanelCopy}
             onCreateRoom={() => void lan.createRoom()}
@@ -431,6 +433,7 @@ export function ChineseChessGame() {
             onReady={lan.markReady}
             onLeave={lan.leaveRoom}
             onRetry={lan.retryConnection}
+            onRematch={() => void lan.requestRematch()}
           />
         )}
 

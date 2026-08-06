@@ -1,4 +1,5 @@
 import type { JsonValue } from "./crypto"
+import type { LanMatchOutcome } from "./match-series"
 
 export type LanTurnGameApplication<State> =
   | { ok: true; state: State }
@@ -35,6 +36,7 @@ export interface LanTurnGameAdapter<
   ) => LanTurnGameApplication<State>
   getRevision: (state: State) => number
   getCurrentSide: (state: State) => Side | null
+  getOutcome: (state: State) => LanMatchOutcome<Side>
 }
 
 export function sideForPeer<Side extends string>(

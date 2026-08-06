@@ -53,7 +53,7 @@ describe("LAN reversi adapter", () => {
   it("assigns the dice winner to black and creates a black-first game", () => {
     expect(reversiLanAdapter.firstSide).toBe("black")
     expect(reversiLanAdapter.secondSide).toBe("white")
-    expect(reversiLanAdapter.engineVersion).toBe("reversi-free-v1")
+    expect(reversiLanAdapter.engineVersion).toBe("reversi-free-v2")
 
     const state = reversiLanAdapter.createInitialState()
     expect(state.currentPlayer).toBe("black")
@@ -125,6 +125,11 @@ describe("LAN reversi adapter", () => {
     expect(state.gameOver).toBe(true)
     expect(state.winner).not.toBeNull()
     expect(reversiLanAdapter.getCurrentSide(state)).toBeNull()
+    expect(reversiLanAdapter.getOutcome(state)).toEqual(
+      state.winner === "tie"
+        ? { status: "draw" }
+        : { status: "won", winner: state.winner },
+    )
     expect(applyLanReversiAction(state, {
       type: "place",
       row: 0,
