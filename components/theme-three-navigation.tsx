@@ -77,6 +77,7 @@ const GAME_ROUTES = new Set([
   "/neon-breaker",
   "/qr-code",
   "/reversi",
+  "/schulte-grid",
   "/snake",
   "/sudoku",
   "/tetris",

@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v4"
+const CACHE_VERSION = "v5"
 const SHELL_CACHE = `xm-games-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `xm-games-runtime-${CACHE_VERSION}`
 const OWNED_CACHE_PREFIX = "xm-games-"
@@ -22,6 +22,7 @@ const APP_ROUTES = [
   "/neon-breaker",
   "/qr-code",
   "/reversi",
+  "/schulte-grid",
   "/settings",
   "/snake",
   "/sudoku",

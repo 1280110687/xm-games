@@ -17,6 +17,10 @@ import './classic-games.css'
 import './theme-one-classic-games.css'
 import './theme-two-classic-games.css'
 import './theme-three-classic-games.css'
+import './schulte-grid.css'
+import './theme-one-schulte-grid.css'
+import './theme-two-schulte-grid.css'
+import './theme-three-schulte-grid.css'
 
 const geist = Geist({
   subsets: ['latin'],

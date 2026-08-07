@@ -111,6 +111,11 @@ export const PAGE_METADATA_KEYS = {
     descriptionKey: "memoryMatchDescription",
     includeAppName: true,
   },
+  "/schulte-grid": {
+    titleKey: "schulteGrid",
+    descriptionKey: "schulteGridDescription",
+    includeAppName: true,
+  },
   "/gomoku": {
     titleKey: "gomoku",
     descriptionKey: "gomokuDescription",

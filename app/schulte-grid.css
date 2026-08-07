@@ -1,0 +1,326 @@
+/* Shared Schulte Grid interaction primitives.
+ * Theme files own composition, spacing, type hierarchy, and color treatment.
+ */
+
+.game-page[data-page='schulte-grid'] {
+  --schulte-board-size: 22rem;
+  --schulte-cell-fill: color-mix(in oklab, var(--card) 88%, black);
+  --schulte-cell-stroke: color-mix(in oklab, var(--border) 82%, transparent);
+  --schulte-cell-text: var(--foreground);
+  --schulte-progress: var(--primary);
+}
+
+.game-page[data-page='schulte-grid'] > main {
+  width: 100%;
+  min-width: 0;
+}
+
+.schulte-board-shell {
+  position: relative;
+  width: min(100%, var(--schulte-board-size));
+  aspect-ratio: 1;
+  flex: 0 0 auto;
+  margin-inline: auto;
+  contain: layout paint;
+}
+
+.schulte-board {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.schulte-board-backdrop {
+  fill: var(--schulte-board-backdrop, transparent);
+  stroke: var(--schulte-board-ring, transparent);
+  stroke-width: var(--schulte-board-ring-width, 0);
+  vector-effect: non-scaling-stroke;
+}
+
+.schulte-cell {
+  cursor: pointer;
+  outline: none;
+}
+
+.schulte-page:not([data-phase='running']) .schulte-cell {
+  cursor: default;
+}
+
+.schulte-cell-hit {
+  fill: transparent;
+  pointer-events: all;
+}
+
+.schulte-cell-shape {
+  fill: var(--schulte-cell-fill);
+  stroke: var(--schulte-cell-stroke);
+  stroke-width: var(--schulte-cell-stroke-width, 1.2px);
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.schulte-cell-number {
+  fill: var(--schulte-cell-text);
+  font-family: var(--schulte-number-font, var(--font-geist-sans));
+  font-weight: var(--schulte-number-weight, 700);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.025em;
+  pointer-events: none;
+}
+
+.schulte-cell:focus-visible .schulte-cell-shape {
+  stroke: var(--schulte-focus-ring, var(--primary));
+  stroke-width: 3px;
+}
+
+.schulte-level-picker {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  min-width: 0;
+  gap: 0.28rem;
+  padding: 0.25rem;
+}
+
+.schulte-level-option {
+  min-width: 0;
+  min-height: 2.5rem;
+  padding: 0.45rem 0.55rem;
+  border: 0;
+  border-radius: 0.75rem;
+  color: inherit;
+  background: transparent;
+  font-size: 0.78rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    color 160ms ease,
+    background-color 160ms ease,
+    box-shadow 160ms ease;
+}
+
+.schulte-level-option:disabled {
+  cursor: not-allowed;
+  opacity: 0.48;
+}
+
+.schulte-level-option:focus-visible {
+  outline: 2px solid var(--schulte-focus-ring, var(--primary));
+  outline-offset: 2px;
+}
+
+.schulte-actions {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  min-width: 0;
+  gap: 0.45rem;
+}
+
+.schulte-actions [data-slot='button'] {
+  min-width: 0;
+  min-height: 2.75rem;
+  padding-inline: 0.8rem;
+  white-space: nowrap;
+}
+
+.schulte-metric {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.schulte-metric-icon {
+  display: grid;
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border-radius: 0.65rem;
+}
+
+.schulte-metric-icon > svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.schulte-metric-copy {
+  display: grid;
+  min-width: 0;
+  gap: 0.08rem;
+}
+
+.schulte-metric-copy small,
+.schulte-metric-copy strong {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.schulte-metric-copy small {
+  font-size: 0.68rem;
+  line-height: 1;
+}
+
+.schulte-metric-copy strong {
+  font-size: 0.96rem;
+  line-height: 1.05;
+  font-variant-numeric: tabular-nums;
+}
+
+.schulte-progress-block {
+  display: grid;
+  min-width: 0;
+  gap: 0.38rem;
+}
+
+.schulte-progress-block > span {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.72rem;
+}
+
+.schulte-progress-block > span strong {
+  font-variant-numeric: tabular-nums;
+}
+
+.schulte-progress-track {
+  height: 0.3rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--schulte-progress-track, color-mix(in oklab, var(--muted) 82%, transparent));
+}
+
+.schulte-progress-track > i {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--schulte-progress);
+  box-shadow: var(--schulte-progress-glow, none);
+  transition: width 160ms ease;
+}
+
+.schulte-notice-slot {
+  display: flex;
+  min-width: 0;
+  min-height: 1.6rem;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  color: var(--schulte-notice, var(--muted-foreground));
+  font-size: 0.72rem;
+  line-height: 1.2;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.schulte-notice-slot.is-penalty {
+  color: var(--schulte-penalty, var(--destructive));
+  font-weight: 800;
+}
+
+.schulte-recent {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.schulte-recent > header {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.38rem;
+}
+
+.schulte-recent > header > span {
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.schulte-recent > header > small {
+  color: var(--muted-foreground);
+  font-size: 0.64rem;
+}
+
+.schulte-recent-track {
+  display: flex;
+  min-height: 2.95rem;
+  gap: 0.4rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-inline: contain;
+  scroll-snap-type: inline proximity;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x;
+}
+
+.schulte-recent-track::-webkit-scrollbar {
+  display: none;
+}
+
+.schulte-recent-empty {
+  display: flex;
+  min-width: 100%;
+  min-height: 2.95rem;
+  align-items: center;
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 0.7rem;
+}
+
+.schulte-recent-item {
+  display: grid;
+  flex: 0 0 auto;
+  min-width: 8.8rem;
+  min-height: 2.95rem;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: auto auto;
+  gap: 0.04rem 0.45rem;
+  align-content: center;
+  padding: 0.36rem 0.58rem;
+  border: 1px solid var(--schulte-history-border, var(--border));
+  border-radius: 0.72rem;
+  background: var(--schulte-history-bg, color-mix(in oklab, var(--card) 82%, transparent));
+  scroll-snap-align: start;
+}
+
+.schulte-recent-item > span {
+  grid-row: 1 / span 2;
+  align-self: center;
+  color: var(--muted-foreground);
+  font-size: 0.62rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.schulte-recent-item > strong {
+  font-size: 0.76rem;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.schulte-recent-item > small {
+  color: var(--muted-foreground);
+  font-size: 0.6rem;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .schulte-level-option,
+  .schulte-progress-track > i {
+    transition: none;
+  }
+}

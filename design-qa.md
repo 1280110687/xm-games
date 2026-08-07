@@ -524,3 +524,105 @@ direction controls measure 48×44 CSS pixels.
   `pnpm build` (24 static pages) and `git diff --check` all passed.
 
 final result: passed
+
+## Schulte Grid focus test QA
+
+### Reference, scope and evidence
+
+- Source visual truth:
+  `.design-qa-evidence/schulte-grid/reference.jpg` (591×1280 pixels).
+  Only the irregular circular number field is treated as a visual reference;
+  the timer, controls, navigation and records retain each XM-Games theme's own
+  design language.
+- Normalized running-state comparison:
+  `.design-qa-evidence/schulte-grid/reference-vs-theme-two-390x844.png`.
+  The reference and the running Theme 2 implementation are both normalized to
+  390×844 CSS pixels in one 790×844 comparison image.
+- Final 390×844 evidence:
+  `.design-qa-evidence/schulte-grid/theme-one-390x844.png`,
+  `.design-qa-evidence/schulte-grid/theme-two-390x844.png`,
+  `.design-qa-evidence/schulte-grid/theme-two-playing-390x844.png`, and
+  `.design-qa-evidence/schulte-grid/theme-three-390x844.png`.
+- The final 320×568 density pass was remeasured in the live browser after the
+  screenshots above: history remains persisted but is hidden only on this
+  extreme short-screen breakpoint so the playable 49-cell board receives the
+  available space.
+
+### Findings and fix history
+
+- Initial browser finding (P1): unrounded Voronoi center coordinates differed
+  at sub-pixel floating-point precision between server and browser, producing a
+  React hydration warning. SVG center and font coordinates are now rounded to
+  the same three-decimal precision used by the generated paths; a fresh reload
+  no longer emits the warning.
+- Initial mobile finding (P1): Theme 1 clipped the lower progress area at
+  320×568. Its final short-screen cockpit uses a 291.1-pixel playable board and
+  a one-row difficulty/action console; the locally persisted history strip is
+  hidden only at the 320×568-class breakpoint.
+- Initial mobile finding (P1): Theme 2 allowed its two-line description to push
+  the title above the 390×844 viewport and let the short-screen history strip
+  collide with the tab bar. Mobile now keeps the centered title only; 320×568
+  uses a 279.6-pixel board, keeps the control dock above the tab bar and hides
+  only the persisted history strip at that extreme breakpoint.
+- Initial mobile finding (P1): Theme 3 rendered its board beyond the available
+  short-screen stage. The final 285.6-pixel board remains fully inside its
+  290.5-pixel stage at 320×568, with telemetry ending above navigation.
+- Initial interaction finding (P2): desktop hover styling could make the last
+  clicked cell appear changed. Persistent and hover cell styling are now
+  identical; only keyboard `focus-visible` remains as an accessibility aid.
+- The final combined comparison retains the source's circular organic search
+  field while presenting three materially different applications: Theme 1 is
+  a violet arcade console, Theme 2 an iOS-style light focus card, and Theme 3
+  an obsidian-green telemetry workstation. No actionable P0/P1/P2 finding
+  remains.
+
+### Responsive checks
+
+| Theme / viewport | Measured result |
+| --- | --- |
+| Theme 1, 320×568 | 291.1×291.1 board; progress and notice end at y=548.3; history hidden at this extreme breakpoint; no clipped button or overflow |
+| Theme 1, 390×844 | 374×374 board; history ends at y=786.3; document 390×844; no clipped button |
+| Theme 1, 375×667 | 320×320 board; history ends at y=626.2; no clipped button or overflow |
+| Theme 2, 320×568 | 279.6×279.6 board; dock ends at y=452.9; tab bar starts at y=496.8; history hidden only at this breakpoint |
+| Theme 2, 390×844 | 352×352 board; history ends at y=645.3; tab bar starts at y=772.8 |
+| Theme 2, 375×667 | 343×343 board; history ends at y=556.3; tab bar starts at y=595.8 |
+| Theme 2, 375×855 | 343×343 board; history ends at y=636.3; tab bar starts at y=783.8 |
+| Theme 3, 320×568 | 285.6×285.6 board inside a 290.5-pixel stage; telemetry ends at y=465.6 before navigation at y=494.8; no clipping or overflow |
+| Theme 3, 390×844 | 366×366 board; history ends at y=746.4 above navigation; document 390×844 |
+| Theme 3, 375×667 | 336×336 board; history ends at y=569.4; no clipped button or overflow |
+
+- The 1–49 expert layout remains a deliberate density exception required by
+  the one-screen brief: after the final short-screen optimization its exact,
+  non-overlapping Voronoi hit cells measure roughly 29.7–32.6 CSS pixels at the
+  narrowest edge across the three themes. Numbers remain legible, but 44-pixel
+  targets cannot coexist with 49 independent cells in a 320-pixel circular
+  board without overlapping adjacent targets.
+
+### Interaction and persistence checks
+
+- Start changes both the number permutation and dynamically deformed shape
+  paths while randomly selecting one of three calibrated topology families.
+- A wrong selection kept the target at 1, displayed `点错 +1 秒`, and added
+  exactly one second. The next correct selection advanced target 1→2 and
+  progress 0/25→1/25.
+- Paths, numbers, fills and strokes were byte-for-byte unchanged before and
+  after the correct tap, proving the board leaves no visual click history.
+- Stop immediately froze a visible incomplete result and inserted it at the
+  front of recent history. Restart reset target/progress and changed both shape
+  paths and number order.
+- A complete 1→25 browser run ended automatically at 25/25, rendered the ✓
+  target and updated the best result. Switching to 1–49 showed an independent
+  empty record set; returning to 1–25 restored its best and three recent runs.
+- Keyboard Enter/Space support and `focus-visible` remain available on every
+  active SVG cell. Idle and completed cells are exposed as disabled.
+
+### Automated checks
+
+- `pnpm test` — 54 files, 375 tests
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build` — `/schulte-grid` statically generated with all 26 application
+  pages and existing LAN API routes
+- `git diff --check`
+
+final result: passed
