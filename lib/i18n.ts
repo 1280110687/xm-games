@@ -288,6 +288,7 @@ export const translations = {
     // Game Categories
     categoryBingo: "Bingo 游戏",
     categoryBoard: "棋类对弈",
+    categoryFocus: "专注力训练",
     categoryPuzzle: "益智解谜",
     categoryArcade: "休闲街机",
     categoryTools: "实用工具",
@@ -379,6 +380,22 @@ export const translations = {
     schulteStartHint: "点击开始后，从 1 依次找到所有数字",
     schulteNoRecentResults: "完成或停止一次测试后，这里会显示成绩",
     schulteResultProgress: "完成进度",
+
+    // Alternating Trail
+    alternatingTrail: "数字字母交替追踪",
+    alternatingTrailShortTitle: "交替追踪",
+    alternatingTrailDescription: "按 1-A-2-B 的顺序追踪数字与字母，训练注意切换与视觉搜索",
+    alternatingTrailInstructions: "按照 1-A-2-B 的顺序依次点击数字和字母；已找到的目标不会显示点击痕迹。",
+    alternatingTrailNextTarget: "当前目标",
+    alternatingTrailWrongTarget: "请按数字与字母交替顺序寻找当前目标",
+    alternatingTrailBoardLabel: "数字字母交替追踪测试区",
+    alternatingTrailNumberLabel: "数字",
+    alternatingTrailLetterLabel: "字母",
+    alternatingTrailDifficulty: "目标数量",
+    alternatingTrailLevel25: "25 项",
+    alternatingTrailLevel36: "36 项",
+    alternatingTrailLevel49: "49 项",
+    alternatingTrailStartHint: "点击开始后，从 1 开始按数字与字母交替顺序寻找全部目标",
 
     // Gomoku
     gomoku: "五子棋",
@@ -671,6 +688,7 @@ export const translations = {
     // Game Categories
     categoryBingo: "Bingo Games",
     categoryBoard: "Board Games",
+    categoryFocus: "Focus Training",
     categoryPuzzle: "Puzzle Games",
     categoryArcade: "Arcade Games",
     categoryTools: "Tools",
@@ -762,6 +780,22 @@ export const translations = {
     schulteStartHint: "Tap Start, then find every number beginning with 1",
     schulteNoRecentResults: "Complete or stop a test to see a result here",
     schulteResultProgress: "Completion",
+
+    // Alternating Trail
+    alternatingTrail: "Alternating Trail",
+    alternatingTrailShortTitle: "1-A Trail",
+    alternatingTrailDescription: "Follow numbers and letters in the 1-A-2-B sequence to train attention switching and visual search",
+    alternatingTrailInstructions: "Tap targets in the 1-A-2-B sequence. Found targets leave no visible trace.",
+    alternatingTrailNextTarget: "Current target",
+    alternatingTrailWrongTarget: "Follow the alternating number-letter sequence to find the current target",
+    alternatingTrailBoardLabel: "Alternating number-letter trail test area",
+    alternatingTrailNumberLabel: "Number",
+    alternatingTrailLetterLabel: "Letter",
+    alternatingTrailDifficulty: "Number of targets",
+    alternatingTrailLevel25: "25 targets",
+    alternatingTrailLevel36: "36 targets",
+    alternatingTrailLevel49: "49 targets",
+    alternatingTrailStartHint: "Tap Start, then find every target in alternating number-letter order beginning with 1",
 
     // Gomoku
     gomoku: "Gomoku",
@@ -1054,6 +1088,7 @@ export const translations = {
     // Game Categories
     categoryBingo: "เกมบิงโก",
     categoryBoard: "เกมกระดาน",
+    categoryFocus: "ฝึกสมาธิ",
     categoryPuzzle: "เกมปริศนา",
     categoryArcade: "เกมอาร์เคด",
     categoryTools: "เครื่องมือ",
@@ -1145,6 +1180,22 @@ export const translations = {
     schulteStartHint: "แตะเริ่ม แล้วค้นหาตัวเลขทั้งหมดโดยเริ่มจาก 1",
     schulteNoRecentResults: "ทำแบบทดสอบให้เสร็จหรือหยุดเพื่อดูผลที่นี่",
     schulteResultProgress: "ความคืบหน้าที่ทำได้",
+
+    // Alternating Trail
+    alternatingTrail: "ติดตามตัวเลขและตัวอักษรสลับกัน",
+    alternatingTrailShortTitle: "เส้นทาง 1-A",
+    alternatingTrailDescription: "ค้นหาตัวเลขและตัวอักษรตามลำดับ 1-A-2-B เพื่อฝึกการสลับความสนใจและการค้นหาด้วยสายตา",
+    alternatingTrailInstructions: "แตะเป้าหมายตามลำดับ 1-A-2-B เป้าหมายที่พบแล้วจะไม่แสดงร่องรอยการแตะ",
+    alternatingTrailNextTarget: "เป้าหมายปัจจุบัน",
+    alternatingTrailWrongTarget: "โปรดค้นหาเป้าหมายปัจจุบันตามลำดับตัวเลขและตัวอักษรสลับกัน",
+    alternatingTrailBoardLabel: "พื้นที่ทดสอบติดตามตัวเลขและตัวอักษรสลับกัน",
+    alternatingTrailNumberLabel: "ตัวเลข",
+    alternatingTrailLetterLabel: "ตัวอักษร",
+    alternatingTrailDifficulty: "จำนวนเป้าหมาย",
+    alternatingTrailLevel25: "25 เป้าหมาย",
+    alternatingTrailLevel36: "36 เป้าหมาย",
+    alternatingTrailLevel49: "49 เป้าหมาย",
+    alternatingTrailStartHint: "แตะเริ่ม แล้วค้นหาเป้าหมายทั้งหมดตามลำดับตัวเลขและตัวอักษรสลับกันโดยเริ่มจาก 1",
 
     // Gomoku
     gomoku: "โกะโมกุ",

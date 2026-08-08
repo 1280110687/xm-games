@@ -525,6 +525,64 @@ direction controls measure 48×44 CSS pixels.
 
 final result: passed
 
+## Alternating number-letter trail QA
+
+### Scope and architecture
+
+- The new `/alternating-trail` focus exercise follows the exact sequence
+  `1-A-2-B…` while keeping stable ordinal IDs internally. The 25-, 36- and
+  49-target modes end at `13`, `R` and `25` respectively.
+- It reuses Schulte Grid's tested organic circular geometry, monotonic clock,
+  stop/restart flow and three theme-specific layouts. Its records use a
+  separate local-storage key, so Schulte and alternating-trail results cannot
+  overwrite one another.
+- The visible board never records a correct-tap state. Numbers, letters, SVG
+  paths and hit regions remain byte-identical after progress; only the target,
+  progress, timer and live status change.
+
+### Responsive checks
+
+| Theme / viewport | Measured result |
+| --- | --- |
+| Theme 1, 320×568 | 304×304 board; final visible section ends at y=548.3; history hidden at this extreme breakpoint; no clipped control or overflow |
+| Theme 1, 375×667 | 320×320 board; history ends at y=626.2; no clipped control or overflow |
+| Theme 1, 390×844 | 374×374 board; history ends at y=786.3; no clipped control or overflow |
+| Theme 2, 320×568 | 288×288 board; dock ends at y=452.9 before tab bar at y=496.8; no clipped control or overflow |
+| Theme 2, 375×667 | 343×343 board; history ends at y=556.3 before tab bar at y=595.8 |
+| Theme 2, 390×844 | 352×352 board; history ends at y=645.3 before tab bar at y=772.8 |
+| Theme 3, 320×568 | 285.6×285.6 board; telemetry ends at y=465.6 before navigation at y=494.8 |
+| Theme 3, 375×667 | 336×336 board; history ends at y=569.4 before navigation at y=593.8 |
+| Theme 3, 390×844 | 366×366 board; history ends at y=746.4 before navigation at y=770.8 |
+
+- Chinese, English and Thai were checked at 320×568. The compact in-game
+  titles, target labels and controls remained readable with no horizontal
+  document overflow.
+
+### Interaction and persistence checks
+
+- Starting a round produced a new label permutation. Restart changed both the
+  label order and the dynamically generated cell paths.
+- A wrong `A` tap while target `1` was active kept progress at `0/49`, showed
+  the penalty notice and increased displayed time by the one-second penalty
+  plus normal clock time.
+- Correct `1`, then `A`, advanced the target to `2` and progress to `2/25`;
+  the complete board signature remained unchanged.
+- Stop generated an incomplete recent result; reloading restored it. Existing
+  Schulte history remained unchanged in its separate record store.
+- The new Focus Training category appears between Board Games and Puzzle Games,
+  with Schulte Grid first and Alternating Trail second.
+
+### Automated checks
+
+- `pnpm test` — 55 files, 384 tests
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm build` — `/alternating-trail` statically generated with all 27
+  application pages and existing LAN API routes
+- `git diff --check`
+
+final result: passed
+
 ## Schulte Grid focus test QA
 
 ### Reference, scope and evidence

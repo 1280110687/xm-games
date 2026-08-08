@@ -8,13 +8,17 @@ describe("home catalog order", () => {
 
     const ordered = orderHomeCategories([
       { titleKey: "categoryTools" },
+      { titleKey: "categoryFocus" },
       { titleKey: "categoryBoard" },
+      { titleKey: "categoryPuzzle" },
       { titleKey: "categoryBingo" },
     ])
 
     expect(ordered.map((category) => category.titleKey)).toEqual([
       "categoryBingo",
       "categoryBoard",
+      "categoryFocus",
+      "categoryPuzzle",
       "categoryTools",
     ])
   })

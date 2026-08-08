@@ -2,7 +2,7 @@
  * Theme files own composition, spacing, type hierarchy, and color treatment.
  */
 
-.game-page[data-page='schulte-grid'] {
+.game-page[data-focus-exercise] {
   --schulte-board-size: 22rem;
   --schulte-cell-fill: color-mix(in oklab, var(--card) 88%, black);
   --schulte-cell-stroke: color-mix(in oklab, var(--border) 82%, transparent);
@@ -10,7 +10,7 @@
   --schulte-progress: var(--primary);
 }
 
-.game-page[data-page='schulte-grid'] > main {
+.game-page[data-focus-exercise] > main {
   width: 100%;
   min-width: 0;
 }
@@ -71,6 +71,16 @@
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.025em;
   pointer-events: none;
+}
+
+.game-page[data-focus-exercise='alternating']
+  .schulte-cell[data-value-kind='letter']
+  .schulte-cell-number {
+  fill: var(--alternating-letter-color, var(--primary));
+}
+
+.game-page[data-focus-exercise='alternating'] .schulte-cell-number {
+  letter-spacing: 0;
 }
 
 .schulte-cell:focus-visible .schulte-cell-shape {

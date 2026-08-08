@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v5"
+const CACHE_VERSION = "v6"
 const SHELL_CACHE = `xm-games-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `xm-games-runtime-${CACHE_VERSION}`
 const OWNED_CACHE_PREFIX = "xm-games-"
@@ -8,6 +8,7 @@ const OWNED_CACHE_PREFIX = "xm-games-"
 const APP_ROUTES = [
   "/",
   "/2048",
+  "/alternating-trail",
   "/anime-tracker",
   "/base64-tool",
   "/bingo",

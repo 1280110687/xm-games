@@ -40,6 +40,7 @@ import {
   TicketCheck,
   TextCursorInput,
   Tv,
+  Waypoints,
   Zap,
   type LucideIcon,
 } from "lucide-react"
@@ -270,6 +271,25 @@ const CATEGORIES: Category[] = [
     ],
   },
   {
+    titleKey: "categoryFocus",
+    games: [
+      {
+        href: "/schulte-grid",
+        titleKey: "schulteGrid",
+        descKey: "schulteGridDescription",
+        icon: Focus,
+        tone: "cyan",
+      },
+      {
+        href: "/alternating-trail",
+        titleKey: "alternatingTrail",
+        descKey: "alternatingTrailDescription",
+        icon: Waypoints,
+        tone: "cyan",
+      },
+    ],
+  },
+  {
     titleKey: "categoryPuzzle",
     games: [
       {
@@ -298,13 +318,6 @@ const CATEGORIES: Category[] = [
         titleKey: "memoryMatch",
         descKey: "memoryMatchDescription",
         icon: BrainCircuit,
-        tone: "cyan",
-      },
-      {
-        href: "/schulte-grid",
-        titleKey: "schulteGrid",
-        descKey: "schulteGridDescription",
-        icon: Focus,
         tone: "cyan",
       },
     ],

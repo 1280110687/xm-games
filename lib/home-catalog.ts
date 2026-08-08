@@ -1,6 +1,7 @@
 export const HOME_CATEGORY_ORDER = [
   "categoryBingo",
   "categoryBoard",
+  "categoryFocus",
   "categoryPuzzle",
   "categoryArcade",
   "categoryTools",

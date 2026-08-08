@@ -116,6 +116,11 @@ export const PAGE_METADATA_KEYS = {
     descriptionKey: "schulteGridDescription",
     includeAppName: true,
   },
+  "/alternating-trail": {
+    titleKey: "alternatingTrail",
+    descriptionKey: "alternatingTrailDescription",
+    includeAppName: true,
+  },
   "/gomoku": {
     titleKey: "gomoku",
     descriptionKey: "gomokuDescription",

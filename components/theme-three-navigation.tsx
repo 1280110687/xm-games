@@ -64,6 +64,7 @@ const NAVIGATION_COPY: Record<
 
 const GAME_ROUTES = new Set([
   "/2048",
+  "/alternating-trail",
   "/base64-tool",
   "/bingo",
   "/bingo-cards",

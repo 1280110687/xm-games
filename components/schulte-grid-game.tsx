@@ -26,6 +26,10 @@ import { GameHeader } from "@/components/game-header"
 import { useTheme } from "@/components/theme-provider"
 import { Button } from "@/components/ui/button"
 import {
+  formatAlternatingTrailTarget,
+  getAlternatingTrailTarget,
+} from "@/features/alternating-trail/sequence"
+import {
   SCHULTE_LEVELS,
   createEmptySchulteRecords,
   createSchulteGridState,
@@ -51,11 +55,67 @@ import { useLocale } from "@/lib/locale-context"
 import type { TranslationKey } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
-const RECORDS_STORAGE_KEY = "xm-games-schulte-records:v1"
-const INITIAL_LAYOUT_SEED = 0x53_43_48_55
 const subscribeToHydration = () => () => {}
 
 type Translate = (key: TranslationKey) => string
+type FocusSequenceMode = "schulte" | "alternating"
+
+interface FocusSequenceConfig {
+  dataPage: "schulte-grid" | "alternating-trail"
+  focusExercise: FocusSequenceMode
+  recordsStorageKey: string
+  initialLayoutSeed: number
+  titleKey: TranslationKey
+  descriptionKey: TranslationKey
+  instructionsKey: TranslationKey
+  nextTargetKey: TranslationKey
+  wrongTargetKey: TranslationKey
+  boardLabelKey: TranslationKey
+  difficultyKey: TranslationKey
+  levelKeys: Record<SchulteLevel, TranslationKey>
+  startHintKey: TranslationKey
+}
+
+const FOCUS_SEQUENCE_CONFIGS: Record<FocusSequenceMode, FocusSequenceConfig> = {
+  schulte: {
+    dataPage: "schulte-grid",
+    focusExercise: "schulte",
+    recordsStorageKey: "xm-games-schulte-records:v1",
+    initialLayoutSeed: 0x53_43_48_55,
+    titleKey: "schulteGrid",
+    descriptionKey: "schulteGridDescription",
+    instructionsKey: "schulteGridInstructions",
+    nextTargetKey: "schulteNextNumber",
+    wrongTargetKey: "schulteWrongNumber",
+    boardLabelKey: "schulteBoardLabel",
+    difficultyKey: "schulteDifficulty",
+    levelKeys: {
+      easy: "schulteLevel25",
+      medium: "schulteLevel36",
+      hard: "schulteLevel49",
+    },
+    startHintKey: "schulteStartHint",
+  },
+  alternating: {
+    dataPage: "alternating-trail",
+    focusExercise: "alternating",
+    recordsStorageKey: "xm-games-alternating-trail-records:v1",
+    initialLayoutSeed: 0x41_4c_54_52,
+    titleKey: "alternatingTrailShortTitle",
+    descriptionKey: "alternatingTrailDescription",
+    instructionsKey: "alternatingTrailInstructions",
+    nextTargetKey: "alternatingTrailNextTarget",
+    wrongTargetKey: "alternatingTrailWrongTarget",
+    boardLabelKey: "alternatingTrailBoardLabel",
+    difficultyKey: "alternatingTrailDifficulty",
+    levelKeys: {
+      easy: "alternatingTrailLevel25",
+      medium: "alternatingTrailLevel36",
+      hard: "alternatingTrailLevel49",
+    },
+    startHintKey: "alternatingTrailStartHint",
+  },
+}
 
 function formatDuration(milliseconds: number) {
   const safeMilliseconds = Math.max(0, Math.floor(milliseconds))
@@ -84,23 +144,50 @@ function useHasHydrated() {
   )
 }
 
-function levelLabel(t: Translate, level: SchulteLevel) {
-  if (level === "medium") return t("schulteLevel36")
-  if (level === "hard") return t("schulteLevel49")
-  return t("schulteLevel25")
+function levelLabel(
+  t: Translate,
+  level: SchulteLevel,
+  config: FocusSequenceConfig,
+) {
+  return t(config.levelKeys[level])
 }
 
-function readStoredRecords() {
+function formatTarget(mode: FocusSequenceMode, ordinal: number) {
+  return mode === "alternating"
+    ? formatAlternatingTrailTarget(ordinal)
+    : String(ordinal)
+}
+
+function targetKind(mode: FocusSequenceMode, ordinal: number) {
+  return mode === "alternating"
+    ? getAlternatingTrailTarget(ordinal).kind
+    : "number"
+}
+
+function targetAriaLabel(
+  mode: FocusSequenceMode,
+  ordinal: number,
+  t: Translate,
+) {
+  const label = formatTarget(mode, ordinal)
+  if (mode !== "alternating") return label
+
+  return targetKind(mode, ordinal) === "letter"
+    ? `${t("alternatingTrailLetterLabel")} ${label}`
+    : `${t("alternatingTrailNumberLabel")} ${label}`
+}
+
+function readStoredRecords(storageKey: string) {
   try {
-    return parseSchulteRecords(window.localStorage.getItem(RECORDS_STORAGE_KEY))
+    return parseSchulteRecords(window.localStorage.getItem(storageKey))
   } catch {
     return createEmptySchulteRecords()
   }
 }
 
-function writeStoredRecords(records: SchulteRecords) {
+function writeStoredRecords(storageKey: string, records: SchulteRecords) {
   try {
-    window.localStorage.setItem(RECORDS_STORAGE_KEY, JSON.stringify(records))
+    window.localStorage.setItem(storageKey, JSON.stringify(records))
   } catch {
     // Private browsing and full storage should not block a local test.
   }
@@ -130,11 +217,13 @@ function getRoundLayout(cellCount: 25 | 36 | 49, seed: number) {
 function SchulteBoard({
   game,
   layout,
+  config,
   onSelect,
   t,
 }: {
   game: SchulteGridState
   layout: SchulteLayout
+  config: FocusSequenceConfig
   onSelect: (number: number) => void
   t: Translate
 }) {
@@ -156,7 +245,7 @@ function SchulteBoard({
         className="schulte-board"
         viewBox={`${layout.viewBox.x} ${layout.viewBox.y} ${layout.viewBox.width} ${layout.viewBox.height}`}
         role="group"
-        aria-label={t("schulteBoardLabel")}
+        aria-label={t(config.boardLabelKey)}
       >
         <defs>
           <clipPath id={clipId}>
@@ -172,6 +261,7 @@ function SchulteBoard({
         <g clipPath={`url(#${clipId})`}>
           {layout.cells.map((cell, index) => {
             const number = game.numbers[index]
+            const label = formatTarget(config.focusExercise, number)
             const fontSize = Math.min(
               cell.safeDiameter * 0.5,
               58 * cell.fontScale,
@@ -183,10 +273,11 @@ function SchulteBoard({
               <g
                 key={cell.id}
                 className="schulte-cell"
+                data-value-kind={targetKind(config.focusExercise, number)}
                 role="button"
                 tabIndex={isRunning ? 0 : -1}
                 aria-disabled={!isRunning}
-                aria-label={String(number)}
+                aria-label={targetAriaLabel(config.focusExercise, number, t)}
                 onClick={() => {
                   if (isRunning) onSelect(number)
                 }}
@@ -202,7 +293,7 @@ function SchulteBoard({
                   dominantBaseline="central"
                   fontSize={roundSvgCoordinate(fontSize)}
                 >
-                  {number}
+                  {label}
                 </text>
               </g>
             )
@@ -216,11 +307,13 @@ function SchulteBoard({
 function SchulteDifficultyPicker({
   level,
   disabled,
+  config,
   onChange,
   t,
 }: {
   level: SchulteLevel
   disabled: boolean
+  config: FocusSequenceConfig
   onChange: (level: SchulteLevel) => void
   t: Translate
 }) {
@@ -228,7 +321,7 @@ function SchulteDifficultyPicker({
     <div
       className="schulte-level-picker"
       role="group"
-      aria-label={t("schulteDifficulty")}
+      aria-label={t(config.difficultyKey)}
     >
       {(Object.keys(SCHULTE_LEVELS) as SchulteLevel[]).map((option) => (
         <button
@@ -239,7 +332,7 @@ function SchulteDifficultyPicker({
           disabled={disabled}
           onClick={() => onChange(option)}
         >
-          {levelLabel(t, option)}
+          {levelLabel(t, option, config)}
         </button>
       ))}
     </div>
@@ -287,19 +380,21 @@ function SchulteNotice({
   game,
   elapsedMs,
   penaltyVisible,
+  config,
   t,
 }: {
   game: SchulteGridState
   elapsedMs: number
   penaltyVisible: boolean
+  config: FocusSequenceConfig
   t: Translate
 }) {
-  let content: ReactNode = t("schulteStartHint")
+  let content: ReactNode = t(config.startHintKey)
 
   if (game.phase === "running") {
     content = penaltyVisible
       ? t("schultePenaltyNotice")
-      : t("schulteGridInstructions")
+      : t(config.instructionsKey)
   } else if (game.phase === "completed") {
     content = game.completionReason === "solved"
       ? `${t("schulteCompleted")} ${formatDuration(elapsedMs)}`
@@ -318,19 +413,21 @@ function SchulteNotice({
 function SchulteLiveStatus({
   game,
   penaltyVisible,
+  config,
   t,
 }: {
   game: SchulteGridState
   penaltyVisible: boolean
+  config: FocusSequenceConfig
   t: Translate
 }) {
-  let message = t("schulteStartHint")
+  let message = t(config.startHintKey)
 
   if (game.phase === "running") {
     const progress = `${t("schulteProgress")}: ${game.correctCount}/${game.cellCount}`
-    const target = `${t("schulteNextNumber")}: ${game.expectedNumber}`
+    const target = `${t(config.nextTargetKey)}: ${formatTarget(config.focusExercise, game.expectedNumber)}`
     message = penaltyVisible
-      ? `${t("schulteWrongNumber")} ${game.wrongCount}. ${t("schultePenaltyNotice")} ${target}. ${progress}`
+      ? `${t(config.wrongTargetKey)} ${game.wrongCount}. ${t("schultePenaltyNotice")} ${target}. ${progress}`
       : `${target}. ${progress}`
   } else if (game.phase === "completed") {
     message = game.completionReason === "solved"
@@ -370,10 +467,12 @@ function SchulteMetric({
 function SchulteRecentResults({
   level,
   records,
+  config,
   t,
 }: {
   level: SchulteLevel
   records: SchulteRecords
+  config: FocusSequenceConfig
   t: Translate
 }) {
   const recent = records.recent[level] ?? []
@@ -382,7 +481,7 @@ function SchulteRecentResults({
     <section className="schulte-recent" aria-label={t("schulteRecentResults")}>
       <header>
         <span>{t("schulteRecentResults")}</span>
-        <small>{levelLabel(t, level)}</small>
+        <small>{levelLabel(t, level, config)}</small>
       </header>
       <div className="schulte-recent-track">
         {recent.length === 0 ? (
@@ -427,6 +526,7 @@ interface SchulteViewProps {
   game: SchulteGridState
   selectedLevel: SchulteLevel
   layout: SchulteLayout
+  config: FocusSequenceConfig
   elapsedMs: number
   records: SchulteRecords
   penaltyVisible: boolean
@@ -460,8 +560,16 @@ function SchulteProgress({ game, t }: { game: SchulteGridState; t: Translate }) 
   )
 }
 
-function SchulteTargetValue({ game }: { game: SchulteGridState }) {
-  if (game.phase !== "completed") return game.expectedNumber
+function SchulteTargetValue({
+  game,
+  config,
+}: {
+  game: SchulteGridState
+  config: FocusSequenceConfig
+}) {
+  if (game.phase !== "completed") {
+    return formatTarget(config.focusExercise, game.expectedNumber)
+  }
   return game.completionReason === "solved" ? "✓" : "—"
 }
 
@@ -479,8 +587,10 @@ function SchulteThemeOneView(props: SchulteViewProps) {
         <SchulteMetric
           className="schulte-target"
           icon={<Target aria-hidden="true" />}
-          label={props.t("schulteNextNumber")}
-          value={<SchulteTargetValue game={props.game} />}
+          label={props.t(props.config.nextTargetKey)}
+          value={(
+            <SchulteTargetValue game={props.game} config={props.config} />
+          )}
         />
         <SchulteMetric
           className="schulte-best"
@@ -494,6 +604,7 @@ function SchulteThemeOneView(props: SchulteViewProps) {
         <SchulteBoard
           game={props.game}
           layout={props.layout}
+          config={props.config}
           onSelect={props.onSelect}
           t={props.t}
         />
@@ -503,6 +614,7 @@ function SchulteThemeOneView(props: SchulteViewProps) {
         <SchulteDifficultyPicker
           level={props.selectedLevel}
           disabled={props.game.phase === "running"}
+          config={props.config}
           onChange={props.onLevelChange}
           t={props.t}
         />
@@ -520,11 +632,13 @@ function SchulteThemeOneView(props: SchulteViewProps) {
         game={props.game}
         elapsedMs={props.elapsedMs}
         penaltyVisible={props.penaltyVisible}
+        config={props.config}
         t={props.t}
       />
       <SchulteRecentResults
         level={props.selectedLevel}
         records={props.records}
+        config={props.config}
         t={props.t}
       />
     </main>
@@ -538,8 +652,10 @@ function SchulteThemeTwoView(props: SchulteViewProps) {
       <article className="schulte-two-stage-card">
         <header className="schulte-two-card-head">
           <div>
-            <span>{props.t("schulteNextNumber")}</span>
-            <strong><SchulteTargetValue game={props.game} /></strong>
+            <span>{props.t(props.config.nextTargetKey)}</span>
+            <strong>
+              <SchulteTargetValue game={props.game} config={props.config} />
+            </strong>
           </div>
           <div className="schulte-two-time">
             <span>{props.t("schulteElapsedTime")}</span>
@@ -549,6 +665,7 @@ function SchulteThemeTwoView(props: SchulteViewProps) {
         <SchulteBoard
           game={props.game}
           layout={props.layout}
+          config={props.config}
           onSelect={props.onSelect}
           t={props.t}
         />
@@ -559,6 +676,7 @@ function SchulteThemeTwoView(props: SchulteViewProps) {
         <SchulteDifficultyPicker
           level={props.selectedLevel}
           disabled={props.game.phase === "running"}
+          config={props.config}
           onChange={props.onLevelChange}
           t={props.t}
         />
@@ -580,11 +698,13 @@ function SchulteThemeTwoView(props: SchulteViewProps) {
         game={props.game}
         elapsedMs={props.elapsedMs}
         penaltyVisible={props.penaltyVisible}
+        config={props.config}
         t={props.t}
       />
       <SchulteRecentResults
         level={props.selectedLevel}
         records={props.records}
+        config={props.config}
         t={props.t}
       />
     </main>
@@ -602,13 +722,16 @@ function SchulteThemeThreeView(props: SchulteViewProps) {
             <strong>{formatDuration(props.elapsedMs)}</strong>
           </span>
           <span>
-            <small>{props.t("schulteNextNumber")}</small>
-            <strong><SchulteTargetValue game={props.game} /></strong>
+            <small>{props.t(props.config.nextTargetKey)}</small>
+            <strong>
+              <SchulteTargetValue game={props.game} config={props.config} />
+            </strong>
           </span>
         </div>
         <SchulteBoard
           game={props.game}
           layout={props.layout}
+          config={props.config}
           onSelect={props.onSelect}
           t={props.t}
         />
@@ -617,13 +740,14 @@ function SchulteThemeThreeView(props: SchulteViewProps) {
       <aside className="schulte-three-telemetry">
         <header>
           <Focus aria-hidden="true" />
-          <span>{props.t("schulteGrid")}</span>
+          <span>{props.t(props.config.titleKey)}</span>
           <i aria-hidden="true" />
         </header>
         <SchulteProgress game={props.game} t={props.t} />
         <SchulteDifficultyPicker
           level={props.selectedLevel}
           disabled={props.game.phase === "running"}
+          config={props.config}
           onChange={props.onLevelChange}
           t={props.t}
         />
@@ -643,6 +767,7 @@ function SchulteThemeThreeView(props: SchulteViewProps) {
           game={props.game}
           elapsedMs={props.elapsedMs}
           penaltyVisible={props.penaltyVisible}
+          config={props.config}
           t={props.t}
         />
       </aside>
@@ -650,22 +775,28 @@ function SchulteThemeThreeView(props: SchulteViewProps) {
       <SchulteRecentResults
         level={props.selectedLevel}
         records={props.records}
+        config={props.config}
         t={props.t}
       />
     </main>
   )
 }
 
-export function SchulteGridGame() {
+function FocusSequenceGame({
+  mode = "schulte",
+}: {
+  mode?: FocusSequenceMode
+}) {
   const { theme } = useTheme()
   const { t } = useLocale()
   const hasHydrated = useHasHydrated()
+  const config = FOCUS_SEQUENCE_CONFIGS[mode]
   const [selectedLevel, setSelectedLevel] = useState<SchulteLevel>("easy")
   const [game, setGame] = useState(() => createSchulteGridState("easy"))
   const [records, setRecords] = useState<SchulteRecords>(() => (
     createEmptySchulteRecords()
   ))
-  const [roundSeed, setRoundSeed] = useState(INITIAL_LAYOUT_SEED)
+  const [roundSeed, setRoundSeed] = useState(config.initialLayoutSeed)
   const [clockNow, setClockNow] = useState(0)
   const [penaltyVisible, setPenaltyVisible] = useState(false)
   const [recordsLoaded, setRecordsLoaded] = useState(false)
@@ -679,15 +810,15 @@ export function SchulteGridGame() {
   )
 
   useEffect(() => {
-    setRecords(readStoredRecords())
+    setRecords(readStoredRecords(config.recordsStorageKey))
     setRecordsLoaded(true)
-  }, [])
+  }, [config.recordsStorageKey])
 
   useEffect(() => {
     if (!recordsLoaded || !recordsDirtyRef.current) return
     recordsDirtyRef.current = false
-    writeStoredRecords(records)
-  }, [records, recordsLoaded])
+    writeStoredRecords(config.recordsStorageKey, records)
+  }, [config.recordsStorageKey, records, recordsLoaded])
 
   useEffect(() => {
     if (game.phase !== "running") {
@@ -728,7 +859,7 @@ export function SchulteGridGame() {
     const result = getSchulteFinalResult(game)
     if (!result || game.completedAtMs === null) return
 
-    const roundKey = `${roundSeed}:${game.level}:${game.completedAtMs}`
+    const roundKey = `${config.dataPage}:${roundSeed}:${game.level}:${game.completedAtMs}`
     if (recordedRoundRef.current === roundKey) return
     recordedRoundRef.current = roundKey
     const recordedAtMs = Date.now()
@@ -739,7 +870,7 @@ export function SchulteGridGame() {
         now: () => recordedAtMs,
       })
     })
-  }, [game, roundSeed])
+  }, [config.dataPage, game, roundSeed])
 
   const elapsedMs = getSchulteElapsedMs(
     game,
@@ -787,6 +918,7 @@ export function SchulteGridGame() {
     game,
     selectedLevel,
     layout,
+    config,
     elapsedMs,
     records,
     penaltyVisible,
@@ -802,12 +934,13 @@ export function SchulteGridGame() {
     return (
       <div
         className="game-page schulte-page"
-        data-page="schulte-grid"
+        data-page={config.dataPage}
+        data-focus-exercise={config.focusExercise}
         data-phase="idle"
         data-outcome="none"
         aria-busy="true"
       >
-        <span className="sr-only">{t("schulteGrid")}</span>
+        <span className="sr-only">{t(config.titleKey)}</span>
       </div>
     )
   }
@@ -815,7 +948,8 @@ export function SchulteGridGame() {
   return (
     <div
       className="game-page schulte-page"
-      data-page="schulte-grid"
+      data-page={config.dataPage}
+      data-focus-exercise={config.focusExercise}
       data-phase={game.phase}
       data-outcome={game.completionReason ?? "none"}
     >
@@ -823,8 +957,8 @@ export function SchulteGridGame() {
         layout={theme === "theme-two" ? "tool" : "centered"}
         homeLabel={t("appName")}
         homeLabelMode="desktop"
-        title={t("schulteGrid")}
-        description={theme === "theme-two" ? t("schulteGridDescription") : undefined}
+        title={t(config.titleKey)}
+        description={theme === "theme-two" ? t(config.descriptionKey) : undefined}
         className="schulte-header"
         titleClassName="schulte-header-title"
         descriptionClassName="schulte-header-description"
@@ -839,8 +973,17 @@ export function SchulteGridGame() {
       <SchulteLiveStatus
         game={game}
         penaltyVisible={penaltyVisible}
+        config={config}
         t={t}
       />
     </div>
   )
+}
+
+export function SchulteGridGame() {
+  return <FocusSequenceGame mode="schulte" />
+}
+
+export function AlternatingTrailSequenceGame() {
+  return <FocusSequenceGame mode="alternating" />
 }
