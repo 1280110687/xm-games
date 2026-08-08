@@ -9,6 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Pause, Play, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import { useLocale } from "@/lib/locale-context";
 import { GameHeader } from "@/components/game-header";
+import {
+  BingoLanHostPanel,
+  BingoModeSwitch,
+  type BingoPlayMode,
+} from "@/components/bingo-lan-panels";
+import { useBingoLanHost } from "@/features/bingo/use-bingo-lan";
 
 // 泰语数字发音映射
 const thaiNumbers: { [key: number]: string } = {
@@ -115,6 +121,7 @@ function getChineseNumber(num: number): string {
 
 export function BingoGame() {
   const { t, locale } = useLocale();
+  const [mode, setMode] = useState<BingoPlayMode>("local");
   const [drawnNumbers, setDrawnNumbers] = useState<number[]>([]);
   const [currentNumber, setCurrentNumber] = useState<number | null>(null);
   const [isAutoMode, setIsAutoMode] = useState(false);
@@ -122,10 +129,28 @@ export function BingoGame() {
   const [isSoundEnabled, setIsSoundEnabled] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const autoTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const lan = useBingoLanHost();
+
+  useEffect(() => {
+    const requestedMode = new URLSearchParams(window.location.search).get("mode");
+    if (requestedMode === "lan") setMode("lan");
+  }, []);
+
+  useEffect(() => {
+    if (lan.state) setMode("lan");
+    if (lan.state?.phase !== "playing") setIsPlaying(false);
+  }, [lan.state]);
+
+  const activeDrawnNumbers = mode === "lan"
+    ? lan.state?.drawnNumbers ?? []
+    : drawnNumbers;
+  const activeCurrentNumber = mode === "lan"
+    ? lan.state?.currentNumber ?? null
+    : currentNumber;
 
   // 所有可用数字 (1-75)
   const allNumbers = Array.from({ length: 75 }, (_, i) => i + 1);
-  const remainingNumbers = allNumbers.filter((n) => !drawnNumbers.includes(n));
+  const remainingNumbers = allNumbers.filter((n) => !activeDrawnNumbers.includes(n));
 
   // 多语言语音播报
   const speakNumber = useCallback(
@@ -176,14 +201,19 @@ export function BingoGame() {
     const randomIndex = Math.floor(Math.random() * remainingNumbers.length);
     const newNumber = remainingNumbers[randomIndex];
 
-    setCurrentNumber(newNumber);
-    setDrawnNumbers((prev) => [...prev, newNumber]);
+    if (mode === "lan") {
+      if (!lan.drawNumber(newNumber)) return;
+    } else {
+      setCurrentNumber(newNumber);
+      setDrawnNumbers((prev) => [...prev, newNumber]);
+    }
     speakNumber(newNumber);
-  }, [remainingNumbers, speakNumber]);
+  }, [lan, mode, remainingNumbers, speakNumber]);
 
   // 自动抽取逻辑
   useEffect(() => {
-    if (isAutoMode && isPlaying && remainingNumbers.length > 0) {
+    const canAutoDraw = mode === "local" || lan.state?.phase === "playing";
+    if (isAutoMode && isPlaying && remainingNumbers.length > 0 && canAutoDraw) {
       autoTimerRef.current = setInterval(() => {
         drawNumber();
       }, autoInterval * 1000);
@@ -199,6 +229,8 @@ export function BingoGame() {
     isPlaying,
     autoInterval,
     drawNumber,
+    lan.state?.phase,
+    mode,
     remainingNumbers.length,
   ]);
 
@@ -208,6 +240,7 @@ export function BingoGame() {
 
   // 重置游戏
   const resetGame = () => {
+    if (mode === "lan") return;
     setDrawnNumbers([]);
     setCurrentNumber(null);
     setIsPlaying(false);
@@ -217,6 +250,7 @@ export function BingoGame() {
   // 开始/暂停自动抽取
   const toggleAutoPlay = () => {
     if (remainingNumbers.length === 0) return;
+    if (mode === "lan" && lan.state?.phase !== "playing") return;
     setIsPlaying(!isPlaying);
   };
 
@@ -308,13 +342,13 @@ export function BingoGame() {
           </div>
         )}
 
-        {drawnNumbers.length > 0 && (
+        {activeDrawnNumbers.length > 0 && (
           <div className="space-y-3 border-t border-white/[0.06] pt-4">
             <Label className="text-sm text-foreground">
               {t("recentDraws")}
             </Label>
             <div className="flex flex-wrap gap-2" role="list">
-              {drawnNumbers
+              {activeDrawnNumbers
                 .slice(-10)
                 .reverse()
                 .map((num, index) => (
@@ -362,7 +396,7 @@ export function BingoGame() {
       {Array.from({ length: 15 }, (_, row) =>
         [1, 2, 3, 4, 5].map((col) => {
           const num = row + 1 + (col - 1) * 15;
-          const isDrawn = drawnNumbers.includes(num);
+          const isDrawn = activeDrawnNumbers.includes(num);
           return (
             <div
               key={num}
@@ -382,8 +416,12 @@ export function BingoGame() {
     </div>
   );
 
+  const canDraw = remainingNumbers.length > 0 && (
+    mode === "local" || lan.state?.phase === "playing"
+  );
+
   return (
-    <div className="bingo-shell game-page" data-page="bingo">
+    <div className="bingo-shell game-page" data-page="bingo" data-mode={mode}>
       <div
         className="game-content mx-auto w-full max-w-6xl"
         data-slot="game-content"
@@ -407,6 +445,25 @@ export function BingoGame() {
           }
         />
 
+        <BingoModeSwitch
+          mode={mode}
+          disabled={Boolean(lan.state)}
+          onChange={setMode}
+        />
+
+        {mode === "lan" && (
+          <BingoLanHostPanel
+            state={lan.state}
+            status={lan.status}
+            error={lan.error}
+            canStart={lan.canStart}
+            onCreate={() => void lan.createRoom()}
+            onStart={() => lan.startGame()}
+            onResetRound={lan.resetRound}
+            onClose={() => void lan.closeRoom()}
+          />
+        )}
+
         <div className="bingo-workspace grid gap-4 lg:grid-cols-3 lg:gap-6">
           {/* 当前抽到的数字 */}
           <Card className="bingo-draw game-stage gap-0 overflow-hidden border-white/10 bg-card/70 py-0 lg:col-span-2">
@@ -421,7 +478,7 @@ export function BingoGame() {
                 <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-1 sm:px-2.5">
                   {t("drawn")}{" "}
                   <strong className="font-semibold text-foreground">
-                    {drawnNumbers.length}
+                    {activeDrawnNumbers.length}
                   </strong>
                 </span>
                 <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-1 sm:px-2.5">
@@ -434,28 +491,28 @@ export function BingoGame() {
             </CardHeader>
             <CardContent className="px-4 py-5 sm:px-6 sm:py-6">
               <div className="flex flex-col items-center justify-center gap-4 sm:gap-5">
-                {currentNumber ? (
+                {activeCurrentNumber ? (
                   <div className="flex flex-col items-center gap-2.5">
                     <div
                       role="status"
                       aria-live="assertive"
                       aria-atomic="true"
-                      className={`flex h-36 w-36 items-center justify-center rounded-full ${getLetterColor(currentNumber)} text-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] ring-4 ring-white/10 transition-all duration-300 sm:h-44 sm:w-44 md:h-52 md:w-52`}
+                      className={`flex h-36 w-36 items-center justify-center rounded-full ${getLetterColor(activeCurrentNumber)} text-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] ring-4 ring-white/10 transition-all duration-300 sm:h-44 sm:w-44 md:h-52 md:w-52`}
                     >
                       <div className="text-center leading-none">
                         <div className="text-xl font-bold sm:text-2xl md:text-3xl">
-                          {getLetter(currentNumber)}
+                          {getLetter(activeCurrentNumber)}
                         </div>
                         <div className="mt-1 text-5xl font-bold tabular-nums sm:text-6xl md:text-7xl">
-                          {currentNumber}
+                          {activeCurrentNumber}
                         </div>
                       </div>
                     </div>
                     {/* {locale !== "en" && (
                       <div className="text-base font-medium text-muted-foreground sm:text-lg">
                         {locale === "th"
-                          ? thaiNumbers[currentNumber]
-                          : getChineseNumber(currentNumber)}
+                          ? thaiNumbers[activeCurrentNumber]
+                          : getChineseNumber(activeCurrentNumber)}
                       </div>
                     )} */}
                   </div>
@@ -469,14 +526,14 @@ export function BingoGame() {
 
                 {/* 操作按钮 */}
                 <div
-                  className="game-actions grid w-full max-w-sm grid-cols-2 gap-2.5 sm:gap-3"
+                  className={`game-actions grid w-full max-w-sm gap-2.5 sm:gap-3 ${mode === "local" ? "grid-cols-2" : "grid-cols-1"}`}
                   data-slot="game-actions"
                 >
                   {!isAutoMode ? (
                     <Button
                       size="lg"
                       onClick={drawNumber}
-                      disabled={remainingNumbers.length === 0}
+                      disabled={!canDraw}
                       className="w-full px-3 text-base sm:text-lg"
                     >
                       {t("drawNumber")}
@@ -485,7 +542,7 @@ export function BingoGame() {
                     <Button
                       size="lg"
                       onClick={toggleAutoPlay}
-                      disabled={remainingNumbers.length === 0}
+                      disabled={!canDraw}
                       className={`w-full px-3 text-base sm:text-lg ${
                         isPlaying
                           ? "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800"
@@ -505,15 +562,17 @@ export function BingoGame() {
                       )}
                     </Button>
                   )}
-                  <Button
-                    size="lg"
-                    variant="outline"
-                    onClick={resetGame}
-                    className="w-full border-white/10 bg-white/[0.035] px-3 text-base text-foreground sm:text-lg"
-                  >
-                    <RotateCcw className="h-5 w-5" aria-hidden="true" />{" "}
-                    {t("reset")}
-                  </Button>
+                  {mode === "local" && (
+                    <Button
+                      size="lg"
+                      variant="outline"
+                      onClick={resetGame}
+                      className="w-full border-white/10 bg-white/[0.035] px-3 text-base text-foreground sm:text-lg"
+                    >
+                      <RotateCcw className="h-5 w-5" aria-hidden="true" />{" "}
+                      {t("reset")}
+                    </Button>
+                  )}
                 </div>
               </div>
             </CardContent>
@@ -533,7 +592,7 @@ export function BingoGame() {
         </div>
 
         <div className="sr-only" role="status" aria-live="polite">
-          {t("drawn")}: {drawnNumbers.length} / 75. {t("remaining")}:{" "}
+          {t("drawn")}: {activeDrawnNumbers.length} / 75. {t("remaining")}:{" "}
           {remainingNumbers.length}
         </div>
 

@@ -1,4 +1,6 @@
-export type BingoCardGrid = ReadonlyArray<ReadonlyArray<number | null>>
+import type { BingoCardGrid } from "./cards"
+
+export type { BingoCardGrid } from "./cards"
 
 function isCellMarked(
   card: BingoCardGrid,

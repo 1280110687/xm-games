@@ -4802,3 +4802,58 @@ html[data-theme='theme-two'] .pwa-install-guide__action {
   color: white;
   background: #007aff;
 }
+
+/* Bingo LAN: iOS-style shared room card. */
+html[data-theme='theme-two'] .bingo-mode-switch,
+html[data-theme='theme-two'] .bingo-lan-panel,
+html[data-theme='theme-two'] .bingo-lan-current {
+  border-color: rgb(15 23 42 / 0.08);
+  border-radius: 1.55rem;
+  color: #111827;
+  background: rgb(255 255 255 / 0.94);
+  box-shadow: 0 16px 45px rgb(15 23 42 / 0.1);
+}
+
+html[data-theme='theme-two'] .bingo-lan-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #007aff;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+html[data-theme='theme-two'] .bingo-lan-eyebrow svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+html[data-theme='theme-two'] .bingo-lan-player-list > li,
+html[data-theme='theme-two'] .bingo-lan-invite {
+  border-color: rgb(15 23 42 / 0.08);
+  background: #f5f6f8;
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards']:not([data-mode='lan']) > .game-content {
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'][data-mode='lan'] {
+    height: auto;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  html[data-theme='theme-two'] .game-page[data-page='bingo-cards'][data-mode='lan'] > .game-content {
+    display: flex;
+    height: auto;
+    min-height: 100%;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding-bottom: calc(4.45rem + env(safe-area-inset-bottom));
+    overflow: visible;
+  }
+}

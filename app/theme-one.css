@@ -2589,3 +2589,52 @@ html[data-theme='theme-one'] .pwa-install-guide__action {
   width: 100%;
   min-height: 2.75rem;
 }
+
+/* Bingo LAN: neon caller console and peer lobby. */
+html[data-theme='theme-one'] .bingo-mode-switch,
+html[data-theme='theme-one'] .bingo-lan-panel,
+html[data-theme='theme-one'] .bingo-lan-current {
+  border-color: oklch(0.76 0.18 278 / 0.26);
+  background:
+    radial-gradient(circle at 0% 0%, oklch(0.72 0.19 278 / 0.13), transparent 38%),
+    linear-gradient(145deg, oklch(0.205 0.045 268 / 0.96), oklch(0.145 0.03 266 / 0.98));
+  box-shadow: 0 18px 50px oklch(0.08 0.035 270 / 0.42);
+}
+
+html[data-theme='theme-one'] .bingo-lan-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: oklch(0.82 0.16 292);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+html[data-theme='theme-one'] .bingo-lan-eyebrow svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-one'] .game-page[data-page='bingo-cards']:not([data-mode='lan']) > .game-content {
+    grid-template-rows: auto auto auto minmax(0, 1fr);
+  }
+
+  html[data-theme='theme-one'] .game-page[data-page='bingo-cards'][data-mode='lan'] {
+    height: auto;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  html[data-theme='theme-one'] .game-page[data-page='bingo-cards'][data-mode='lan'] > .game-content {
+    display: flex;
+    height: auto;
+    min-height: 100%;
+    flex-direction: column;
+    gap: 0.6rem;
+    overflow: visible;
+  }
+}
