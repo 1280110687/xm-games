@@ -12,7 +12,6 @@ import PaperMaterial from './PaperMaterial';
 import GalleryClouds from './GalleryClouds';
 import { useAudio } from '../../../../context/AudioManager';
 import { usePaintMaterial } from './usePaintMaterial';
-import { useGalleryProjects } from '../../../../hooks/useSanityData';
 
 // Reusable Vector3 to avoid allocations in useFrame
 const _tempScale = new THREE.Vector3();
@@ -33,43 +32,56 @@ export const GALLERY_INTERACTION_AUDIO_SETTINGS = {
     rolloff: 2        // How fast the sound fades away (exponential)
 };
 
-// Define the unique projects and their textures
-const FALLBACK_PROJECTS = [
+const XM_GAME_PROJECTS = [
     {
-        id: 'monetune',
-        title: 'MONETUNE',
-        front: '/theme-four-experience/textures/gallery/monetuneprzod.webp',
-        painted: '/theme-four-experience/textures/gallery/monetuneprzod_painted.webp',
-        url: 'https://monetune.pl',
-        description: 'MoneTune is a step-by-step blueprint that teaches beginners how to generate passive income using AI-created music. Without any musical skills, you will learn how to easily produce professional tracks, publish them on platforms like Spotify, and monetize your digital assets.',
-        techStack: ['/theme-four-experience/textures/gallery/wordpresslogo.webp', '/theme-four-experience/textures/gallery/elementorlogo.webp', '/theme-four-experience/textures/gallery/phplogo.webp', '/theme-four-experience/textures/gallery/csslogo.webp']
+        id: 'bingo',
+        title: 'BINGO',
+        front: '/theme-four-experience/textures/gallery/tylkartki.webp',
+        painted: '/theme-four-experience/textures/gallery/tylkartki_painted.webp',
+        href: '/bingo',
+        description: 'Create a board, invite nearby players and race to the first valid Bingo.',
+        mode: 'LOCAL · LAN',
+        techStack: [],
     },
     {
-        id: 'timber',
-        title: 'TIMBERKITTY',
-        front: '/theme-four-experience/textures/gallery/timberkittyprzod.webp',
-        painted: '/theme-four-experience/textures/gallery/timberkittyprzod_painted.webp',
-        url: 'https://timberkitty.netlify.app',
-        description: 'TimberKitty is an addictive, free-to-play browser arcade game built in pure JavaScript. Players control a lumberjack cat to chop wood, save birds, complete daily missions, and compete on global leaderboards.',
-        techStack: ['/theme-four-experience/textures/gallery/jslogo.webp', '/theme-four-experience/textures/gallery/htmllogo.webp', '/theme-four-experience/textures/gallery/csslogo.webp', '/theme-four-experience/textures/gallery/firebaselogo.webp']
+        id: 'chinese-chess',
+        title: 'CHINESE CHESS',
+        front: '/theme-four-experience/textures/gallery/tylkartki.webp',
+        painted: '/theme-four-experience/textures/gallery/tylkartki_painted.webp',
+        href: '/chinese-chess',
+        description: 'A complete mobile board with local play and a direct LAN match flow.',
+        mode: '2 PLAYERS · LAN',
+        techStack: [],
     },
     {
-        id: 'young',
-        title: 'YOUNG MULTI',
-        front: '/theme-four-experience/textures/gallery/youngmultiprzod.webp',
-        painted: '/theme-four-experience/textures/gallery/youngmultiprzod_painted.webp',
-        url: 'https://young-multi-strona.netlify.app',
-        description: 'A sleek, modern concept website dedicated to the Polish rapper and creator Young Multi. It serves as a promotional landing page designed to highlight his personal brand, music, and online presence.',
-        techStack: ['/theme-four-experience/textures/gallery/reactlogo.webp', '/theme-four-experience/textures/gallery/tailwindlogo.webp', '/theme-four-experience/textures/gallery/htmllogo.webp', '/theme-four-experience/textures/gallery/netlifylogo.webp']
+        id: 'schulte-grid',
+        title: 'SCHULTE GRID',
+        front: '/theme-four-experience/textures/gallery/tylkartki.webp',
+        painted: '/theme-four-experience/textures/gallery/tylkartki_painted.webp',
+        href: '/schulte-grid',
+        description: 'Train visual focus and search speed with a fast, responsive number grid.',
+        mode: 'FOCUS · SOLO',
+        techStack: [],
     },
     {
-        id: 'bio',
-        title: 'BIO',
-        front: '/theme-four-experience/textures/gallery/bioprzod.webp',
-        painted: '/theme-four-experience/textures/gallery/bioprzod_painted.webp',
-        url: 'https://tomkingbio.netlify.app',
-        description: 'A fast, modern personal bio page serving as a central hub for my digital footprint. It showcases my latest coding projects, web development services, YouTube videos, and recommended music artists.',
-        techStack: ['/theme-four-experience/textures/gallery/htmllogo.webp', '/theme-four-experience/textures/gallery/csslogo.webp', '/theme-four-experience/textures/gallery/jslogo.webp', '/theme-four-experience/textures/gallery/netlifylogo.webp']
+        id: 'sudoku',
+        title: 'SUDOKU',
+        front: '/theme-four-experience/textures/gallery/tylkartki.webp',
+        painted: '/theme-four-experience/textures/gallery/tylkartki_painted.webp',
+        href: '/sudoku',
+        description: 'A clean puzzle board for quick sessions, notes and deliberate problem solving.',
+        mode: 'PUZZLE · SOLO',
+        techStack: [],
+    },
+    {
+        id: 'neon-breaker',
+        title: 'NEON BREAKER',
+        front: '/theme-four-experience/textures/gallery/tylkartki.webp',
+        painted: '/theme-four-experience/textures/gallery/tylkartki_painted.webp',
+        href: '/neon-breaker',
+        description: 'A compact arcade challenge with touch-friendly controls and immediate play.',
+        mode: 'ARCADE · SOLO',
+        techStack: [],
     },
 ];
 
@@ -208,9 +220,7 @@ const GalleryRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     // We use matchMedia('(hover: hover)') to detect devices with a cursor/hover capability
     const [canHover, setCanHover] = useState(() => typeof window !== 'undefined' ? window.matchMedia('(hover: hover)').matches : true);
 
-    // Pobieranie danych z Sanity.io (fallback do starych danych)
-    const sanityProjects = useGalleryProjects();
-    const activeProjects = sanityProjects || FALLBACK_PROJECTS;
+    const activeProjects = XM_GAME_PROJECTS;
 
     useEffect(() => {
         const mq = window.matchMedia('(hover: hover)');
@@ -1169,7 +1179,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                         anchorY="middle"
                         fillOpacity={0} // Start hidden
                     >
-                        OPEN PROJECT
+                        OPEN GAME
                     </Text>
 
                     {/* Warstwa 3: Niewidoczny hit-area pokrywający cały przycisk - łapie WSZYSTKIE eventy */}
@@ -1178,7 +1188,10 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                         onClick={(e) => {
                             if (isSelected && !isTransitioning) {
                                 e.stopPropagation();
-                                window.open(project.url, '_blank');
+                                window.parent.postMessage(
+                                    { type: 'xm-games:theme-four-navigate', href: project.href },
+                                    window.location.origin,
+                                );
                             }
                         }}
                         onPointerEnter={(e) => {
@@ -1215,7 +1228,7 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                         anchorY="middle"
                         fillOpacity={0} // Start hidden
                     >
-                        PROJECT DETAILS:
+                        GAME DETAILS:
                     </Text>
 
                     <Text
@@ -1251,22 +1264,19 @@ const ProjectCard = memo(forwardRef(({ index, project, clothespinTexture, curren
                         anchorY="middle"
                         fillOpacity={0} // Start hidden
                     >
-                        TECH STACK
+                        PLAY MODE
                     </Text>
 
-                    {/* Kontener na loga układane poziomo */}
-                    <group position={[0, -0.05, 0.01]}>
-                        {project.techStack && project.techStack.map((logoPath, idx) => {
-                            // Rozstawienie kwadracików (4 sztuki wyśrodkowane)
-                            const spacing = 0.30;
-                            const startX = -((project.techStack.length - 1) * spacing) / 2;
-                            const xPos = startX + (idx * spacing);
-
-                            return (
-                                <TechStackLogo key={idx} path={logoPath} position={[xPos, 0, 0]} />
-                            );
-                        })}
-                    </group>
+                    <Text
+                        position={[0, -0.04, 0.01]}
+                        fontSize={0.065}
+                        color="#286f72"
+                        font="/theme-four-experience/fonts/CabinSketch-Bold.ttf"
+                        anchorX="center"
+                        anchorY="middle"
+                    >
+                        {project.mode}
+                    </Text>
                 </group>
 
                 {/* 

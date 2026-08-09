@@ -2,14 +2,13 @@ import { useRef, useState, useEffect, useMemo, useCallback, memo } from 'react';
 import { useFrame, useThree, useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 import gsap from 'gsap';
-import { CONTENT_DATA, PLATFORM_CONFIG, getLatestContent } from './contentData';
+import { CONTENT_DATA, PLATFORM_CONFIG } from './contentData';
 import { useScene } from '../../../../context/SceneContext';
 import { useAchievements } from '../../../../context/AchievementsContext';
 import { TextureLoader } from 'three';
 import FloatingCodeParticles from './FloatingCodeParticles';
-import { PositionalAudio } from '@react-three/drei';
+import { PositionalAudio, Text } from '@react-three/drei';
 import { useAudio } from '../../../../context/AudioManager';
-import { useStudioContent } from '../../../../hooks/useSanityData';
 import '../../shaders/RevealMaterial';
 import { isTouchDevice } from '../../../../utils/deviceDetect';
 import { usePaintMaterial } from '../Gallery/usePaintMaterial';
@@ -100,16 +99,14 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
     const [isAnimating, setIsAnimating] = useState(false);
 
     // Global Scene Context for Overlay
-    const { openOverlay, overlayContent, isTeleporting } = useScene();
+    const { overlayContent, isTeleporting } = useScene();
 
     // Achievements Context
     const { showTutorial, unlockAchievement, hidePopup } = useAchievements();
     const { globalVolume, isMuted } = useAudio();
     const effectiveVolume = isMuted ? 0 : AUDIO_SETTINGS.volume * globalVolume;
 
-    // Pobieranie danych z Sanity.io (fallback do starych danych)
-    const sanityContent = useStudioContent();
-    const activeContent = sanityContent || CONTENT_DATA;
+    const activeContent = CONTENT_DATA;
 
     const audioRef = useRef();
     useEffect(() => {
@@ -455,13 +452,16 @@ const StudioRoom = ({ showRoom, onReady, isExiting, isWarmup }) => {
                     ease: 'power2.inOut',
                     onComplete: () => {
                         setIsAnimating(false);
-                        openOverlay(item); // Open global overlay in HUD
+                        window.parent.postMessage(
+                            { type: 'xm-games:theme-four-navigate', href: item.href },
+                            window.location.origin,
+                        );
                     }
                 });
             }
         });
 
-    }, [isAnimating, camera, responsiveParams, openOverlay]);
+    }, [isAnimating, camera, responsiveParams, unlockAchievement]);
 
     // Trigger camera return ONLY when overlay is explicitly closed
     // We use a ref to track if overlay was previously open to avoid initial race conditions
@@ -859,9 +859,22 @@ const MonitorBlock = memo(({ item, meshRef, isSelected, onMonitorClick, disabled
                     }
                 })}
             </mesh>
+
+            <Text
+                position={[0, 0, item.depth / 2 + 0.012]}
+                fontSize={isPhoneMonitor ? 0.11 : 0.15}
+                maxWidth={item.width * 0.72}
+                lineHeight={0.86}
+                textAlign="center"
+                color="#1c1c1c"
+                anchorX="center"
+                anchorY="middle"
+                font="/theme-four-experience/fonts/CabinSketch-Bold.ttf"
+            >
+                {item.screenLabel}
+            </Text>
         </group>
     );
 });
 
 export default StudioRoom;
-

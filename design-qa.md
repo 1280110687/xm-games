@@ -525,6 +525,62 @@ direction controls measure 48×44 CSS pixels.
 
 final result: passed
 
+---
+
+# Theme Four original 3D room restoration QA (2026-08-09)
+
+**Source and implementation**
+
+- Source truth: `/Users/mimi/Documents/Improvement/portfolio-itom/src/components/canvas/rooms/`
+- Restored implementation: `/Users/mimi/Documents/Improvement/xm-games/vendor/theme-four-experience/src/components/canvas/rooms/`
+- Room switch restored in `vendor/theme-four-experience/src/components/canvas/corridor/RoomInterior.jsx`.
+- Visual comparison viewport: 1280 × 720 CSS pixels for both source and implementation.
+
+**Same-input comparison evidence**
+
+- Gallery: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/theme4-room-3d-rework/compare-gallery.png`
+- Studio: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/theme4-room-3d-rework/compare-studio.png`
+- About: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/theme4-room-3d-rework/compare-about.png`
+- Contact: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/theme4-room-3d-rework/compare-contact.png`
+
+Each comparison places the reference room on the left and the restored XM-Games room on the right. The original room geometry, camera framing, source textures, clouds, depth, and animated structures remain visibly aligned. Only the portfolio author's content layer is replaced.
+
+**Room fidelity and content replacement**
+
+- Gallery retains the hand-drawn skyline, balcony, railing, curved clothesline, drifting clouds, horizontal movement, and physical card-flip interaction. Its cards now show Bingo, Chinese Chess, Schulte Grid, Sudoku, and Neon Breaker and route through the same-origin XM-Games bridge.
+- Studio retains the auto-rotating, vertically falling TV/monitor/phone tower and pointer-drag physics. Generic source device shells now carry XM-Games labels such as Bingo LAN, Gomoku, and 2048; the author's videos and social posts are no longer used.
+- About retains the infinite cloud chunks, paper airplane, wheel/touch momentum, camera banking, and repeating fly-through narrative. Personal avatar, awards, school, and skills content were replaced with four XM-Games milestones.
+- Contact retains the animated sea layers, clouds, lighthouse, moving ship, dock, and floating barrel motion. Social/message barrels are now TEXT, QR, JSON, CRYPTO, and ANIME tool routes.
+- The room overlay is collapsed by default into a compact paper control at the lower-right and expands only on request, so it no longer hides the 3D room. Its mobile breakpoint constrains the collapsed panel to 10.5rem and the expanded catalog to 52dvh.
+- The localized Back to corridor control remains visible above every room and completed the actual exit transition in Gallery, Studio, About, and Contact.
+
+**Interaction evidence**
+
+- Entered the 3D front door, moved through the real corridor, and opened all four room doors.
+- Gallery card wall and horizontal scene, Studio screen tower, About wheel-flight state, and Contact animated sea were exercised in the in-app browser.
+- Clicked the visible QR barrel; the parent application navigated to `http://127.0.0.1:3020/qr-code` and rendered `文字二维码 - XM-Games`.
+- Returned from each tested room using the visible top-left control.
+
+**Comparison history**
+
+1. Generic room shell — P1. The previous implementation replaced all four source room components with a tiled box and large DOM catalog. Fixed by restoring the original Gallery, Studio, About, and Contact component switch in `RoomInterior`.
+2. Author content remained inside restored scenes — P1. Fixed at the 3D object seams: project cards, device screens, flight milestones, and sea barrels now use XM-Games content and whitelisted internal routes.
+3. Catalog covered the 3D scene — P1. Fixed with a collapsed-by-default lower-right paper control and an explicit expandable catalog.
+4. Production preview initially rendered white after asset hashes changed — P1. The already-running Next production server had not registered the newly generated static asset names. Restarting the exact preview process restored 200 responses for the new Vite chunks and the real WebGL entrance. The final production preview was restarted again after the full build.
+
+**Validation**
+
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test` — 58 files, 397 tests
+- `pnpm build` — Vite Theme Four build plus all 27 Next.js pages and LAN API routes
+- `git diff --check`
+- Vite's remaining large-entry-chunk message is advisory and unchanged in kind; the room experience remains lazy-loaded.
+
+No actionable P0, P1, or P2 visual or interaction findings remain.
+
+final result: passed
+
 # Theme Four WebGL replacement design QA (2026-08-09)
 
 This report supersedes the earlier Theme Four 2.5D raster-scene QA above. The
@@ -958,5 +1014,21 @@ final result: passed
 
 The remaining Vite message is its standard large-entry-chunk advisory; the
 room experience itself remains lazy-loaded and was reduced to about 201 kB.
+
+final result: passed
+
+---
+
+# Theme Four 3D room restoration final record (2026-08-09)
+
+This final record supersedes the historical generic-shell room replacement
+section immediately above it. Theme Four now imports and renders the original
+Gallery, Studio, About, and Contact 3D room structures again; only their
+portfolio content has been replaced with XM-Games games, tools, and narrative.
+
+The detailed same-viewport comparisons, interaction evidence, fixes, and
+validation results are recorded in **Theme Four original 3D room restoration
+QA (2026-08-09)** above. The final production preview was restarted after the
+complete build and no actionable P0, P1, or P2 findings remain.
 
 final result: passed

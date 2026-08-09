@@ -14,6 +14,8 @@ const COPY = {
         aboutTitle: '关于 XM-Games',
         aboutDescription: '一个移动端优先、轻量、本地优先的游戏与实用工具集合。',
         open: '进入',
+        explore: '展开完整目录',
+        close: '收起目录',
         goToGames: '前往游戏馆',
         loading: '正在读取游戏目录…',
         loungePoints: ['手机优先的 H5 体验', '游戏状态与主题展示分离', '支持本地、离线与局域网玩法'],
@@ -30,6 +32,8 @@ const COPY = {
         aboutTitle: 'About XM-Games',
         aboutDescription: 'A lightweight, mobile-first collection of games and practical local tools.',
         open: 'Open',
+        explore: 'Open full catalog',
+        close: 'Close catalog',
         goToGames: 'Go to Game Hall',
         loading: 'Loading the game catalog…',
         loungePoints: ['Mobile-first H5 experience', 'Game state stays separate from presentation themes', 'Local, offline and LAN play'],
@@ -46,6 +50,8 @@ const COPY = {
         aboutTitle: 'เกี่ยวกับ XM-Games',
         aboutDescription: 'คอลเลกชันเกมและเครื่องมือที่เบา เน้นมือถือ และทำงานในเครื่อง',
         open: 'เปิด',
+        explore: 'เปิดรายการทั้งหมด',
+        close: 'ปิดรายการ',
         goToGames: 'ไปที่ห้องเกม',
         loading: 'กำลังโหลดรายการเกม…',
         loungePoints: ['ประสบการณ์ H5 ที่เน้นมือถือ', 'สถานะเกมแยกจากธีมการแสดงผล', 'รองรับการเล่นในเครื่อง ออฟไลน์ และ LAN'],
@@ -75,6 +81,7 @@ const RoomLink = ({ game, copy, onNavigate }) => (
 const XmGamesRoomOverlay = () => {
     const { currentRoom, isInRoom, teleportTo } = useScene();
     const [context, setContext] = useState(EMPTY_CONTEXT);
+    const [isExpanded, setIsExpanded] = useState(false);
 
     useEffect(() => {
         const handleMessage = (event) => {
@@ -85,6 +92,10 @@ const XmGamesRoomOverlay = () => {
         window.parent.postMessage({ type: 'xm-games:theme-four-ready' }, window.location.origin);
         return () => window.removeEventListener('message', handleMessage);
     }, []);
+
+    useEffect(() => {
+        setIsExpanded(false);
+    }, [currentRoom]);
 
     const locale = COPY[context.locale] ? context.locale : 'zh';
     const copy = COPY[locale];
@@ -128,7 +139,7 @@ const XmGamesRoomOverlay = () => {
 
     return (
         <section className={`xm-room-overlay xm-room-${currentRoom}`} aria-labelledby="xm-room-title">
-            <div className="xm-room-paper">
+            <div className={`xm-room-paper${isExpanded ? ' is-expanded' : ''}`}>
                 <header>
                     <span>{copy.eyebrow}</span>
                     <h1 id="xm-room-title">{title}</h1>
@@ -136,6 +147,17 @@ const XmGamesRoomOverlay = () => {
                 </header>
 
                 {(isGameHall || isToolbox) && (
+                    <button
+                        type="button"
+                        className="xm-room-catalog-toggle"
+                        aria-expanded={isExpanded}
+                        onClick={() => setIsExpanded((expanded) => !expanded)}
+                    >
+                        {isExpanded ? copy.close : copy.explore}
+                    </button>
+                )}
+
+                {(isGameHall || isToolbox) && isExpanded && (
                     <div className="xm-room-catalog">
                         {categories.length === 0 ? (
                             <p className="xm-room-loading">{copy.loading}</p>
@@ -157,14 +179,24 @@ const XmGamesRoomOverlay = () => {
 
                 {!isGameHall && !isToolbox && (
                     <div className="xm-room-summary">
-                        <ol>
-                            {points.map((point, index) => (
-                                <li key={point}>
-                                    <span>{String(index + 1).padStart(2, '0')}</span>
-                                    <strong>{point}</strong>
-                                </li>
-                            ))}
-                        </ol>
+                        {isExpanded && (
+                            <ol>
+                                {points.map((point, index) => (
+                                    <li key={point}>
+                                        <span>{String(index + 1).padStart(2, '0')}</span>
+                                        <strong>{point}</strong>
+                                    </li>
+                                ))}
+                            </ol>
+                        )}
+                        <button
+                            type="button"
+                            className="xm-room-details-toggle"
+                            aria-expanded={isExpanded}
+                            onClick={() => setIsExpanded((expanded) => !expanded)}
+                        >
+                            {isExpanded ? copy.close : copy.explore}
+                        </button>
                         <button type="button" onClick={() => teleportTo('gallery')}>
                             {copy.goToGames}
                         </button>
