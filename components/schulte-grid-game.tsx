@@ -954,16 +954,22 @@ function FocusSequenceGame({
       data-outcome={game.completionReason ?? "none"}
     >
       <GameHeader
-        layout={theme === "theme-two" ? "tool" : "centered"}
+        layout={
+          theme === "theme-two" || theme === "theme-four" ? "tool" : "centered"
+        }
         homeLabel={t("appName")}
         homeLabelMode="desktop"
         title={t(config.titleKey)}
-        description={theme === "theme-two" ? t(config.descriptionKey) : undefined}
+        description={
+          theme === "theme-two" || theme === "theme-four"
+            ? t(config.descriptionKey)
+            : undefined
+        }
         className="schulte-header"
         titleClassName="schulte-header-title"
         descriptionClassName="schulte-header-description"
       />
-      {theme === "theme-two" ? (
+      {theme === "theme-two" || theme === "theme-four" ? (
         <SchulteThemeTwoView {...viewProps} />
       ) : theme === "theme-three" ? (
         <SchulteThemeThreeView {...viewProps} />

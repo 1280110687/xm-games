@@ -1,0 +1,3 @@
+# Vendored upstream source and generated bundles retain their original spacing.
+vendor/theme-four-experience/** -whitespace
+public/theme-four-experience/assets/*.js -whitespace

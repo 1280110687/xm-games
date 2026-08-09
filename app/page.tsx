@@ -47,6 +47,7 @@ import {
 
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { ThemeSwitcher } from "@/components/theme-switcher"
+import { ThemeFourHome } from "@/components/theme-four-home"
 import { Button } from "@/components/ui/button"
 import { useLocale } from "@/lib/locale-context"
 import { orderHomeCategories } from "@/lib/home-catalog"
@@ -855,6 +856,7 @@ export default function Home() {
 
   return (
     <>
+      <ThemeFourHome rooms={HOME_CATEGORIES} />
       <ThemeThreeHome />
       <div data-page="home" className="home-shell app-shell py-4 sm:py-6 lg:py-8">
       <div className="app-container">

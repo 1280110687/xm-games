@@ -1,4 +1,9 @@
-export const themes = ["theme-one", "theme-two", "theme-three"] as const
+export const themes = [
+  "theme-one",
+  "theme-two",
+  "theme-three",
+  "theme-four",
+] as const
 
 export type ThemeId = (typeof themes)[number]
 
@@ -24,6 +29,10 @@ export const THEME_CONFIG: Record<
     colorScheme: "dark",
     themeColor: "#030604",
   },
+  "theme-four": {
+    colorScheme: "light",
+    themeColor: "#e9e1d2",
+  },
 }
 
 export function isThemeId(value: unknown): value is ThemeId {
@@ -36,6 +45,10 @@ export function normalizeTheme(value: unknown): ThemeId {
 
 export function themeUsesDarkChrome(theme: ThemeId): boolean {
   return THEME_CONFIG[theme].colorScheme === "dark"
+}
+
+export function themeLoadsWebglExperience(theme: ThemeId): boolean {
+  return theme === "theme-four"
 }
 
 export const themeBootstrapScript = `(() => {

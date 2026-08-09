@@ -5,6 +5,7 @@ import {
   MoonStar,
   Palette,
   PanelsTopLeft,
+  PencilRuler,
   Smartphone,
   type LucideIcon,
 } from "lucide-react"
@@ -54,6 +55,10 @@ const THEME_COPY: Record<
         name: "主题三",
         description: "黑曜玻璃控制台",
       },
+      "theme-four": {
+        name: "主题四",
+        description: "手绘沉浸游戏走廊",
+      },
     },
   },
   en: {
@@ -71,6 +76,10 @@ const THEME_COPY: Record<
       "theme-three": {
         name: "Theme Three",
         description: "Obsidian glass console",
+      },
+      "theme-four": {
+        name: "Theme Four",
+        description: "Hand-drawn immersive corridor",
       },
     },
   },
@@ -90,6 +99,10 @@ const THEME_COPY: Record<
         name: "ธีม 3",
         description: "คอนโซลกระจกออบซิเดียน",
       },
+      "theme-four": {
+        name: "ธีม 4",
+        description: "โถงเกมวาดมือแบบเต็มอารมณ์",
+      },
     },
   },
 }
@@ -98,6 +111,7 @@ const THEME_ICONS: Record<ThemeId, LucideIcon> = {
   "theme-one": MoonStar,
   "theme-two": Smartphone,
   "theme-three": PanelsTopLeft,
+  "theme-four": PencilRuler,
 }
 
 export function ThemeSwitcher({

@@ -1,0 +1,1647 @@
+/*
+ * Theme Four: a pencil-and-paper game club.
+ *
+ * The immersive entrance and corridor are isolated in ThemeFourHome. Existing
+ * game routes keep their stateful React trees and receive this paper workspace
+ * shell through theme-scoped selectors only.
+ */
+html[data-theme='theme-four'] {
+  color-scheme: light;
+  --background: #e9e1d2;
+  --foreground: #292720;
+  --card: #f7f1e7;
+  --card-foreground: #292720;
+  --popover: #fbf6ec;
+  --popover-foreground: #292720;
+  --primary: #286f72;
+  --primary-foreground: #fffdf8;
+  --secondary: #ddd2c1;
+  --secondary-foreground: #302d26;
+  --muted: #e1d8ca;
+  --muted-foreground: #696359;
+  --accent: #c97758;
+  --accent-foreground: #fffdf8;
+  --destructive: #a44337;
+  --destructive-foreground: #fffaf5;
+  --border: rgb(56 51 43 / 0.28);
+  --input: rgb(255 252 245 / 0.72);
+  --ring: #286f72;
+  --radius: 0.35rem;
+  --surface-low: rgb(244 238 226 / 0.72);
+  --surface: rgb(250 245 235 / 0.88);
+  --surface-high: rgb(255 251 243 / 0.94);
+  --surface-border: rgb(56 51 43 / 0.24);
+  --surface-shadow: 0 18px 48px rgb(65 53 37 / 0.18);
+  --control-fill: rgb(255 252 245 / 0.72);
+  --control-hover: rgb(255 252 245 / 0.96);
+  --separator: rgb(56 51 43 / 0.16);
+  --glow-primary: transparent;
+  --glow-cyan: transparent;
+  --theme-four-paper: #f7f0e4;
+  --theme-four-paper-deep: #ded3c2;
+  --theme-four-ink: #292720;
+  --theme-four-pencil: #665f54;
+  --theme-four-teal: #286f72;
+  --theme-four-coral: #c97758;
+  --theme-four-ochre: #b17a38;
+}
+
+.theme-four-home,
+.theme-four-route-nav {
+  display: none;
+}
+
+html[data-theme='theme-four'],
+html[data-theme='theme-four'] body {
+  min-height: 100%;
+  background: var(--background);
+}
+
+html[data-theme='theme-four'] body {
+  color: var(--foreground);
+  font-family:
+    var(--font-geist-sans),
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'PingFang SC',
+    'Hiragino Sans GB',
+    'Noto Sans Thai',
+    sans-serif;
+}
+
+html[data-theme='theme-four'] ::selection {
+  color: #fffdf8;
+  background: rgb(40 111 114 / 0.82);
+}
+
+html[data-theme='theme-four'] .theme-four-home {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  color: var(--theme-four-ink);
+  background: var(--theme-four-paper);
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+html[data-theme='theme-four'] .theme-four-home[data-ready='true'] {
+  opacity: 1;
+}
+
+html[data-theme='theme-four'] .home-shell {
+  display: none;
+}
+
+.theme-four-entry,
+.theme-four-corridor {
+  position: absolute;
+  inset: 0;
+  min-width: 320px;
+  overflow: hidden;
+  transition: opacity 620ms ease, visibility 620ms step-end;
+}
+
+.theme-four-entry {
+  z-index: 2;
+  opacity: 1;
+  visibility: visible;
+}
+
+.theme-four-corridor {
+  --theme-four-look-x: 0;
+  --theme-four-look-y: 0;
+  z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+  outline: none;
+}
+
+.theme-four-home[data-entered='true'] .theme-four-entry {
+  z-index: 1;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.theme-four-home[data-entered='true'] .theme-four-corridor {
+  z-index: 2;
+  opacity: 1;
+  visibility: visible;
+}
+
+.theme-four-entry-scene,
+.theme-four-corridor-scene {
+  position: absolute;
+  inset: -2.5%;
+  pointer-events: none;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  will-change: transform, filter;
+}
+
+.theme-four-entry-scene {
+  background-image: url('/theme-four/club-entrance.webp');
+  filter: grayscale(0.78) saturate(0.58) contrast(1.02);
+  transform: scale(1.02);
+  transition: filter 720ms ease, transform 900ms cubic-bezier(0.2, 0.75, 0.2, 1);
+}
+
+.theme-four-entry:focus-within .theme-four-entry-scene {
+  filter: grayscale(0.1) saturate(0.9) contrast(1.01);
+  transform: scale(1.035);
+}
+
+.theme-four-corridor-scene {
+  background-image: url('/theme-four/club-corridor.webp');
+  transform:
+    translate3d(
+      calc(var(--theme-four-look-x) * -0.55rem),
+      calc(var(--theme-four-look-y) * -0.35rem),
+      0
+    )
+    scale(1.035);
+  transition: transform 180ms ease-out;
+}
+
+.theme-four-corridor-wash {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: rgb(255 250 240 / 0.06);
+}
+
+.theme-four-entry-toolbar,
+.theme-four-corridor-toolbar {
+  position: absolute;
+  z-index: 5;
+  top: max(0.75rem, env(safe-area-inset-top));
+  right: max(0.85rem, env(safe-area-inset-right));
+  left: max(0.85rem, env(safe-area-inset-left));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  pointer-events: none;
+}
+
+.theme-four-entry-toolbar > *,
+.theme-four-corridor-toolbar > * {
+  pointer-events: auto;
+}
+
+.theme-four-brand-chip,
+.theme-four-tool-button,
+.theme-four-entry-toolbar .theme-switcher-trigger,
+.theme-four-entry-toolbar .language-switcher-trigger,
+.theme-four-corridor-toolbar .theme-switcher-trigger,
+.theme-four-corridor-toolbar .language-switcher-trigger,
+.theme-four-entry-toolbar a {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid rgb(54 49 41 / 0.44);
+  border-radius: 0.2rem;
+  color: var(--theme-four-ink);
+  background: rgb(250 245 235 / 0.9);
+  box-shadow: 3px 4px 0 rgb(72 62 49 / 0.16);
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.theme-four-brand-chip {
+  padding-inline: 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+}
+
+.theme-four-brand-chip svg,
+.theme-four-tool-button svg,
+.theme-four-entry-toolbar a svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.theme-four-toolbar-controls,
+.theme-four-corridor-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.theme-four-entry-toolbar .theme-switcher-trigger,
+.theme-four-entry-toolbar .language-switcher-trigger,
+.theme-four-corridor-toolbar .theme-switcher-trigger,
+.theme-four-corridor-toolbar .language-switcher-trigger,
+.theme-four-entry-toolbar a {
+  width: 2.75rem !important;
+  height: 2.75rem;
+  padding: 0 !important;
+}
+
+.theme-four-entry-toolbar .language-switcher-compact-label,
+.theme-four-corridor-toolbar .language-switcher-compact-label {
+  display: none;
+}
+
+.theme-four-entry-toolbar .language-switcher-trigger svg,
+.theme-four-corridor-toolbar .language-switcher-trigger svg {
+  color: var(--theme-four-teal);
+}
+
+.theme-four-entry-sign {
+  position: absolute;
+  z-index: 3;
+  top: 17.5%;
+  left: 50%;
+  display: grid;
+  width: min(25rem, 31vw);
+  justify-items: center;
+  color: #373129;
+  text-align: center;
+  transform: translateX(-50%) rotate(-0.6deg);
+}
+
+.theme-four-entry-sign strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.25rem, 2.4vw, 2.35rem);
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.theme-four-entry-sign span {
+  margin-top: 0.22rem;
+  color: #625a50;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: clamp(0.56rem, 0.78vw, 0.8rem);
+  letter-spacing: 0.08em;
+}
+
+.theme-four-door-target {
+  position: absolute;
+  z-index: 4;
+  top: 34%;
+  left: 41.4%;
+  width: 20.5%;
+  height: 44%;
+  cursor: pointer;
+  border: 0;
+  border-radius: 0.3rem;
+  background: transparent;
+}
+
+.theme-four-door-target::after {
+  position: absolute;
+  inset: 0;
+  border: 2px solid transparent;
+  border-radius: inherit;
+  content: '';
+  transition: border-color 240ms ease, box-shadow 240ms ease;
+}
+
+.theme-four-door-target > span {
+  position: absolute;
+  bottom: 8%;
+  left: 50%;
+  display: inline-flex;
+  min-width: max-content;
+  min-height: 2.7rem;
+  align-items: center;
+  gap: 0.48rem;
+  padding: 0.7rem 0.95rem;
+  border: 1px solid rgb(54 49 41 / 0.52);
+  border-radius: 0.2rem;
+  color: #2c2923;
+  background: rgb(250 245 235 / 0.94);
+  box-shadow: 4px 5px 0 rgb(60 50 38 / 0.18);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  transform: translate(-50%, 1rem);
+  opacity: 0;
+  transition: opacity 220ms ease, transform 220ms ease;
+}
+
+.theme-four-door-target > span svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--theme-four-teal);
+}
+
+.theme-four-door-target:hover > span,
+.theme-four-door-target:focus-visible > span {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.theme-four-door-target:hover::after,
+.theme-four-door-target:focus-visible::after {
+  border-color: rgb(40 111 114 / 0.72);
+  box-shadow: 0 0 0 5px rgb(247 240 228 / 0.52);
+}
+
+.theme-four-door-target:focus-visible {
+  outline: none;
+}
+
+.theme-four-entry-note {
+  position: absolute;
+  z-index: 4;
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  left: 50%;
+  display: flex;
+  width: min(calc(100% - 2rem), 31rem);
+  align-items: flex-start;
+  gap: 0.72rem;
+  padding: 0.85rem 1rem;
+  border: 1px solid rgb(54 49 41 / 0.4);
+  border-radius: 0.2rem;
+  background: rgb(250 245 235 / 0.92);
+  box-shadow: 5px 6px 0 rgb(68 57 43 / 0.15);
+  transform: translateX(-50%) rotate(0.3deg);
+}
+
+.theme-four-entry-note > svg {
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.14rem;
+  color: var(--theme-four-coral);
+}
+
+.theme-four-entry-note > span {
+  display: grid;
+  gap: 0.14rem;
+}
+
+.theme-four-entry-note strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
+}
+
+.theme-four-entry-note small {
+  color: var(--theme-four-pencil);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.theme-four-corridor-toolbar {
+  align-items: flex-start;
+}
+
+.theme-four-tool-button {
+  padding-inline: 0.75rem;
+  cursor: pointer;
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+.theme-four-tool-button:hover,
+.theme-four-tool-button:focus-visible,
+.theme-four-entry-toolbar a:hover,
+.theme-four-entry-toolbar a:focus-visible {
+  color: var(--theme-four-teal);
+  background: #fffaf0;
+  transform: translateY(-1px);
+}
+
+.theme-four-corridor-title {
+  display: grid;
+  min-width: 13rem;
+  justify-items: center;
+  gap: 0.12rem;
+  padding: 0.55rem 1.1rem 0.65rem;
+  border: 1px solid rgb(54 49 41 / 0.35);
+  border-radius: 0.15rem;
+  background: rgb(250 245 235 / 0.88);
+  box-shadow: 4px 5px 0 rgb(68 57 43 / 0.14);
+  transform: rotate(-0.35deg);
+}
+
+.theme-four-corridor-title span {
+  color: var(--theme-four-teal);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.theme-four-corridor-title strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+}
+
+.theme-four-room-markers {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+}
+
+.theme-four-room-markers > button {
+  position: absolute;
+  display: flex;
+  min-width: 9.8rem;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.52rem 0.65rem;
+  cursor: pointer;
+  border: 1px solid rgb(54 49 41 / 0.35);
+  border-radius: 0.18rem;
+  color: var(--theme-four-pencil);
+  background: rgb(250 245 235 / 0.84);
+  box-shadow: 3px 4px 0 rgb(68 57 43 / 0.13);
+  text-align: left;
+  pointer-events: auto;
+  filter: grayscale(1);
+  opacity: 0.82;
+  transition: color 200ms ease, filter 200ms ease, opacity 200ms ease, transform 200ms ease;
+}
+
+.theme-four-room-markers > button:hover,
+.theme-four-room-markers > button:focus-visible,
+.theme-four-room-markers > button.is-active {
+  color: var(--theme-four-ink);
+  filter: grayscale(0);
+  opacity: 1;
+  transform: translateY(-3px) rotate(-0.4deg);
+}
+
+.theme-four-room-markers > button.is-active {
+  border-color: rgb(40 111 114 / 0.7);
+  box-shadow: 4px 5px 0 rgb(40 111 114 / 0.17);
+}
+
+.theme-four-room-markers > button > svg {
+  width: 1.2rem;
+  height: 1.2rem;
+  color: var(--theme-four-teal);
+}
+
+.theme-four-room-markers > button > span {
+  display: grid;
+  gap: 0.04rem;
+}
+
+.theme-four-room-markers small {
+  color: var(--theme-four-coral);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.49rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.theme-four-room-markers strong {
+  font-size: 0.72rem;
+  white-space: nowrap;
+}
+
+.theme-four-room-markers [data-room-position='1'] {
+  top: 29%;
+  left: 4.5%;
+}
+
+.theme-four-room-markers [data-room-position='2'] {
+  top: 41%;
+  left: 19.5%;
+}
+
+.theme-four-room-markers [data-room-position='3'] {
+  top: 51%;
+  left: 31%;
+}
+
+.theme-four-room-markers [data-room-position='4'] {
+  top: 47%;
+  right: 31%;
+}
+
+.theme-four-room-markers [data-room-position='5'] {
+  top: 38%;
+  right: 18%;
+}
+
+.theme-four-room-markers [data-room-position='6'] {
+  top: 27%;
+  right: 4%;
+}
+
+.theme-four-room-deck {
+  position: absolute;
+  z-index: 4;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  left: max(1rem, env(safe-area-inset-left));
+  display: grid;
+  max-height: 31vh;
+  grid-template-columns: minmax(12rem, 0.72fr) minmax(0, 2.4fr) auto;
+  gap: 0.9rem;
+  align-items: stretch;
+  padding: 0.85rem;
+  border: 1px solid rgb(54 49 41 / 0.45);
+  border-radius: 0.2rem;
+  background: rgb(250 245 235 / 0.94);
+  box-shadow: 7px 8px 0 rgb(65 53 38 / 0.15), 0 22px 70px rgb(56 46 32 / 0.2);
+}
+
+.theme-four-room-identity {
+  display: grid;
+  align-content: center;
+  padding: 0.45rem 0.7rem;
+  border-right: 1px dashed rgb(54 49 41 / 0.28);
+}
+
+.theme-four-room-identity > span {
+  color: var(--theme-four-coral);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.theme-four-room-identity h1 {
+  margin-top: 0.16rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.2rem, 2vw, 1.85rem);
+  line-height: 1.1;
+}
+
+.theme-four-room-identity p {
+  margin-top: 0.3rem;
+  color: var(--theme-four-pencil);
+  font-size: 0.68rem;
+  line-height: 1.4;
+}
+
+.theme-four-room-games {
+  display: flex;
+  min-width: 0;
+  gap: 0.55rem;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-color: rgb(40 111 114 / 0.45) transparent;
+  scrollbar-width: thin;
+}
+
+.theme-four-room-games > a {
+  display: grid;
+  min-width: 11.6rem;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 0.52rem;
+  align-items: center;
+  padding: 0.62rem 0.7rem;
+  border: 1px solid rgb(54 49 41 / 0.23);
+  border-radius: 0.18rem;
+  color: var(--theme-four-ink);
+  background: rgb(255 252 246 / 0.72);
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+
+.theme-four-room-games > a:hover,
+.theme-four-room-games > a:focus-visible {
+  border-color: rgb(40 111 114 / 0.65);
+  background: #fffaf0;
+  transform: translateY(-2px);
+}
+
+.theme-four-room-games > a > svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  color: var(--theme-four-teal);
+}
+
+.theme-four-room-games > a > span:not(.theme-four-game-open) {
+  display: grid;
+  min-width: 0;
+  gap: 0.08rem;
+}
+
+.theme-four-room-games strong,
+.theme-four-room-games small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.theme-four-room-games strong {
+  font-size: 0.72rem;
+}
+
+.theme-four-room-games small {
+  color: var(--theme-four-pencil);
+  font-size: 0.58rem;
+}
+
+.theme-four-game-open {
+  color: var(--theme-four-coral);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.54rem;
+  font-weight: 800;
+}
+
+.theme-four-room-controls {
+  display: grid;
+  grid-template-columns: 2.5rem auto 2.5rem;
+  gap: 0.35rem;
+  align-items: center;
+}
+
+.theme-four-room-controls button {
+  display: grid;
+  width: 2.5rem;
+  height: 2.5rem;
+  place-items: center;
+  cursor: pointer;
+  border: 1px solid rgb(54 49 41 / 0.34);
+  border-radius: 50%;
+  color: var(--theme-four-ink);
+  background: rgb(255 252 246 / 0.8);
+}
+
+.theme-four-room-controls button:hover,
+.theme-four-room-controls button:focus-visible {
+  color: #fff;
+  background: var(--theme-four-teal);
+}
+
+.theme-four-room-controls button svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.theme-four-room-controls > span {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.6rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.theme-four-explore-hint {
+  position: absolute;
+  z-index: 4;
+  top: 5.2rem;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.42rem 0.62rem;
+  border: 1px solid rgb(54 49 41 / 0.28);
+  border-radius: 999px;
+  color: var(--theme-four-pencil);
+  background: rgb(250 245 235 / 0.78);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.57rem;
+  transform: translateX(-50%);
+}
+
+.theme-four-explore-hint svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  color: var(--theme-four-teal);
+}
+
+.theme-four-mobile-hint {
+  display: none;
+}
+
+html[data-theme='theme-four'] [data-slot='dialog-overlay'] {
+  background: rgb(42 37 30 / 0.6);
+  backdrop-filter: blur(5px);
+}
+
+html[data-theme='theme-four'] [data-slot='dialog-content'].theme-four-map-dialog {
+  display: grid;
+  width: min(calc(100vw - 2rem), 62rem);
+  max-width: 62rem;
+  max-height: min(90svh, 52rem);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 1rem;
+  padding: 1.35rem;
+  overflow: hidden;
+  border: 1px solid rgb(54 49 41 / 0.52);
+  border-radius: 0.2rem;
+  color: var(--theme-four-ink);
+  background: #f8f1e5;
+  box-shadow: 8px 10px 0 rgb(48 39 28 / 0.2), 0 34px 110px rgb(42 34 24 / 0.36);
+}
+
+.theme-four-map-heading {
+  padding-right: 2.5rem;
+  border-bottom: 1px dashed rgb(54 49 41 / 0.3);
+  padding-bottom: 0.85rem;
+}
+
+.theme-four-map-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  color: var(--theme-four-teal);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.theme-four-map-kicker svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.theme-four-map-heading [data-slot='dialog-title'] {
+  margin-top: 0.2rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.6rem, 3vw, 2.45rem);
+  letter-spacing: 0.03em;
+}
+
+.theme-four-map-heading [data-slot='dialog-description'] {
+  color: var(--theme-four-pencil);
+}
+
+.theme-four-map-dialog > [data-slot='dialog-close']:not(.theme-four-map-done) {
+  display: grid;
+  width: 2.6rem;
+  height: 2.6rem;
+  place-items: center;
+  border: 1px solid rgb(54 49 41 / 0.4);
+  border-radius: 0.15rem;
+  color: var(--theme-four-ink);
+  background: #fffaf0;
+}
+
+.theme-four-map-grid {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.15rem;
+}
+
+.theme-four-map-room {
+  display: grid;
+  align-content: start;
+  gap: 0.45rem;
+  padding: 0.62rem;
+  border: 1px solid rgb(54 49 41 / 0.24);
+  border-radius: 0.18rem;
+  background: rgb(255 252 246 / 0.58);
+}
+
+.theme-four-map-room > button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.12rem 0.5rem;
+  padding: 0.15rem;
+  cursor: pointer;
+  border: 0;
+  color: var(--theme-four-ink);
+  background: transparent;
+  text-align: left;
+}
+
+.theme-four-map-room > button > span {
+  grid-row: span 2;
+  color: var(--theme-four-coral);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.theme-four-map-room > button > strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.92rem;
+}
+
+.theme-four-map-room > button > small {
+  overflow: hidden;
+  color: var(--theme-four-pencil);
+  font-size: 0.58rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.theme-four-map-room > button.is-active > strong {
+  color: var(--theme-four-teal);
+  text-decoration: underline;
+  text-underline-offset: 0.22rem;
+}
+
+.theme-four-map-room > div {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.theme-four-map-room > div > a {
+  display: flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.34rem 0.42rem;
+  border-radius: 0.12rem;
+  color: var(--theme-four-pencil);
+  font-size: 0.68rem;
+}
+
+.theme-four-map-room > div > a:hover,
+.theme-four-map-room > div > a:focus-visible {
+  color: var(--theme-four-ink);
+  background: #ebe2d3;
+}
+
+.theme-four-map-room > div > a svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  color: var(--theme-four-teal);
+}
+
+.theme-four-map-done {
+  justify-self: end;
+  min-height: 2.6rem;
+  padding-inline: 1rem;
+  cursor: pointer;
+  border: 1px solid rgb(54 49 41 / 0.42);
+  border-radius: 0.16rem;
+  color: #fff;
+  background: var(--theme-four-teal);
+  font-size: 0.7rem;
+  font-weight: 750;
+}
+
+/* Shared game and utility pages */
+html[data-theme='theme-four'] .game-page,
+html[data-theme='theme-four'] .app-shell[data-page='anime-tracker'] {
+  color: var(--theme-four-ink);
+  background: #e9e1d2;
+}
+
+html[data-theme='theme-four'] .game-page::before,
+html[data-theme='theme-four'] .app-shell[data-page='anime-tracker']::before {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  content: '';
+  background-image: url('/theme-four/club-corridor.webp');
+  background-position: center;
+  background-size: cover;
+  filter: grayscale(0.82) opacity(0.1);
+}
+
+html[data-theme='theme-four'] .game-page {
+  padding-left: 5.4rem;
+}
+
+html[data-theme='theme-four'] .game-page main,
+html[data-theme='theme-four'] .game-page > .game-content,
+html[data-theme='theme-four'] .app-shell[data-page='anime-tracker'] > .app-container {
+  width: min(100%, 74rem);
+  margin-inline: auto;
+}
+
+html[data-theme='theme-four'] .game-header {
+  width: min(calc(100% - 2rem), 74rem);
+  margin: 0.8rem auto 1rem;
+  border: 1px solid rgb(54 49 41 / 0.34);
+  border-radius: 0.2rem;
+  color: var(--theme-four-ink);
+  background: rgb(249 243 232 / 0.92);
+  box-shadow: 5px 6px 0 rgb(68 57 43 / 0.14);
+}
+
+html[data-theme='theme-four'] .game-header h1,
+html[data-theme='theme-four'] .settings-header h1,
+html[data-theme='theme-four'] .utility-page h1 {
+  color: var(--theme-four-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  letter-spacing: 0.01em;
+}
+
+html[data-theme='theme-four'] .game-header [data-layout-slot='description'] {
+  color: var(--theme-four-pencil);
+}
+
+html[data-theme='theme-four'] .game-header-home,
+html[data-theme='theme-four'] .game-header .theme-switcher-trigger,
+html[data-theme='theme-four'] .game-header .language-switcher-trigger,
+html[data-theme='theme-four'] .game-header .theme-two-settings-shortcut {
+  border-color: rgb(54 49 41 / 0.3);
+  border-radius: 0.15rem;
+  color: var(--theme-four-ink);
+  background: rgb(255 252 246 / 0.72);
+  box-shadow: none;
+}
+
+html[data-theme='theme-four'] .game-header .language-switcher-trigger svg {
+  color: var(--theme-four-teal);
+}
+
+html[data-theme='theme-four'] .surface-panel,
+html[data-theme='theme-four'] .surface-card,
+html[data-theme='theme-four'] [data-slot='card'] {
+  border: 1px solid rgb(54 49 41 / 0.28);
+  border-radius: 0.22rem;
+  color: var(--theme-four-ink);
+  background: rgb(249 243 232 / 0.9);
+  box-shadow: 4px 5px 0 rgb(68 57 43 / 0.12);
+}
+
+html[data-theme='theme-four'] [data-slot='button'] {
+  border-radius: 0.18rem;
+}
+
+html[data-theme='theme-four'] [data-slot='button'][data-variant='outline'],
+html[data-theme='theme-four'] [data-slot='button'][data-variant='secondary'],
+html[data-theme='theme-four'] [data-slot='button'][data-variant='ghost'] {
+  border-color: rgb(54 49 41 / 0.3);
+  color: var(--theme-four-ink);
+  background: rgb(255 252 246 / 0.7);
+}
+
+html[data-theme='theme-four'] [data-slot='button'][data-variant='outline']:hover,
+html[data-theme='theme-four'] [data-slot='button'][data-variant='secondary']:hover,
+html[data-theme='theme-four'] [data-slot='button'][data-variant='ghost']:hover {
+  color: #fff;
+  background: var(--theme-four-teal);
+}
+
+html[data-theme='theme-four'] [data-slot='input'],
+html[data-theme='theme-four'] [data-slot='select-trigger'],
+html[data-theme='theme-four'] textarea {
+  border-color: rgb(54 49 41 / 0.3);
+  border-radius: 0.16rem;
+  color: var(--theme-four-ink);
+  background: rgb(255 252 246 / 0.78);
+}
+
+html[data-theme='theme-four'] [data-slot='select-content'],
+html[data-theme='theme-four'] [data-slot='dropdown-menu-content'],
+html[data-theme='theme-four'] [data-slot='dropdown-menu-sub-content'] {
+  border-color: rgb(54 49 41 / 0.34);
+  border-radius: 0.18rem;
+  color: var(--theme-four-ink);
+  background: #fbf6ec;
+  box-shadow: 5px 6px 0 rgb(68 57 43 / 0.13), 0 18px 54px rgb(55 44 31 / 0.18);
+}
+
+html[data-theme='theme-four'] .theme-switcher-content [data-slot='dropdown-menu-radio-item'] {
+  border-radius: 0.14rem;
+}
+
+html[data-theme='theme-four'] .theme-switcher-content [data-slot='dropdown-menu-radio-item'][data-state='checked'] {
+  color: var(--theme-four-teal);
+  background: #e6ddd0;
+}
+
+html[data-theme='theme-four'] .eyebrow,
+html[data-theme='theme-four'] .memory-kicker,
+html[data-theme='theme-four'] .bingo-lan-eyebrow {
+  color: var(--theme-four-teal);
+  font-family: var(--font-geist-mono), monospace;
+  letter-spacing: 0.1em;
+}
+
+html[data-theme='theme-four'] canvas {
+  border-color: rgb(54 49 41 / 0.28) !important;
+  box-shadow: 5px 6px 0 rgb(68 57 43 / 0.14) !important;
+}
+
+html[data-theme='theme-four'] .classic-2048-shell {
+  padding: 0.85rem;
+  border: 1px solid rgb(54 49 41 / 0.3);
+  border-radius: 0.2rem;
+  background: rgb(249 243 232 / 0.92);
+  box-shadow: 5px 6px 0 rgb(68 57 43 / 0.14);
+}
+
+html[data-theme='theme-four'] .classic-2048-logo {
+  color: var(--theme-four-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+html[data-theme='theme-four'] .classic-2048-score {
+  background: var(--theme-four-teal);
+}
+
+html[data-theme='theme-four'] .classic-2048-new-game,
+html[data-theme='theme-four'] .classic-2048-message [data-slot='button'] {
+  color: #fff;
+  background: var(--theme-four-teal);
+}
+
+html[data-theme='theme-four'] .tetris-handheld {
+  border: 1px solid rgb(54 49 41 / 0.4);
+  border-radius: 0.28rem;
+  color: var(--theme-four-ink);
+  background: #d8c99f;
+  box-shadow: 6px 7px 0 rgb(68 57 43 / 0.16), 0 24px 64px rgb(56 46 32 / 0.18);
+}
+
+html[data-theme='theme-four'] .tetris-brand-blocks,
+html[data-theme='theme-four'] .tetris-function-button,
+html[data-theme='theme-four'] .tetris-drop-button {
+  color: var(--theme-four-teal);
+}
+
+html[data-theme='theme-four'] .schulte-two-stack > section,
+html[data-theme='theme-four'] .schulte-two-board-card,
+html[data-theme='theme-four'] .schulte-two-settings-card,
+html[data-theme='theme-four'] .schulte-two-stat-card {
+  border-color: rgb(54 49 41 / 0.28);
+  border-radius: 0.22rem;
+  color: var(--theme-four-ink);
+  background: rgb(249 243 232 / 0.92);
+  box-shadow: 4px 5px 0 rgb(68 57 43 / 0.12);
+}
+
+html[data-theme='theme-four'] .theme-four-route-nav {
+  position: fixed;
+  z-index: 42;
+  top: 50%;
+  left: max(0.65rem, env(safe-area-inset-left));
+  display: grid;
+  width: 4.15rem;
+  gap: 0.45rem;
+  padding: 0.45rem;
+  border: 1px solid rgb(54 49 41 / 0.38);
+  border-radius: 0.2rem;
+  background: rgb(249 243 232 / 0.94);
+  box-shadow: 5px 6px 0 rgb(68 57 43 / 0.14);
+  transform: translateY(-50%);
+}
+
+.theme-four-route-brand,
+.theme-four-route-nav > div > a {
+  display: grid;
+  min-height: 3.2rem;
+  place-items: center;
+  gap: 0.2rem;
+  border-radius: 0.14rem;
+  color: var(--theme-four-pencil);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.52rem;
+  font-weight: 750;
+}
+
+.theme-four-route-brand {
+  color: #fff;
+  background: var(--theme-four-teal);
+}
+
+.theme-four-route-nav > div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.theme-four-route-brand svg,
+.theme-four-route-nav > div > a svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.theme-four-route-nav > div > a:hover,
+.theme-four-route-nav > div > a:focus-visible,
+.theme-four-route-nav > div > a.is-active {
+  color: var(--theme-four-teal);
+  background: #e6ddd0;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt,
+html[data-theme='theme-four'] [data-slot='dialog-content'].pwa-install-guide {
+  border-color: rgb(54 49 41 / 0.38);
+  border-radius: 0.2rem;
+  color: var(--theme-four-ink);
+  background: #f8f1e5;
+  box-shadow: 6px 7px 0 rgb(68 57 43 / 0.15), 0 28px 80px rgb(55 44 31 / 0.2);
+}
+
+@media (hover: hover) {
+  .theme-four-entry:hover .theme-four-entry-scene {
+    filter: grayscale(0.18) saturate(0.9) contrast(1.01);
+  }
+}
+
+@media (max-width: 900px) {
+  .theme-four-room-markers {
+    display: none;
+  }
+
+  .theme-four-room-deck {
+    max-height: 36vh;
+    grid-template-columns: minmax(10rem, 0.65fr) minmax(0, 2fr) auto;
+  }
+
+  .theme-four-map-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-four'] [data-slot='dialog-overlay'] {
+    background: rgb(42 37 30 / 0.32);
+    backdrop-filter: blur(2px);
+  }
+
+  html[data-theme='theme-four'] .theme-four-home {
+    height: 100dvh;
+  }
+
+  .theme-four-entry-scene,
+  .theme-four-corridor-scene {
+    inset: -1.5%;
+  }
+
+  .theme-four-entry-scene {
+    background-position: 50% center;
+  }
+
+  .theme-four-entry-sign {
+    top: 17%;
+    width: 76vw;
+  }
+
+  .theme-four-entry-sign strong {
+    font-size: clamp(1.25rem, 6vw, 1.65rem);
+  }
+
+  .theme-four-entry-sign span {
+    font-size: 0.56rem;
+  }
+
+  .theme-four-door-target {
+    top: 34%;
+    left: 17%;
+    width: 66%;
+    height: 43%;
+  }
+
+  .theme-four-door-target > span {
+    bottom: 13%;
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  .theme-four-entry-note {
+    bottom: max(0.7rem, env(safe-area-inset-bottom));
+    width: calc(100% - 1.4rem);
+    padding: 0.72rem 0.78rem;
+  }
+
+  .theme-four-entry-note small {
+    font-size: 0.65rem;
+  }
+
+  .theme-four-corridor-scene {
+    background-position: 50% center;
+    transform: translate3d(calc(var(--theme-four-look-x) * -0.2rem), 0, 0) scale(1.04);
+  }
+
+  .theme-four-corridor-title {
+    display: none;
+  }
+
+  .theme-four-tool-button {
+    width: 2.75rem;
+    padding: 0;
+  }
+
+  .theme-four-tool-button > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .theme-four-explore-hint {
+    top: 4.6rem;
+  }
+
+  .theme-four-desktop-hint {
+    display: none;
+  }
+
+  .theme-four-mobile-hint {
+    display: inline;
+  }
+
+  .theme-four-room-deck {
+    right: 0.65rem;
+    bottom: calc(0.65rem + env(safe-area-inset-bottom));
+    left: 0.65rem;
+    max-height: min(45dvh, 22rem);
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto minmax(0, 1fr);
+    gap: 0.55rem;
+    padding: 0.65rem;
+  }
+
+  .theme-four-room-identity {
+    padding: 0.2rem 0.35rem 0.55rem;
+    border-right: 0;
+    border-bottom: 1px dashed rgb(54 49 41 / 0.28);
+  }
+
+  .theme-four-room-identity h1 {
+    font-size: 1.22rem;
+  }
+
+  .theme-four-room-identity p {
+    font-size: 0.62rem;
+  }
+
+  .theme-four-room-games {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .theme-four-room-games > a {
+    min-width: min(15.2rem, 74vw);
+  }
+
+  .theme-four-room-controls {
+    grid-template-columns: 2.25rem auto 2.25rem;
+    align-self: center;
+  }
+
+  .theme-four-room-controls button {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+
+  html[data-theme='theme-four'] [data-slot='dialog-content'].theme-four-map-dialog {
+    top: max(0.5rem, env(safe-area-inset-top));
+    width: calc(100vw - 1rem);
+    max-height: min(72dvh, 38rem);
+    padding: 1rem;
+    translate: -50% 0 !important;
+    transform: none;
+  }
+
+  .theme-four-map-grid {
+    grid-template-columns: 1fr;
+  }
+
+  html[data-theme='theme-four'] .game-page {
+    padding-right: 0;
+    padding-bottom: calc(4.9rem + env(safe-area-inset-bottom));
+    padding-left: 0;
+  }
+
+  html[data-theme='theme-four'] .app-shell[data-page='anime-tracker'] {
+    padding-bottom: calc(4.9rem + env(safe-area-inset-bottom));
+  }
+
+  html[data-theme='theme-four'] .game-header {
+    width: calc(100% - 1rem);
+    margin-top: 0.5rem;
+  }
+
+  html[data-theme='theme-four'] .theme-four-route-nav {
+    top: auto;
+    right: max(0.55rem, env(safe-area-inset-right));
+    bottom: max(0.45rem, env(safe-area-inset-bottom));
+    left: max(0.55rem, env(safe-area-inset-left));
+    width: auto;
+    grid-template-columns: 2.85rem minmax(0, 1fr);
+    gap: 0.3rem;
+    padding: 0.35rem;
+    transform: none;
+  }
+
+  .theme-four-route-brand {
+    min-height: 3rem;
+  }
+
+  .theme-four-route-nav > div {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .theme-four-route-nav > div > a {
+    min-height: 3rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .theme-four-brand-chip {
+    width: 2.75rem;
+    padding: 0;
+    font-size: 0;
+  }
+
+  .theme-four-brand-chip svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .theme-four-entry-toolbar,
+  .theme-four-corridor-toolbar {
+    right: 0.55rem;
+    left: 0.55rem;
+  }
+
+  .theme-four-entry-toolbar .theme-switcher-trigger,
+  .theme-four-entry-toolbar .language-switcher-trigger,
+  .theme-four-entry-toolbar a,
+  .theme-four-corridor-toolbar .theme-switcher-trigger,
+  .theme-four-corridor-toolbar .language-switcher-trigger,
+  .theme-four-tool-button {
+    width: 2.5rem !important;
+    min-height: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .theme-four-room-deck {
+    max-height: 48dvh;
+  }
+
+  .theme-four-room-games > a {
+    min-width: 13.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-four-home,
+  .theme-four-entry,
+  .theme-four-corridor,
+  .theme-four-entry-scene,
+  .theme-four-corridor-scene,
+  .theme-four-door-target > span,
+  .theme-four-room-markers > button,
+  .theme-four-room-games > a {
+    scroll-behavior: auto;
+    transition: none !important;
+  }
+}
+
+/* Theme Four WebGL host ---------------------------------------------------
+ * The reference scene runs in an iframe so its global canvas/SCSS, history,
+ * CMS and animation lifecycle cannot leak into the Next.js application.
+ */
+html[data-theme='theme-four'] .theme-four-webgl-home {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100svh;
+  min-height: 32rem;
+  overflow: hidden;
+  background: #f4f2ed;
+  opacity: 1;
+}
+
+.theme-four-webgl-frame {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #f4f2ed;
+}
+
+.theme-four-webgl-loading {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.8rem;
+  color: #3a3731;
+  background:
+    radial-gradient(circle at center, rgb(255 255 255 / 0.72), transparent 42%),
+    #f4f2ed;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+.theme-four-webgl-loading svg {
+  width: 1.45rem;
+  height: 1.45rem;
+  animation: theme-four-webgl-spin 900ms linear infinite;
+}
+
+@keyframes theme-four-webgl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.theme-four-webgl-toolbar {
+  position: absolute;
+  z-index: 12;
+  top: max(0.7rem, env(safe-area-inset-top));
+  right: max(0.72rem, env(safe-area-inset-right));
+  left: max(0.72rem, env(safe-area-inset-left));
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.65rem;
+  pointer-events: none;
+}
+
+.theme-four-webgl-toolbar > * {
+  pointer-events: auto;
+}
+
+.theme-four-webgl-brand,
+.theme-four-webgl-map-trigger,
+.theme-four-webgl-controls .theme-switcher-trigger,
+.theme-four-webgl-controls .language-switcher-trigger,
+.theme-four-webgl-controls > a {
+  display: inline-flex;
+  min-height: 2.72rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(32 30 27 / 0.68);
+  border-radius: 0.08rem;
+  color: #25231f;
+  background: rgb(250 249 245 / 0.92);
+  box-shadow: 3px 4px 0 rgb(38 35 30 / 0.14);
+  backdrop-filter: blur(6px);
+}
+
+.theme-four-webgl-brand {
+  gap: 0.58rem;
+  padding: 0.48rem 0.72rem;
+  transform: rotate(-0.25deg);
+}
+
+.theme-four-webgl-brand > svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  color: #2b7777;
+}
+
+.theme-four-webgl-brand > span {
+  display: grid;
+  gap: 0.04rem;
+}
+
+.theme-four-webgl-brand strong,
+.theme-four-webgl-brand small,
+.theme-four-webgl-map-trigger {
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.theme-four-webgl-brand strong {
+  font-size: 0.7rem;
+  letter-spacing: 0.13em;
+}
+
+.theme-four-webgl-brand small {
+  color: #686158;
+  font-size: 0.54rem;
+  letter-spacing: 0.04em;
+}
+
+.theme-four-webgl-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+}
+
+.theme-four-webgl-map-trigger {
+  gap: 0.42rem;
+  min-width: 2.72rem;
+  padding-inline: 0.72rem;
+  cursor: pointer;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.theme-four-webgl-map-trigger svg,
+.theme-four-webgl-controls .theme-switcher-trigger svg,
+.theme-four-webgl-controls .language-switcher-trigger svg,
+.theme-four-webgl-controls > a svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.theme-four-webgl-controls .theme-switcher-trigger,
+.theme-four-webgl-controls .language-switcher-trigger,
+.theme-four-webgl-controls > a {
+  width: 2.72rem !important;
+  height: 2.72rem;
+  padding: 0 !important;
+}
+
+.theme-four-webgl-controls .language-switcher-compact-label {
+  display: none;
+}
+
+.theme-four-webgl-map-trigger:hover,
+.theme-four-webgl-map-trigger:focus-visible,
+.theme-four-webgl-controls > a:hover,
+.theme-four-webgl-controls > a:focus-visible {
+  color: #2b7777;
+  background: #fffefa;
+  transform: translateY(-1px);
+}
+
+.theme-four-map-room-heading {
+  display: grid;
+  gap: 0.18rem;
+  padding: 0.72rem 0.76rem;
+  border-bottom: 1px dashed rgb(56 51 43 / 0.24);
+  background: rgb(234 226 213 / 0.48);
+}
+
+.theme-four-map-room-heading > span {
+  color: var(--theme-four-coral);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.53rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.theme-four-map-room-heading > strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1rem;
+}
+
+.theme-four-map-room-heading > small {
+  color: var(--theme-four-pencil);
+  font-size: 0.67rem;
+  line-height: 1.35;
+}
+
+.theme-four-map-room > div > a > small {
+  margin-left: auto;
+  color: var(--theme-four-coral);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-four'] .theme-four-webgl-home {
+    min-height: 100svh;
+  }
+
+  .theme-four-webgl-brand {
+    width: 2.72rem;
+    height: 2.72rem;
+    padding: 0;
+  }
+
+  .theme-four-webgl-brand > span {
+    display: none;
+  }
+
+  .theme-four-webgl-map-trigger {
+    width: 2.72rem;
+    padding: 0;
+  }
+
+  .theme-four-webgl-map-trigger > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 380px) {
+  .theme-four-webgl-toolbar {
+    gap: 0.3rem;
+  }
+
+  .theme-four-webgl-controls {
+    gap: 0.25rem;
+  }
+
+  .theme-four-webgl-brand,
+  .theme-four-webgl-map-trigger,
+  .theme-four-webgl-controls .theme-switcher-trigger,
+  .theme-four-webgl-controls .language-switcher-trigger,
+  .theme-four-webgl-controls > a {
+    width: 2.48rem !important;
+    height: 2.48rem;
+    min-height: 2.48rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-four-webgl-loading svg {
+    animation: none;
+  }
+}

@@ -1,0 +1,270 @@
+.xm-room-overlay {
+    position: fixed;
+    z-index: 90;
+    inset: max(9.5rem, calc(env(safe-area-inset-top) + 8.75rem)) 1.5rem 1.5rem;
+    display: grid;
+    place-items: center;
+    pointer-events: none;
+    color: #25231f;
+}
+
+.xm-room-paper {
+    position: relative;
+    width: min(64rem, 100%);
+    max-height: 100%;
+    overflow: auto;
+    padding: clamp(1.25rem, 3vw, 2.35rem);
+    pointer-events: auto;
+    border: 1px solid rgb(37 35 31 / 0.55);
+    background:
+        linear-gradient(rgb(255 253 247 / 0.94), rgb(247 240 227 / 0.96)),
+        url('/theme-four-experience/textures/paper-texture.webp') center / cover;
+    box-shadow: 8px 10px 0 rgb(37 35 31 / 0.14), 0 24px 80px rgb(37 35 31 / 0.24);
+    clip-path: polygon(0.4% 0, 99.5% 0.5%, 100% 99%, 98.5% 100%, 1% 99.6%, 0 2%);
+    scrollbar-width: thin;
+    scrollbar-color: #286f72 transparent;
+}
+
+.xm-room-paper::before {
+    content: '';
+    position: absolute;
+    inset: 0.55rem;
+    border: 1px dashed rgb(37 35 31 / 0.25);
+    pointer-events: none;
+}
+
+.xm-room-paper > header,
+.xm-room-catalog,
+.xm-room-summary {
+    position: relative;
+    z-index: 1;
+}
+
+.xm-room-paper > header {
+    display: grid;
+    gap: 0.35rem;
+    max-width: 48rem;
+    margin-bottom: 1.25rem;
+}
+
+.xm-room-paper > header > span,
+.xm-room-category > div:first-child > strong,
+.xm-room-game-link em,
+.xm-room-summary li span {
+    font-family: 'Cabin Sketch', ui-monospace, monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.xm-room-paper > header > span {
+    color: #286f72;
+    font-size: 0.72rem;
+    font-weight: 700;
+}
+
+.xm-room-paper h1 {
+    margin: 0;
+    font-family: 'Fredericka the Great', Georgia, serif;
+    font-size: clamp(2rem, 5vw, 4.5rem);
+    font-weight: 400;
+    line-height: 0.95;
+}
+
+.xm-room-paper header p {
+    max-width: 42rem;
+    margin: 0.35rem 0 0;
+    color: #5f594f;
+    font-family: 'Cabin Sketch', ui-monospace, monospace;
+    font-size: clamp(0.92rem, 1.7vw, 1.08rem);
+    line-height: 1.55;
+}
+
+.xm-room-catalog {
+    display: grid;
+    gap: 1rem;
+}
+
+.xm-room-category {
+    display: grid;
+    grid-template-columns: minmax(8rem, 0.28fr) minmax(0, 1fr);
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgb(37 35 31 / 0.24);
+}
+
+.xm-room-category > div:first-child {
+    display: grid;
+    align-content: start;
+    gap: 0.25rem;
+}
+
+.xm-room-category > div:first-child > strong {
+    font-size: 0.85rem;
+}
+
+.xm-room-category > div:first-child > small {
+    color: #70695e;
+    font-family: 'Cabin Sketch', ui-monospace, monospace;
+    line-height: 1.35;
+}
+
+.xm-room-game-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.55rem;
+}
+
+.xm-room-game-link {
+    display: flex;
+    min-width: 0;
+    min-height: 3.75rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.65rem 0.75rem;
+    border: 1px solid rgb(37 35 31 / 0.28);
+    color: inherit;
+    background: rgb(255 253 247 / 0.62);
+    cursor: pointer;
+    text-align: left;
+    transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+
+.xm-room-game-link:hover,
+.xm-room-game-link:focus-visible {
+    transform: translate(-2px, -2px);
+    border-color: #286f72;
+    background: #fffdf7;
+    outline: none;
+    box-shadow: 3px 3px 0 rgb(40 111 114 / 0.22);
+}
+
+.xm-room-game-link > span {
+    display: grid;
+    min-width: 0;
+    gap: 0.1rem;
+}
+
+.xm-room-game-link strong,
+.xm-room-game-link small {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.xm-room-game-link strong {
+    font-family: 'Cabin Sketch', ui-monospace, monospace;
+    font-size: 1rem;
+}
+
+.xm-room-game-link small {
+    color: #746c60;
+    font-size: 0.72rem;
+}
+
+.xm-room-game-link em {
+    flex: none;
+    color: #286f72;
+    font-size: 0.65rem;
+    font-style: normal;
+}
+
+.xm-room-loading {
+    margin: 0;
+    padding: 2rem;
+    border: 1px dashed rgb(37 35 31 / 0.3);
+    font-family: 'Cabin Sketch', ui-monospace, monospace;
+    text-align: center;
+}
+
+.xm-room-summary {
+    display: grid;
+    gap: 1.25rem;
+}
+
+.xm-room-summary ol {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.xm-room-summary li {
+    display: grid;
+    gap: 0.65rem;
+    min-height: 8rem;
+    padding: 1rem;
+    border: 1px solid rgb(37 35 31 / 0.28);
+    background: rgb(255 253 247 / 0.6);
+}
+
+.xm-room-summary li span {
+    color: #c97758;
+    font-size: 0.75rem;
+}
+
+.xm-room-summary li strong {
+    align-self: end;
+    font-family: 'Cabin Sketch', ui-monospace, monospace;
+    font-size: 1.08rem;
+    line-height: 1.35;
+}
+
+.xm-room-summary > button {
+    justify-self: start;
+    min-height: 3rem;
+    padding: 0.65rem 1rem;
+    border: 1px solid #25231f;
+    color: #fffdf7;
+    background: #286f72;
+    box-shadow: 4px 4px 0 rgb(37 35 31 / 0.18);
+    cursor: pointer;
+    font-family: 'Cabin Sketch', ui-monospace, monospace;
+    font-size: 1rem;
+}
+
+.xm-room-summary > button:hover,
+.xm-room-summary > button:focus-visible {
+    transform: translate(-1px, -1px);
+    outline: 2px solid #25231f;
+    outline-offset: 3px;
+}
+
+@media (max-width: 720px) {
+    .xm-room-overlay {
+        inset: max(8rem, calc(env(safe-area-inset-top) + 7.3rem)) 0.65rem max(0.65rem, env(safe-area-inset-bottom));
+        place-items: stretch;
+    }
+
+    .xm-room-paper {
+        width: 100%;
+        padding: 1.2rem 1rem 1.35rem;
+    }
+
+    .xm-room-category {
+        grid-template-columns: 1fr;
+        gap: 0.6rem;
+    }
+
+    .xm-room-game-grid,
+    .xm-room-summary ol {
+        grid-template-columns: 1fr;
+    }
+
+    .xm-room-game-link {
+        min-height: 3.5rem;
+    }
+
+    .xm-room-summary li {
+        min-height: 5.25rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .xm-room-game-link,
+    .xm-room-summary > button {
+        transition: none;
+    }
+}

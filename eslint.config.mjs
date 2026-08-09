@@ -16,6 +16,8 @@ export default defineConfig([
     ".next/**",
     "out/**",
     "build/**",
+    "public/theme-four-experience/**",
+    "vendor/theme-four-experience/**",
     "next-env.d.ts",
   ]),
 ])

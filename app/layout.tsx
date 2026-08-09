@@ -5,6 +5,7 @@ import { LocaleProvider } from '@/lib/locale-context'
 import { ThemeProvider } from '@/components/theme-provider'
 import { ThemeTwoTabBar } from '@/components/theme-two-tab-bar'
 import { ThemeThreeNavigation } from '@/components/theme-three-navigation'
+import { ThemeFourNavigation } from '@/components/theme-four-navigation'
 import { PwaRegister } from '@/components/pwa-register'
 import { PwaInstallPrompt } from '@/components/pwa-install-prompt'
 import { getPageMetadata } from '@/lib/page-metadata'
@@ -17,10 +18,13 @@ import './classic-games.css'
 import './theme-one-classic-games.css'
 import './theme-two-classic-games.css'
 import './theme-three-classic-games.css'
+import './theme-four-classic-games.css'
 import './schulte-grid.css'
 import './theme-one-schulte-grid.css'
 import './theme-two-schulte-grid.css'
 import './theme-three-schulte-grid.css'
+import './theme-four-schulte-grid.css'
+import './theme-four.css'
 
 const geist = Geist({
   subsets: ['latin'],
@@ -89,6 +93,7 @@ export default function RootLayout({
             {children}
             <ThemeTwoTabBar />
             <ThemeThreeNavigation />
+            <ThemeFourNavigation />
             <PwaInstallPrompt />
           </LocaleProvider>
         </ThemeProvider>

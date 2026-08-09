@@ -525,6 +525,142 @@ direction controls measure 48×44 CSS pixels.
 
 final result: passed
 
+# Theme Four WebGL replacement design QA (2026-08-09)
+
+This report supersedes the earlier Theme Four 2.5D raster-scene QA above. The
+rejected raster implementation has been replaced by an isolated build of the
+reference project's real React Three Fiber scene.
+
+**Source visual truth**
+
+- Local reference source: `/Users/mimi/Documents/Improvement/portfolio-itom`
+- Desktop entry, 1280 × 720: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-theme4-3d-qa/reference-entry-1280x720.png`
+- Desktop corridor, 1280 × 720: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-theme4-3d-qa/reference-corridor-1280x720.png`
+- Mobile entry, 390 × 844: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-audit/08-mobile-entry-390x844.png`
+
+**Rendered implementation evidence**
+
+- Production desktop entry, 1280 × 720: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-theme4-3d-qa/target-production-entry-1280x720.png`
+- Production desktop corridor, 1280 × 720: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-theme4-3d-qa/target-production-corridor-1280x720.png`
+- Mobile entry and walked corridor, 390 × 844: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-theme4-3d-qa/target-ready-390x844.png`, `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-theme4-3d-qa/target-walk-390x844.png`
+- Short-screen entry and game map, 320 × 568: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-theme4-3d-qa/target-entry-320x568.png`, `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-theme4-3d-qa/target-map-320x568.png`
+
+**Viewport and normalization**
+
+- Desktop source and implementation: 1280 × 720 pixels and CSS pixels,
+  device scale factor 1; no density normalization required.
+- Mobile source and implementation: 390 × 844 pixels and CSS pixels,
+  device scale factor 1; no density normalization required.
+- Implementation-only regression viewport: 320 × 568 CSS pixels.
+- States: fully loaded entry, post-door camera flight, corridor scroll advance,
+  map open/scrolled, Theme One reload, Theme Four reload.
+
+**Full-view comparison evidence**
+
+- Desktop entry side by side (source left, implementation right): `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-theme4-3d-qa/desktop-entry-comparison.png`
+- Desktop corridor side by side (source left, implementation right): `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-theme4-3d-qa/desktop-corridor-comparison.png`
+- Mobile entry side by side (source left, implementation right): `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-theme4-3d-qa/mobile-entry-comparison.png`
+
+**Focused-region comparison evidence**
+
+- No additional crop was required: the source scene and embedded scene use the
+  same R3F geometry, textures, shaders, fonts, camera settings and responsive
+  crop. The full-view desktop and mobile comparisons keep the entrance door,
+  sign, path, paper hint, wall texture and corridor avatar readable at 1:1.
+- The XM-Games game map is an intentional host-layer extension rather than a
+  reference-fidelity surface. It was checked separately at 320 × 568: all 22
+  route links are present, the lower tools are reachable by internal scrolling,
+  and the close action remains visible.
+
+**Required fidelity surfaces**
+
+- Fonts and typography: the iframe loads the reference Cabin Sketch, Frederika
+  the Great and Rubik Scribble assets and the original CSS. The entry hint,
+  labels and corridor text therefore match source family, weight, scale, line
+  height and letter spacing. Host controls use the existing XM-Games mono/serif
+  hierarchy and remain legible in Chinese, English and Thai.
+- Spacing and layout rhythm: entrance geometry, camera framing, path crop,
+  corridor perspective, door placement and mobile crop are the reference
+  implementation itself. The only visible addition is a compact host toolbar;
+  320 × 568 metrics were `scrollWidth = clientWidth = 320` for both host and
+  iframe, so no horizontal overflow or control collision remains.
+- Colors and visual tokens: the WebGL scene uses the reference textures,
+  material colors, fog and monochrome/reveal behavior without approximation.
+  The host map continues the existing Theme Four paper, ink and teal tokens.
+- Image quality and asset fidelity: source WebP textures and animation frames
+  are copied at their original dimensions. No screenshot background, generated
+  replacement, CSS drawing, inline SVG illustration or stretched sprite is
+  used for the 3D scene.
+- Copy and content: reference-world labels and tutorial copy remain unchanged
+  inside the isolated scene to meet the exact-display request. XM-Games-specific
+  copy lives in the host toolbar and map, which exposes six real categories and
+  all 22 existing routes.
+- Icons and affordances: source WebGL hotspots, source paper UI and source
+  navigation remain functional. Host map/theme/language/settings controls use
+  the existing Lucide family, semantic labels and focus behavior.
+- Accessibility and motion: the iframe has a descriptive title and retains the
+  reference screen-reader navigation. The host map is a labelled dialog with
+  semantic links and close controls. Mobile targets, 320/390 responsive layout
+  and reduced-motion loading fallback were checked; the requested 3D scene
+  intentionally retains its spatial animation.
+
+**Comparison history**
+
+1. 2.5D scene substitution — P1. The prior implementation used static raster
+   scenes and CSS parallax, so it could not reproduce camera depth, door motion,
+   looping corridor segments or room transitions. Fixed by replacing it with an
+   isolated build of the reference R3F source. Post-fix evidence:
+   `desktop-entry-comparison.png`, `desktop-corridor-comparison.png` and
+   `mobile-entry-comparison.png`.
+2. Reference service leakage — P1 integration risk. The original source
+   initialized PostHog, automatically requested Sanity and synchronized its own
+   room paths. Fixed in the embedded fork by disabling those integrations and
+   keeping all fallback room content local. Production interaction logs contain
+   no warnings or errors.
+3. Theme-wide WebGL cost — P2. Mounting the iframe with the other themes would
+   load the 3D bundle and consume a WebGL context while hidden. Fixed by gating
+   the iframe with `themeLoadsWebglExperience`; a Theme One reload produced
+   `iframeCount = 0`, while Theme Four produced `iframeCount = 1`.
+
+**Primary interactions tested**
+
+- Select Theme Four through the real theme menu.
+- Click/tap a door and complete the door rotation plus camera flight.
+- Scroll through the corridor on desktop and 390px mobile until side-room doors
+  enter the viewport.
+- Open, scroll and close the XM-Games map at 1280 and 320 widths; all 22 links
+  are available.
+- Switch to Theme One, reload and confirm the 3D iframe is absent; switch back
+  and confirm it mounts again.
+- Production preview console checked after the full interaction run: no warnings
+  or errors.
+
+**Automated checks**
+
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test` — 58 files, 397 tests
+- `pnpm build` — Theme Four Vite bundle plus all Next.js routes generated
+- Theme Four bundle: 692 modules; entry bundle 1.212 MB / 347 KB gzip and lazy
+  experience chunk 335 KB / 104 KB gzip
+
+**Findings**
+
+- No actionable P0, P1 or P2 visual or interaction findings remain.
+- Intentional deviation: the XM-Games host toolbar and game map sit above the
+  exact reference canvas so users can switch themes and enter real game routes.
+- Publication boundary: the upstream MIT code notice is retained, but the
+  upstream README separately restricts reuse of personal textures, images and
+  copy. Permission must be confirmed before deploying these exact assets.
+
+**Follow-up polish**
+
+- P3: replace the reference portfolio labels and personal room content only
+  after equivalent licensed/original textures exist; doing so now would reduce
+  the requested visual fidelity.
+
+final result: passed
+
 ## Alternating number-letter trail QA
 
 ### Scope and architecture
@@ -682,5 +818,145 @@ final result: passed
 - `pnpm build` — `/schulte-grid` statically generated with all 26 application
   pages and existing LAN API routes
 - `git diff --check`
+
+final result: passed
+
+---
+
+# Theme Four design QA
+
+**Source visual truth**
+
+- Desktop entrance: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-audit/02-desktop-door-hover.png`
+- Desktop corridor: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-audit/03-desktop-corridor.png`
+- Mobile map: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-audit/12-mobile-menu-390x844.png`
+
+**Rendered implementation evidence**
+
+- Desktop entrance: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/xm-games-theme-four/desktop-entry-1440x900.png`
+- Desktop corridor: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/xm-games-theme-four/desktop-corridor-1440x900.png`
+- Mobile entry and corridor: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/xm-games-theme-four/mobile-entry-390x844.png`, `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/xm-games-theme-four/mobile-corridor-390x844.png`
+- Mobile map final: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/xm-games-theme-four/mobile-map-final-390x844.png`
+- Responsive game routes: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/xm-games-theme-four/mobile-2048-nav-390x844.png`, `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/xm-games-theme-four/mobile-bingo-390x844.png`, `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/xm-games-theme-four/mobile-schulte-390x844.png`
+
+**Viewport and normalization**
+
+- Desktop source and implementation: 1440 × 900 pixels, 1440 × 900 CSS pixels, device scale factor 1. No density normalization required.
+- Mobile source and implementation: 390 × 844 pixels, 390 × 844 CSS pixels, device scale factor 1. No density normalization required.
+- Small-screen implementation-only regression: 320 × 568 CSS pixels.
+- States: entrance hover/focus language, entered corridor, room selected, map open, game route, and theme-switch state preservation.
+
+**Full-view comparison evidence**
+
+- Desktop entrance side by side: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/xm-games-theme-four/comparisons/entry-desktop-side-by-side.png`
+- Desktop corridor side by side: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/xm-games-theme-four/comparisons/corridor-desktop-side-by-side.png`
+- Mobile map before and after: `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/xm-games-theme-four/comparisons/map-mobile-side-by-side-before.png`, `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/xm-games-theme-four/comparisons/map-mobile-side-by-side-after.png`
+
+**Focused-region comparison evidence**
+
+- The map footer and close control were inspected at their exact bounding boxes after the first desktop defect.
+- Mobile map content was measured directly: the final viewport exposes a constrained 405px scroll region for 1271px of content and keeps the close action inside the paper sheet.
+- Mobile game boards were inspected separately because their typography, controls, and persistent navigation are too small to judge in a full-view entrance comparison.
+
+**Required fidelity surfaces**
+
+- Fonts and typography: serif display headings and compact monospaced labels preserve the reference's printed/sketchbook hierarchy. Chinese, English, and Thai retain the project's existing fallbacks and do not clip at tested widths.
+- Spacing and layout rhythm: entrance door, sign, top controls, corridor perspective, room markers, bottom deck, and mobile paper map preserve the source hierarchy. 320px, 390px, and 1440px checks show no horizontal overflow or persistent-control collision.
+- Colors and visual tokens: warm paper, graphite ink, muted teal, ochre, and coral replace the reference's personal palette while preserving the monochrome-to-watercolor interaction language and usable contrast.
+- Image quality and asset fidelity: both visible scenes are original 1536-class raster assets encoded as WebP. No source personal artwork, inline SVG illustration, CSS drawing, placeholder, stretched screenshot, or copied character is used.
+- Copy and content: all labels describe XM-Games rooms and real routes; the map exposes all 22 existing experiences. Copy is localized for Chinese, English, and Thai.
+- Icons and affordances: Lucide icons use a consistent stroke family; door, map, room, previous/next, theme, language, settings, and route controls have semantic labels and visible focus states.
+- Accessibility and motion: semantic buttons/links/dialog, keyboard arrows, scroll, drag/swipe, reduced-motion overrides, practical mobile targets, and focus-visible states were verified.
+
+**Comparison history**
+
+1. Desktop map footer — P2. The shared dialog-close selector compressed the text close action to icon width. Fixed by excluding `.theme-four-map-done`; post-fix evidence: `desktop-map-fixed-1440x900.png`.
+2. Mobile map overflow — P1. The map grid expanded to 1271px inside an 828px dialog, hiding lower rooms and the close action. Fixed with `grid-template-rows: auto minmax(0, 1fr) auto`; post-fix grid is 625px with internal scrolling and the close action remains visible.
+3. Classic game layout — P1. The first Theme Four 2048 render lacked the theme-owned board layout. Fixed by adding isolated Theme Four classic and Schulte layout suites; post-fix evidence: `mobile-2048-nav-390x844.png` and `mobile-schulte-390x844.png`.
+4. Mobile map fidelity — P2. The first implementation filled the complete viewport while the source uses a paper sheet over a visible corridor. Fixed by constraining the sheet to 72dvh, anchoring it near the top, and lightening the mobile backdrop; post-fix evidence: `map-mobile-side-by-side-after.png`.
+
+**Primary interactions tested**
+
+- Switch Theme One → Theme Four from the real theme menu.
+- Enter through the door and return outside.
+- Change rooms with buttons, keyboard/wheel controls, and an actual horizontal drag.
+- Open, scroll, and close the room map; launch 2048, Bingo, and Schulte Grid.
+- Switch away from Theme Four and back while a 2048 board is active; tile state remained identical (`[2,4,2]`).
+- Browser console checked after interaction run: no warnings or errors.
+
+**Findings**
+
+- No actionable P0, P1, or P2 findings remain.
+- Intentional deviation: original generated XM-Games scenes and app-specific room content replace the reference creator's restricted personal characters, logos, text, textures, and portfolio narrative.
+
+**Follow-up polish**
+
+- P3: optional ambient audio could be added later only with a separately licensed or original sound asset and an explicit mute preference.
+
+final result: passed
+
+---
+
+# Theme Four XM-Games room replacement QA (2026-08-09)
+
+**Scope and root cause**
+
+- The room return control existed inside the embedded 3D experience, but its
+  original top offset placed it underneath the XM-Games host toolbar.
+- The source portfolio's Gallery, Studio, About, and Contact components were
+  still mounted after entering a door, so the room narrative remained the
+  original author's even though the host shell had XM-Games branding.
+
+**Implemented room architecture**
+
+- The host sends a localized, route-derived game manifest to the same-origin
+  Theme Four iframe. Navigation messages are accepted only from that exact
+  iframe, at the current origin, and for routes present in the manifest.
+- Gallery is now a dedicated **Game Hall** containing the project's real game
+  routes. Contact is an **Offline Toolbox**. Studio is a **LAN Lounge** summary,
+  and About describes XM-Games without duplicating playable entries.
+- The original room component tree is no longer imported or prewarmed. Runtime
+  room rendering uses a neutral paper-textured 3D shell plus localized
+  XM-Games overlays.
+- The original author avatar, achievement copy, console signature, empty-canvas
+  contact solicitation, and unused avatar-animation preload list were removed
+  from the runtime path.
+
+**Rendered evidence**
+
+- Final entrance branding:
+  `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-theme4-3d-qa/xm-games-entrance-final.png`
+- Desktop Game Hall and return control:
+  `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-theme4-3d-qa/xm-games-game-hall-desktop-final.png`
+- 320 × 568 Game Hall:
+  `/Users/mimi/.codex/visualizations/2026/08/08/019fe27e-6119-75f1-bf78-eef9cb8ec0c8/itom-theme4-3d-qa/xm-games-game-hall-320-final.png`
+
+**Interaction and responsive checks**
+
+- Entered through the real WebGL entrance door, moved down the corridor, and
+  clicked the real XM GAMES door.
+- Desktop, 390 × 844, and 320 × 568 all keep the return control below the host
+  toolbar. Returning completes the room-exit transition and restores the
+  corridor.
+- At 320px, the room paper measured 300px client width and 300px scroll width,
+  with a 445px internal viewport for 1467px of catalog content: vertical
+  scrolling is contained and there is no horizontal overflow.
+- Clicking the visible BINGO entry navigated the parent application to the real
+  `/bingo` route and rendered its BINGO heading.
+- Browser console after the interaction run: no warnings or errors.
+
+**Build evidence**
+
+- Theme Four source build: 670 modules; room experience chunk 201.18 kB
+  (66.12 kB gzip).
+- `pnpm lint`
+- `pnpm typecheck`
+- `pnpm test` — 58 files, 397 tests
+- `pnpm build` — Theme Four Vite build plus all 27 Next.js pages and LAN API
+  routes generated successfully
+- `git diff --check`
+
+The remaining Vite message is its standard large-entry-chunk advisory; the
+room experience itself remains lazy-loaded and was reduced to about 201 kB.
 
 final result: passed

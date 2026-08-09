@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "pnpm run build:theme-four && next build",
+    "build:theme-four": "pnpm --filter @xm-games/theme-four-experience build && mkdir -p public/theme-four-experience/assets && rsync -a --delete vendor/theme-four-experience/dist/assets/ public/theme-four-experience/assets/ && rsync -a vendor/theme-four-experience/dist/index.html public/theme-four-experience/index.html",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit --incremental false",
