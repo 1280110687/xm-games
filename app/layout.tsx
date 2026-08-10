@@ -8,6 +8,7 @@ import { ThemeThreeNavigation } from '@/components/theme-three-navigation'
 import { ThemeFourNavigation } from '@/components/theme-four-navigation'
 import { PwaRegister } from '@/components/pwa-register'
 import { PwaInstallPrompt } from '@/components/pwa-install-prompt'
+import { DEFAULT_LOCALE, localeHtmlLang } from '@/lib/i18n'
 import { getPageMetadata } from '@/lib/page-metadata'
 import { themeBootstrapScript } from '@/lib/theme'
 import './globals.css'
@@ -36,7 +37,7 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  ...getPageMetadata('/', 'zh'),
+  ...getPageMetadata('/', DEFAULT_LOCALE),
   applicationName: 'XM-Games',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
@@ -81,7 +82,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="zh-CN"
+      lang={localeHtmlLang[DEFAULT_LOCALE]}
       className="dark"
       data-theme="theme-one"
       suppressHydrationWarning

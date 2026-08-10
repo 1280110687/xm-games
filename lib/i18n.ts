@@ -2,6 +2,8 @@ export type Locale = "zh" | "en" | "th"
 
 export const locales: Locale[] = ["zh", "en", "th"]
 
+export const DEFAULT_LOCALE: Locale = "en"
+
 export const localeHtmlLang: Record<Locale, string> = {
   zh: "zh-CN",
   en: "en",
@@ -1351,4 +1353,22 @@ export function getTranslation(locale: Locale, key: TranslationKey): string {
 
 export function isLocale(value: unknown): value is Locale {
   return typeof value === "string" && locales.includes(value as Locale)
+}
+
+export function resolveInitialLocale(
+  savedLocale: unknown,
+  systemLanguageTags: readonly string[],
+): Locale {
+  if (isLocale(savedLocale)) return savedLocale
+
+  for (const languageTag of systemLanguageTags) {
+    const language = languageTag
+      .trim()
+      .toLowerCase()
+      .replaceAll("_", "-")
+      .split("-")[0]
+    if (isLocale(language)) return language
+  }
+
+  return DEFAULT_LOCALE
 }
