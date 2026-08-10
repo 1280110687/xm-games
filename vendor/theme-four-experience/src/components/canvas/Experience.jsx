@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 
 import InfiniteCorridorManager from './corridor/InfiniteCorridorManager';
+import { SEGMENT_LENGTH } from './corridor/CorridorSegment';
 import EntranceDoors from './entrance/EntranceDoors';
 import EmptyCorridor from './entrance/EmptyCorridor';
 import TeleportRoom from './corridor/TeleportRoom';
@@ -34,7 +35,7 @@ const Experience = ({ isLoaded, onSceneReady, performanceTier }) => {
     // Camera control - both scroll and parallax only work after entering
     // Disable during teleporting to prevent scroll interference
     const { setCameraOverride } = useInfiniteCamera({
-        segmentLength: 80,
+        segmentLength: SEGMENT_LENGTH,
         scrollSpeed: 0.025,
         parallaxIntensity: 0.4,
         smoothing: 0.06,
@@ -114,4 +115,3 @@ const Experience = ({ isLoaded, onSceneReady, performanceTier }) => {
 };
 
 export default Experience;
-

@@ -9,9 +9,11 @@ import { AudioProvider, useAudio } from './context/AudioManager';
 import { initAudio } from './utils/audioManager';
 import { PerformanceProvider, usePerformance } from './context/PerformanceContext';
 import { SceneProvider } from './context/SceneContext';
+import { TreasureHuntProvider } from './context/TreasureHuntContext';
 import NavigationUI from './components/ui/NavigationUI';
 import ScreenReaderOverlay from './components/ui/ScreenReaderOverlay';
 import XmGamesRoomOverlay from './components/ui/XmGamesRoomOverlay';
+import TreasureHuntHud from './components/ui/TreasureHuntHud';
 
 // Lazy load the heavy 3D experience
 const Experience = lazy(() => import('./components/canvas/Experience'));
@@ -120,8 +122,9 @@ function AppContent() {
   return (
     <AudioProvider>
       <SceneProvider>
-        <GlobalAudioEnabler />
-        <div className="app">
+        <TreasureHuntProvider>
+          <GlobalAudioEnabler />
+          <div className="app">
           {/* Full screen 3D Canvas */}
           <div className="canvas-wrapper">
             <Canvas
@@ -170,6 +173,7 @@ function AppContent() {
             <>
               <NavigationUI />
               <XmGamesRoomOverlay />
+              <TreasureHuntHud />
               <PaperTransition />
               <ScreenReaderOverlay />
             </>
@@ -180,7 +184,8 @@ function AppContent() {
             ready={sceneReady}
             onComplete={() => setIsLoaded(true)}
           />
-        </div>
+          </div>
+        </TreasureHuntProvider>
       </SceneProvider>
     </AudioProvider>
   );

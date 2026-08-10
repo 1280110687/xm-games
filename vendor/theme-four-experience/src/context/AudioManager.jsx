@@ -82,7 +82,9 @@ export const AudioProvider = ({ children }) => {
             'szummiasta': '/theme-four-experience/sounds/szummiasta.mp3', // Szum miasta w pokoju The Gallery
             'uchyleniedrzwi': '/theme-four-experience/sounds/uchyleniedrzwi.mp3', // Skrzypienie przy najechaniu
             'otwarciedrzwi': '/theme-four-experience/sounds/otwarciedrzwi.mp3',   // Otwarcie głównych/bocznych drzwi
-            'zamknieciedrzwi': '/theme-four-experience/sounds/zamknieciedrzwi.mp3' // Zamykanie drzwi
+            'zamknieciedrzwi': '/theme-four-experience/sounds/zamknieciedrzwi.mp3', // Zamykanie drzwi
+            'pencil': '/theme-four-experience/sounds/papersound.mp3',
+            'tear': '/theme-four-experience/sounds/papersound.mp3',
         };
         const path = soundPaths[soundName] || `/theme-four-experience/sounds/${soundName}.mp3`;
 

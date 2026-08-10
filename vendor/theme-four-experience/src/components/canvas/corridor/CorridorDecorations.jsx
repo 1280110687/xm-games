@@ -352,7 +352,7 @@ const CorridorDecorations = ({ segmentLength, zOffset, corridorWidth = 4, corrid
         const LIGHT_START_OFFSET = -5;  // Start z zapasem od początku (bo tam są drzwi poprzedniego segmentu)
 
         const startZ = zOffset + LIGHT_START_OFFSET;
-        const endZ = zOffset - segmentLength + 10; // Zapas od końca (SegmentDoors jest na -75)
+        const endZ = zOffset - segmentLength + 10; // Leave clearance before the segment loop doors.
 
         for (let z = startZ; z > endZ; z -= LIGHT_SPACING) {
             items.push({ z });

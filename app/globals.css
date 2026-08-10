@@ -68,6 +68,8 @@
   html {
     min-width: 320px;
     background: var(--background);
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {

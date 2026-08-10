@@ -15,10 +15,12 @@ import CorridorDecorations from './CorridorDecorations';
  * A single repeatable chunk of the infinite corridor.
  * Each segment contains: walls, avatar, ITOM text, doors, decorations.
  * 
- * Segment length: 80 units
+ * Segment length: 96 units
  * Positioned based on segmentIndex * segmentLength
  */
-const SEGMENT_LENGTH = 80;
+// The original 80-unit segment became crowded after adding the fifth room.
+// Keep a full exhibit bay between the treasure room and the loop doors.
+const SEGMENT_LENGTH = 96;
 
 // Sawtooth Geometry Constants (Shared with CorridorWalls logic conceptually)
 const WALL_X_OUTER = 3.5;
@@ -37,7 +39,7 @@ const CorridorSegment = ({
 }) => {
 
     // Calculate Z offset based on segment index
-    // Segment 0 starts at Z=10, goes to Z=-70
+    // Segment 0 starts at Z=10, goes to Z=-86
     const zOffset = 10 - (segmentIndex * SEGMENT_LENGTH);
 
     // Door positions within this segment (relative to segment start)
@@ -79,6 +81,15 @@ const CorridorSegment = ({
                 label: "LET'S CONNECT",
                 icon: '✉',
                 color: '#f5e6e6'
+            },
+            {
+                id: `treasure-${segmentIndex}`,
+                roomId: 'treasure',
+                relativeZ: -78,
+                side: 'left',
+                label: 'TREASURE HUNT',
+                icon: '◆',
+                color: '#f5e6cf'
             },
         ];
 

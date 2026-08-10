@@ -12,8 +12,8 @@ const SegmentVisibilityWrapper = ({ children, segmentIndex }) => {
     const { camera } = useThree();
 
     // Z bounds for this segment
-    // Segment 0: Z=10 to Z=-70
-    // Segment 1: Z=-70 to Z=-150
+    // Segment 0: Z=10 to Z=-86
+    // Segment 1: Z=-86 to Z=-182
     const startZ = 10 - (segmentIndex * SEGMENT_LENGTH);
     const endZ = startZ - SEGMENT_LENGTH;
 

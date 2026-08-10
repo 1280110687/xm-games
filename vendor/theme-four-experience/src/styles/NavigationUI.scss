@@ -92,9 +92,9 @@
 .back-btn {
     position: fixed;
     top: max(5.75rem, calc(env(safe-area-inset-top) + 5rem));
-    left: 24px;
+    left: max(24px, calc(env(safe-area-inset-left) + 12px));
     width: auto;
-    min-width: 50px;
+    min-width: 7rem;
     padding: 8px 14px 5px;
     gap: 8px;
     animation: fadeSlideDown 0.3s ease-out;
@@ -133,8 +133,9 @@
 @media (max-width: 720px) {
     .back-btn {
         top: max(4.65rem, calc(env(safe-area-inset-top) + 4.15rem));
-        left: 12px;
+        left: max(12px, calc(env(safe-area-inset-left) + 8px));
         height: 48px;
+        min-width: 7.2rem;
         padding: 5px 11px 3px;
 
         span {
@@ -146,8 +147,8 @@
 // === RIGHT SIDE CONTROLS ===
 .nav-controls {
     position: fixed;
-    top: 0; // Starts from top edge
-    right: 24px;
+    top: env(safe-area-inset-top); // Starts below the iOS status-bar cutout
+    right: max(24px, calc(env(safe-area-inset-right) + 12px));
     display: flex;
     gap: 12px;
     transition: transform 0.3s ease, opacity 0.3s ease;
@@ -476,8 +477,8 @@
 // === AUDIO PANEL ===
 .audio-panel {
     position: fixed;
-    top: 0;
-    right: 24px;
+    top: env(safe-area-inset-top);
+    right: max(24px, calc(env(safe-area-inset-right) + 12px));
     width: 220px;
     filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.15));
     opacity: 0;
@@ -664,7 +665,7 @@
 // === ENTRANCE HINT - Before entering (same style as corridor hint) ===
 .entrance-hint {
     position: fixed;
-    bottom: 32px;
+    bottom: max(32px, calc(env(safe-area-inset-bottom) + 16px));
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -689,7 +690,7 @@
 // === CORRIDOR HINT - After entering ===
 .corridor-hint {
     position: fixed;
-    bottom: 32px;
+    bottom: max(32px, calc(env(safe-area-inset-bottom) + 16px));
     left: 50%;
     transform: translateX(-50%);
     display: flex;
@@ -738,16 +739,16 @@
     }
 
     .back-btn {
-        left: 16px;
+        left: max(16px, calc(env(safe-area-inset-left) + 8px));
     }
 
     .nav-controls {
-        right: 16px;
+        right: max(16px, calc(env(safe-area-inset-right) + 8px));
         gap: 8px;
     }
 
     .audio-panel {
-        right: 16px;
+        right: max(16px, calc(env(safe-area-inset-right) + 8px));
     }
 
     .map-panel {
@@ -766,14 +767,14 @@
 
     .entrance-hint {
         gap: 8px;
-        bottom: 24px;
+        bottom: max(24px, calc(env(safe-area-inset-bottom) + 12px));
         padding: 12px 20px;
         font-size: 13px;
     }
 
     .corridor-hint {
         gap: 8px;
-        bottom: 24px;
+        bottom: max(24px, calc(env(safe-area-inset-bottom) + 12px));
         padding: 12px 20px;
         font-size: 13px;
     }

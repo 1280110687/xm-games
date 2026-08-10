@@ -115,7 +115,7 @@ const XmGamesRoomOverlay = () => {
         );
     };
 
-    if (!isInRoom) return null;
+    if (!isInRoom || currentRoom === 'treasure') return null;
 
     const isGameHall = currentRoom === 'gallery';
     const isToolbox = currentRoom === 'contact';

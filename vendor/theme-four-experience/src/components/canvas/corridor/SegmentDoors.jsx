@@ -79,8 +79,8 @@ const SegmentDoors = ({
     const sideWallWidth = (corridorWidth - doorOpeningWidth) / 2;
 
     // Trigger distances
-    const openDistance = 12;
-    const closeDistance = 18; // Close when far enough away (behind or front?) 
+    const openDistance = 7;
+    const closeDistance = 13; // Close when far enough away (behind or front?) 
     // Actually, distinct logic: open when close, close when far.
     // The previous logic was: if (dist < open) open; if (dist > close) close.
 
