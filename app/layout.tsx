@@ -50,6 +50,7 @@ export const metadata: Metadata = {
   },
   other: {
     'apple-mobile-web-app-capable': 'yes',
+    google: 'notranslate',
   },
   icons: {
     icon: [
@@ -83,6 +84,7 @@ export default function RootLayout({
   return (
     <html
       lang={localeHtmlLang[DEFAULT_LOCALE]}
+      translate="no"
       className="dark"
       data-theme="theme-one"
       suppressHydrationWarning
