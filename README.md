@@ -87,6 +87,23 @@ Upstash 当前 Free 计划包含每月 500,000 条命令、256 MB 数据和 10 G
 
 部署后若加入或心跳返回 `503`，优先检查两项 Redis 环境变量是否同时存在并已重新部署；若返回 `404 ROOM_NOT_FOUND`，确认测试使用的是重新部署后新建的房间，并检查 Upstash 请求日志。所有信令接口为 `200` 但 WebRTC 仍无法连接时，再检查手机热点的客户端隔离以及 STUN/TURN 配置。
 
+### Cloudflare Workers 免费部署
+
+Cloudflare 使用 `@opennextjs/cloudflare` 把 Next.js 构建结果转换为 Worker。仓库根目录同时包含 Next.js 主应用和 Theme Four Vite workspace，因此不要使用裸的 `wrangler deploy` 自动检测，也不要把 Root directory 指向 `vendor/theme-four-experience`。
+
+Workers Builds 使用以下配置：
+
+```text
+Root directory: ./
+Build command: pnpm run cf:build
+Deploy command: pnpm run cf:deploy
+Version command: pnpm run cf:upload
+```
+
+在 Worker 的运行时 **Variables and Secrets** 中配置 `UPSTASH_REDIS_REST_URL` 与 `UPSTASH_REDIS_REST_TOKEN`，并保留部署命令中的 `--keep-vars`。这两个值只供服务端信令使用，不得添加 `NEXT_PUBLIC_` 前缀。`wrangler.jsonc` 中的 `XM_SHARED_SIGNAL_STORE_REQUIRED=1` 会让 Cloudflare 在 Redis 未完整配置时明确返回 `503`，避免回退到只能在单实例内工作的内存房间。
+
+首次部署前可运行 `pnpm run cf:preview` 在本机 `workerd` 环境检查页面和 API；普通本地开发、Vercel 及其他平台继续使用现有的 `pnpm run dev`、`pnpm run build` 和 `pnpm run start`。
+
 ## 语音功能
 
 Bingo 使用浏览器的 Web Speech API：号码抽取支持语音合成播报，Bingo 卡片支持语音识别录入。语音识别的可用性取决于浏览器，建议使用支持该能力的最新版 Chromium 浏览器（如 Chrome 或 Edge）；首次使用时需要允许麦克风权限。不支持或拒绝授权时，仍可使用手动输入等非语音功能。

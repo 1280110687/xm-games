@@ -22,7 +22,7 @@ export const LAN_IN_MEMORY_STORE_LIMITATION =
   "The default LAN signal store is process-local and supports one Next.js instance only. Configure a shared LanSignalStore before horizontal or serverless deployment."
 
 export const LAN_REDIS_CONFIGURATION_ERROR =
-  "LAN multiplayer is unavailable on Vercel until an Upstash Redis integration provides UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN."
+  "LAN multiplayer is unavailable in this serverless deployment until an Upstash Redis integration provides UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN."
 
 interface SignalingEnvironment {
   [key: string]: string | undefined
@@ -32,6 +32,7 @@ interface SignalingEnvironment {
   KV_REST_API_TOKEN?: string
   VERCEL?: string
   VERCEL_ENV?: string
+  XM_SHARED_SIGNAL_STORE_REQUIRED?: string
 }
 
 class UnavailableLanSignalStore implements LanSignalStore {
@@ -124,7 +125,9 @@ export function createLanSignalStoreForEnvironment(
     || environment.KV_REST_API_TOKEN,
   )
   const isVercel = environment.VERCEL === "1" || Boolean(environment.VERCEL_ENV)
-  if (hasPartialCredentials || isVercel) {
+  const requiresSharedStore = isVercel
+    || environment.XM_SHARED_SIGNAL_STORE_REQUIRED === "1"
+  if (hasPartialCredentials || requiresSharedStore) {
     return new UnavailableLanSignalStore(LAN_REDIS_CONFIGURATION_ERROR)
   }
 

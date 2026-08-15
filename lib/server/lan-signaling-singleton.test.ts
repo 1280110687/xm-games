@@ -84,6 +84,20 @@ describe("LAN signaling store selection", () => {
     })
   })
 
+  it("returns a 503 store when a serverless platform requires shared signaling", async () => {
+    const store = createLanSignalStoreForEnvironment({
+      XM_SHARED_SIGNAL_STORE_REQUIRED: "1",
+    })
+
+    await expect(store.createRoom({
+      requestId: "create-request-0001",
+    })).rejects.toMatchObject({
+      code: "SERVICE_UNAVAILABLE",
+      status: 503,
+      message: LAN_REDIS_CONFIGURATION_ERROR,
+    })
+  })
+
   it("fails closed when only one Redis credential is configured", async () => {
     const store = createLanSignalStoreForEnvironment({
       UPSTASH_REDIS_REST_URL: "https://example.upstash.io",
