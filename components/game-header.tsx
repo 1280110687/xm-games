@@ -47,7 +47,7 @@ function HomeLink({
       size={labelMode === "sr-only" ? "icon" : "sm"}
       className={cn("game-header-home", className)}
     >
-      <Link href="/">
+      <Link href="/" prefetch={false}>
         <Icon className="h-4 w-4" aria-hidden="true" />
         <span
           className={cn(
@@ -97,7 +97,7 @@ export function GameHeader({
         size="sm"
         className="theme-two-settings-shortcut"
       >
-        <Link href="/settings">
+        <Link href="/settings" prefetch={false}>
           <Settings2 aria-hidden="true" />
           <span>{t("settings")}</span>
         </Link>

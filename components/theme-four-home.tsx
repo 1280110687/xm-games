@@ -235,7 +235,7 @@ export function ThemeFourHome({ rooms }: { rooms: ThemeFourRoom[] }) {
           </button>
           <ThemeSwitcher compact />
           <LanguageSwitcher compact />
-          <Link href="/settings" aria-label={copy.settings}>
+          <Link href="/settings" prefetch={false} aria-label={copy.settings}>
             <Settings2 aria-hidden="true" />
           </Link>
         </span>
@@ -267,7 +267,7 @@ export function ThemeFourHome({ rooms }: { rooms: ThemeFourRoom[] }) {
                   {room.games.map((game) => {
                     const Icon = game.icon
                     return (
-                      <Link key={game.href} href={game.href}>
+                      <Link key={game.href} href={game.href} prefetch={false}>
                         <Icon aria-hidden="true" />
                         <span>{t(game.titleKey)}</span>
                         <small>{copy.open}</small>

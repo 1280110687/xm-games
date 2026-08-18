@@ -39,6 +39,7 @@ export const translations = {
     edit: "编辑",
     delete: "删除",
     all: "全部",
+    routeLoading: "正在打开…",
 
     // PWA installation
     pwaInstallEyebrow: "安装应用",
@@ -481,6 +482,7 @@ export const translations = {
     edit: "Edit",
     delete: "Delete",
     all: "All",
+    routeLoading: "Opening…",
 
     // PWA installation
     pwaInstallEyebrow: "Install app",
@@ -923,6 +925,7 @@ export const translations = {
     edit: "แก้ไข",
     delete: "ลบ",
     all: "ทั้งหมด",
+    routeLoading: "กำลังเปิด…",
 
     // PWA installation
     pwaInstallEyebrow: "ติดตั้งแอป",

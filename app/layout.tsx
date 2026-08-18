@@ -3,11 +3,10 @@ import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
 import { LocaleProvider } from '@/lib/locale-context'
 import { ThemeProvider } from '@/components/theme-provider'
-import { ThemeTwoTabBar } from '@/components/theme-two-tab-bar'
-import { ThemeThreeNavigation } from '@/components/theme-three-navigation'
-import { ThemeFourNavigation } from '@/components/theme-four-navigation'
+import { ThemeNavigation } from '@/components/theme-navigation'
 import { PwaRegister } from '@/components/pwa-register'
 import { PwaInstallPrompt } from '@/components/pwa-install-prompt'
+import { RouteProgress } from '@/components/route-progress'
 import { DEFAULT_LOCALE, localeHtmlLang } from '@/lib/i18n'
 import { getPageMetadata } from '@/lib/page-metadata'
 import { themeBootstrapScript } from '@/lib/theme'
@@ -98,10 +97,9 @@ export default function RootLayout({
         />
         <ThemeProvider>
           <LocaleProvider>
+            <RouteProgress />
             {children}
-            <ThemeTwoTabBar />
-            <ThemeThreeNavigation />
-            <ThemeFourNavigation />
+            <ThemeNavigation />
             <PwaInstallPrompt />
           </LocaleProvider>
         </ThemeProvider>

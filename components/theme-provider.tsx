@@ -21,6 +21,7 @@ import {
 
 interface ThemeContextValue {
   theme: ThemeId
+  isResolved: boolean
   setTheme: (theme: ThemeId) => void
 }
 
@@ -54,6 +55,7 @@ function readStoredTheme(): ThemeId {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<ThemeId>(DEFAULT_THEME)
+  const [isResolved, setIsResolved] = useState(false)
 
   useEffect(() => {
     const handleStorage = (event: StorageEvent) => {
@@ -70,6 +72,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const initialTheme = readStoredTheme()
     setThemeState(initialTheme)
     applyTheme(initialTheme)
+    setIsResolved(true)
 
     return () => window.removeEventListener("storage", handleStorage)
   }, [])
@@ -84,7 +87,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, [])
 
-  const value = useMemo(() => ({ theme, setTheme }), [theme, setTheme])
+  const value = useMemo(
+    () => ({ theme, isResolved, setTheme }),
+    [isResolved, theme, setTheme],
+  )
 
   return (
     <ThemeContext.Provider value={value}>

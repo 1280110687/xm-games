@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v6"
+const CACHE_VERSION = "v7"
 const SHELL_CACHE = `xm-games-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `xm-games-runtime-${CACHE_VERSION}`
 const OWNED_CACHE_PREFIX = "xm-games-"
@@ -45,6 +45,7 @@ const SENSITIVE_SEARCH_PATTERN =
   /(?:sdp|ice|candidate|token|credential|offer|answer)/i
 const NEXT_STATIC_PATTERN = /\/_next\/static\/[^"'\\\s<>()]+/g
 const NAVIGATION_TIMEOUT_MS = 4_000
+const OFFLINE_WARM_CONCURRENCY = 2
 
 function isSensitiveRequest(request, url) {
   if (url.pathname.startsWith("/api/")) return true
@@ -102,31 +103,74 @@ async function fetchAndCache(cache, resource) {
   return response
 }
 
-async function precacheApplicationShell() {
+async function fetchAndCacheIfMissing(cache, resource) {
+  const request =
+    resource instanceof Request
+      ? resource
+      : createSameOriginRequest(resource)
+  const cached = await cache.match(request)
+  return cached ?? fetchAndCache(cache, request)
+}
+
+async function mapWithConcurrency(items, concurrency, task) {
+  let nextIndex = 0
+  const workers = Array.from(
+    { length: Math.min(concurrency, items.length) },
+    async () => {
+      while (nextIndex < items.length) {
+        const item = items[nextIndex]
+        nextIndex += 1
+        await task(item)
+      }
+    },
+  )
+
+  await Promise.all(workers)
+}
+
+async function precacheCoreShell() {
   const cache = await caches.open(SHELL_CACHE)
-  const nextStaticResources = new Set()
+  const homeResponse = await fetchAndCacheIfMissing(cache, "/")
+  const contentType = homeResponse.headers.get("content-type") ?? ""
+  const homeHtml = contentType.includes("text/html")
+    ? await homeResponse.text()
+    : ""
 
-  // Fetching every route document lets the worker discover the exact hashed
-  // Next.js CSS, JavaScript, font and media URLs emitted by this deployment.
-  const routeDocuments = await Promise.all(
-    APP_ROUTES.map(async (route) => {
-      const response = await fetchAndCache(cache, route)
-      const contentType = response.headers.get("content-type") ?? ""
-      return contentType.includes("text/html") ? response.text() : ""
-    }),
+  await mapWithConcurrency(
+    STATIC_SHELL,
+    OFFLINE_WARM_CONCURRENCY,
+    (resource) => fetchAndCacheIfMissing(cache, resource),
   )
-
-  for (const html of routeDocuments) {
-    for (const resource of extractNextStaticResources(html)) {
-      nextStaticResources.add(resource)
-    }
-  }
-
-  await Promise.all(
-    STATIC_SHELL.map((resource) => fetchAndCache(cache, resource)),
+  await mapWithConcurrency(
+    [...extractNextStaticResources(homeHtml)],
+    OFFLINE_WARM_CONCURRENCY,
+    (resource) => fetchAndCacheIfMissing(cache, resource),
   )
-  await Promise.all(
-    [...nextStaticResources].map((resource) => fetchAndCache(cache, resource)),
+}
+
+async function warmApplicationShell() {
+  const cache = await caches.open(SHELL_CACHE)
+
+  // Full offline coverage is prepared after the page is interactive. Keeping
+  // this work out of install prevents dozens of route and chunk requests from
+  // competing with hydration on a cold load.
+  await mapWithConcurrency(
+    APP_ROUTES.filter((route) => route !== "/"),
+    OFFLINE_WARM_CONCURRENCY,
+    async (route) => {
+      try {
+        const response = await fetchAndCacheIfMissing(cache, route)
+        const contentType = response.headers.get("content-type") ?? ""
+        if (!contentType.includes("text/html")) return
+
+        const html = await response.text()
+        for (const resource of extractNextStaticResources(html)) {
+          await fetchAndCacheIfMissing(cache, resource)
+        }
+      } catch (error) {
+        console.warn(`[pwa] Unable to warm offline route ${route}:`, error)
+      }
+    },
   )
 }
 
@@ -154,22 +198,23 @@ async function matchCurrentCaches(request, runtimeFirst = false) {
 }
 
 async function offlineNavigationFallback(request) {
-  const exactMatch = await matchCurrentCaches(request, true)
+  const exactMatch = await matchCachedNavigation(request)
   if (exactMatch) return exactMatch
-
-  const url = new URL(request.url)
-  if (url.search) {
-    const routeMatch = await matchCurrentCaches(
-      createSameOriginRequest(url.pathname),
-      true,
-    )
-    if (routeMatch) return routeMatch
-  }
 
   return (
     (await matchCurrentCaches(createSameOriginRequest("/"), true)) ??
     Response.error()
   )
+}
+
+async function matchCachedNavigation(request) {
+  const exactMatch = await matchCurrentCaches(request, true)
+  if (exactMatch) return exactMatch
+
+  const url = new URL(request.url)
+  if (!url.search) return undefined
+
+  return matchCurrentCaches(createSameOriginRequest(url.pathname), true)
 }
 
 async function fetchNavigation(request) {
@@ -193,6 +238,18 @@ async function networkFirstNavigation(request) {
   }
 }
 
+async function cachedFirstNavigation(request, event) {
+  const cached = await matchCachedNavigation(request)
+  if (!cached) return networkFirstNavigation(request)
+
+  event.waitUntil(
+    fetchNavigation(request)
+      .then((response) => updateCache(RUNTIME_CACHE, request, response))
+      .catch(() => undefined),
+  )
+  return cached
+}
+
 async function cacheFirst(request) {
   const cached = await matchCurrentCaches(request)
   if (cached) return cached
@@ -205,12 +262,17 @@ async function cacheFirst(request) {
 self.addEventListener("install", (event) => {
   // Do not call skipWaiting here. An update must stay waiting until existing
   // tabs using the previous Next.js chunks have closed or accepted an update.
-  event.waitUntil(precacheApplicationShell())
+  event.waitUntil(precacheCoreShell())
 })
 
 self.addEventListener("message", (event) => {
   if (event.data?.type === "SKIP_WAITING") {
     event.waitUntil(self.skipWaiting())
+    return
+  }
+
+  if (event.data?.type === "WARM_OFFLINE_CACHE") {
+    event.waitUntil(warmApplicationShell())
   }
 })
 
@@ -243,7 +305,7 @@ self.addEventListener("fetch", (event) => {
   if (isSensitiveRequest(request, url)) return
 
   if (request.mode === "navigate") {
-    event.respondWith(networkFirstNavigation(request))
+    event.respondWith(cachedFirstNavigation(request, event))
     return
   }
 

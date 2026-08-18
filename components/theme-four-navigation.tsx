@@ -61,7 +61,12 @@ export function ThemeFourNavigation() {
 
   return (
     <nav className="theme-four-route-nav" aria-label={copy.navigation}>
-      <Link href="/" className="theme-four-route-brand" aria-label={copy.home}>
+      <Link
+        href="/"
+        prefetch={false}
+        className="theme-four-route-brand"
+        aria-label={copy.home}
+      >
         <Gamepad2 aria-hidden="true" />
         <span>XM</span>
       </Link>
@@ -70,6 +75,7 @@ export function ThemeFourNavigation() {
           <Link
             key={href}
             href={href}
+            prefetch={false}
             className={cn(active && "is-active")}
             aria-current={active ? "page" : undefined}
           >

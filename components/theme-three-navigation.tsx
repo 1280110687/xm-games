@@ -106,6 +106,7 @@ function NavigationItems({
     <Link
       key={href}
       href={href}
+      prefetch={false}
       onClick={onClick}
       className={cn(itemClassName, active && "is-active")}
       aria-current={current}
@@ -189,7 +190,7 @@ export function ThemeThreeNavigation() {
   return (
     <>
       <aside className="theme-three-sidebar" aria-label={copy.workspace}>
-        <Link href="/" className="theme-three-sidebar-brand">
+        <Link href="/" prefetch={false} className="theme-three-sidebar-brand">
           <span className="theme-three-brand-mark">
             <Sparkles aria-hidden="true" />
           </span>

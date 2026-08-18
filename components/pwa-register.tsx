@@ -4,6 +4,8 @@ import { useEffect } from "react"
 
 const PWA_CACHE_PREFIX = "xm-games-"
 const DEVELOPMENT_CLEANUP_KEY = "xm-games-pwa-development-cleaned:v1"
+const OFFLINE_WARMUP_DELAY_MS = 8_000
+const OFFLINE_WARMUP_IDLE_TIMEOUT_MS = 15_000
 
 function isXmGamesWorker(worker: ServiceWorker | null): boolean {
   if (!worker) return false
@@ -59,22 +61,53 @@ export function PwaRegister() {
       return
     }
 
-    const register = () => {
-      void navigator.serviceWorker.register("/sw.js", {
-        scope: "/",
-        updateViaCache: "none",
-      }).catch((error: unknown) => {
+    let cancelled = false
+    let warmupTimer: number | null = null
+    let idleCallback: number | null = null
+    const scheduleOfflineWarmup = (registration: ServiceWorkerRegistration) => {
+      warmupTimer = window.setTimeout(() => {
+        if (cancelled) return
+
+        const warm = () => {
+          if (cancelled) return
+          registration.active?.postMessage({ type: "WARM_OFFLINE_CACHE" })
+        }
+
+        if (typeof window.requestIdleCallback === "function") {
+          idleCallback = window.requestIdleCallback(warm, {
+            timeout: OFFLINE_WARMUP_IDLE_TIMEOUT_MS,
+          })
+        } else {
+          warm()
+        }
+      }, OFFLINE_WARMUP_DELAY_MS)
+    }
+
+    const register = async () => {
+      try {
+        await navigator.serviceWorker.register("/sw.js", {
+          scope: "/",
+          updateViaCache: "none",
+        })
+        const readyRegistration = await navigator.serviceWorker.ready
+        if (!cancelled) scheduleOfflineWarmup(readyRegistration)
+      } catch (error: unknown) {
         console.warn("[pwa] Service worker registration failed:", error)
-      })
+      }
     }
 
     if (document.readyState === "complete") {
-      register()
-      return
+      void register()
+    } else {
+      window.addEventListener("load", register, { once: true })
     }
 
-    window.addEventListener("load", register, { once: true })
-    return () => window.removeEventListener("load", register)
+    return () => {
+      cancelled = true
+      window.removeEventListener("load", register)
+      if (warmupTimer !== null) window.clearTimeout(warmupTimer)
+      if (idleCallback !== null) window.cancelIdleCallback?.(idleCallback)
+    }
   }, [])
 
   return null

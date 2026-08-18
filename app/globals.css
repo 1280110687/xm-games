@@ -465,6 +465,52 @@
   to { transform: translateY(0.16rem) rotate(2deg); }
 }
 
+.route-loading {
+  position: fixed;
+  z-index: 120;
+  inset: 0 0 auto;
+  display: flex;
+  justify-content: center;
+  padding: max(0.75rem, env(safe-area-inset-top)) 1rem 0;
+  pointer-events: none;
+}
+
+.route-loading__bar {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 3px;
+  overflow: hidden;
+  background: color-mix(in oklab, var(--primary) 18%, transparent);
+}
+
+.route-loading__bar::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  width: 42%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, transparent, var(--primary), white);
+  box-shadow: 0 0 18px color-mix(in oklab, var(--primary) 72%, transparent);
+  animation: route-loading-slide 0.9s ease-in-out infinite;
+}
+
+.route-loading__label {
+  padding: 0.4rem 0.7rem;
+  border: 1px solid color-mix(in oklab, var(--primary) 28%, var(--border));
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--background) 88%, transparent);
+  box-shadow: 0 10px 30px color-mix(in oklab, black 28%, transparent);
+  color: var(--foreground);
+  font-size: 0.75rem;
+  font-weight: 700;
+  backdrop-filter: blur(14px);
+}
+
+@keyframes route-loading-slide {
+  from { transform: translateX(-110%); }
+  to { transform: translateX(350%); }
+}
+
 @media (max-width: 420px) {
   .gomoku-lan-panel__join > div {
     grid-template-columns: 1fr;

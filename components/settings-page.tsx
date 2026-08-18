@@ -75,7 +75,7 @@ export function SettingsPage() {
             size="icon"
             className="settings-back-button shrink-0"
           >
-            <Link href="/" aria-label={copy.back}>
+            <Link href="/" prefetch={false} aria-label={copy.back}>
               <ArrowLeft aria-hidden="true" />
             </Link>
           </Button>

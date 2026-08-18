@@ -47,7 +47,7 @@ interface NavigatorWithStandalone extends Navigator {
   standalone?: boolean
 }
 
-const PROMPT_DELAY_MS = 1_400
+const PROMPT_DELAY_MS = 12_000
 const STANDALONE_QUERIES = [
   "(display-mode: standalone)",
   "(display-mode: fullscreen)",

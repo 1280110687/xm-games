@@ -96,6 +96,27 @@ describe("service worker shell", () => {
     expect(installHandler).not.toContain("self.skipWaiting()")
   })
 
+  it("installs only the core shell and warms full offline coverage later", () => {
+    const installHandler = source.match(
+      /self\.addEventListener\("install"[\s\S]*?(?=self\.addEventListener\("message")/,
+    )?.[0]
+
+    expect(installHandler).toContain("precacheCoreShell()")
+    expect(installHandler).not.toContain("warmApplicationShell()")
+    expect(source).toContain("const OFFLINE_WARM_CONCURRENCY = 2")
+    expect(source).toContain('event.data?.type === "WARM_OFFLINE_CACHE"')
+  })
+
+  it("serves cached navigations immediately while refreshing in the background", () => {
+    const navigationHandler = source.match(
+      /async function cachedFirstNavigation[\s\S]*?(?=async function cacheFirst)/,
+    )?.[0]
+
+    expect(navigationHandler).toContain("matchCachedNavigation(request)")
+    expect(navigationHandler).toContain("event.waitUntil(")
+    expect(source).toContain("cachedFirstNavigation(request, event)")
+  })
+
   it("never uses a game page as the final navigation fallback", () => {
     expect(source).toContain('createSameOriginRequest("/")')
     expect(source).not.toContain('caches.match("/gomoku")')
