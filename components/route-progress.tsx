@@ -19,6 +19,11 @@ function isPlainPrimaryClick(event: MouseEvent): boolean {
 
 export function RouteProgress() {
   const pathname = usePathname()
+
+  return <RouteProgressForPath key={pathname} pathname={pathname} />
+}
+
+function RouteProgressForPath({ pathname }: { pathname: string }) {
   const { t } = useLocale()
   const [targetPathname, setTargetPathname] = useState<string | null>(null)
   const timeoutRef = useRef<number | null>(null)

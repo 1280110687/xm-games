@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v7"
+const CACHE_VERSION = "v8"
 const SHELL_CACHE = `xm-games-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `xm-games-runtime-${CACHE_VERSION}`
 const OWNED_CACHE_PREFIX = "xm-games-"
