@@ -7,6 +7,7 @@ const ROOM_NAMES = {
     about: 'About XM-Games',
     contact: 'Offline Toolbox',
     treasure: '3D Gallery Treasure Hunt',
+    elemental: 'Elemental Ability Arena',
 };
 
 const ScreenReaderOverlay = () => {
@@ -34,6 +35,7 @@ const ScreenReaderOverlay = () => {
                             <li><button type="button" onClick={() => teleportTo('about')}>About XM-Games</button></li>
                             <li><button type="button" onClick={() => teleportTo('contact')}>Offline Toolbox</button></li>
                             <li><button type="button" onClick={() => teleportTo('treasure')}>3D Gallery Treasure Hunt</button></li>
+                            <li><button type="button" onClick={() => teleportTo('elemental')}>Elemental Ability Arena</button></li>
                         </ul>
                     </>
                 )}

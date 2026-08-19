@@ -8,12 +8,13 @@ import PaperTransition from './components/dom/PaperTransition';
 import { AudioProvider, useAudio } from './context/AudioManager';
 import { initAudio } from './utils/audioManager';
 import { PerformanceProvider, usePerformance } from './context/PerformanceContext';
-import { SceneProvider } from './context/SceneContext';
+import { SceneProvider, useScene } from './context/SceneContext';
 import { TreasureHuntProvider } from './context/TreasureHuntContext';
 import NavigationUI from './components/ui/NavigationUI';
 import ScreenReaderOverlay from './components/ui/ScreenReaderOverlay';
 import XmGamesRoomOverlay from './components/ui/XmGamesRoomOverlay';
 import TreasureHuntHud from './components/ui/TreasureHuntHud';
+import ElementalArenaExperience from './components/ui/ElementalArenaExperience';
 
 // Lazy load the heavy 3D experience
 const Experience = lazy(() => import('./components/canvas/Experience'));
@@ -101,6 +102,19 @@ const PaperSceneBackground = () => {
   return null;
 };
 
+const ElementalArenaFrameController = () => {
+  const { currentRoom, exitRequested } = useScene();
+  const { setFrameloop, invalidate } = useThree();
+
+  useEffect(() => {
+    const arenaOwnsFrame = currentRoom === 'elemental' && !exitRequested;
+    setFrameloop(arenaOwnsFrame ? 'never' : 'always');
+    if (!arenaOwnsFrame) invalidate();
+  }, [currentRoom, exitRequested, invalidate, setFrameloop]);
+
+  return null;
+};
+
 function AppContent() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [sceneReady, setSceneReady] = useState(false);
@@ -154,6 +168,8 @@ function AppContent() {
                 onFallback={() => downgradeTier()}
               />
 
+              <ElementalArenaFrameController />
+
               {/* Advanced FPS & Performance Monitor */}
               {/* <Perf position="top-left" minimal={false} /> */}
 
@@ -174,6 +190,7 @@ function AppContent() {
               <NavigationUI />
               <XmGamesRoomOverlay />
               <TreasureHuntHud />
+              <ElementalArenaExperience />
               <PaperTransition />
               <ScreenReaderOverlay />
             </>

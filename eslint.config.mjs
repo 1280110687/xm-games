@@ -14,10 +14,13 @@ export default defineConfig([
   },
   globalIgnores([
     ".next/**",
+    ".open-next/**",
+    ".playwright-cli/**",
     "out/**",
     "build/**",
     "public/theme-four-experience/**",
     "vendor/theme-four-experience/**",
+    "vendor/elemental-arena/**",
     "next-env.d.ts",
   ]),
 ])

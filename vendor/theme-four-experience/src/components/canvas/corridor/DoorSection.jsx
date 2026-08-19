@@ -46,6 +46,7 @@ const DOOR_TEXTURES = {
     'THE ABOUT': '/theme-four-experience/textures/corridor/doors/drzwiabout.webp',
     "LET'S CONNECT": '/theme-four-experience/textures/corridor/doors/drzwikontakt.webp',
     'TREASURE HUNT': '/theme-four-experience/textures/corridor/doors/drzwiprojekty.webp',
+    'ELEMENTAL ARENA': '/theme-four-experience/textures/corridor/doors/drzwisocial.webp',
 };
 
 // Painted (colored) variants for brush-stroke reveal on hover
@@ -55,6 +56,7 @@ const DOOR_PAINTED_TEXTURES = {
     'THE ABOUT': '/theme-four-experience/textures/corridor/doors/drzwiabout_painted.webp',
     "LET'S CONNECT": '/theme-four-experience/textures/corridor/doors/drzwikontakt_painted.webp',
     'TREASURE HUNT': '/theme-four-experience/textures/corridor/doors/drzwiprojekty_painted.webp',
+    'ELEMENTAL ARENA': '/theme-four-experience/textures/corridor/doors/drzwisocial_painted.webp',
 };
 
 
@@ -130,6 +132,7 @@ const DoorSection = ({
         if (label === 'THE ABOUT') return 'about';
         if (label === "LET'S CONNECT") return 'contact';
         if (label === 'TREASURE HUNT') return 'treasure';
+        if (label === 'ELEMENTAL ARENA') return 'elemental';
         return null;
     }, [label, roomId]);
 
@@ -1171,6 +1174,30 @@ const DoorSection = ({
                                     position={[0, 0.03, 0]}
                                 >
                                     HUNT
+                                </Text>
+                            </group>
+                        )}
+                        {label === 'ELEMENTAL ARENA' && (
+                            <group position={[0, 0, 0.01]}>
+                                <Text
+                                    font="/theme-four-experience/fonts/CabinSketch-Bold.ttf"
+                                    fontSize={0.20}
+                                    color="#111111"
+                                    anchorX="center"
+                                    anchorY="bottom"
+                                    position={[0, -0.02, 0]}
+                                >
+                                    ELEMENTAL
+                                </Text>
+                                <Text
+                                    font="/theme-four-experience/fonts/CabinSketch-Bold.ttf"
+                                    fontSize={0.22}
+                                    color="#111111"
+                                    anchorX="center"
+                                    anchorY="top"
+                                    position={[0, 0.03, 0]}
+                                >
+                                    ARENA
                                 </Text>
                             </group>
                         )}

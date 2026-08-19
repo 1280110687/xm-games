@@ -43,7 +43,7 @@ importers:
         version: 1.38.1
       '@vercel/analytics':
         specifier: 1.6.1
-        version: 1.6.1(next@16.2.11(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1))(react@19.2.4)
+        version: 1.6.1(next@16.2.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1))(react@19.2.4)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -55,7 +55,7 @@ importers:
         version: 0.564.0(react@19.2.4)
       next:
         specifier: 16.2.11
-        version: 16.2.11(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1)
+        version: 16.2.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1)
       pixi.js:
         specifier: 8.19.0
         version: 8.19.0
@@ -74,7 +74,7 @@ importers:
     devDependencies:
       '@opennextjs/cloudflare':
         specifier: 1.20.2
-        version: 1.20.2(next@16.2.11(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1))(wrangler@4.123.0)
+        version: 1.20.2(next@16.2.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1))(wrangler@4.123.0)
       '@tailwindcss/postcss':
         specifier: ^4.2.0
         version: 4.2.0
@@ -117,6 +117,19 @@ importers:
       wrangler:
         specifier: 4.123.0
         version: 4.123.0
+
+  vendor/elemental-arena:
+    dependencies:
+      lil-gui:
+        specifier: 0.21.0
+        version: 0.21.0
+      three:
+        specifier: 0.185.1
+        version: 0.185.1
+    devDependencies:
+      vite:
+        specifier: 8.1.5
+        version: 8.1.5(@types/node@22.19.11)(esbuild@0.28.1)(jiti@2.6.1)(sass@1.97.1)(terser@5.16.9)(yaml@2.9.0)
 
   vendor/theme-four-experience:
     dependencies:
@@ -4257,6 +4270,9 @@ packages:
     resolution: {integrity: sha512-NXYBzinNrblfraPGyrbPoD19C1h9lfI/1mzgWYvXUTe414Gz/X1FD2XBZSZM7rRTrMA8JL3OtAaGifrIKhQ5yQ==}
     engines: {node: '>= 12.0.0'}
 
+  lil-gui@0.21.0:
+    resolution: {integrity: sha512-tpvxN7v1GvE/Tv+GRopfOp0W7fVEjF4PltkuX8vOCIfim22rD1ztvfkoEMcv9lzQeuNUSeIrUmUjBwmlW/oUew==}
+
   locate-path@5.0.0:
     resolution: {integrity: sha512-t7hw9pI+WvuwNJXwk5zVHpyhIqzg2qTlklJOf0mVxGSbe3Fp2VieZcduNYjaLDoy6p9uGpQEGWG87WpMKlNq8g==}
     engines: {node: '>=8'}
@@ -5015,6 +5031,9 @@ packages:
 
   three@0.182.0:
     resolution: {integrity: sha512-GbHabT+Irv+ihI1/f5kIIsZ+Ef9Sl5A1Y7imvS5RQjWgtTPfPnZ43JmlYI7NtCRDK9zir20lQpfg8/9Yd02OvQ==}
+
+  three@0.185.1:
+    resolution: {integrity: sha512-5aojFCXKwnjBRZvUnt3WFfEcvUJgkN5LlijRFN95hMy8WVkG4I0QNcJE+OuWvuJ0bOdStrbfXn0pkd6/QyiAlg==}
 
   tiny-lru@11.4.7:
     resolution: {integrity: sha512-w/Te7uMUVeH0CR8vZIjr+XiN41V+30lkDdK+NRIDCUYKKuL9VcmaUEmaPISuwGhLlrTGh5yu18lENtR9axSxYw==}
@@ -6897,7 +6916,7 @@ snapshots:
 
   '@nolyfill/is-core-module@1.0.39': {}
 
-  '@opennextjs/aws@4.1.0(next@16.2.11(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1))':
+  '@opennextjs/aws@4.1.0(next@16.2.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1))':
     dependencies:
       '@ast-grep/napi': 0.40.5
       '@aws-sdk/client-cloudfront': 3.984.0
@@ -6913,24 +6932,24 @@ snapshots:
       cookie: 1.1.1
       esbuild: 0.25.4
       express: 5.2.1
-      next: 16.2.11(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1)
+      next: 16.2.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1)
       path-to-regexp: 6.3.0
       urlpattern-polyfill: 10.1.0
       yaml: 2.9.0
     transitivePeerDependencies:
       - supports-color
 
-  '@opennextjs/cloudflare@1.20.2(next@16.2.11(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1))(wrangler@4.123.0)':
+  '@opennextjs/cloudflare@1.20.2(next@16.2.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1))(wrangler@4.123.0)':
     dependencies:
       '@ast-grep/napi': 0.40.5
       '@dotenvx/dotenvx': 1.31.0
-      '@opennextjs/aws': 4.1.0(next@16.2.11(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1))
+      '@opennextjs/aws': 4.1.0(next@16.2.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1))
       ci-info: 4.4.0
       cloudflare: 4.5.0
       comment-json: 4.6.2
       enquirer: 2.4.1
       glob: 12.0.0
-      next: 16.2.11(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1)
+      next: 16.2.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1)
       ts-tqdm: 0.8.6
       wrangler: 4.123.0
       yargs: 18.1.0
@@ -8136,9 +8155,9 @@ snapshots:
       '@use-gesture/core': 10.3.1
       react: 19.2.4
 
-  '@vercel/analytics@1.6.1(next@16.2.11(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1))(react@19.2.4)':
+  '@vercel/analytics@1.6.1(next@16.2.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1))(react@19.2.4)':
     optionalDependencies:
-      next: 16.2.11(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1)
+      next: 16.2.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1)
       react: 19.2.4
 
   '@vitejs/plugin-react@5.1.1(vite@7.3.0(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.16.9)(yaml@2.9.0))':
@@ -9681,6 +9700,8 @@ snapshots:
       lightningcss-win32-arm64-msvc: 1.32.0
       lightningcss-win32-x64-msvc: 1.32.0
 
+  lil-gui@0.21.0: {}
+
   locate-path@5.0.0:
     dependencies:
       p-locate: 4.1.0
@@ -9797,7 +9818,7 @@ snapshots:
 
   negotiator@1.0.0: {}
 
-  next@16.2.11(@babel/core@7.29.7)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1):
+  next@16.2.11(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(sass@1.97.1):
     dependencies:
       '@next/env': 16.2.11
       '@swc/helpers': 0.5.15
@@ -9806,7 +9827,7 @@ snapshots:
       postcss: 8.5.19
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
-      styled-jsx: 5.1.6(@babel/core@7.29.7)(react@19.2.4)
+      styled-jsx: 5.1.6(react@19.2.4)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.2.11
       '@next/swc-darwin-x64': 16.2.11
@@ -10506,12 +10527,10 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  styled-jsx@5.1.6(@babel/core@7.29.7)(react@19.2.4):
+  styled-jsx@5.1.6(react@19.2.4):
     dependencies:
       client-only: 0.0.1
       react: 19.2.4
-    optionalDependencies:
-      '@babel/core': 7.29.7
 
   supports-color@10.2.2: {}
 
@@ -10553,6 +10572,8 @@ snapshots:
       three: 0.182.0
 
   three@0.182.0: {}
+
+  three@0.185.1: {}
 
   tiny-lru@11.4.7: {}
 

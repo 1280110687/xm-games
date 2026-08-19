@@ -6,6 +6,7 @@ import StudioRoom from '../rooms/Studio/StudioRoom';
 import AboutRoom from '../rooms/About/AboutRoom';
 import ContactRoom from '../rooms/Contact/ContactRoom';
 import TreasureRoom from '../rooms/Treasure/TreasureRoom';
+import ElementalPortalRoom from '../rooms/Elemental/ElementalPortalRoom';
 
 const ROOM_CONFIG = {
     corridorWidth: 2.2,
@@ -95,6 +96,7 @@ const RoomInterior = memo(({ label, showRoom, onReady, isExiting }) => {
                         {label === 'THE ABOUT' && <AboutRoom {...roomProps} />}
                         {label === "LET'S CONNECT" && <ContactRoom {...roomProps} />}
                         {label === 'TREASURE HUNT' && <TreasureRoom {...roomProps} />}
+                        {label === 'ELEMENTAL ARENA' && <ElementalPortalRoom {...roomProps} />}
                     </Suspense>
                 </group>
             )}

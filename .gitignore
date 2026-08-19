@@ -5,6 +5,9 @@
 /vendor/theme-four-experience/node_modules/
 /vendor/theme-four-experience/dist/
 /vendor/theme-four-experience/package-lock.json
+/vendor/elemental-arena/node_modules/
+/vendor/elemental-arena/dist/
+/vendor/elemental-arena/package-lock.json
 
 # next.js
 /.next/

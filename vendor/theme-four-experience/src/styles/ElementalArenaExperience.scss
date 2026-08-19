@@ -1,0 +1,62 @@
+.elemental-arena {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    overflow: hidden;
+    background: #05070a;
+    animation: elemental-arena-enter 420ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+.elemental-arena__frame {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #05070a;
+    opacity: 0;
+    transition: opacity 280ms ease;
+}
+
+.elemental-arena.is-loaded .elemental-arena__frame {
+    opacity: 1;
+}
+
+.elemental-arena__handoff {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 18px;
+    color: rgba(225, 244, 255, 0.82);
+    background: radial-gradient(circle at 50% 45%, #162334 0%, #05070a 68%);
+    font: 600 11px/1.4 ui-monospace, SFMono-Regular, Menlo, monospace;
+    letter-spacing: 0.22em;
+}
+
+.elemental-arena__handoff span {
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(127, 214, 255, 0.28);
+    border-top-color: #7fd6ff;
+    border-radius: 50%;
+    animation: elemental-arena-spin 900ms linear infinite;
+}
+
+@keyframes elemental-arena-enter {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes elemental-arena-spin {
+    to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .elemental-arena,
+    .elemental-arena__frame,
+    .elemental-arena__handoff span {
+        animation: none;
+        transition: none;
+    }
+}

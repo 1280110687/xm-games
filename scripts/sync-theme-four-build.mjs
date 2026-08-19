@@ -9,6 +9,8 @@ const sourceAssets = resolve(sourceRoot, "assets");
 const sourceIndex = resolve(sourceRoot, "index.html");
 const destinationAssets = resolve(destinationRoot, "assets");
 const destinationIndex = resolve(destinationRoot, "index.html");
+const elementalSourceRoot = resolve(projectRoot, "vendor/elemental-arena/dist");
+const elementalDestinationRoot = resolve(destinationRoot, "elemental-arena");
 
 const [assetsStats, indexStats] = await Promise.all([
   stat(sourceAssets),
@@ -27,5 +29,7 @@ await mkdir(destinationRoot, { recursive: true });
 await rm(destinationAssets, { recursive: true, force: true });
 await cp(sourceAssets, destinationAssets, { recursive: true });
 await copyFile(sourceIndex, destinationIndex);
+await rm(elementalDestinationRoot, { recursive: true, force: true });
+await cp(elementalSourceRoot, elementalDestinationRoot, { recursive: true });
 
-console.log("Theme Four build artifacts synced to public/theme-four-experience.");
+console.log("Theme Four and Elemental Arena build artifacts synced to public/theme-four-experience.");

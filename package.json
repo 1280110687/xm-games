@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "pnpm run build:theme-four && next build",
-    "build:theme-four": "pnpm --filter @xm-games/theme-four-experience build && node scripts/sync-theme-four-build.mjs && node scripts/generate-offline-assets.mjs",
+    "build:theme-four": "pnpm --filter @xm-games/theme-four-experience build && pnpm --filter @xm-games/elemental-arena build && node scripts/sync-theme-four-build.mjs && node scripts/generate-offline-assets.mjs",
     "cf:build": "opennextjs-cloudflare build",
     "cf:deploy": "opennextjs-cloudflare deploy -- --keep-vars",
     "cf:upload": "opennextjs-cloudflare upload -- --keep-vars",
