@@ -1,10 +1,10 @@
 "use client"
 
 import type { ReactNode } from "react"
-import Link from "next/link"
 import { ArrowLeft, Home, Settings2 } from "lucide-react"
 
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { PrefetchLink as Link } from "@/components/prefetch-link"
 import { ThemeSwitcher } from "@/components/theme-switcher"
 import { Button } from "@/components/ui/button"
 import { useLocale } from "@/lib/locale-context"
@@ -47,7 +47,7 @@ function HomeLink({
       size={labelMode === "sr-only" ? "icon" : "sm"}
       className={cn("game-header-home", className)}
     >
-      <Link href="/" prefetch={false}>
+      <Link href="/">
         <Icon className="h-4 w-4" aria-hidden="true" />
         <span
           className={cn(
@@ -97,7 +97,7 @@ export function GameHeader({
         size="sm"
         className="theme-two-settings-shortcut"
       >
-        <Link href="/settings" prefetch={false}>
+        <Link href="/settings">
           <Settings2 aria-hidden="true" />
           <span>{t("settings")}</span>
         </Link>

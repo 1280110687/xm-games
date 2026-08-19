@@ -1,7 +1,6 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
 import { usePathname } from "next/navigation"
 import {
   Activity,
@@ -14,6 +13,7 @@ import {
 } from "lucide-react"
 
 import { useLocale } from "@/lib/locale-context"
+import { PrefetchLink as Link } from "@/components/prefetch-link"
 import type { Locale } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
@@ -106,7 +106,6 @@ function NavigationItems({
     <Link
       key={href}
       href={href}
-      prefetch={false}
       onClick={onClick}
       className={cn(itemClassName, active && "is-active")}
       aria-current={current}
@@ -190,7 +189,7 @@ export function ThemeThreeNavigation() {
   return (
     <>
       <aside className="theme-three-sidebar" aria-label={copy.workspace}>
-        <Link href="/" prefetch={false} className="theme-three-sidebar-brand">
+        <Link href="/" className="theme-three-sidebar-brand">
           <span className="theme-three-brand-mark">
             <Sparkles aria-hidden="true" />
           </span>

@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation"
 import { useLocale } from "@/lib/locale-context"
 
 const ROUTE_PROGRESS_TIMEOUT_MS = 12_000
+const ROUTE_PROGRESS_DELAY_MS = 150
 
 function isPlainPrimaryClick(event: MouseEvent): boolean {
   return (
@@ -26,14 +27,22 @@ export function RouteProgress() {
 function RouteProgressForPath({ pathname }: { pathname: string }) {
   const { t } = useLocale()
   const [targetPathname, setTargetPathname] = useState<string | null>(null)
+  const [showProgress, setShowProgress] = useState(false)
+  const delayRef = useRef<number | null>(null)
   const timeoutRef = useRef<number | null>(null)
-  const visible = targetPathname !== null && targetPathname !== pathname
+  const visible =
+    showProgress && targetPathname !== null && targetPathname !== pathname
 
   useEffect(() => {
-    const clearProgressTimeout = () => {
-      if (timeoutRef.current === null) return
-      window.clearTimeout(timeoutRef.current)
-      timeoutRef.current = null
+    const clearProgressTimers = () => {
+      if (delayRef.current !== null) {
+        window.clearTimeout(delayRef.current)
+        delayRef.current = null
+      }
+      if (timeoutRef.current !== null) {
+        window.clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
     }
 
     const handleClick = (event: MouseEvent) => {
@@ -60,18 +69,34 @@ function RouteProgressForPath({ pathname }: { pathname: string }) {
         nextUrl.search === currentUrl.search
       if (routeIsUnchanged) return
 
+      // Next.js client navigations request an RSC response. Those responses are
+      // intentionally not cached because they can carry request-specific data.
+      // A full document navigation lets the service worker serve the prepared
+      // static route while the installed app is offline.
+      if (!navigator.onLine) {
+        event.preventDefault()
+        window.location.assign(nextUrl.href)
+        return
+      }
+
       setTargetPathname(nextUrl.pathname)
-      clearProgressTimeout()
+      setShowProgress(false)
+      clearProgressTimers()
+      delayRef.current = window.setTimeout(() => {
+        delayRef.current = null
+        setShowProgress(true)
+      }, ROUTE_PROGRESS_DELAY_MS)
       timeoutRef.current = window.setTimeout(() => {
         timeoutRef.current = null
         setTargetPathname(null)
+        setShowProgress(false)
       }, ROUTE_PROGRESS_TIMEOUT_MS)
     }
 
     document.addEventListener("click", handleClick, true)
     return () => {
       document.removeEventListener("click", handleClick, true)
-      clearProgressTimeout()
+      clearProgressTimers()
     }
   }, [pathname])
 

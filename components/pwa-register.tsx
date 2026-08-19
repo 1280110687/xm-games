@@ -2,10 +2,23 @@
 
 import { useEffect } from "react"
 
+import { prepareOfflinePackage } from "@/features/pwa/offline-package"
+
 const PWA_CACHE_PREFIX = "xm-games-"
 const DEVELOPMENT_CLEANUP_KEY = "xm-games-pwa-development-cleaned:v1"
-const OFFLINE_WARMUP_DELAY_MS = 8_000
+const WEB_OFFLINE_WARMUP_DELAY_MS = 30_000
 const OFFLINE_WARMUP_IDLE_TIMEOUT_MS = 15_000
+
+interface NavigatorWithStandalone extends Navigator {
+  standalone?: boolean
+}
+
+function isInstalledPwa(): boolean {
+  return (
+    window.matchMedia("(display-mode: standalone)").matches ||
+    (navigator as NavigatorWithStandalone).standalone === true
+  )
+}
 
 function isXmGamesWorker(worker: ServiceWorker | null): boolean {
   if (!worker) return false
@@ -64,13 +77,31 @@ export function PwaRegister() {
     let cancelled = false
     let warmupTimer: number | null = null
     let idleCallback: number | null = null
+    const prepare = (
+      registration: ServiceWorkerRegistration,
+      scope: "core" | "full",
+    ) => {
+      document.documentElement.dataset.offlinePackage = "preparing"
+      void prepareOfflinePackage(scope, registration)
+        .then((result) => {
+          document.documentElement.dataset.offlinePackage = result.scope === "full"
+            ? "full"
+            : "core"
+        })
+        .catch((error: unknown) => {
+          document.documentElement.dataset.offlinePackage = "error"
+          console.warn("[pwa] Offline package preparation failed:", error)
+        })
+    }
+
     const scheduleOfflineWarmup = (registration: ServiceWorkerRegistration) => {
+      const installed = isInstalledPwa()
       warmupTimer = window.setTimeout(() => {
         if (cancelled) return
 
         const warm = () => {
           if (cancelled) return
-          registration.active?.postMessage({ type: "WARM_OFFLINE_CACHE" })
+          prepare(registration, installed ? "full" : "core")
         }
 
         if (typeof window.requestIdleCallback === "function") {
@@ -80,7 +111,13 @@ export function PwaRegister() {
         } else {
           warm()
         }
-      }, OFFLINE_WARMUP_DELAY_MS)
+      }, installed ? 0 : WEB_OFFLINE_WARMUP_DELAY_MS)
+    }
+
+    let readyRegistration: ServiceWorkerRegistration | null = null
+    const handleInstalled = () => {
+      if (cancelled || !readyRegistration) return
+      prepare(readyRegistration, "full")
     }
 
     const register = async () => {
@@ -89,7 +126,7 @@ export function PwaRegister() {
           scope: "/",
           updateViaCache: "none",
         })
-        const readyRegistration = await navigator.serviceWorker.ready
+        readyRegistration = await navigator.serviceWorker.ready
         if (!cancelled) scheduleOfflineWarmup(readyRegistration)
       } catch (error: unknown) {
         console.warn("[pwa] Service worker registration failed:", error)
@@ -101,10 +138,12 @@ export function PwaRegister() {
     } else {
       window.addEventListener("load", register, { once: true })
     }
+    window.addEventListener("appinstalled", handleInstalled)
 
     return () => {
       cancelled = true
       window.removeEventListener("load", register)
+      window.removeEventListener("appinstalled", handleInstalled)
       if (warmupTimer !== null) window.clearTimeout(warmupTimer)
       if (idleCallback !== null) window.cancelIdleCallback?.(idleCallback)
     }

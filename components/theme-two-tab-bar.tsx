@@ -1,11 +1,11 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Gamepad2, House, Settings2, Tv } from "lucide-react"
 
 import { useLocale } from "@/lib/locale-context"
+import { PrefetchLink as Link } from "@/components/prefetch-link"
 import type { Locale } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
@@ -67,7 +67,6 @@ export function ThemeTwoTabBar() {
     <nav className="theme-two-tab-bar" aria-label={copy.navigation}>
       <Link
         href="/"
-        prefetch={false}
         onClick={() => setHash("")}
         className={cn("theme-two-tab-item", isHome && "is-active")}
         aria-current={isHome ? "page" : undefined}
@@ -77,7 +76,6 @@ export function ThemeTwoTabBar() {
       </Link>
       <Link
         href="/#game-library"
-        prefetch={false}
         onClick={() => setHash("#game-library")}
         className={cn("theme-two-tab-item", isGame && "is-active")}
         aria-current={isGame ? "page" : undefined}
@@ -87,7 +85,6 @@ export function ThemeTwoTabBar() {
       </Link>
       <Link
         href="/anime-tracker"
-        prefetch={false}
         className={cn("theme-two-tab-item", isTracker && "is-active")}
         aria-current={isTracker ? "page" : undefined}
       >
@@ -96,7 +93,6 @@ export function ThemeTwoTabBar() {
       </Link>
       <Link
         href="/settings"
-        prefetch={false}
         className={cn("theme-two-tab-item", isSettings && "is-active")}
         aria-current={isSettings ? "page" : undefined}
       >

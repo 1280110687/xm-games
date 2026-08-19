@@ -7,7 +7,6 @@ import {
   useState,
   type CSSProperties,
 } from "react"
-import Link from "next/link"
 import {
   Activity,
   ArrowUpRight,
@@ -46,6 +45,7 @@ import {
 } from "lucide-react"
 
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { PrefetchLink as Link } from "@/components/prefetch-link"
 import { useTheme } from "@/components/theme-provider"
 import { ThemeSwitcher } from "@/components/theme-switcher"
 import { ThemeFourHome } from "@/components/theme-four-home"
@@ -455,7 +455,6 @@ function GameCard({
     return (
       <Link
         href={game.href}
-        prefetch={false}
         aria-label={`${title} — ${description}`}
         className="home-game-card home-game-card--featured surface-card group col-span-2 flex min-h-36 items-center gap-4 overflow-hidden p-4 transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_24px_64px_oklch(0.08_0.06_278_/_0.42)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transform-none sm:col-span-2 sm:min-h-40 sm:gap-6 sm:p-6 md:col-span-3 lg:col-span-4"
       >
@@ -488,7 +487,6 @@ function GameCard({
   return (
     <Link
       href={game.href}
-      prefetch={false}
       aria-label={`${title} — ${description}`}
       className="home-game-card surface-card group flex min-h-36 flex-col overflow-hidden p-3.5 transition-[transform,border-color,box-shadow] duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-[0_22px_56px_oklch(0.08_0.05_278_/_0.38)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background motion-reduce:transform-none sm:min-h-44 sm:p-5"
     >
@@ -700,7 +698,6 @@ function ThemeThreeHome() {
                             <Link
                               key={game.href}
                               href={game.href}
-                              prefetch={false}
                             >
                               <span className="theme-three-board-game-icon">
                                 <Icon aria-hidden="true" />
@@ -745,7 +742,6 @@ function ThemeThreeHome() {
                     <Link
                       key={game.href}
                       href={game.href}
-                      prefetch={false}
                       className={cn(
                         "theme-three-stack-card",
                         isActive && "is-active",
@@ -813,7 +809,6 @@ function ThemeThreeHome() {
 
                 <Link
                   href={featuredTool.href}
-                  prefetch={false}
                   className="theme-three-inspector-action"
                 >
                   {copy.openTracker}
@@ -843,7 +838,6 @@ function ThemeThreeHome() {
                   <Link
                     key={game.href}
                     href={game.href}
-                    prefetch={false}
                     className={index === 3 ? "is-active" : undefined}
                   >
                     <Icon aria-hidden="true" />
@@ -902,7 +896,7 @@ export default function Home() {
               size="sm"
               className="theme-two-settings-shortcut"
             >
-              <Link href="/settings" prefetch={false}>
+              <Link href="/settings">
                 <Settings2 aria-hidden="true" />
                 <span>{t("settings")}</span>
               </Link>

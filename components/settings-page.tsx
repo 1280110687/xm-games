@@ -1,9 +1,9 @@
 "use client"
 
-import Link from "next/link"
 import { ArrowLeft, Globe2, Palette, ShieldCheck } from "lucide-react"
 
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { PrefetchLink as Link } from "@/components/prefetch-link"
 import { ThemeSwitcher } from "@/components/theme-switcher"
 import { Button } from "@/components/ui/button"
 import { useLocale } from "@/lib/locale-context"
@@ -75,7 +75,7 @@ export function SettingsPage() {
             size="icon"
             className="settings-back-button shrink-0"
           >
-            <Link href="/" prefetch={false} aria-label={copy.back}>
+            <Link href="/" aria-label={copy.back}>
               <ArrowLeft aria-hidden="true" />
             </Link>
           </Button>

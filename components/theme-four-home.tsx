@@ -1,7 +1,6 @@
 "use client"
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
   Gamepad2,
@@ -13,6 +12,7 @@ import {
 } from "lucide-react"
 
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { PrefetchLink as Link } from "@/components/prefetch-link"
 import { ThemeSwitcher } from "@/components/theme-switcher"
 import { useTheme } from "@/components/theme-provider"
 import {
@@ -235,7 +235,7 @@ export function ThemeFourHome({ rooms }: { rooms: ThemeFourRoom[] }) {
           </button>
           <ThemeSwitcher compact />
           <LanguageSwitcher compact />
-          <Link href="/settings" prefetch={false} aria-label={copy.settings}>
+          <Link href="/settings" aria-label={copy.settings}>
             <Settings2 aria-hidden="true" />
           </Link>
         </span>
@@ -267,7 +267,7 @@ export function ThemeFourHome({ rooms }: { rooms: ThemeFourRoom[] }) {
                   {room.games.map((game) => {
                     const Icon = game.icon
                     return (
-                      <Link key={game.href} href={game.href} prefetch={false}>
+                      <Link key={game.href} href={game.href}>
                         <Icon aria-hidden="true" />
                         <span>{t(game.titleKey)}</span>
                         <small>{copy.open}</small>

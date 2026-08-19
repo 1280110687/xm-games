@@ -31,6 +31,7 @@ import {
   shouldOfferPwaInstall,
   type PwaInstallPlatform,
 } from "@/features/pwa/install-prompt"
+import { prepareOfflinePackage } from "@/features/pwa/offline-package"
 import { useLocale } from "@/lib/locale-context"
 
 type InstallChoice = {
@@ -220,6 +221,7 @@ export function PwaInstallPrompt() {
     const installPrompt = deferredPrompt
     setInstalling(true)
     setInstallError(false)
+    void prepareOfflinePackage("core").catch(() => undefined)
 
     try {
       await installPrompt.prompt()
@@ -228,6 +230,9 @@ export function PwaInstallPrompt() {
 
       if (choice.outcome === "accepted") {
         writeStorage(PWA_INSTALL_ACCEPTED_AT_KEY, String(Date.now()))
+        void prepareOfflinePackage("full").catch((error: unknown) => {
+          console.warn("[pwa] Full offline package preparation failed:", error)
+        })
       } else {
         writeStorage(PWA_INSTALL_DISMISSED_AT_KEY, String(Date.now()))
       }
@@ -238,6 +243,13 @@ export function PwaInstallPrompt() {
     } finally {
       setInstalling(false)
     }
+  }
+
+  const openManualGuide = () => {
+    setGuideOpen(true)
+    void prepareOfflinePackage("full").catch((error: unknown) => {
+      console.warn("[pwa] Full offline package preparation failed:", error)
+    })
   }
 
   const description = hasNativePrompt
@@ -341,7 +353,7 @@ export function PwaInstallPrompt() {
                 {installing ? t("pwaInstalling") : t("pwaInstallNow")}
               </Button>
             ) : (
-              <Button type="button" onClick={() => setGuideOpen(true)} aria-haspopup="dialog">
+              <Button type="button" onClick={openManualGuide} aria-haspopup="dialog">
                 {isIos ? <Share2 aria-hidden="true" /> : <MoreVertical aria-hidden="true" />}
                 {t("pwaInstallHowTo")}
               </Button>

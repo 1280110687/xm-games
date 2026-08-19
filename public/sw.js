@@ -1,7 +1,8 @@
-const CACHE_VERSION = "v8"
+const CACHE_VERSION = "v11"
 const SHELL_CACHE = `xm-games-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `xm-games-runtime-${CACHE_VERSION}`
 const OWNED_CACHE_PREFIX = "xm-games-"
+const OFFLINE_ASSET_MANIFEST = "/offline-assets.json"
 
 // Keep this list aligned with every non-API app/**/page.tsx route. The test in
 // app/manifest.test.ts protects future pages from being omitted accidentally.
@@ -34,6 +35,7 @@ const APP_ROUTES = [
 
 const STATIC_SHELL = [
   "/manifest.webmanifest",
+  OFFLINE_ASSET_MANIFEST,
   "/icon.svg",
   "/apple-touch-icon.png",
   "/pwa-icon-192.png",
@@ -149,7 +151,10 @@ async function precacheCoreShell() {
 }
 
 async function warmApplicationShell() {
+  await precacheCoreShell()
   const cache = await caches.open(SHELL_CACHE)
+  const nextStaticResources = new Set()
+  const failures = []
 
   // Full offline coverage is prepared after the page is interactive. Keeping
   // this work out of install prevents dozens of route and chunk requests from
@@ -165,13 +170,118 @@ async function warmApplicationShell() {
 
         const html = await response.text()
         for (const resource of extractNextStaticResources(html)) {
-          await fetchAndCacheIfMissing(cache, resource)
+          nextStaticResources.add(resource)
         }
       } catch (error) {
-        console.warn(`[pwa] Unable to warm offline route ${route}:`, error)
+        failures.push({ resource: route, error })
       }
     },
   )
+
+  await mapWithConcurrency(
+    [...nextStaticResources],
+    OFFLINE_WARM_CONCURRENCY,
+    async (resource) => {
+      try {
+        await fetchAndCacheIfMissing(cache, resource)
+      } catch (error) {
+        failures.push({ resource, error })
+      }
+    },
+  )
+
+  if (failures.length > 0) {
+    throw new Error(
+      `Unable to prepare ${failures.length} core offline resources: ${failures
+        .slice(0, 3)
+        .map(({ resource }) => resource)
+        .join(", ")}`,
+    )
+  }
+
+  return {
+    scope: "core",
+    routeCount: APP_ROUTES.length,
+    resourceCount: (await cache.keys()).length,
+  }
+}
+
+async function readOfflineAssetManifest(cache) {
+  const response = await fetchAndCacheIfMissing(cache, OFFLINE_ASSET_MANIFEST)
+  const manifest = await response.clone().json()
+
+  if (
+    manifest?.version !== 1 ||
+    !Array.isArray(manifest.assets) ||
+    manifest.assets.some(
+      (asset) => typeof asset !== "string" || !asset.startsWith("/"),
+    )
+  ) {
+    throw new Error("Offline asset manifest is invalid.")
+  }
+
+  return manifest.assets
+}
+
+async function warmFullOfflinePackage() {
+  await warmApplicationShell()
+  const cache = await caches.open(SHELL_CACHE)
+  const offlineAssets = await readOfflineAssetManifest(cache)
+  const failures = []
+
+  await mapWithConcurrency(
+    offlineAssets,
+    OFFLINE_WARM_CONCURRENCY,
+    async (resource) => {
+      try {
+        await fetchAndCacheIfMissing(cache, resource)
+      } catch (error) {
+        failures.push({ resource, error })
+      }
+    },
+  )
+
+  if (failures.length > 0) {
+    throw new Error(
+      `Unable to prepare ${failures.length} full offline resources: ${failures
+        .slice(0, 3)
+        .map(({ resource }) => resource)
+        .join(", ")}`,
+    )
+  }
+
+  return {
+    scope: "full",
+    routeCount: APP_ROUTES.length,
+    resourceCount: (await cache.keys()).length,
+  }
+}
+
+let corePreparation
+let fullPreparation
+
+function prepareOfflinePackage(scope) {
+  if (scope === "full") {
+    if (!fullPreparation) {
+      fullPreparation = Promise.resolve(corePreparation)
+        .catch(() => undefined)
+        .then(() => warmFullOfflinePackage())
+        .catch((error) => {
+          fullPreparation = undefined
+          throw error
+        })
+    }
+    return fullPreparation
+  }
+
+  if (fullPreparation) return fullPreparation
+  if (!corePreparation) {
+    corePreparation = warmApplicationShell().catch((error) => {
+      corePreparation = undefined
+      throw error
+    })
+  }
+  return corePreparation
 }
 
 async function updateCache(cacheName, request, response) {
@@ -272,7 +382,30 @@ self.addEventListener("message", (event) => {
   }
 
   if (event.data?.type === "WARM_OFFLINE_CACHE") {
-    event.waitUntil(warmApplicationShell())
+    event.waitUntil(
+      prepareOfflinePackage("core").catch((error) => {
+        console.warn("[pwa] Core offline cache preparation failed:", error)
+      }),
+    )
+    return
+  }
+
+  if (event.data?.type === "PREPARE_OFFLINE_PACKAGE") {
+    const scope = event.data.scope === "full" ? "full" : "core"
+    const replyPort = event.ports[0]
+
+    event.waitUntil(
+      prepareOfflinePackage(scope)
+        .then((result) => {
+          replyPort?.postMessage({ type: "OFFLINE_PACKAGE_READY", ...result })
+        })
+        .catch((error) => {
+          replyPort?.postMessage({
+            type: "OFFLINE_PACKAGE_ERROR",
+            message: error instanceof Error ? error.message : String(error),
+          })
+        }),
+    )
   }
 })
 
@@ -310,8 +443,13 @@ self.addEventListener("fetch", (event) => {
   }
 
   const isStaticAsset =
+    STATIC_SHELL.includes(url.pathname) ||
     url.pathname.startsWith("/_next/static/") ||
-    ["font", "image", "script", "style"].includes(request.destination)
+    url.pathname.startsWith("/theme-four-experience/") ||
+    url.pathname.startsWith("/theme-four/") ||
+    ["audio", "font", "image", "script", "style", "video", "worker"].includes(
+      request.destination,
+    )
 
   if (isStaticAsset) {
     event.respondWith(cacheFirst(request))

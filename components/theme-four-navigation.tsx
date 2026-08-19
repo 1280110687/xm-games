@@ -1,10 +1,10 @@
 "use client"
 
-import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Gamepad2, House, Map, Settings2, Tv } from "lucide-react"
 
 import { useLocale } from "@/lib/locale-context"
+import { PrefetchLink as Link } from "@/components/prefetch-link"
 import type { Locale } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
 
@@ -63,7 +63,6 @@ export function ThemeFourNavigation() {
     <nav className="theme-four-route-nav" aria-label={copy.navigation}>
       <Link
         href="/"
-        prefetch={false}
         className="theme-four-route-brand"
         aria-label={copy.home}
       >
@@ -75,7 +74,6 @@ export function ThemeFourNavigation() {
           <Link
             key={href}
             href={href}
-            prefetch={false}
             className={cn(active && "is-active")}
             aria-current={active ? "page" : undefined}
           >
