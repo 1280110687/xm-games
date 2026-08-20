@@ -131,13 +131,13 @@ describe("service worker shell", () => {
     expect(installHandler).not.toContain("self.skipWaiting()")
   })
 
-  it("installs only the core shell and warms full offline coverage later", () => {
+  it("installs every app route while leaving heavy experience assets for later", () => {
     const installHandler = source.match(
       /self\.addEventListener\("install"[\s\S]*?(?=self\.addEventListener\("message")/,
     )?.[0]
 
-    expect(installHandler).toContain("precacheCoreShell()")
-    expect(installHandler).not.toContain("warmApplicationShell()")
+    expect(installHandler).toContain("warmApplicationShell()")
+    expect(installHandler).not.toContain("warmFullOfflinePackage()")
     expect(source).toContain("const OFFLINE_WARM_CONCURRENCY = 2")
     expect(source).toContain('event.data?.type === "WARM_OFFLINE_CACHE"')
   })

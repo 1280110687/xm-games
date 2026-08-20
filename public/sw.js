@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v12"
+const CACHE_VERSION = "v13"
 const SHELL_CACHE = `xm-games-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `xm-games-runtime-${CACHE_VERSION}`
 const OWNED_CACHE_PREFIX = "xm-games-"
@@ -372,7 +372,9 @@ async function cacheFirst(request) {
 self.addEventListener("install", (event) => {
   // Do not call skipWaiting here. An update must stay waiting until existing
   // tabs using the previous Next.js chunks have closed or accepted an update.
-  event.waitUntil(precacheCoreShell())
+  // A worker is not install-ready until every app route and its Next.js chunks
+  // can open offline. Heavy Theme Four assets are still prepared separately.
+  event.waitUntil(warmApplicationShell())
 })
 
 self.addEventListener("message", (event) => {
