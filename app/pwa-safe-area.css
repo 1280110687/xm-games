@@ -1,0 +1,95 @@
+/*
+ * iOS standalone mode draws the document underneath the translucent status bar.
+ * Keep the artwork full bleed, but move every interactive top surface below the
+ * device cutout with a small visual gutter. The custom property also gives
+ * browser tests a deterministic way to emulate a non-zero iPhone safe area.
+ */
+:root {
+  --xm-safe-area-top: env(safe-area-inset-top, 0px);
+}
+
+/* Theme One */
+html[data-theme='theme-one'] .home-shell,
+html[data-theme='theme-one'] .settings-shell {
+  padding-top: max(1rem, calc(var(--xm-safe-area-top) + 1rem));
+}
+
+html[data-theme='theme-one'] .game-page {
+  padding-top: max(1rem, calc(var(--xm-safe-area-top) + 0.5rem));
+}
+
+html[data-theme='theme-one'] .app-shell[data-page='anime-tracker'] {
+  padding-top: var(--xm-safe-area-top);
+}
+
+/* Theme Two */
+html[data-theme='theme-two'] .home-shell,
+html[data-theme='theme-two'] .game-page {
+  padding-top: max(0.75rem, calc(var(--xm-safe-area-top) + 0.5rem));
+}
+
+html[data-theme='theme-two'] .home-header {
+  top: max(0.5rem, calc(var(--xm-safe-area-top) + 0.35rem));
+}
+
+html[data-theme='theme-two'] .settings-shell {
+  padding-top: max(1rem, calc(var(--xm-safe-area-top) + 0.75rem));
+}
+
+html[data-theme='theme-two'] .app-shell[data-page='anime-tracker'] {
+  padding-top: var(--xm-safe-area-top);
+}
+
+html[data-theme='theme-two']
+  .app-shell[data-page='anime-tracker']
+  .anime-filters {
+  top: max(0.25rem, calc(var(--xm-safe-area-top) + 0.35rem));
+}
+
+/* Theme Three */
+html[data-theme='theme-three'] .game-page,
+html[data-theme='theme-three'] .app-shell:not(.theme-three-home) {
+  padding-top: max(0.75rem, calc(var(--xm-safe-area-top) + 0.5rem));
+}
+
+html[data-theme='theme-three'] .theme-three-home {
+  padding-top: max(0.5rem, calc(var(--xm-safe-area-top) + 0.5rem));
+}
+
+html[data-theme='theme-three']
+  .app-shell[data-page='anime-tracker']
+  .anime-filters {
+  top: max(0.35rem, calc(var(--xm-safe-area-top) + 0.35rem));
+}
+
+/* Theme Four shared pages keep the paper/3D background full bleed. */
+html[data-theme='theme-four'] .game-page,
+html[data-theme='theme-four'] .app-shell[data-page='anime-tracker'] {
+  padding-top: var(--xm-safe-area-top);
+}
+
+html[data-theme='theme-four'] .settings-shell {
+  padding-top: max(1rem, calc(var(--xm-safe-area-top) + 1rem));
+}
+
+.theme-four-entry-toolbar,
+.theme-four-corridor-toolbar {
+  top: max(0.75rem, calc(var(--xm-safe-area-top) + 0.45rem));
+}
+
+.theme-four-webgl-toolbar {
+  top: max(0.7rem, calc(var(--xm-safe-area-top) + 0.45rem));
+}
+
+html[data-theme='theme-four']
+  [data-slot='dialog-content'].theme-four-map-dialog {
+  top: max(0.5rem, calc(var(--xm-safe-area-top) + 0.45rem));
+}
+
+@media (max-width: 767px) {
+  /* Preserve the compact game cockpits while adding space below the cutout. */
+  html[data-theme='theme-one'] .game-page,
+  html[data-theme='theme-two'] .game-page {
+    padding-top: max(0.35rem, calc(var(--xm-safe-area-top) + 0.35rem));
+  }
+}

@@ -5,6 +5,10 @@
 @use 'variables' as *;
 @use 'mixins' as *;
 
+:root {
+    --xm-safe-area-top: env(safe-area-inset-top, 0px);
+}
+
 // CSS Reset
 *,
 *::before,

@@ -1,6 +1,6 @@
 .achievements-panel {
     position: fixed;
-    top: 0;
+    top: max(8px, calc(var(--xm-safe-area-top) + 8px));
     right: 24px;
     width: 280px;
     filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.15));

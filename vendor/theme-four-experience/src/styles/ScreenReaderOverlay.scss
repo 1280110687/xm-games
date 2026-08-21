@@ -30,7 +30,7 @@
 // Focusable skip link — becomes visible on focus
 .sr-focusable:focus {
     position: fixed !important;
-    top: 8px;
+    top: max(8px, calc(var(--xm-safe-area-top) + 8px));
     left: 8px;
     width: auto !important;
     height: auto !important;

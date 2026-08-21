@@ -147,7 +147,7 @@
 // === RIGHT SIDE CONTROLS ===
 .nav-controls {
     position: fixed;
-    top: env(safe-area-inset-top); // Starts below the iOS status-bar cutout
+    top: max(8px, calc(var(--xm-safe-area-top) + 8px));
     right: max(24px, calc(env(safe-area-inset-right) + 12px));
     display: flex;
     gap: 12px;
@@ -477,7 +477,7 @@
 // === AUDIO PANEL ===
 .audio-panel {
     position: fixed;
-    top: env(safe-area-inset-top);
+    top: max(8px, calc(var(--xm-safe-area-top) + 8px));
     right: max(24px, calc(env(safe-area-inset-right) + 12px));
     width: 220px;
     filter: drop-shadow(0 4px 15px rgba(0, 0, 0, 0.15));

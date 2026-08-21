@@ -1,6 +1,6 @@
 .audio-controls {
     position: fixed;
-    top: 2rem;
+    top: max(2rem, calc(var(--xm-safe-area-top) + 0.75rem));
     right: 2rem;
     z-index: 1000;
     display: flex;

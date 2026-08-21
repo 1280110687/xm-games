@@ -15,6 +15,7 @@ import './theme-one.css'
 import './theme-two.css'
 import './theme-three.css'
 import './theme-four.css'
+import './pwa-safe-area.css'
 
 const geist = Geist({
   subsets: ['latin'],
