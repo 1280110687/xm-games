@@ -1,4 +1,4 @@
-import { SudokuGame } from "@/components/sudoku-game"
+import { SudokuGame } from "@/features/sudoku/components/sudoku-game"
 import { getPageMetadata } from "@/lib/page-metadata"
 
 export default function SudokuPage() {

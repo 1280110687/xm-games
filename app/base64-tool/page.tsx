@@ -1,4 +1,4 @@
-import { Base64Tool } from "@/components/base64-tool"
+import { Base64Tool } from "@/features/tools/components/base64-tool"
 import { getPageMetadata } from "@/lib/page-metadata"
 
 export const metadata = getPageMetadata("/base64-tool", "zh")

@@ -46,9 +46,9 @@ import {
 
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { PrefetchLink as Link } from "@/components/prefetch-link"
-import { useTheme } from "@/components/theme-provider"
-import { ThemeSwitcher } from "@/components/theme-switcher"
-import { ThemeFourHome } from "@/components/theme-four-home"
+import { useTheme } from "@/features/themes/shared/theme-provider"
+import { ThemeSwitcher } from "@/features/themes/shared/theme-switcher"
+import { ThemeFourHome } from "@/features/themes/theme-four/home"
 import { Button } from "@/components/ui/button"
 import { useLocale } from "@/lib/locale-context"
 import { orderHomeCategories } from "@/lib/home-catalog"

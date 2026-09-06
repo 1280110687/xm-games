@@ -1,35 +1,46 @@
-import { copyFile, cp, mkdir, rm, stat } from "node:fs/promises";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
+import { cp, mkdir, mkdtemp, rename, rm, stat } from "node:fs/promises"
+import { dirname, join, resolve } from "node:path"
+import { fileURLToPath } from "node:url"
+import { verifyExperienceAssets } from "./verify-experience-assets.mjs"
 
-const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const sourceRoot = resolve(projectRoot, "vendor/theme-four-experience/dist");
-const destinationRoot = resolve(projectRoot, "public/theme-four-experience");
-const sourceAssets = resolve(sourceRoot, "assets");
-const sourceIndex = resolve(sourceRoot, "index.html");
-const destinationAssets = resolve(destinationRoot, "assets");
-const destinationIndex = resolve(destinationRoot, "index.html");
-const elementalSourceRoot = resolve(projectRoot, "vendor/elemental-arena/dist");
-const elementalDestinationRoot = resolve(destinationRoot, "elemental-arena");
+const root = resolve(dirname(fileURLToPath(import.meta.url)), "..")
+const world = join(root, "apps/theme-four-world/dist")
+const arena = join(root, "apps/elemental-arena/dist")
+const published = join(root, "public/theme-four-experience")
 
-const [assetsStats, indexStats] = await Promise.all([
-  stat(sourceAssets),
-  stat(sourceIndex),
-]);
-
-if (!assetsStats.isDirectory()) {
-  throw new Error(`Theme Four assets directory is missing: ${sourceAssets}`);
+// Validate both builds before replacing the last working published package.
+for (const source of [world, arena]) {
+  if (!(await stat(join(source, "index.html"))).isFile()) {
+    throw new Error(`Missing experience entry: ${source}`)
+  }
 }
-
-if (!indexStats.isFile()) {
-  throw new Error(`Theme Four entry file is missing: ${sourceIndex}`);
+await mkdir(join(root, "public"), { recursive: true })
+const stage = await mkdtemp(join(root, "public/.experience-stage-"))
+const next = join(stage, "next")
+const previous = join(stage, "previous")
+let backedUp = false
+let retainBackup = false
+try {
+  await cp(world, next, { recursive: true })
+  await cp(arena, join(next, "elemental-arena"), { recursive: true })
+  await verifyExperienceAssets(next)
+  try {
+    await rename(published, previous)
+    backedUp = true
+  } catch (error) {
+    if (error.code !== "ENOENT") throw error
+  }
+  try {
+    await rename(next, published)
+  } catch (error) {
+    if (backedUp) {
+      retainBackup = true
+      await rename(previous, published)
+      retainBackup = false
+    }
+    throw error
+  }
+} finally {
+  if (!retainBackup) await rm(stage, { recursive: true, force: true })
 }
-
-await mkdir(destinationRoot, { recursive: true });
-await rm(destinationAssets, { recursive: true, force: true });
-await cp(sourceAssets, destinationAssets, { recursive: true });
-await copyFile(sourceIndex, destinationIndex);
-await rm(elementalDestinationRoot, { recursive: true, force: true });
-await cp(elementalSourceRoot, elementalDestinationRoot, { recursive: true });
-
-console.log("Theme Four and Elemental Arena build artifacts synced to public/theme-four-experience.");
+console.log("Both experience builds verified and published to public/theme-four-experience.")

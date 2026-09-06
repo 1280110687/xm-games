@@ -10,15 +10,16 @@ XM-Games 是一个基于 Next.js 的多语言浏览器小游戏合集，支持�
 - 街机游戏：俄罗斯方块、贪吃蛇、霓虹打砖块（PixiJS）
 - Bingo：本地号码抽取与卡片工具，以及带准备、同步抽号和发牌端验卡的局域网模式
 - 工具：追番助手、AES-GCM 文本加解密、文字二维码、JSON 格式化、UTF-8 Base64 编解码、文本整理与统计
-- 三套主题：霓虹深色大厅、iOS 灵感浅色应用、曜石绿玻璃工作台
+- 四套主题：霓虹深色大厅、iOS 灵感浅色应用、曜石绿玻璃工作台、独立 WebGL 房间
 
 ## 主题与布局
 
-- 三套主题共用游戏规则、对局状态与本地数据，但分别拥有独立的颜色、组件外观、页面间距、排版和响应式布局。
+- 四套主题共用游戏规则、对局状态与本地数据，但分别拥有独立的颜色、组件外观、页面间距、排版和响应式布局。
 - 主题一保留页头主题与语言工具；主题二通过独立设置页集中管理，并在移动端使用“首页 / 游戏 / 追番 / 设置”四栏底部导航。设置保存在 `xm-games-theme:v1`，刷新、路由跳转和重新打开页面后会继续使用上次选择。
 - 主题三采用纯黑画布、银灰玻璃边缘和荧光绿状态色：桌面端使用独立固定侧栏与高密度控制台，移动端重排为单列工作台和悬浮玻璃底栏。
 - 主题切换只改变展示壳层，不会重新挂载游戏控制器，因此不会重置棋盘、分数、计时器、语音实例或 PixiJS 画布。
-- `app/theme-one.css`、`app/theme-two.css` 和 `app/theme-three.css` 分别维护三套视觉与布局；经典 2048 / Tetris 也拥有对应的独立主题文件，`data-page` 为每个路由提供布局接入点。
+- 主题四的 WebGL 场景和元素技能竞技场分别由两个独立 Vite 应用构建，通过同源 iframe 接入；主站保留主题、语言和路由控制权。
+- `styles/themes/theme-{one,two,three,four}/` 分别维护四套视觉与布局；经典 2048 / Tetris 也拥有对应的独立主题文件，`data-page` 为每个路由提供布局接入点。
 
 ## 本地开发
 
@@ -33,7 +34,7 @@ pnpm install
 pnpm dev
 ```
 
-开发服务默认运行在 [http://localhost:3000](http://localhost:3000)。
+开发服务默认运行在 [http://localhost:3000](http://localhost:3000)。`pnpm dev` 同时启动 Next.js 和两个 Vite 服务（本机端口 4174、4175），通过主站代理加载最新 3D 源码，退出时一起关闭。无需先构建或手动复制文件。仅调试主站时可用 `pnpm dev:host`，但主题四需要先执行 `pnpm build:theme-four`。
 
 ## 常用命令
 
@@ -41,20 +42,30 @@ pnpm dev
 pnpm dev        # 启动开发服务器
 pnpm build      # 生成生产构建
 pnpm start      # 启动生产服务器（需先 build）
-pnpm lint       # 执行 ESLint 检查
-pnpm typecheck  # 执行 TypeScript 类型检查
-pnpm test       # 运行 Vitest 测试
+pnpm lint       # 检查主站及两个 3D 应用
+pnpm typecheck  # 主站与共享协议的 TypeScript 类型检查
+pnpm test       # 先生成 3D 离线素材，再运行 Vitest
 pnpm test:watch # 监听模式运行测试
+pnpm verify     # lint、类型检查、完整构建、测试
 ```
 
 ## 主要目录
 
 ```text
-app/         页面、路由、布局与全局样式
-components/  游戏界面及通用 UI 组件
-features/    可独立测试的游戏规则与逻辑引擎
-lib/         国际化、页面元数据与通用工具
+app/                         Next.js 页面、路由、布局及全局基础样式
+components/                  跨功能通用组件、UI 基础组件
+features/                    游戏规则、控制器、各游戏界面、工具和主题宿主
+styles/themes/               四套主题的主样式及按路由拆分的样式
+apps/theme-four-world/       WebGL 世界源码及原始 public 素材
+apps/elemental-arena/        技能竞技场源码及原始 public 素材
+packages/experience-bridge/  主站与场景共用的消息协议、类型和校验
+public/                     主站静态素材；3D 发布目录由构建生成
+scripts/                    开发编排、构建同步和离线清单生成
+lib/                        国际化、页面元数据与通用工具
+docs/                       工程边界与维护说明
 ```
+
+详见 [工程结构与构建约定](docs/architecture.md)。`public/theme-four-experience/` 和 `public/offline-assets.json` 是忽略的生成物，不要直接修改；生产构建会从两个应用的源码与素材重新生成。
 
 ## H5 局域网对战
 
@@ -89,7 +100,7 @@ Upstash 当前 Free 计划包含每月 500,000 条命令、256 MB 数据和 10 G
 
 ### Cloudflare Workers 免费部署
 
-Cloudflare 使用 `@opennextjs/cloudflare` 把 Next.js 构建结果转换为 Worker。仓库根目录同时包含 Next.js 主应用和 Theme Four Vite workspace，因此不要使用裸的 `wrangler deploy` 自动检测，也不要把 Root directory 指向 `vendor/theme-four-experience`。
+Cloudflare 使用 `@opennextjs/cloudflare` 把 Next.js 构建结果转换为 Worker。仓库根目录同时包含 Next.js 主应用和 Theme Four Vite workspace，因此不要使用裸的 `wrangler deploy` 自动检测，也不要把 Root directory 指向 `apps/theme-four-world`。
 
 Workers Builds 使用以下配置：
 
@@ -112,7 +123,7 @@ Bingo 使用浏览器的 Web Speech API：号码抽取支持语音合成播报�
 
 主题与语言偏好、动漫追踪记录、旧版封面 URL 索引、贪吃蛇最高分、2048 最高分、记忆翻牌最佳记录和霓虹打砖块最高分保存在当前浏览器的 `localStorage` 中；可下载的封面文件会优先写入 Cache Storage 或 IndexedDB。这些数据不会自动同步到其他浏览器或设备；清除站点数据、使用隐私模式或浏览器限制存储时，记录可能丢失或无法持久化。
 
-文本加解密、二维码、JSON、Base64 和文本整理工具不会把输入内容、密码或处理历史写入本地存储，也不会发送到服务器。文本加密使用 Web Crypto 的 PBKDF2-HMAC-SHA-256 与 AES-256-GCM；二维码由随应用打包的本地生成器完成；JSON 格式化会保留超大整数字面量与重复键，Base64 按 UTF-8 字节处理多语言和 Emoji。H5 已提供 Web App Manifest 与 Service Worker，可安装到桌面并缓存首页、五子棋页面及版本化静态资源；首次加载、更新缓存以及未访问过的页面仍需要网络。局域网信令接口、SDP、ICE Candidate 和房间令牌不会写入离线缓存。Base64 只是一种编码格式，不提供加密保护。
+文本加解密、二维码、JSON、Base64 和文本整理工具不会把输入内容、密码或处理历史写入本地存储，也不会发送到服务器。文本加密使用 Web Crypto 的 PBKDF2-HMAC-SHA-256 与 AES-256-GCM；二维码由随应用打包的本地生成器完成；JSON 格式化会保留超大整数字面量与重复键，Base64 按 UTF-8 字节处理多语言和 Emoji。H5 已提供 Web App Manifest 与 Service Worker，可安装到桌面；首次联网完成离线包准备后，可离线进入本机工具和游戏，完整包还包含主题四的 3D 资源。首次下载、更新缓存和联网功能仍需要网络；离线数据可能被浏览器回收。局域网信令接口、SDP、ICE Candidate 和房间令牌不会写入离线缓存。Base64 只是一种编码格式，不提供加密保护。
 
 ### 追番助手兼容与离线策略
 

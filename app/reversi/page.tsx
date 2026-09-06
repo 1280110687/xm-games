@@ -1,4 +1,4 @@
-import { ReversiGame } from "@/components/reversi-game"
+import { ReversiGame } from "@/features/reversi/components/reversi-game"
 import { getPageMetadata } from "@/lib/page-metadata"
 
 export default function ReversiPage() {

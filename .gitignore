@@ -2,12 +2,15 @@
 
 # dependencies
 /node_modules
-/vendor/theme-four-experience/node_modules/
-/vendor/theme-four-experience/dist/
-/vendor/theme-four-experience/package-lock.json
-/vendor/elemental-arena/node_modules/
-/vendor/elemental-arena/dist/
-/vendor/elemental-arena/package-lock.json
+
+# workspace build output (source assets live in apps/*/public)
+/apps/*/node_modules/
+/packages/*/node_modules/
+/apps/*/dist/
+/apps/*/package-lock.json
+/public/theme-four-experience/
+/public/offline-assets.json
+/public/.experience-stage-*/
 
 # next.js
 /.next/

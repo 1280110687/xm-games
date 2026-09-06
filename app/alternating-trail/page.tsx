@@ -1,10 +1,10 @@
-import { AlternatingTrailGame } from "@/components/alternating-trail-game"
+import { AlternatingTrailGame } from "@/features/alternating-trail/components/alternating-trail-game"
 import { getPageMetadata } from "@/lib/page-metadata"
 import "../schulte-grid.css"
-import "../theme-one-schulte-grid.css"
-import "../theme-two-schulte-grid.css"
-import "../theme-three-schulte-grid.css"
-import "../theme-four-schulte-grid.css"
+import "@/styles/themes/theme-one/schulte-grid.css"
+import "@/styles/themes/theme-two/schulte-grid.css"
+import "@/styles/themes/theme-three/schulte-grid.css"
+import "@/styles/themes/theme-four/schulte-grid.css"
 
 export default function AlternatingTrailPage() {
   return <AlternatingTrailGame />

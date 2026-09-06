@@ -1,4 +1,4 @@
-import { QrCodeTool } from "@/components/qr-code-tool"
+import { QrCodeTool } from "@/features/tools/components/qr-code-tool"
 import { getPageMetadata } from "@/lib/page-metadata"
 
 export const metadata = getPageMetadata("/qr-code", "zh")

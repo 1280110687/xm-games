@@ -1,0 +1,863 @@
+/*
+ * Theme Four: a pencil-and-paper game club.
+ *
+ * The immersive entrance and corridor are isolated in ThemeFourHome. Existing
+ * game routes keep their stateful React trees and receive this paper workspace
+ * shell through theme-scoped selectors only.
+ */
+html[data-theme='theme-four'] {
+  color-scheme: light;
+  --background: #e9e1d2;
+  --foreground: #292720;
+  --card: #f7f1e7;
+  --card-foreground: #292720;
+  --popover: #fbf6ec;
+  --popover-foreground: #292720;
+  --primary: #286f72;
+  --primary-foreground: #fffdf8;
+  --secondary: #ddd2c1;
+  --secondary-foreground: #302d26;
+  --muted: #e1d8ca;
+  --muted-foreground: #696359;
+  --accent: #c97758;
+  --accent-foreground: #fffdf8;
+  --destructive: #a44337;
+  --destructive-foreground: #fffaf5;
+  --border: rgb(56 51 43 / 0.28);
+  --input: rgb(255 252 245 / 0.72);
+  --ring: #286f72;
+  --radius: 0.35rem;
+  --surface-low: rgb(244 238 226 / 0.72);
+  --surface: rgb(250 245 235 / 0.88);
+  --surface-high: rgb(255 251 243 / 0.94);
+  --surface-border: rgb(56 51 43 / 0.24);
+  --surface-shadow: 0 18px 48px rgb(65 53 37 / 0.18);
+  --control-fill: rgb(255 252 245 / 0.72);
+  --control-hover: rgb(255 252 245 / 0.96);
+  --separator: rgb(56 51 43 / 0.16);
+  --glow-primary: transparent;
+  --glow-cyan: transparent;
+  --theme-four-paper: #f7f0e4;
+  --theme-four-paper-deep: #ded3c2;
+  --theme-four-ink: #292720;
+  --theme-four-pencil: #665f54;
+  --theme-four-teal: #286f72;
+  --theme-four-coral: #c97758;
+  --theme-four-ochre: #b17a38;
+}
+
+.theme-four-home,
+.theme-four-route-nav {
+  display: none;
+}
+
+html[data-theme='theme-four'],
+html[data-theme='theme-four'] body {
+  min-height: 100%;
+  background: var(--background);
+}
+
+html[data-theme='theme-four'] body {
+  color: var(--foreground);
+  font-family:
+    var(--font-geist-sans),
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    'PingFang SC',
+    'Hiragino Sans GB',
+    'Noto Sans Thai',
+    sans-serif;
+}
+
+html[data-theme='theme-four'] ::selection {
+  color: #fffdf8;
+  background: rgb(40 111 114 / 0.82);
+}
+
+html[data-theme='theme-four'] .theme-four-home {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  color: var(--theme-four-ink);
+  background: var(--theme-four-paper);
+  opacity: 0;
+  transition: opacity 220ms ease;
+}
+
+html[data-theme='theme-four'] .theme-four-home[data-ready='true'] {
+  opacity: 1;
+}
+
+html[data-theme='theme-four'] .home-shell {
+  display: none;
+}
+
+.theme-four-toolbar-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.theme-four-game-open {
+  color: var(--theme-four-coral);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.54rem;
+  font-weight: 800;
+}
+
+html[data-theme='theme-four'] [data-slot='dialog-overlay'] {
+  background: rgb(42 37 30 / 0.6);
+  backdrop-filter: blur(5px);
+}
+
+html[data-theme='theme-four'] [data-slot='dialog-content'].theme-four-map-dialog {
+  display: grid;
+  width: min(calc(100vw - 2rem), 62rem);
+  max-width: 62rem;
+  max-height: min(90svh, 52rem);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 1rem;
+  padding: 1.35rem;
+  overflow: hidden;
+  border: 1px solid rgb(54 49 41 / 0.52);
+  border-radius: 0.2rem;
+  color: var(--theme-four-ink);
+  background: #f8f1e5;
+  box-shadow: 8px 10px 0 rgb(48 39 28 / 0.2), 0 34px 110px rgb(42 34 24 / 0.36);
+}
+
+.theme-four-map-heading {
+  padding-right: 2.5rem;
+  border-bottom: 1px dashed rgb(54 49 41 / 0.3);
+  padding-bottom: 0.85rem;
+}
+
+.theme-four-map-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  color: var(--theme-four-teal);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+}
+
+.theme-four-map-kicker svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.theme-four-map-heading [data-slot='dialog-title'] {
+  margin-top: 0.2rem;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.6rem, 3vw, 2.45rem);
+  letter-spacing: 0.03em;
+}
+
+.theme-four-map-heading [data-slot='dialog-description'] {
+  color: var(--theme-four-pencil);
+}
+
+.theme-four-map-dialog > [data-slot='dialog-close']:not(.theme-four-map-done) {
+  display: grid;
+  width: 2.6rem;
+  height: 2.6rem;
+  place-items: center;
+  border: 1px solid rgb(54 49 41 / 0.4);
+  border-radius: 0.15rem;
+  color: var(--theme-four-ink);
+  background: #fffaf0;
+}
+
+.theme-four-map-grid {
+  display: grid;
+  min-height: 0;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.15rem;
+}
+
+.theme-four-map-room {
+  display: grid;
+  align-content: start;
+  gap: 0.45rem;
+  padding: 0.62rem;
+  border: 1px solid rgb(54 49 41 / 0.24);
+  border-radius: 0.18rem;
+  background: rgb(255 252 246 / 0.58);
+}
+
+.theme-four-map-room > button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.12rem 0.5rem;
+  padding: 0.15rem;
+  cursor: pointer;
+  border: 0;
+  color: var(--theme-four-ink);
+  background: transparent;
+  text-align: left;
+}
+
+.theme-four-map-room > button > span {
+  grid-row: span 2;
+  color: var(--theme-four-coral);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.theme-four-map-room > button > strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 0.92rem;
+}
+
+.theme-four-map-room > button > small {
+  overflow: hidden;
+  color: var(--theme-four-pencil);
+  font-size: 0.58rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.theme-four-map-room > button.is-active > strong {
+  color: var(--theme-four-teal);
+  text-decoration: underline;
+  text-underline-offset: 0.22rem;
+}
+
+.theme-four-map-room > div {
+  display: grid;
+  gap: 0.28rem;
+}
+
+.theme-four-map-room > div > a {
+  display: flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: 0.42rem;
+  padding: 0.34rem 0.42rem;
+  border-radius: 0.12rem;
+  color: var(--theme-four-pencil);
+  font-size: 0.68rem;
+}
+
+.theme-four-map-room > div > a:hover,
+.theme-four-map-room > div > a:focus-visible {
+  color: var(--theme-four-ink);
+  background: #ebe2d3;
+}
+
+.theme-four-map-room > div > a svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  color: var(--theme-four-teal);
+}
+
+.theme-four-map-done {
+  justify-self: end;
+  min-height: 2.6rem;
+  padding-inline: 1rem;
+  cursor: pointer;
+  border: 1px solid rgb(54 49 41 / 0.42);
+  border-radius: 0.16rem;
+  color: #fff;
+  background: var(--theme-four-teal);
+  font-size: 0.7rem;
+  font-weight: 750;
+}
+
+/* Shared game and utility pages */
+html[data-theme='theme-four'] .game-page,
+html[data-theme='theme-four'] .app-shell[data-page='anime-tracker'] {
+  color: var(--theme-four-ink);
+  background: #e9e1d2;
+}
+
+html[data-theme='theme-four'] .game-page::before,
+html[data-theme='theme-four'] .app-shell[data-page='anime-tracker']::before {
+  position: fixed;
+  z-index: -1;
+  inset: 0;
+  pointer-events: none;
+  content: '';
+  background-image: url('/theme-four/club-corridor.webp');
+  background-position: center;
+  background-size: cover;
+  filter: grayscale(0.82) opacity(0.1);
+}
+
+html[data-theme='theme-four'] .game-page {
+  padding-left: 5.4rem;
+}
+
+html[data-theme='theme-four'] .game-page main,
+html[data-theme='theme-four'] .game-page > .game-content,
+html[data-theme='theme-four'] .app-shell[data-page='anime-tracker'] > .app-container {
+  width: min(100%, 74rem);
+  margin-inline: auto;
+}
+
+html[data-theme='theme-four'] .game-header {
+  width: min(calc(100% - 2rem), 74rem);
+  margin: 0.8rem auto 1rem;
+  border: 1px solid rgb(54 49 41 / 0.34);
+  border-radius: 0.2rem;
+  color: var(--theme-four-ink);
+  background: rgb(249 243 232 / 0.92);
+  box-shadow: 5px 6px 0 rgb(68 57 43 / 0.14);
+}
+
+html[data-theme='theme-four'] .game-header h1,
+html[data-theme='theme-four'] .settings-header h1,
+html[data-theme='theme-four'] .utility-page h1 {
+  color: var(--theme-four-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+  letter-spacing: 0.01em;
+}
+
+html[data-theme='theme-four'] .game-header [data-layout-slot='description'] {
+  color: var(--theme-four-pencil);
+}
+
+html[data-theme='theme-four'] .game-header-home,
+html[data-theme='theme-four'] .game-header .theme-switcher-trigger,
+html[data-theme='theme-four'] .game-header .language-switcher-trigger,
+html[data-theme='theme-four'] .game-header .theme-two-settings-shortcut {
+  border-color: rgb(54 49 41 / 0.3);
+  border-radius: 0.15rem;
+  color: var(--theme-four-ink);
+  background: rgb(255 252 246 / 0.72);
+  box-shadow: none;
+}
+
+html[data-theme='theme-four'] .game-header .language-switcher-trigger svg {
+  color: var(--theme-four-teal);
+}
+
+html[data-theme='theme-four'] .surface-panel,
+html[data-theme='theme-four'] .surface-card,
+html[data-theme='theme-four'] [data-slot='card'] {
+  border: 1px solid rgb(54 49 41 / 0.28);
+  border-radius: 0.22rem;
+  color: var(--theme-four-ink);
+  background: rgb(249 243 232 / 0.9);
+  box-shadow: 4px 5px 0 rgb(68 57 43 / 0.12);
+}
+
+html[data-theme='theme-four'] [data-slot='button'] {
+  border-radius: 0.18rem;
+}
+
+html[data-theme='theme-four'] [data-slot='button'][data-variant='outline'],
+html[data-theme='theme-four'] [data-slot='button'][data-variant='secondary'],
+html[data-theme='theme-four'] [data-slot='button'][data-variant='ghost'] {
+  border-color: rgb(54 49 41 / 0.3);
+  color: var(--theme-four-ink);
+  background: rgb(255 252 246 / 0.7);
+}
+
+html[data-theme='theme-four'] [data-slot='button'][data-variant='outline']:hover,
+html[data-theme='theme-four'] [data-slot='button'][data-variant='secondary']:hover,
+html[data-theme='theme-four'] [data-slot='button'][data-variant='ghost']:hover {
+  color: #fff;
+  background: var(--theme-four-teal);
+}
+
+html[data-theme='theme-four'] [data-slot='input'],
+html[data-theme='theme-four'] [data-slot='select-trigger'],
+html[data-theme='theme-four'] textarea {
+  border-color: rgb(54 49 41 / 0.3);
+  border-radius: 0.16rem;
+  color: var(--theme-four-ink);
+  background: rgb(255 252 246 / 0.78);
+}
+
+html[data-theme='theme-four'] [data-slot='select-content'],
+html[data-theme='theme-four'] [data-slot='dropdown-menu-content'],
+html[data-theme='theme-four'] [data-slot='dropdown-menu-sub-content'] {
+  border-color: rgb(54 49 41 / 0.34);
+  border-radius: 0.18rem;
+  color: var(--theme-four-ink);
+  background: #fbf6ec;
+  box-shadow: 5px 6px 0 rgb(68 57 43 / 0.13), 0 18px 54px rgb(55 44 31 / 0.18);
+}
+
+html[data-theme='theme-four'] .theme-switcher-content [data-slot='dropdown-menu-radio-item'] {
+  border-radius: 0.14rem;
+}
+
+html[data-theme='theme-four'] .theme-switcher-content [data-slot='dropdown-menu-radio-item'][data-state='checked'] {
+  color: var(--theme-four-teal);
+  background: #e6ddd0;
+}
+
+html[data-theme='theme-four'] .eyebrow,
+html[data-theme='theme-four'] .memory-kicker,
+html[data-theme='theme-four'] .bingo-lan-eyebrow {
+  color: var(--theme-four-teal);
+  font-family: var(--font-geist-mono), monospace;
+  letter-spacing: 0.1em;
+}
+
+html[data-theme='theme-four'] canvas {
+  border-color: rgb(54 49 41 / 0.28) !important;
+  box-shadow: 5px 6px 0 rgb(68 57 43 / 0.14) !important;
+}
+
+html[data-theme='theme-four'] .classic-2048-shell {
+  padding: 0.85rem;
+  border: 1px solid rgb(54 49 41 / 0.3);
+  border-radius: 0.2rem;
+  background: rgb(249 243 232 / 0.92);
+  box-shadow: 5px 6px 0 rgb(68 57 43 / 0.14);
+}
+
+html[data-theme='theme-four'] .classic-2048-logo {
+  color: var(--theme-four-ink);
+  font-family: Georgia, 'Times New Roman', serif;
+}
+
+html[data-theme='theme-four'] .classic-2048-score {
+  background: var(--theme-four-teal);
+}
+
+html[data-theme='theme-four'] .classic-2048-new-game,
+html[data-theme='theme-four'] .classic-2048-message [data-slot='button'] {
+  color: #fff;
+  background: var(--theme-four-teal);
+}
+
+html[data-theme='theme-four'] .tetris-handheld {
+  border: 1px solid rgb(54 49 41 / 0.4);
+  border-radius: 0.28rem;
+  color: var(--theme-four-ink);
+  background: #d8c99f;
+  box-shadow: 6px 7px 0 rgb(68 57 43 / 0.16), 0 24px 64px rgb(56 46 32 / 0.18);
+}
+
+html[data-theme='theme-four'] .tetris-brand-blocks,
+html[data-theme='theme-four'] .tetris-function-button,
+html[data-theme='theme-four'] .tetris-drop-button {
+  color: var(--theme-four-teal);
+}
+
+html[data-theme='theme-four'] .schulte-two-stack > section,
+html[data-theme='theme-four'] .schulte-two-board-card,
+html[data-theme='theme-four'] .schulte-two-settings-card,
+html[data-theme='theme-four'] .schulte-two-stat-card {
+  border-color: rgb(54 49 41 / 0.28);
+  border-radius: 0.22rem;
+  color: var(--theme-four-ink);
+  background: rgb(249 243 232 / 0.92);
+  box-shadow: 4px 5px 0 rgb(68 57 43 / 0.12);
+}
+
+html[data-theme='theme-four'] .theme-four-route-nav {
+  position: fixed;
+  z-index: 42;
+  top: 50%;
+  left: max(0.65rem, env(safe-area-inset-left));
+  display: grid;
+  width: 4.15rem;
+  gap: 0.45rem;
+  padding: 0.45rem;
+  border: 1px solid rgb(54 49 41 / 0.38);
+  border-radius: 0.2rem;
+  background: rgb(249 243 232 / 0.94);
+  box-shadow: 5px 6px 0 rgb(68 57 43 / 0.14);
+  transform: translateY(-50%);
+}
+
+.theme-four-route-brand,
+.theme-four-route-nav > div > a {
+  display: grid;
+  min-height: 3.2rem;
+  place-items: center;
+  gap: 0.2rem;
+  border-radius: 0.14rem;
+  color: var(--theme-four-pencil);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.52rem;
+  font-weight: 750;
+}
+
+.theme-four-route-brand {
+  color: #fff;
+  background: var(--theme-four-teal);
+}
+
+.theme-four-route-nav > div {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.theme-four-route-brand svg,
+.theme-four-route-nav > div > a svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.theme-four-route-nav > div > a:hover,
+.theme-four-route-nav > div > a:focus-visible,
+.theme-four-route-nav > div > a.is-active {
+  color: var(--theme-four-teal);
+  background: #e6ddd0;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt,
+html[data-theme='theme-four'] [data-slot='dialog-content'].pwa-install-guide {
+  border-color: rgb(54 49 41 / 0.38);
+  border-radius: 0.2rem;
+  color: var(--theme-four-ink);
+  background: #f8f1e5;
+  box-shadow: 6px 7px 0 rgb(68 57 43 / 0.15), 0 28px 80px rgb(55 44 31 / 0.2);
+}
+
+@media (max-width: 900px) {
+
+  .theme-four-map-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-four'] [data-slot='dialog-overlay'] {
+    background: rgb(42 37 30 / 0.32);
+    backdrop-filter: blur(2px);
+  }
+
+  html[data-theme='theme-four'] .theme-four-home {
+    height: 100dvh;
+  }
+
+  html[data-theme='theme-four'] [data-slot='dialog-content'].theme-four-map-dialog {
+    top: max(0.5rem, env(safe-area-inset-top));
+    width: calc(100vw - 1rem);
+    max-height: min(72dvh, 38rem);
+    padding: 1rem;
+    translate: -50% 0 !important;
+    transform: none;
+  }
+
+  .theme-four-map-grid {
+    grid-template-columns: 1fr;
+  }
+
+  html[data-theme='theme-four'] .game-page {
+    padding-right: 0;
+    padding-bottom: calc(4.9rem + env(safe-area-inset-bottom));
+    padding-left: 0;
+  }
+
+  html[data-theme='theme-four'] .app-shell[data-page='anime-tracker'] {
+    padding-bottom: calc(4.9rem + env(safe-area-inset-bottom));
+  }
+
+  html[data-theme='theme-four'] .game-header {
+    width: calc(100% - 1rem);
+    margin-top: 0.5rem;
+  }
+
+  html[data-theme='theme-four'] .theme-four-route-nav {
+    top: auto;
+    right: max(0.55rem, env(safe-area-inset-right));
+    bottom: max(0.45rem, env(safe-area-inset-bottom));
+    left: max(0.55rem, env(safe-area-inset-left));
+    width: auto;
+    grid-template-columns: 2.85rem minmax(0, 1fr);
+    gap: 0.3rem;
+    padding: 0.35rem;
+    transform: none;
+  }
+
+  .theme-four-route-brand {
+    min-height: 3rem;
+  }
+
+  .theme-four-route-nav > div {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .theme-four-route-nav > div > a {
+    min-height: 3rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-four-home {
+    scroll-behavior: auto;
+    transition: none !important;
+  }
+}
+
+/* Theme Four WebGL host ---------------------------------------------------
+ * The reference scene runs in an iframe so its global canvas/SCSS, history,
+ * CMS and animation lifecycle cannot leak into the Next.js application.
+ */
+html[data-theme='theme-four'] .theme-four-webgl-home {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100vh;
+  height: 100svh;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  background: #f4f2ed;
+  opacity: 1;
+}
+
+.theme-four-webgl-frame {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  background: #f4f2ed;
+  overscroll-behavior: none;
+}
+
+.theme-four-webgl-loading {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 0.8rem;
+  color: #3a3731;
+  background:
+    radial-gradient(circle at center, rgb(255 255 255 / 0.72), transparent 42%),
+    #f4f2ed;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+}
+
+.theme-four-webgl-loading svg {
+  width: 1.45rem;
+  height: 1.45rem;
+  animation: theme-four-webgl-spin 900ms linear infinite;
+}
+
+@keyframes theme-four-webgl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.theme-four-webgl-toolbar {
+  position: absolute;
+  z-index: 12;
+  top: max(0.7rem, calc(env(safe-area-inset-top) + 0.45rem));
+  right: max(0.72rem, calc(env(safe-area-inset-right) + 0.45rem));
+  left: max(0.72rem, calc(env(safe-area-inset-left) + 0.45rem));
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.65rem;
+  pointer-events: none;
+}
+
+.theme-four-webgl-toolbar > * {
+  pointer-events: auto;
+}
+
+.theme-four-webgl-brand,
+.theme-four-webgl-map-trigger,
+.theme-four-webgl-controls .theme-switcher-trigger,
+.theme-four-webgl-controls .language-switcher-trigger,
+.theme-four-webgl-controls > a {
+  display: inline-flex;
+  min-height: 2.72rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(32 30 27 / 0.68);
+  border-radius: 0.08rem;
+  color: #25231f;
+  background: rgb(250 249 245 / 0.92);
+  box-shadow: 3px 4px 0 rgb(38 35 30 / 0.14);
+  backdrop-filter: blur(6px);
+}
+
+.theme-four-webgl-brand {
+  gap: 0.58rem;
+  padding: 0.48rem 0.72rem;
+  transform: rotate(-0.25deg);
+}
+
+.theme-four-webgl-brand > svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  color: #2b7777;
+}
+
+.theme-four-webgl-brand > span {
+  display: grid;
+  gap: 0.04rem;
+}
+
+.theme-four-webgl-brand strong,
+.theme-four-webgl-brand small,
+.theme-four-webgl-map-trigger {
+  font-family: var(--font-geist-mono), monospace;
+}
+
+.theme-four-webgl-brand strong {
+  font-size: 0.7rem;
+  letter-spacing: 0.13em;
+}
+
+.theme-four-webgl-brand small {
+  color: #686158;
+  font-size: 0.54rem;
+  letter-spacing: 0.04em;
+}
+
+.theme-four-webgl-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.38rem;
+}
+
+.theme-four-webgl-map-trigger {
+  gap: 0.42rem;
+  min-width: 2.72rem;
+  padding-inline: 0.72rem;
+  cursor: pointer;
+  font-size: 0.67rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.theme-four-webgl-map-trigger svg,
+.theme-four-webgl-controls .theme-switcher-trigger svg,
+.theme-four-webgl-controls .language-switcher-trigger svg,
+.theme-four-webgl-controls > a svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.theme-four-webgl-controls .theme-switcher-trigger,
+.theme-four-webgl-controls .language-switcher-trigger,
+.theme-four-webgl-controls > a {
+  width: 2.72rem !important;
+  height: 2.72rem;
+  padding: 0 !important;
+}
+
+.theme-four-webgl-controls .language-switcher-compact-label {
+  display: none;
+}
+
+.theme-four-webgl-map-trigger:hover,
+.theme-four-webgl-map-trigger:focus-visible,
+.theme-four-webgl-controls > a:hover,
+.theme-four-webgl-controls > a:focus-visible {
+  color: #2b7777;
+  background: #fffefa;
+  transform: translateY(-1px);
+}
+
+.theme-four-map-room-heading {
+  display: grid;
+  gap: 0.18rem;
+  padding: 0.72rem 0.76rem;
+  border-bottom: 1px dashed rgb(56 51 43 / 0.24);
+  background: rgb(234 226 213 / 0.48);
+}
+
+.theme-four-map-room-heading > span {
+  color: var(--theme-four-coral);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.53rem;
+  font-weight: 800;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.theme-four-map-room-heading > strong {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 1rem;
+}
+
+.theme-four-map-room-heading > small {
+  color: var(--theme-four-pencil);
+  font-size: 0.67rem;
+  line-height: 1.35;
+}
+
+.theme-four-map-room > div > a > small {
+  margin-left: auto;
+  color: var(--theme-four-coral);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.52rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-four'] .theme-four-webgl-home {
+    min-height: 0;
+  }
+
+  .theme-four-webgl-brand {
+    width: 2.72rem;
+    height: 2.72rem;
+    padding: 0;
+  }
+
+  .theme-four-webgl-brand > span {
+    display: none;
+  }
+
+  .theme-four-webgl-map-trigger {
+    width: 2.72rem;
+    padding: 0;
+  }
+
+  .theme-four-webgl-map-trigger > span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 380px) {
+  .theme-four-webgl-toolbar {
+    gap: 0.3rem;
+  }
+
+  .theme-four-webgl-controls {
+    gap: 0.25rem;
+  }
+
+  .theme-four-webgl-brand,
+  .theme-four-webgl-map-trigger,
+  .theme-four-webgl-controls .theme-switcher-trigger,
+  .theme-four-webgl-controls .language-switcher-trigger,
+  .theme-four-webgl-controls > a {
+    width: 2.48rem !important;
+    height: 2.48rem;
+    min-height: 2.48rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .theme-four-webgl-loading svg {
+    animation: none;
+  }
+}

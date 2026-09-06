@@ -532,8 +532,8 @@ final result: passed
 **Source and implementation**
 
 - Source truth: `/Users/mimi/Documents/Improvement/portfolio-itom/src/components/canvas/rooms/`
-- Restored implementation: `/Users/mimi/Documents/Improvement/xm-games/vendor/theme-four-experience/src/components/canvas/rooms/`
-- Room switch restored in `vendor/theme-four-experience/src/components/canvas/corridor/RoomInterior.jsx`.
+- Restored implementation: `/Users/mimi/Documents/Improvement/xm-games/apps/theme-four-world/src/components/canvas/rooms/`
+- Room switch restored in `apps/theme-four-world/src/components/canvas/corridor/RoomInterior.jsx`.
 - Visual comparison viewport: 1280 × 720 CSS pixels for both source and implementation.
 
 **Same-input comparison evidence**

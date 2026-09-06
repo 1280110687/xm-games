@@ -1,3 +1,4 @@
 packages:
-  - vendor/theme-four-experience
-  - vendor/elemental-arena
+  - apps/theme-four-world
+  - apps/elemental-arena
+  - packages/*

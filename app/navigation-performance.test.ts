@@ -7,10 +7,10 @@ const NAVIGATION_FILES = [
   "app/page.tsx",
   "components/game-header.tsx",
   "components/settings-page.tsx",
-  "components/theme-four-home.tsx",
-  "components/theme-four-navigation.tsx",
-  "components/theme-three-navigation.tsx",
-  "components/theme-two-tab-bar.tsx",
+  "features/themes/theme-four/home.tsx",
+  "features/themes/theme-four/navigation.tsx",
+  "features/themes/theme-three/theme-three-navigation.tsx",
+  "features/themes/theme-two/theme-two-tab-bar.tsx",
 ]
 
 describe("route navigation performance", () => {

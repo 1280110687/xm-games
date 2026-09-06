@@ -1,4 +1,4 @@
-import { ChineseChessGame } from "@/components/chinese-chess-game"
+import { ChineseChessGame } from "@/features/chinese-chess/components/chinese-chess-game"
 import { getPageMetadata } from "@/lib/page-metadata"
 
 export const metadata = getPageMetadata("/chinese-chess", "zh")

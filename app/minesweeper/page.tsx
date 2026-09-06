@@ -1,4 +1,4 @@
-import { MinesweeperGame } from "@/components/minesweeper-game"
+import { MinesweeperGame } from "@/features/minesweeper/components/minesweeper-game"
 import { getPageMetadata } from "@/lib/page-metadata"
 
 export default function MinesweeperPage() {

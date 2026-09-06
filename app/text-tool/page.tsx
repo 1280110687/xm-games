@@ -1,4 +1,4 @@
-import { TextTool } from "@/components/text-tool"
+import { TextTool } from "@/features/tools/components/text-tool"
 import { getPageMetadata } from "@/lib/page-metadata"
 
 export const metadata = getPageMetadata("/text-tool", "zh")

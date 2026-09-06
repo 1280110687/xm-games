@@ -6,18 +6,18 @@ const PROJECT_ROOT = process.cwd()
 
 const CLASSIC_STYLE_IMPORTS = [
   "classic-games.css",
-  "theme-one-classic-games.css",
-  "theme-two-classic-games.css",
-  "theme-three-classic-games.css",
-  "theme-four-classic-games.css",
+  "@/styles/themes/theme-one/classic-games.css",
+  "@/styles/themes/theme-two/classic-games.css",
+  "@/styles/themes/theme-three/classic-games.css",
+  "@/styles/themes/theme-four/classic-games.css",
 ] as const
 
 const FOCUS_STYLE_IMPORTS = [
   "schulte-grid.css",
-  "theme-one-schulte-grid.css",
-  "theme-two-schulte-grid.css",
-  "theme-three-schulte-grid.css",
-  "theme-four-schulte-grid.css",
+  "@/styles/themes/theme-one/schulte-grid.css",
+  "@/styles/themes/theme-two/schulte-grid.css",
+  "@/styles/themes/theme-three/schulte-grid.css",
+  "@/styles/themes/theme-four/schulte-grid.css",
 ] as const
 
 function readProjectFile(path: string): string {

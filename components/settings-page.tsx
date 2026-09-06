@@ -4,7 +4,7 @@ import { ArrowLeft, Globe2, Palette, ShieldCheck } from "lucide-react"
 
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { PrefetchLink as Link } from "@/components/prefetch-link"
-import { ThemeSwitcher } from "@/components/theme-switcher"
+import { ThemeSwitcher } from "@/features/themes/shared/theme-switcher"
 import { Button } from "@/components/ui/button"
 import { useLocale } from "@/lib/locale-context"
 import type { Locale } from "@/lib/i18n"

@@ -1,0 +1,26 @@
+{
+  "name": "@xm-games/theme-four-experience",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1 --port 4174 --strictPort",
+    "lint": "eslint src --config ../../eslint.experiences.config.mjs",
+    "build": "vite build"
+  },
+  "dependencies": {
+    "@xm-games/experience-bridge": "workspace:*",
+    "@react-three/drei": "10.7.7",
+    "@react-three/fiber": "9.4.2",
+    "gsap": "3.14.2",
+    "react": "19.2.4",
+    "react-dom": "19.2.4",
+    "three": "0.182.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "5.1.1",
+    "sass": "1.97.1",
+    "vite": "7.3.0",
+    "vite-plugin-compression": "0.5.1"
+  }
+}
