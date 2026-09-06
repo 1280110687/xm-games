@@ -213,7 +213,7 @@ export function MinesweeperGame() {
 
         {/* Game stats */}
         <Card
-          className="game-summary surface-panel flex items-center gap-6 border-white/10 bg-card/70 px-4 py-2"
+          className="game-summary surface-panel flex flex-row items-center gap-6 border-white/10 bg-card/70 px-4 py-2"
           aria-label={`${t("minesweeper")}: ${mines - flagCount}; ${formatTime(timer)}; ${flagCount}`}
         >
           <div className="flex items-center gap-2">

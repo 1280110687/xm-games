@@ -1,0 +1,444 @@
+/* Paper workbench. Keep layout local to this theme, not to the 3D iframe. */
+html[data-theme='theme-four'] .utility-main {
+  display: grid;
+  min-width: 0;
+  gap: 1rem;
+  padding: 0 1rem 1.5rem;
+}
+
+html[data-theme='theme-four'] .utility-intro {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+html[data-theme='theme-four'] .utility-intro > div {
+  min-width: 0;
+}
+
+html[data-theme='theme-four'] .utility-intro-icon {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border: 1px solid var(--border);
+  border-radius: 0.2rem;
+  color: var(--theme-four-teal);
+  background: var(--surface-high);
+}
+
+html[data-theme='theme-four'] .utility-intro-icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+html[data-theme='theme-four'] .utility-eyebrow {
+  color: var(--theme-four-teal);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+html[data-theme='theme-four'] .utility-intro h1 {
+  margin-block: 0.2rem 0.4rem;
+  font-size: clamp(1.35rem, 3vw, 2rem);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+html[data-theme='theme-four'] .utility-intro > div > p:last-child {
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+html[data-theme='theme-four'] .utility-facts {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  padding-top: 0.8rem;
+  border-top: 1px dashed var(--border);
+}
+
+html[data-theme='theme-four'] .utility-facts dt {
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+html[data-theme='theme-four'] .utility-facts dd {
+  margin-top: 0.25rem;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+html[data-theme='theme-four'] .utility-workspace {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 1rem;
+}
+
+html[data-theme='theme-four'] .offline-tool-workspace {
+  grid-template-areas: 'editor output' 'command output';
+}
+
+html[data-theme='theme-four'] .offline-tool-editor,
+html[data-theme='theme-four'] .qr-editor {
+  grid-area: editor;
+}
+
+html[data-theme='theme-four'] .offline-tool-command {
+  grid-area: command;
+}
+
+html[data-theme='theme-four'] .offline-tool-output {
+  grid-area: output;
+}
+
+html[data-theme='theme-four'] .qr-workspace {
+  grid-template-areas: 'editor preview' 'options preview';
+}
+
+html[data-theme='theme-four'] .qr-preview {
+  grid-area: preview;
+}
+
+html[data-theme='theme-four'] .qr-options {
+  grid-area: options;
+}
+
+html[data-theme='theme-four'] .utility-panel {
+  min-width: 0;
+  padding: 1rem;
+}
+
+html[data-theme='theme-four'] .utility-panel-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.85rem;
+}
+
+html[data-theme='theme-four'] .utility-panel-heading > div {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+html[data-theme='theme-four'] .utility-panel-heading h2 {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+html[data-theme='theme-four'] .utility-panel-heading > svg {
+  width: 1.1rem;
+  height: 1.1rem;
+  color: var(--theme-four-teal);
+}
+
+html[data-theme='theme-four'] .utility-step,
+html[data-theme='theme-four'] .utility-result-count {
+  color: var(--theme-four-teal);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+html[data-theme='theme-four'] .utility-mode-switch {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.2rem;
+  border: 1px solid var(--border);
+  border-radius: 0.2rem;
+  background: var(--surface-low);
+}
+
+html[data-theme='theme-four'] .utility-mode-switch button {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 2.75rem;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.4rem 0.65rem;
+  border-radius: 0.15rem;
+  color: var(--muted-foreground);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+html[data-theme='theme-four'] .utility-mode-switch button.is-active {
+  color: var(--primary-foreground);
+  background: var(--theme-four-teal);
+}
+
+html[data-theme='theme-four'] .utility-mode-switch svg,
+html[data-theme='theme-four'] .utility-password-field svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+html[data-theme='theme-four'] .utility-textarea {
+  display: block;
+  width: 100%;
+  min-height: 12rem;
+  resize: vertical;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+html[data-theme='theme-four'] .utility-password-field,
+html[data-theme='theme-four'] .utility-select-field {
+  display: grid;
+  min-width: 0;
+  gap: 0.45rem;
+  margin-top: 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+html[data-theme='theme-four'] .utility-password-field > span:first-child {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+html[data-theme='theme-four'] .utility-password-control {
+  position: relative;
+}
+
+html[data-theme='theme-four'] .utility-password-control input {
+  min-height: 2.75rem;
+  padding-right: 3rem;
+  font-size: 1rem;
+}
+
+html[data-theme='theme-four'] .utility-password-control > button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  display: grid;
+  width: 2.75rem;
+  height: 100%;
+  place-items: center;
+  cursor: pointer;
+}
+
+html[data-theme='theme-four'] .utility-select-field select {
+  width: 100%;
+  min-width: 0;
+  min-height: 2.75rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 0.2rem;
+  color: var(--foreground);
+  background: var(--surface-high);
+  font-size: 1rem;
+}
+
+html[data-theme='theme-four'] .utility-textarea:focus-visible,
+html[data-theme='theme-four'] .utility-mode-switch button:focus-visible,
+html[data-theme='theme-four'] .utility-password-control > button:focus-visible,
+html[data-theme='theme-four'] .utility-select-field select:focus-visible,
+html[data-theme='theme-four'] .utility-result:focus-visible {
+  outline: 2px solid var(--theme-four-teal);
+  outline-offset: 2px;
+}
+
+html[data-theme='theme-four'] .utility-error,
+html[data-theme='theme-four'] .utility-note,
+html[data-theme='theme-four'] .utility-status {
+  margin-block: 0.75rem;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+
+html[data-theme='theme-four'] .utility-error {
+  color: var(--destructive);
+}
+
+html[data-theme='theme-four'] .utility-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  color: var(--muted-foreground);
+}
+
+html[data-theme='theme-four'] .utility-note svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+  margin-top: 0.2rem;
+}
+
+html[data-theme='theme-four'] .utility-status {
+  min-height: 1.3rem;
+  color: var(--theme-four-teal);
+}
+
+html[data-theme='theme-four'] .utility-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 0.85rem;
+}
+
+html[data-theme='theme-four'] .utility-actions--stacked {
+  display: grid;
+}
+
+html[data-theme='theme-four'] .utility-actions [data-slot='button'] {
+  flex: 1 1 10rem;
+}
+
+html[data-theme='theme-four'] .utility-panel [data-slot='button'] {
+  min-width: 0;
+  min-height: 2.75rem;
+  height: auto;
+  padding-block: 0.6rem;
+  white-space: normal;
+}
+
+html[data-theme='theme-four'] .utility-result {
+  min-width: 0;
+  min-height: 18rem;
+  max-height: 30rem;
+  overflow: auto;
+  padding: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: 0.2rem;
+  background: var(--surface-high);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 0.85rem;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+html[data-theme='theme-four'] .utility-result.is-empty {
+  display: grid;
+  place-items: center;
+  color: var(--muted-foreground);
+  font-family: inherit;
+  text-align: center;
+}
+
+html[data-theme='theme-four'] .offline-tool-code-result {
+  overflow-wrap: normal;
+  white-space: pre;
+}
+
+html[data-theme='theme-four'] .offline-tool-code-input {
+  font-family: var(--font-geist-mono), monospace;
+}
+
+html[data-theme='theme-four'] .offline-tool-command-grid,
+html[data-theme='theme-four'] .offline-tool-stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+html[data-theme='theme-four'] .offline-tool-stats,
+html[data-theme='theme-four'] .offline-tool-mode-switch {
+  margin-bottom: 0.85rem;
+}
+
+html[data-theme='theme-four'] .offline-tool-command-grid > [data-slot='button']:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+}
+
+html[data-theme='theme-four'] .offline-tool-stat {
+  min-width: 0;
+  padding: 0.7rem;
+  border: 1px dashed var(--border);
+}
+
+html[data-theme='theme-four'] .offline-tool-stat dt {
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+html[data-theme='theme-four'] .offline-tool-stat dd {
+  margin-top: 0.2rem;
+  color: var(--theme-four-teal);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 1.2rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+html[data-theme='theme-four'] .qr-preview-frame {
+  display: grid;
+  width: min(100%, 22rem);
+  aspect-ratio: 1;
+  margin-inline: auto;
+  place-items: center;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  background: white;
+}
+
+html[data-theme='theme-four'] .qr-preview-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+html[data-theme='theme-four'] .qr-preview-frame.is-empty span {
+  display: grid;
+  justify-items: center;
+  gap: 0.75rem;
+  color: var(--muted-foreground);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+html[data-theme='theme-four'] .qr-preview-frame.is-empty svg {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+@media (max-width: 900px) {
+  html[data-theme='theme-four'] .utility-workspace {
+    grid-template-areas: none;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  html[data-theme='theme-four'] .utility-workspace > .utility-panel {
+    grid-area: auto;
+  }
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-four'] .utility-main {
+    gap: 0.85rem;
+    padding-inline: 0.75rem;
+  }
+
+  html[data-theme='theme-four'] .utility-result {
+    min-height: 12rem;
+    max-height: 22rem;
+  }
+}
+
+@media (max-width: 380px) {
+  html[data-theme='theme-four'] .utility-facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

@@ -1,3 +1,7 @@
+@import './utilities.css';
+@import './settings.css';
+@import './pwa.css';
+
 /*
  * Theme Four: a pencil-and-paper game club.
  *
@@ -315,7 +319,7 @@ html[data-theme='theme-four'] .game-header {
 }
 
 html[data-theme='theme-four'] .game-header h1,
-html[data-theme='theme-four'] .settings-header h1,
+html[data-theme='theme-four'] .settings-page-header h1,
 html[data-theme='theme-four'] .utility-page h1 {
   color: var(--theme-four-ink);
   font-family: Georgia, 'Times New Roman', serif;
@@ -528,6 +532,17 @@ html[data-theme='theme-four'] [data-slot='dialog-content'].pwa-install-guide {
 }
 
 @media (max-width: 767px) {
+  /* The controls are wider than the back link: reserve their actual width. */
+  html[data-theme='theme-four'] .game-header[data-layout='centered'] {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.5rem;
+  }
+
+  html[data-theme='theme-four'] .game-header[data-layout='centered'] > [data-layout-slot='title'] {
+    min-width: 0;
+    text-align: left;
+  }
+
   html[data-theme='theme-four'] [data-slot='dialog-overlay'] {
     background: rgb(42 37 30 / 0.32);
     backdrop-filter: blur(2px);

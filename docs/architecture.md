@@ -4,6 +4,8 @@
 
 Next.js 主站仍位于仓库根目录，不为目录整齐额外迁移应用入口。`app/` 负责路由组装，业务界面与对应规则、控制器放在 `features/<功能>/`；通用组件保留在 `components/`，基础 UI 保留在 `components/ui/`。四套主题宿主统一在 `features/themes/`，主题样式统一在 `styles/themes/`。全局重置与 PWA 安全区仍在 `app/`，不改变原有样式加载顺序。
 
+主题四的 `index.css` 聚合 `utilities.css`、`settings.css` 和 `pwa.css`，分别负责宿主工具工作台、设置页与安装提示的结构样式；这些文件均限定在 `data-theme='theme-four'`，不进入 3D iframe，也不覆盖前三个主题。新增主题不能只换配色，必须补齐工具工作区、输入/结果区域及共享提示的布局契约。
+
 两个 3D 应用是维护中的产品源码，不是不可改动的 vendor 快照：
 
 | 工作区 | 责任 | 稳定发布 URL |

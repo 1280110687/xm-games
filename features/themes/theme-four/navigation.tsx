@@ -7,6 +7,7 @@ import { useLocale } from "@/lib/locale-context"
 import { PrefetchLink as Link } from "@/components/prefetch-link"
 import type { Locale } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
+import { getThemeFourActiveSection } from "./navigation-model"
 
 const COPY: Record<
   Locale,
@@ -39,23 +40,24 @@ export function ThemeFourNavigation() {
   const pathname = usePathname()
   const { locale } = useLocale()
   const copy = COPY[locale]
+  const activeSection = getThemeFourActiveSection(pathname)
 
   if (pathname === "/") return null
 
   const items = [
     { href: "/", label: copy.home, icon: House, active: false },
-    { href: "/#theme-four-map", label: copy.map, icon: Map, active: true },
+    { href: "/#theme-four-map", label: copy.map, icon: Map, active: activeSection === "rooms" },
     {
       href: "/anime-tracker",
       label: copy.tracker,
       icon: Tv,
-      active: pathname === "/anime-tracker",
+      active: activeSection === "tracker",
     },
     {
       href: "/settings",
       label: copy.settings,
       icon: Settings2,
-      active: pathname === "/settings",
+      active: activeSection === "settings",
     },
   ]
 

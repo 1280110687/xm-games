@@ -1,0 +1,163 @@
+/* The delayed prompt and manual install guide share the same paper layout. */
+html[data-theme='theme-four'] .pwa-install-prompt {
+  position: fixed;
+  z-index: 45;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  display: grid;
+  width: min(calc(100vw - 2rem), 25rem);
+  max-height: calc(100dvh - 2rem - var(--xm-safe-area-top));
+  gap: 0.85rem;
+  padding: 1rem;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__close {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border-radius: 0.2rem;
+  color: var(--theme-four-pencil);
+  background: var(--surface-low);
+  cursor: pointer;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__close:focus-visible {
+  outline: 2px solid var(--theme-four-teal);
+  outline-offset: 2px;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__brand {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+  padding-right: 2.5rem;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__icon {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--theme-four-teal);
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt h2 {
+  margin-top: 0.25rem;
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__description,
+html[data-theme='theme-four'] .pwa-install-prompt__steps p {
+  color: var(--muted-foreground);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__benefits {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__benefits > span {
+  display: grid;
+  justify-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 0.3rem;
+  border: 1px dashed var(--border);
+  font-size: 0.7rem;
+  text-align: center;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__steps {
+  display: grid;
+  gap: 0.65rem;
+  list-style: none;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__steps li {
+  display: grid;
+  grid-template-columns: 2rem minmax(0, 1fr);
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem;
+  border-left: 2px solid var(--theme-four-teal);
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__steps li > span {
+  display: grid;
+  place-items: center;
+  color: var(--theme-four-teal);
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__steps svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__steps strong {
+  font-size: 0.85rem;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__error {
+  color: var(--destructive);
+  font-size: 0.8rem;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+html[data-theme='theme-four'] .pwa-install-prompt__actions [data-slot='button'] {
+  min-height: 2.75rem;
+  height: auto;
+  flex: 1 1 8rem;
+  padding-block: 0.6rem;
+  white-space: normal;
+}
+
+html[data-theme='theme-four'] [data-slot='dialog-content'].pwa-install-guide {
+  max-height: calc(100dvh - 2rem - var(--xm-safe-area-top));
+  overflow-y: auto;
+}
+
+@media (max-width: 767px) {
+  html[data-theme='theme-four'] .pwa-install-prompt {
+    right: max(0.75rem, env(safe-area-inset-right));
+    bottom: calc(5.25rem + env(safe-area-inset-bottom));
+    width: calc(100vw - 1.5rem - env(safe-area-inset-left) - env(safe-area-inset-right));
+    max-height: calc(100dvh - 6.25rem - var(--xm-safe-area-top) - env(safe-area-inset-bottom));
+  }
+}
