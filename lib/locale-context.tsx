@@ -4,7 +4,6 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 import { usePathname } from "next/navigation"
 
 import {
-  DEFAULT_LOCALE,
   localeHtmlLang,
   resolveInitialLocale,
   translations,
@@ -25,7 +24,9 @@ const LOCALE_STORAGE_KEY = "xm-games-locale"
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname()
-  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE)
+  // Server HTML and the first hydration render must agree. Do not mount page
+  // content with a fallback language before browser preferences are available.
+  const [locale, setLocaleState] = useState<Locale | null>(null)
 
   useEffect(() => {
     let savedLocale: string | null = null
@@ -44,6 +45,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   }, [])
 
   useEffect(() => {
+    if (locale === null) return
     document.documentElement.lang = localeHtmlLang[locale]
 
     const pageMetadata = getPageMetadata(pathname, locale)
@@ -67,6 +69,19 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     } catch {
       // Keep language switching functional even when persistence is blocked.
     }
+  }
+
+  if (locale === null) {
+    return (
+      <div className="locale-startup" data-locale-pending="true" role="status" aria-busy="true" aria-label="XM-Games">
+        <span className="locale-startup-placeholder" aria-hidden="true">
+          <span /><span /><span /><span />
+        </span>
+        <span className="locale-startup-brand" aria-hidden="true">
+          <span className="locale-startup-brand-accent">XM</span>-GAMES
+        </span>
+      </div>
+    )
   }
 
   const t = (key: TranslationKey): string => {
