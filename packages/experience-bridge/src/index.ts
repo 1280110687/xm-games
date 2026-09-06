@@ -1,5 +1,7 @@
 /** Same-origin host/world protocol. The host retains the route allowlist. */
 export const EXPERIENCE_MESSAGES = {
+  booted: "xm-games:theme-four-booted",
+  failed: "xm-games:theme-four-failed",
   ready: "xm-games:theme-four-ready",
   context: "xm-games:theme-four-context",
   navigate: "xm-games:theme-four-navigate",

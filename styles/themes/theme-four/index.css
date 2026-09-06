@@ -664,6 +664,32 @@ html[data-theme='theme-four'] .theme-four-webgl-home {
   animation: theme-four-webgl-spin 900ms linear infinite;
 }
 
+.theme-four-webgl-failure {
+  font-size: 0.875rem;
+  padding: max(6rem, env(safe-area-inset-top)) 1.5rem max(5rem, env(safe-area-inset-bottom));
+  text-align: center;
+  overflow: auto;
+}
+
+.theme-four-webgl-failure p {
+  max-width: 28rem;
+  line-height: 1.8;
+}
+
+.theme-four-webgl-failure button {
+  min-height: 44px;
+  padding: 0.65rem 1rem;
+  border: 1px solid #8c877d;
+  border-radius: 0.3rem;
+  background: #fffaf0;
+  cursor: pointer;
+}
+
+.theme-four-webgl-failure button:focus-visible {
+  outline: 2px solid #216d6b;
+  outline-offset: 3px;
+}
+
 @keyframes theme-four-webgl-spin {
   to {
     transform: rotate(360deg);

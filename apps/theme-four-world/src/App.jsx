@@ -2,6 +2,7 @@ import { useState, Suspense, useEffect, useCallback, useLayoutEffect, lazy } fro
 import { Canvas, useThree, useFrame, useLoader } from '@react-three/fiber';
 import { Preload, useTexture, Text, PerformanceMonitor } from '@react-three/drei';
 import * as THREE from 'three';
+import { EXPERIENCE_MESSAGES } from '@xm-games/experience-bridge';
 
 import Preloader from './components/dom/Preloader';
 import PaperTransition from './components/dom/PaperTransition';
@@ -211,6 +212,11 @@ function AppContent() {
 import { AchievementsProvider } from './context/AchievementsContext';
 
 export default function App() {
+  useEffect(() => {
+    // App startup is independent of iframe load (which can wait on media).
+    window.parent.postMessage({ type: EXPERIENCE_MESSAGES.booted }, window.location.origin);
+  }, []);
+
   // Preload browser-based images (for standard <img> tags) immediately upon mounting App
   // This ensures they are in the network waterfall during the initial loading phase.
   useEffect(() => {

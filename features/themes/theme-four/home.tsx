@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { EXPERIENCE_MESSAGES, type ExperienceContext } from "@xm-games/experience-bridge"
 import {
@@ -27,6 +27,7 @@ import {
 import { useLocale } from "@/lib/locale-context"
 import type { Locale, TranslationKey } from "@/lib/i18n"
 import { themeLoadsWebglExperience } from "@/lib/theme"
+import { INITIAL_SCENE_LOAD, SCENE_START_TIMEOUT_MS, sceneLoadReducer } from "./scene-loading"
 
 export type ThemeFourGame = {
   href: string
@@ -45,6 +46,8 @@ const COPY: Record<
   {
     experience: string
     loading: string
+    failed: string
+    retry: string
     map: string
     mapDescription: string
     mapClose: string
@@ -56,6 +59,8 @@ const COPY: Record<
   zh: {
     experience: "3D 手绘游戏世界",
     loading: "正在装配 3D 走廊…",
+    failed: "3D 走廊暂时未能启动。可以重新加载，或通过游戏地图继续使用。",
+    retry: "重新加载 3D",
     map: "游戏地图",
     mapDescription: "从 3D 世界直接进入 XM-Games 的全部游戏与离线工具。",
     mapClose: "关闭游戏地图",
@@ -66,6 +71,8 @@ const COPY: Record<
   en: {
     experience: "Hand-drawn 3D game world",
     loading: "Building the 3D corridor…",
+    failed: "The 3D corridor could not start. Retry, or use the game map to continue.",
+    retry: "Reload 3D",
     map: "Game map",
     mapDescription: "Open every XM-Games experience and offline tool from the 3D world.",
     mapClose: "Close game map",
@@ -76,6 +83,8 @@ const COPY: Record<
   th: {
     experience: "โลกเกม 3D วาดมือ",
     loading: "กำลังสร้างโถงทางเดิน 3D…",
+    failed: "ยังเปิดโถงทางเดิน 3D ไม่สำเร็จ ลองโหลดใหม่หรือใช้แผนที่เกมเพื่อเล่นต่อ",
+    retry: "โหลด 3D ใหม่",
     map: "แผนที่เกม",
     mapDescription: "เปิดเกมและเครื่องมือออฟไลน์ทั้งหมดของ XM-Games จากโลก 3D",
     mapClose: "ปิดแผนที่เกม",
@@ -118,8 +127,7 @@ export function ThemeFourHome({ rooms }: { rooms: ThemeFourRoom[] }) {
   const router = useRouter()
   const copy = COPY[locale]
   const frameRef = useRef<HTMLIFrameElement>(null)
-  const [sceneLoaded, setSceneLoaded] = useState(false)
-  const [sceneFailed, setSceneFailed] = useState(false)
+  const [scene, dispatchScene] = useReducer(sceneLoadReducer, INITIAL_SCENE_LOAD)
   const [mapOpen, setMapOpen] = useState(false)
 
   const sceneManifest = useMemo<ExperienceContext>(
@@ -164,7 +172,18 @@ export function ThemeFourHome({ rooms }: { rooms: ThemeFourRoom[] }) {
       }
 
       if (event.data?.type === EXPERIENCE_MESSAGES.ready) {
+        dispatchScene("ready")
         sendSceneManifest()
+        return
+      }
+
+      if (event.data?.type === EXPERIENCE_MESSAGES.booted) {
+        dispatchScene("booted")
+        return
+      }
+
+      if (event.data?.type === EXPERIENCE_MESSAGES.failed) {
+        dispatchScene("failed")
         return
       }
 
@@ -182,8 +201,14 @@ export function ThemeFourHome({ rooms }: { rooms: ThemeFourRoom[] }) {
   }, [allowedRoutes, router, sendSceneManifest])
 
   useEffect(() => {
-    if (sceneLoaded) sendSceneManifest()
-  }, [sceneLoaded, sendSceneManifest])
+    if (scene.phase === "ready") sendSceneManifest()
+  }, [scene.phase, sendSceneManifest])
+
+  useEffect(() => {
+    if (!themeLoadsWebglExperience(theme)) return
+    const timeout = window.setTimeout(() => dispatchScene("timeout"), SCENE_START_TIMEOUT_MS)
+    return () => window.clearTimeout(timeout)
+  }, [scene.attempt, theme])
 
   // The WebGL bundle and its textures must not load for Themes One–Three.
   if (!themeLoadsWebglExperience(theme)) return null
@@ -191,28 +216,34 @@ export function ThemeFourHome({ rooms }: { rooms: ThemeFourRoom[] }) {
   return (
     <section
       className="theme-four-home theme-four-webgl-home"
-      data-ready={sceneLoaded || sceneFailed ? "true" : "false"}
+      data-ready={scene.phase === "ready" ? "true" : "false"}
+      data-scene-state={scene.phase}
       aria-label={copy.experience}
-      aria-busy={!sceneLoaded && !sceneFailed}
+      aria-busy={scene.phase === "starting" || scene.phase === "booted"}
     >
       <iframe
+        key={scene.attempt}
         ref={frameRef}
         className="theme-four-webgl-frame"
         src="/theme-four-experience/index.html"
         title={copy.experience}
         allow="autoplay; fullscreen"
         allowFullScreen
-        onLoad={() => {
-          setSceneLoaded(true)
-          sendSceneManifest()
-        }}
-        onError={() => setSceneFailed(true)}
+        onLoad={sendSceneManifest}
       />
 
-      {!sceneLoaded && !sceneFailed && (
+      {scene.phase === "starting" && (
         <div className="theme-four-webgl-loading" role="status">
           <LoaderCircle aria-hidden="true" />
           <span>{copy.loading}</span>
+        </div>
+      )}
+
+      {scene.phase === "failed" && (
+        <div className="theme-four-webgl-loading theme-four-webgl-failure" role="alert">
+          <p>{copy.failed}</p>
+          <button type="button" onClick={() => dispatchScene("retry")}>{copy.retry}</button>
+          <button type="button" onClick={() => setMapOpen(true)}>{copy.map}</button>
         </div>
       )}
 

@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v17"
+const CACHE_VERSION = "v18"
 const SHELL_CACHE = `xm-games-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `xm-games-runtime-${CACHE_VERSION}`
 const OWNED_CACHE_PREFIX = "xm-games-"
@@ -62,6 +62,7 @@ function canCacheResponse(response) {
   const cacheControl = response.headers.get("cache-control") ?? ""
   return (
     response.ok &&
+    response.status !== 206 &&
     (response.type === "basic" || response.type === "default") &&
     !/(?:^|,)\s*(?:private|no-store)\b/i.test(cacheControl)
   )
@@ -369,6 +370,32 @@ async function cacheFirst(request) {
   return response
 }
 
+// Safari probes media with Range requests. Cache Storage only accepts whole
+// responses; when offline, slice that whole file into the requested byte range.
+async function cachedRangeResponse(request) {
+  const cached = await matchCurrentCaches(createSameOriginRequest(request.url))
+  if (!cached || cached.status !== 200) return fetch(request)
+
+  const range = /^bytes=(\d*)-(\d*)$/i.exec(request.headers.get("range")?.trim() ?? "")
+  // HTTP permits ignoring unsupported/malformed ranges and serving the whole file.
+  if (!range || (!range[1] && !range[2]) || request.headers.has("if-range")) return cached
+
+  const blob = await cached.blob()
+  const size = blob.size
+  const start = range[1] ? Number(range[1]) : Math.max(0, size - Number(range[2]))
+  const end = range[1] && range[2] ? Math.min(Number(range[2]), size - 1) : size - 1
+  if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) || start >= size || start > end) {
+    return new Response(null, { status: 416, headers: { "Content-Range": `bytes */${size}` } })
+  }
+
+  const headers = new Headers(cached.headers)
+  headers.delete("Content-Encoding")
+  headers.set("Accept-Ranges", "bytes")
+  headers.set("Content-Range", `bytes ${start}-${end}/${size}`)
+  headers.set("Content-Length", String(end - start + 1))
+  return new Response(blob.slice(start, end + 1), { status: 206, statusText: "Partial Content", headers })
+}
+
 self.addEventListener("install", (event) => {
   // Do not call skipWaiting here. An update must stay waiting until existing
   // tabs using the previous Next.js chunks have closed or accepted an update.
@@ -454,6 +481,6 @@ self.addEventListener("fetch", (event) => {
     )
 
   if (isStaticAsset) {
-    event.respondWith(cacheFirst(request))
+    event.respondWith(request.headers.has("range") ? cachedRangeResponse(request) : cacheFirst(request))
   }
 })

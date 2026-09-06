@@ -1,6 +1,14 @@
 import { Component, StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
+import { EXPERIENCE_MESSAGES } from '@xm-games/experience-bridge'
+
+const reportFailure = () => {
+  window.parent.postMessage({ type: EXPERIENCE_MESSAGES.failed }, window.location.origin)
+}
+
+// Context loss can otherwise leave a frozen canvas behind a perpetual loader.
+document.addEventListener('webglcontextlost', reportFailure, true)
 
 class RuntimeErrorBoundary extends Component {
   state = { error: null }
@@ -10,6 +18,7 @@ class RuntimeErrorBoundary extends Component {
   }
 
   componentDidCatch(error) {
+    reportFailure()
     console.error('Theme Four runtime error', error)
   }
 
@@ -21,6 +30,7 @@ class RuntimeErrorBoundary extends Component {
 
 createRoot(document.getElementById('root'), {
   onUncaughtError(error) {
+    reportFailure()
     console.error('Theme Four uncaught error', error)
   },
 }).render(
