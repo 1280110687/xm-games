@@ -1,0 +1,43 @@
+import type { Locale } from "@/lib/i18n"
+
+export const THEME_THREE_HOME_COPY = {
+  zh: {
+    title: "随时，开一局",
+    subtitle: "游戏、专注训练和实用工具，都在这里。",
+    search: "搜索游戏或工具",
+    placeholder: "想玩点什么？",
+    clear: "清除搜索",
+    library: "游戏与工具",
+    categories: "个分类",
+    experiences: "个体验",
+    results: "个匹配结果",
+    empty: "暂时没有找到",
+    emptyHint: "换个关键词，或清除搜索查看全部内容。",
+  },
+  en: {
+    title: "A little time to play",
+    subtitle: "Games, focus exercises and useful tools. All in one place.",
+    search: "Search games or tools",
+    placeholder: "What would you like to play?",
+    clear: "Clear search",
+    library: "Games & tools",
+    categories: "categories",
+    experiences: "experiences",
+    results: "matches",
+    empty: "Nothing here just yet",
+    emptyHint: "Try another keyword, or clear your search to see everything.",
+  },
+  th: {
+    title: "พักสักนิด มาเล่นกัน",
+    subtitle: "เกม ฝึกสมาธิ และเครื่องมือที่มีประโยชน์ รวมไว้ที่เดียว",
+    search: "ค้นหาเกมหรือเครื่องมือ",
+    placeholder: "วันนี้อยากเล่นอะไร?",
+    clear: "ล้างการค้นหา",
+    library: "เกมและเครื่องมือ",
+    categories: "หมวดหมู่",
+    experiences: "รายการ",
+    results: "ผลลัพธ์",
+    empty: "ยังไม่พบรายการที่ตรงกัน",
+    emptyHint: "ลองคำค้นอื่น หรือล้างการค้นหาเพื่อดูทั้งหมด",
+  },
+} satisfies Record<Locale, Record<string, string>>

@@ -1,0 +1,100 @@
+html[data-theme='theme-three'] body .theme-three-sidebar {
+  width: 13rem;
+  padding: 1rem 0.75rem;
+}
+
+html[data-theme='theme-three'] body .theme-three-sidebar-brand {
+  padding-inline: 0.35rem;
+}
+
+html[data-theme='theme-three'] body .theme-three-sidebar-brand small,
+html[data-theme='theme-three'] body .theme-three-sidebar-workspace > p {
+  color: var(--t3-muted);
+}
+
+html[data-theme='theme-three'] body .theme-three-sidebar-workspace {
+  border: 0;
+  background: none;
+  padding: 0.6rem;
+}
+
+html[data-theme='theme-three'] body .theme-three-system-status {
+  display: none;
+}
+
+html[data-theme='theme-three'] body .theme-three-sidebar-link,
+html[data-theme='theme-three'] body .theme-three-bottom-item {
+  color: var(--t3-muted);
+}
+
+html[data-theme='theme-three'] body .theme-three-sidebar-link.is-active,
+html[data-theme='theme-three'] body .theme-three-bottom-item.is-active {
+  color: var(--t3-ink);
+  background: rgb(198 241 224 / 0.15);
+  box-shadow: inset 0 1px 0 rgb(240 255 250 / 0.2);
+}
+
+html[data-theme='theme-three'] body .theme-three-sidebar-link.is-active::after,
+html[data-theme='theme-three'] body .theme-three-bottom-item.is-active::before {
+  display: none;
+}
+
+html[data-theme='theme-three'] body .theme-three-nav-icon,
+html[data-theme='theme-three']
+  body
+  .theme-three-sidebar-link.is-active
+  .theme-three-nav-icon {
+  border: 0;
+  color: inherit;
+  background: none;
+}
+
+html[data-theme='theme-three'] body .theme-three-brand-mark {
+  background: var(--t3-accent);
+  box-shadow: none;
+}
+
+html[data-theme='theme-three'] body .theme-three-bottom-bar {
+  max-width: 32rem;
+  min-height: 4.5rem;
+  margin-inline: auto;
+  padding: 0.35rem;
+}
+
+html[data-theme='theme-three'] body .theme-three-bottom-item {
+  min-height: 3.6rem;
+  font-size: 0.6875rem;
+  line-height: 1.25;
+}
+
+html[data-theme='theme-three'] body .theme-three-bottom-item svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+html[data-theme='theme-three'] body .game-header {
+  max-width: 76rem;
+  width: 100%;
+  margin: 0 auto;
+  padding: 0.75rem;
+}
+
+html[data-theme='theme-three'] body .game-header [data-layout-slot='title'] {
+  font-size: 1.05rem;
+  color: var(--t3-ink);
+  white-space: normal;
+  line-height: 1.5;
+}
+
+html[data-theme='theme-three']
+  body
+  .game-header
+  [data-layout-slot='description'] {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  html[data-theme='theme-three'] body :is(.app-shell, .game-page) {
+    padding-left: 16rem;
+  }
+}

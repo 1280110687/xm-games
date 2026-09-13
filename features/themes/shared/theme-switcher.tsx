@@ -53,7 +53,7 @@ const THEME_COPY: Record<
       },
       "theme-three": {
         name: "主题三",
-        description: "黑曜玻璃控制台",
+        description: "薄荷青玻璃工作区",
       },
       "theme-four": {
         name: "主题四",
@@ -75,7 +75,7 @@ const THEME_COPY: Record<
       },
       "theme-three": {
         name: "Theme Three",
-        description: "Obsidian glass console",
+        description: "Mint glass workspace",
       },
       "theme-four": {
         name: "Theme Four",
@@ -97,7 +97,7 @@ const THEME_COPY: Record<
       },
       "theme-three": {
         name: "ธีม 3",
-        description: "คอนโซลกระจกออบซิเดียน",
+        description: "พื้นที่ทำงานกระจกสีมินต์",
       },
       "theme-four": {
         name: "ธีม 4",

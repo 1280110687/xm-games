@@ -169,12 +169,13 @@ export function JsonTool() {
             <div className="utility-panel-heading">
               <div>
                 <span className="utility-step">01</span>
-                <h2>{copy.common.input}</h2>
+                <h2 id="json-tool-input-label">{copy.common.input}</h2>
               </div>
               <span className="utility-result-count">{input.length}</span>
             </div>
             <textarea
               className="utility-textarea offline-tool-code-input"
+              aria-labelledby="json-tool-input-label"
               value={input}
               onChange={(event) => {
                 setInput(event.target.value)

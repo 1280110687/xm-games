@@ -307,7 +307,7 @@ export function TextCryptoTool() {
             <div className="utility-panel-heading">
               <div>
                 <span className="utility-step">01</span>
-                <h2>{copy.inputLabel}</h2>
+                <h2 id="text-crypto-input-label">{copy.inputLabel}</h2>
               </div>
               <div className="utility-mode-switch" role="group" aria-label={copy.inputLabel}>
                 <button
@@ -333,6 +333,7 @@ export function TextCryptoTool() {
 
             <textarea
               className="utility-textarea"
+              aria-labelledby="text-crypto-input-label"
               value={input}
               onChange={(event) => {
                 setInput(event.target.value)

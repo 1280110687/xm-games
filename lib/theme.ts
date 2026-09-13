@@ -27,7 +27,7 @@ export const THEME_CONFIG: Record<
   },
   "theme-three": {
     colorScheme: "dark",
-    themeColor: "#030604",
+    themeColor: "#142d35",
   },
   "theme-four": {
     colorScheme: "light",

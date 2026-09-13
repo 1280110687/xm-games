@@ -336,7 +336,7 @@ export function QrCodeTool() {
             <div className="utility-panel-heading">
               <div>
                 <span className="utility-step">01</span>
-                <h2>{copy.input}</h2>
+                <h2 id="qr-code-input-label">{copy.input}</h2>
               </div>
               <span className="utility-result-count">
                 {input.length} {copy.characterCount}
@@ -345,6 +345,7 @@ export function QrCodeTool() {
 
             <textarea
               className="utility-textarea"
+              aria-labelledby="qr-code-input-label"
               value={input}
               onChange={(event) => {
                 setInput(event.target.value)

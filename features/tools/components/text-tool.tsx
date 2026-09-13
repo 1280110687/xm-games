@@ -131,16 +131,17 @@ export function TextTool() {
         </section>
 
         <div className="offline-tool-workspace utility-workspace">
-          <section className="offline-tool-editor utility-panel surface-card">
+          <section data-t3-glass="panel" className="offline-tool-editor utility-panel surface-card">
             <div className="utility-panel-heading">
               <div>
                 <span className="utility-step">01</span>
-                <h2>{copy.common.input}</h2>
+                <h2 id="text-tool-input-label">{copy.common.input}</h2>
               </div>
               <span className="utility-result-count">{copy.text.analyzed}</span>
             </div>
             <textarea
               className="utility-textarea offline-tool-text-input"
+              aria-labelledby="text-tool-input-label"
               value={input}
               onChange={(event) => {
                 setInput(event.target.value)
@@ -151,7 +152,7 @@ export function TextTool() {
             />
           </section>
 
-          <section className="offline-tool-command utility-panel surface-card">
+          <section data-t3-glass="panel" className="offline-tool-command utility-panel surface-card">
             <div className="utility-panel-heading">
               <div>
                 <span className="utility-step">02</span>
@@ -199,7 +200,7 @@ export function TextTool() {
             </p>
           </section>
 
-          <section className="offline-tool-output utility-panel surface-panel">
+          <section data-t3-glass="panel" className="offline-tool-output utility-panel surface-panel">
             <div className="utility-panel-heading">
               <div>
                 <span className="utility-step">03</span>

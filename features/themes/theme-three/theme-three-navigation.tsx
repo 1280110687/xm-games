@@ -9,13 +9,19 @@ import {
   House,
   Settings2,
   Sparkles,
-  Tv,
+  Wrench,
 } from "lucide-react"
 
 import { useLocale } from "@/lib/locale-context"
 import { PrefetchLink as Link } from "@/components/prefetch-link"
 import type { Locale } from "@/lib/i18n"
 import { cn } from "@/lib/utils"
+import {
+  getThemeThreeNavigationSection,
+  THEME_THREE_HOME_NAVIGATION,
+  THEME_THREE_LIBRARY_HASH,
+  THEME_THREE_TOOLS_HASH,
+} from "./navigation-model"
 
 const NAVIGATION_COPY: Record<
   Locale,
@@ -23,7 +29,7 @@ const NAVIGATION_COPY: Record<
     navigation: string
     home: string
     games: string
-    tracker: string
+    tools: string
     settings: string
     workspace: string
     workspaceDescription: string
@@ -32,9 +38,9 @@ const NAVIGATION_COPY: Record<
 > = {
   zh: {
     navigation: "主题三主导航",
-    home: "控制台",
+    home: "首页",
     games: "游戏库",
-    tracker: "追番",
+    tools: "工具",
     settings: "设置中心",
     workspace: "娱乐工作区",
     workspaceDescription: "本地优先 · 即开即玩",
@@ -42,9 +48,9 @@ const NAVIGATION_COPY: Record<
   },
   en: {
     navigation: "Theme Three navigation",
-    home: "Console",
+    home: "Home",
     games: "Library",
-    tracker: "Tracker",
+    tools: "Tools",
     settings: "Settings",
     workspace: "Play workspace",
     workspaceDescription: "Local first · Instant play",
@@ -52,9 +58,9 @@ const NAVIGATION_COPY: Record<
   },
   th: {
     navigation: "การนำทางธีม 3",
-    home: "คอนโซล",
+    home: "หน้าแรก",
     games: "คลังเกม",
-    tracker: "อนิเมะ",
+    tools: "เครื่องมือ",
     settings: "ตั้งค่า",
     workspace: "พื้นที่ความบันเทิง",
     workspaceDescription: "เน้นในเครื่อง · เล่นทันที",
@@ -62,37 +68,13 @@ const NAVIGATION_COPY: Record<
   },
 }
 
-const GAME_ROUTES = new Set([
-  "/2048",
-  "/alternating-trail",
-  "/base64-tool",
-  "/bingo",
-  "/bingo-cards",
-  "/chess",
-  "/chinese-chess",
-  "/go",
-  "/gomoku",
-  "/json-tool",
-  "/memory-match",
-  "/minesweeper",
-  "/neon-breaker",
-  "/qr-code",
-  "/reversi",
-  "/schulte-grid",
-  "/snake",
-  "/sudoku",
-  "/tetris",
-  "/text-crypto",
-  "/text-tool",
-])
-
 type NavigationItem = {
   href: string
   label: string
   icon: typeof House
   active: boolean
   current?: "page" | "location"
-  onClick?: () => void
+  onNavigate?: () => void
 }
 
 function NavigationItems({
@@ -102,20 +84,22 @@ function NavigationItems({
   items: NavigationItem[]
   itemClassName: string
 }) {
-  return items.map(({ href, label, icon: Icon, active, current, onClick }) => (
-    <Link
-      key={href}
-      href={href}
-      onClick={onClick}
-      className={cn(itemClassName, active && "is-active")}
-      aria-current={current}
-    >
-      <span className="theme-three-nav-icon">
-        <Icon aria-hidden="true" />
-      </span>
-      <span>{label}</span>
-    </Link>
-  ))
+  return items.map(
+    ({ href, label, icon: Icon, active, current, onNavigate }) => (
+      <Link
+        key={href}
+        href={href}
+        onNavigate={onNavigate}
+        className={cn(itemClassName, active && "is-active")}
+        aria-current={current}
+      >
+        <span className="theme-three-nav-icon">
+          <Icon aria-hidden="true" />
+        </span>
+        <span>{label}</span>
+      </Link>
+    ),
+  )
 }
 
 export function ThemeThreeNavigation() {
@@ -129,17 +113,25 @@ export function ThemeThreeNavigation() {
 
     syncHash()
     window.addEventListener("hashchange", syncHash)
-    return () => window.removeEventListener("hashchange", syncHash)
+    window.addEventListener("popstate", syncHash)
+    return () => {
+      window.removeEventListener("hashchange", syncHash)
+      window.removeEventListener("popstate", syncHash)
+    }
   }, [pathname])
 
-  const isGameLibrary =
-    pathname === "/" && hash === "#theme-three-game-library"
-  const isHome = pathname === "/" && !isGameLibrary
-  const isTracker =
-    pathname === "/anime-tracker" || pathname.startsWith("/anime-tracker/")
-  const isSettings =
-    pathname === "/settings" || pathname.startsWith("/settings/")
-  const isGame = isGameLibrary || GAME_ROUTES.has(pathname)
+  const section = getThemeThreeNavigationSection(pathname, hash)
+  const isHome = section === "home"
+  const isGame = section === "games"
+  const isTools = section === "tools"
+  const isSettings = section === "settings"
+  const navigateHome = (nextHash: string) => {
+    setHash(nextHash)
+    // Also reset an existing home search, including a repeated tap on Tools.
+    window.dispatchEvent(
+      new CustomEvent(THEME_THREE_HOME_NAVIGATION, { detail: nextHash }),
+    )
+  }
 
   const items: NavigationItem[] = [
     {
@@ -148,30 +140,23 @@ export function ThemeThreeNavigation() {
       icon: House,
       active: isHome,
       current: isHome ? "page" : undefined,
-      onClick: () => setHash(""),
+      onNavigate: () => navigateHome(""),
     },
     {
-      href: "/#theme-three-game-library",
+      href: `/${THEME_THREE_LIBRARY_HASH}`,
       label: copy.games,
       icon: Gamepad2,
       active: isGame,
-      current: isGameLibrary
-        ? "page"
-        : GAME_ROUTES.has(pathname)
-          ? "location"
-          : undefined,
-      onClick: () => setHash("#theme-three-game-library"),
+      current: isGame ? (pathname === "/" ? "page" : "location") : undefined,
+      onNavigate: () => navigateHome(THEME_THREE_LIBRARY_HASH),
     },
     {
-      href: "/anime-tracker",
-      label: copy.tracker,
-      icon: Tv,
-      active: isTracker,
-      current: isTracker
-        ? pathname === "/anime-tracker"
-          ? "page"
-          : "location"
-        : undefined,
+      href: `/${THEME_THREE_TOOLS_HASH}`,
+      label: copy.tools,
+      icon: Wrench,
+      active: isTools,
+      current: isTools ? (pathname === "/" ? "page" : "location") : undefined,
+      onNavigate: () => navigateHome(THEME_THREE_TOOLS_HASH),
     },
     {
       href: "/settings",
@@ -189,7 +174,11 @@ export function ThemeThreeNavigation() {
   return (
     <>
       <aside className="theme-three-sidebar" aria-label={copy.workspace}>
-        <Link href="/" className="theme-three-sidebar-brand">
+        <Link
+          href="/"
+          className="theme-three-sidebar-brand"
+          onNavigate={() => navigateHome("")}
+        >
           <span className="theme-three-brand-mark">
             <Sparkles aria-hidden="true" />
           </span>
@@ -199,10 +188,7 @@ export function ThemeThreeNavigation() {
           </span>
         </Link>
 
-        <nav
-          className="theme-three-sidebar-links"
-          aria-label={copy.navigation}
-        >
+        <nav className="theme-three-sidebar-links" aria-label={copy.navigation}>
           <NavigationItems
             items={items}
             itemClassName="theme-three-sidebar-link"

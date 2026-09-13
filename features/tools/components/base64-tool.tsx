@@ -127,12 +127,13 @@ export function Base64Tool() {
             <div className="utility-panel-heading">
               <div>
                 <span className="utility-step">01</span>
-                <h2>{copy.common.input}</h2>
+                <h2 id="base64-tool-input-label">{copy.common.input}</h2>
               </div>
               <span className="utility-result-count">{input.length}</span>
             </div>
             <textarea
               className="utility-textarea offline-tool-code-input"
+              aria-labelledby="base64-tool-input-label"
               value={input}
               onChange={(event) => {
                 setInput(event.target.value)
