@@ -38,8 +38,8 @@ export function ArcadePageHeader({ title, description, actions, homeLabel }: {
   const copy = ARCADE_COPY[locale]
   const section = getArcadeRouteSection(usePathname())
   const hash = section === "tools" ? "#arcade-tools" : section === "games" ? "#arcade-games" : ""
-  return <header className="arcade-page-header">
-    <div className="arcade-header">
+  return <>
+    <header className="arcade-header arcade-page-header" data-has-context={Boolean(description || actions)}>
       <Link href={`/${hash}`} className="arcade-back" aria-label={section ? copy[section] : homeLabel}
         onNavigate={() => navigateArcade(hash)}><ArrowLeft aria-hidden="true" /></Link>
       <h1>{title || homeLabel}</h1>
@@ -47,10 +47,10 @@ export function ArcadePageHeader({ title, description, actions, homeLabel }: {
         <LanguageSwitcher compact />
         <ThemeSwitcher compact className="arcade-theme-switch" />
       </div>
-    </div>
+    </header>
     {(description || actions) && <div className="arcade-page-context">
       {description && <p>{description}</p>}
       {actions && <div className="arcade-page-actions">{actions}</div>}
     </div>}
-  </header>
+  </>
 }

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest"
 import { readFileSync, readdirSync, statSync } from "node:fs"
+import postcss from "postcss"
 import { cleanText, getTextStats } from "../../../lib/offline-tools"
 import { normalizeTheme, themeBootstrapScript } from "../../../lib/theme"
 import { HOME_CATEGORIES } from "../../catalog/catalog"
@@ -29,6 +30,22 @@ describe("arcade full page coverage", () => {
     expect(ARCADE_NAV_ITEMS.map(item => item.key)).toEqual(["home", "games", "tools"])
     expect(ARCADE_NAV_ITEMS.map(item => item.href)).toEqual(["/", "/#arcade-games", "/#arcade-tools"])
     expect(readFileSync("features/themes/theme-arcade/header.tsx", "utf8")).not.toContain("!tool &&")
+  })
+  it("keeps the sticky toolbar independent of scrolling page context and covers its safe-area gutter", () => {
+    const header = readFileSync("features/themes/theme-arcade/header.tsx", "utf8")
+    const pageHeader = header.slice(header.indexOf("export function ArcadePageHeader"))
+    expect(pageHeader).toContain('<header className="arcade-header arcade-page-header"')
+    expect(pageHeader.indexOf("</header>")).toBeLessThan(pageHeader.indexOf('className="arcade-page-context"'))
+
+    const styles = postcss.parse(readFileSync("styles/themes/theme-arcade/index.css", "utf8"))
+    const declarations = (selector: string) => {
+      const values: Record<string, string> = {}
+      styles.walkRules(selector, rule => { rule.walkDecls(decl => { values[decl.prop] = decl.value }) })
+      return values
+    }
+    expect(declarations(".arcade-header")).toMatchObject({ position: "sticky", top: "var(--arcade-header-inset)", "z-index": "40" })
+    expect(declarations(".arcade-header::before")).toMatchObject({ position: "absolute", background: "var(--background)", "pointer-events": "none" })
+    expect(declarations("html[data-theme='theme-arcade']")["--arcade-header-inset"]).toContain("var(--xm-safe-area-top)")
   })
   it("keeps every existing entry reachable from its game or tool shelf", () => {
     const games = getArcadeEntries(HOME_CATEGORIES, "games", "featured")
