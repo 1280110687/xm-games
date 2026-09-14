@@ -74,6 +74,7 @@ import {
   writeCachedAnimeSearch,
 } from "@/features/anime-tracker/search-cache"
 import {
+  ANIME_STORAGE_KEY,
   readAnimeImageCache,
   readAnimeStorage,
   writeAnimeImageCache,
@@ -88,6 +89,7 @@ import type {
 import type { TranslationKey } from "@/lib/i18n"
 import { useLocale } from "@/lib/locale-context"
 import { cn } from "@/lib/utils"
+import { AnimeTransfer } from "./anime-transfer"
 
 const STATUS_TRANSLATION_KEYS: Record<AnimeStatus, TranslationKey> = {
   watching: "statusWatching",
@@ -418,6 +420,18 @@ export function AnimeTracker() {
     setCanPersistImages(legacyImageCache.canPersist)
     setStorageProtected(!animeStorage.canPersist)
     setStorageReady(true)
+    const syncStorage = (event: StorageEvent) => {
+      if (
+        event.storageArea !== window.localStorage ||
+        (event.key !== null && event.key !== ANIME_STORAGE_KEY)
+      ) return
+      const current = readAnimeStorage(window.localStorage)
+      setCanPersistAnime(current.canPersist)
+      setStorageProtected(!current.canPersist)
+      setAnimeList(current.records)
+    }
+    window.addEventListener("storage", syncStorage)
+    return () => window.removeEventListener("storage", syncStorage)
   }, [])
 
   useEffect(() => {
@@ -758,6 +772,16 @@ export function AnimeTracker() {
             </Button>
           }
         />
+
+        <div className="mb-4 flex justify-end">
+          <AnimeTransfer
+            records={animeList}
+            ready={storageReady}
+            canPersist={canPersistAnime}
+            online={isOnline}
+            onImported={setAnimeList}
+          />
+        </div>
 
         {storageProtected && (
           <div
