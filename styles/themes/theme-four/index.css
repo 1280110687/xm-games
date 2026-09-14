@@ -332,8 +332,7 @@ html[data-theme='theme-four'] .game-header [data-layout-slot='description'] {
 
 html[data-theme='theme-four'] .game-header-home,
 html[data-theme='theme-four'] .game-header .theme-switcher-trigger,
-html[data-theme='theme-four'] .game-header .language-switcher-trigger,
-html[data-theme='theme-four'] .game-header .theme-two-settings-shortcut {
+html[data-theme='theme-four'] .game-header .language-switcher-trigger {
   border-color: rgb(54 49 41 / 0.3);
   border-radius: 0.15rem;
   color: var(--theme-four-ink);
@@ -452,10 +451,10 @@ html[data-theme='theme-four'] .tetris-drop-button {
   color: var(--theme-four-teal);
 }
 
-html[data-theme='theme-four'] .schulte-two-stack > section,
-html[data-theme='theme-four'] .schulte-two-board-card,
-html[data-theme='theme-four'] .schulte-two-settings-card,
-html[data-theme='theme-four'] .schulte-two-stat-card {
+html[data-theme='theme-four'] .schulte-four-stack > section,
+html[data-theme='theme-four'] .schulte-four-board-card,
+html[data-theme='theme-four'] .schulte-four-settings-card,
+html[data-theme='theme-four'] .schulte-four-stat-card {
   border-color: rgb(54 49 41 / 0.28);
   border-radius: 0.22rem;
   color: var(--theme-four-ink);

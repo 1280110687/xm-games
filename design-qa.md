@@ -1,4 +1,202 @@
-# Classic Games Design QA
+# Theme One — Secondary Page Rollout (latest)
+
+2026-09-14. User approved extending the selected arcade design to secondary
+pages and removing the Settings Center destination from this theme's bottom
+navigation. This section supersedes the two-page preview boundary below.
+
+## Scope and design decisions
+
+- All 22 catalog destinations now retain `theme-arcade`, including direct
+  refresh. No route-level fallback to Theme Three remains.
+- Home / Library / Tools are the only bottom destinations. Headers expose
+  language and appearance directly; the old `/settings` URL remains compatible.
+- Preserve the selected mock's off-white canvas, black rules, bold headings,
+  coral actions, yellow/mint accents and crisp outlined controls. Tool pages
+  use open numbered work sections; desktop editor/result columns replace
+  nested cards. The anime toolbar combines add/transfer actions and the list
+  uses rule-separated records. Focus exercises receive their own layout view.
+- No new assets, dependencies, game engines, storage schemas or API changes.
+  Original local illustrations are reused. Interactive SVG/game grids remain
+  real controls; the neon game's dark canvas stays legible inside arcade chrome.
+- Theme styles are separated into shared/tools/games/anime modules. Classic
+  and focus CSS stays route-scoped. Shared focus slots are theme-neutral types.
+
+## Visual evidence and findings
+
+Evidence: `output/theme-arcade-secondary-2026-09-14/` (ignored local artifacts).
+Chinese baseline 390×844; short/narrow 320×568; desktop 1280×900.
+The selected 1296×1213 two-screen raster was shown alongside the final 390px
+text-tool screenshot in the same inspection. This is an extension of its design
+language, not a claim that previously undesigned game pages are pixel replicas.
+Three-item navigation and the additional language control intentionally differ
+from the original mock per the user's current requirements.
+
+- **Fixed P1:** Secondary routes switched theme on navigation/refresh. Removed
+  both bootstrap and provider preview fallbacks; route tests and browser checks
+  now keep the selected identity.
+- **Fixed P2:** White chess pieces lacked contrast. Added crisp outlines while
+  preserving selected-square and last-move markers. Sudoku errors retain red
+  instead of being hidden by the selected-cell accent.
+- **Fixed P2:** Anime intro appeared twice, with an isolated add button row.
+  Moved add/transfer into a shared toolbar only for arcade, retaining all handlers.
+- **Fixed P2:** Thai crypto heading and mode labels competed for a narrow row.
+  Modes now wrap onto their own full-width row on small screens.
+- **Fixed P2:** AI setup selected choices had no visible marker. Corrected the
+  selector to the existing `aria-pressed` contract and compacted the popup.
+- **Fixed P2:** Neon controls were pushed far below its tall playfield. The
+  mobile playfield scales with available height; score/actions precede help.
+- All 22 entries were visited at 390px and 320px. No document-level horizontal
+  overflow; game/tool navigation classification and three destinations verified.
+  Longer tools and short-height views remain intentionally scrollable; fixed
+  navigation has bottom content clearance, not an artificial single-screen crop.
+- Visual families checked: five board games, Bingo and cards, 2048, Tetris,
+  Sudoku, Minesweeper, Snake, Memory, Neon, both focus exercises, all six tools,
+  and the compatibility settings route. Desktop editor/results, Tetris side
+  controls, focus side controls and anime index were also inspected.
+- Theme Three Base64 and Theme Four focus screenshots confirm their separate
+  material/layout systems remain in place. No Theme Four engine edits.
+
+Primary comparison: `text-final-390.png`. Representative family evidence:
+`2048-390.png`, `tetris-390.png`, `memory-match-390.png`,
+`base64-result-390.png`, `qr-generated-390.png`, `anime-tracker-desktop.png`.
+Use viewport captures for geometry: the in-app browser's full-page export
+occasionally includes surplus whitespace at 320px, so those long PNGs are not
+evidence of exact physical viewport dimensions.
+
+## Functional and build verification
+
+- Bootstrap/route/style tests first failed on the old preview implementation;
+  implementation made them pass. Catalog classification includes every current
+  destination plus trailing-slash and unknown-route cases.
+- Text sample: 47 characters, 35 non-space, 9 words, 4 lines. Clean all retains
+  the existing blank-line behavior and enables copy/reuse controls.
+- Base64 `Hello XM-Games` → `SGVsbG8gWE0tR2FtZXM=`; JSON format and local QR
+  generation work in the new layout.
+- Focus Start → click 1 yields progress 1/25 and next target 2. Navigated away
+  without completing/stopping the exercise, so no test result was saved.
+- Tetris Start → Pause displays paused state; direction controls disabled.
+- English text tool and Thai crypto checked at 320px; restored Chinese.
+- `pnpm verify`: lint, TypeScript and both 3D + Next production builds passed;
+  **77 test files passed, 1 skipped; 560 tests passed, 2 skipped**.
+- Redis external integration remains skipped without its environment. Existing
+  3D chunk-size / runtime texture-path warnings are unchanged.
+- SW cache version v21 retains user-confirmed update behavior; no forced
+  activation or business-data clearing. No true installed iOS/Android offline
+  cold-start or device safe-area/performance acceptance was performed this turn.
+- This is the pre-commit verification snapshot. The user authorized commit and
+  push on 2026-09-14; revision and synchronization status are recorded by Git.
+  No separate deployment is invoked. Preview remains on localhost:4412.
+
+---
+
+# Theme One Rebuild — Arcade Editorial QA (earlier representative-page phase)
+
+2026-09-14. Scope: the selected third mock, implemented in the existing Next.js
+application at `/` and `/text-tool`. The historical reports below remain intact;
+they are not evidence that the retired themes are still available.
+
+## Visual truth and evidence
+
+- Selected visual truth: `/Users/mimi/.codex/generated_images/019feb77-4fc5-7a12-9663-08490176993a/exec-9df62f15-109c-4600-aac0-984e2af2323e.png`.
+- Implementation: `http://localhost:4412/` and `http://localhost:4412/text-tool`.
+- Evidence directory: `output/theme-arcade-2026-09-14/`.
+- Final mobile: `home-final-390x844.png`, `text-final-390x844.png`.
+- Final desktop: `home-desktop-final.png`, `text-desktop-final.png`.
+- Narrow screens: `home-zh-320-final.png`, `home-th-320-final.png`.
+- Retained-theme regressions: `theme-three-text-regression.png`, `theme-four-text-regression.png`.
+
+The source is a composed two-screen raster board (1296×1213), not a literal
+browser capture with density metadata. Each panel is approximately 640px wide.
+Compare each panel at the implementation's 390 CSS-pixel width; do not stretch
+its typography to fill 844px vertically. The board normalizes to approximately
+390×735 per panel. Primary mobile captures are 390×844, DPR 1; an additional
+390×736 short-height inspection confirmed scrollable content and the fixed
+navigation. Desktop inspection is 1280×900; narrow inspection is 320×740.
+The taller runtime viewport intentionally leaves more space above the footer.
+
+The exact source and both final mobile screenshots were opened together in one
+comparison input after fixes. Header, feature artwork, stats, command buttons,
+output and bottom-navigation regions were readable at full resolution in that
+same input; no independent crop was needed to judge those regions. Desktop and
+Thai captures were inspected separately for responsiveness, not passed off as
+source-fidelity comparisons.
+
+State: Chinese, selected arcade preview, home Featured shelf; text sample
+`  Hello XM-Games  \n\nReady to play\nReady to play`, input tab, after Clean all.
+Actual counts are 47 characters / 35 non-whitespace / 9 words / 4 lines.
+Output retains one blank line per the existing algorithm. The mock's two-line
+output is not a license to change that behavior.
+
+## Comparison history and findings
+
+1. **P2 — illustration colors became muddy.** `home-v1.png` showed multiplied
+   colored backdrops, notably darkening the balls and snake. Removed multiply
+   blending and aligned surfaces with sampled image backdrops. Final captures
+   show white eyes/ball faces, yellow and mint accents without the dark overlay.
+2. **P2 — undersized headline and tile illustration.** First home capture did not
+   have the source's headline emphasis. Increased display type and tile-art
+   footprint; checked wrapping in Chinese and English.
+3. **P2 — longer copy could collide with artwork.** English Bingo description
+   overlapped the cage, and Thai 2048 copy reached the arrow at 320px. The Bingo
+   artwork now occupies remaining layout space; text/art columns are separated
+   on desktop, and the Thai summary is concise. Final Thai capture shows the
+   arrow separated from copy. The 2048 caption width prevents text/art overlap.
+4. **P2 — same-home navigation retained the previous filter.** Reset filters on
+   home-navigation events, including repeated taps. Browser verification:
+   Board → Home returns Featured (`aria-pressed=true`).
+5. Final comparison: no remaining actionable P0/P1/P2 issues within this
+   representative-page scope.
+
+## Required fidelity surfaces
+
+- **Fonts / typography:** bold black editorial hierarchy, large home headline,
+  condensed-looking game headings and monospace editor/result. Existing Geist
+  and system CJK/Thai fallbacks avoid added font requests. The raster's exact
+  display-face contours are not claimed as a pixel-identical font match.
+- **Spacing / layout:** unequal game composition, tall Bingo plus two compact
+  entries, rule-separated secondary links and four-item navigation preserved.
+  Desktop adapts the same hierarchy; narrow pages scroll with bottom padding.
+  Header controls are 44px; primary actions have visible keyboard focus.
+- **Colors / tokens:** off-white, near-black, coral, yellow and mint; no glass
+  surface or gradients added. Active text is a darker coral for readability.
+- **Images:** five actual generated WebP assets, approximately 61 KB total,
+  same-origin and included in the full offline manifest. No CSS or handcrafted
+  SVG illustration substitutes. Tiny generated backdrop variations remain P3.
+- **Copy / content:** three locales; all 22 real catalog destinations reachable.
+  Preserved non-whitespace statistics, copy status, empty-input errors, result
+  invalidation and reuse-as-input. Replaced decorative palette swatches with
+  the existing functional, labeled theme picker rather than dead controls.
+
+## Interaction and regression verification
+
+- Categories, Home/Library/Tools navigation, settings, text input, Clean all,
+  result tab, clipboard equality, reuse-as-input and empty input were exercised.
+- Saved arcade preview → 2048 / settings uses the complete glass interface;
+  2048 reload remains styled, and returning home restores arcade automatically.
+- Theme Three processed a real test input with the shared controller; Theme
+  Four's text-tool layout remained complete after switching.
+- No console errors or warnings were recorded in the verification tab.
+- `pnpm verify` passed: lint, TypeScript, production build, 77 test files /
+  556 tests passed; 1 file / 2 tests skipped. The existing 3D bundle/path warnings remain.
+- Actual installed iOS/Android PWA, offline cold starts and real Redis integration
+  were not tested. Local screenshots do not stand in for those checks.
+
+## Follow-up polish / implementation checklist
+
+- P3: a separately licensed condensed display font could tighten Latin-heading
+  fidelity later; current typography is consistent and readable.
+- [x] Resolve all P0/P1/P2 findings in the representative pages.
+- [x] Preserve original game/tool behavior and retired preference migration.
+- [x] Keep preview theme boundaries explicit; no unfinished unstyled routes.
+- [ ] User visual acceptance before extending the theme to other page families.
+
+Asset provenance, final paths and generation prompts: [theme-arcade-assets.md](docs/theme-arcade-assets.md).
+
+final result: passed
+
+---
+
+# Historical Classic Games Design QA
 
 ## References
 

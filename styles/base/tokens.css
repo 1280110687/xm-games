@@ -1,0 +1,29 @@
+/* Neutral fallback only. Every active theme owns its visual tokens. */
+:root {
+  color-scheme: dark;
+  --background: #181a1d;
+  --foreground: #f4f4f5;
+  --card: #232529;
+  --card-foreground: #f4f4f5;
+  --popover: #232529;
+  --popover-foreground: #f4f4f5;
+  --primary: #e4e4e7;
+  --primary-foreground: #181a1d;
+  --secondary: #303237;
+  --secondary-foreground: #f4f4f5;
+  --muted: #303237;
+  --muted-foreground: #b5b6bb;
+  --accent: #3e4148;
+  --accent-foreground: #f4f4f5;
+  --destructive: #ef6666;
+  --destructive-foreground: #ffffff;
+  --border: #454850;
+  --input: #303237;
+  --ring: #d4d4d8;
+  --radius: 0.75rem;
+  --surface-low: #1d1f23;
+  --surface: #232529;
+  --surface-high: #303237;
+  --glow-primary: transparent;
+  --glow-cyan: transparent;
+}

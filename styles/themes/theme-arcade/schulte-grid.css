@@ -1,0 +1,35 @@
+/* Loaded by the two focus exercise routes, never by the app shell. */
+html[data-theme='theme-arcade'] .game-page[data-focus-exercise] {
+  --schulte-board-size: min(100%, 370px);
+  --schulte-cell-fill: #fff3b3;
+  --schulte-cell-stroke: #292929;
+  --schulte-cell-text: #141414;
+  --schulte-board-fill: #292929;
+  --schulte-progress: #be363c;
+  --schulte-progress-track: #dfdcd2;
+}
+html[data-theme='theme-arcade'] .arcade-focus { width: min(100%, 920px); margin-inline: auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+html[data-theme='theme-arcade'] .arcade-focus-stage { min-width: 0; padding: 14px; border: 2px solid #141414; background: #fffefa; box-shadow: 4px 4px 0 #dedbd3; }
+html[data-theme='theme-arcade'] .arcade-focus-scoreboard { display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 12px; }
+html[data-theme='theme-arcade'] .arcade-focus-scoreboard > div { display: grid; gap: 4px; padding-left: 10px; border-left: 1px solid #999; }
+html[data-theme='theme-arcade'] .arcade-focus-scoreboard span { color: #606064; font-size: 12px; }
+html[data-theme='theme-arcade'] .arcade-focus-scoreboard strong { font: 900 clamp(22px,5vw,32px) var(--font-geist-mono),monospace; }
+html[data-theme='theme-arcade'] .arcade-focus-scoreboard > div:first-child strong { color: #ae3035; }
+html[data-theme='theme-arcade'] .schulte-board-shell { margin: 0 auto 14px; }
+html[data-theme='theme-arcade'] .arcade-focus-controls { display: flex; flex-direction: column; gap: 14px; }
+html[data-theme='theme-arcade'] .schulte-level-picker { gap: 6px; }
+html[data-theme='theme-arcade'] .schulte-level-option { min-height: 44px; border: 1px solid #292929; border-radius: 3px; background: #fffefa; }
+html[data-theme='theme-arcade'] .schulte-level-option[aria-pressed='true'] { background: #ffe177; }
+html[data-theme='theme-arcade'] .schulte-notice-slot { white-space: normal; line-height: 1.6; min-height: 36px; font-size: 13px; overflow: visible; }
+html[data-theme='theme-arcade'] .arcade-focus-best { display: flex; justify-content: space-between; gap: 8px; border-top: 1px solid #999; padding-top: 12px; font-size: 13px; }
+html[data-theme='theme-arcade'] .schulte-recent { border-top: 2px solid #141414; padding-top: 12px; }
+html[data-theme='theme-arcade'] .schulte-recent-item { border-radius: 2px; background: #efeeeb; padding: 8px; }
+html[data-theme='theme-arcade'] .schulte-cell:focus-visible path { stroke: #b52d31; stroke-width: 5px; }
+@media (min-width: 760px) {
+  html[data-theme='theme-arcade'] .arcade-focus { grid-template-columns: minmax(0,1.25fr) minmax(240px,1fr); gap: 24px; align-items: start; }
+  html[data-theme='theme-arcade'] .arcade-focus-controls { border-top: 2px solid #141414; padding-top: 16px; }
+  html[data-theme='theme-arcade'] .arcade-focus .schulte-recent { grid-column: 1 / -1; }
+}
+@media (max-width: 759px) {
+  html[data-theme='theme-arcade'] .game-page[data-focus-exercise] { --schulte-board-size: min(100%, max(180px, calc(100svh - 420px))); }
+}

@@ -9,12 +9,11 @@ import { PwaInstallPrompt } from '@/components/pwa-install-prompt'
 import { RouteProgress } from '@/components/route-progress'
 import { DEFAULT_LOCALE, localeHtmlLang } from '@/lib/i18n'
 import { getPageMetadata } from '@/lib/page-metadata'
-import { themeBootstrapScript } from '@/lib/theme'
+import { DEFAULT_THEME, THEME_CONFIG, themeBootstrapScript, themeUsesDarkChrome } from '@/lib/theme'
 import './globals.css'
-import '@/styles/themes/theme-one/index.css'
-import '@/styles/themes/theme-two/index.css'
 import '@/styles/themes/theme-three/index.css'
 import '@/styles/themes/theme-four/index.css'
+import '@/styles/themes/theme-arcade/index.css'
 import './pwa-safe-area.css'
 
 const geist = Geist({
@@ -62,7 +61,7 @@ export const viewport: Viewport = {
   minimumScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#101421',
+  themeColor: THEME_CONFIG[DEFAULT_THEME].themeColor,
   viewportFit: 'cover',
 }
 
@@ -75,8 +74,8 @@ export default function RootLayout({
     <html
       lang={localeHtmlLang[DEFAULT_LOCALE]}
       translate="no"
-      className="dark"
-      data-theme="theme-one"
+      className={themeUsesDarkChrome(DEFAULT_THEME) ? 'dark' : undefined}
+      data-theme={DEFAULT_THEME}
       suppressHydrationWarning
     >
       <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>

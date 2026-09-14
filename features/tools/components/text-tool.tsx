@@ -1,6 +1,5 @@
 "use client"
 
-import { useMemo, useState } from "react"
 import {
   AlignJustify,
   ArrowRightLeft,
@@ -15,87 +14,18 @@ import {
 
 import { GameHeader } from "@/components/game-header"
 import { Button } from "@/components/ui/button"
-import { copyTextToClipboard } from "@/lib/client-clipboard"
-import { useLocale } from "@/lib/locale-context"
-import { OFFLINE_TOOL_COPY } from "@/lib/offline-tool-copy"
-import {
-  cleanText,
-  collapseBlankLines,
-  deduplicateLines,
-  getTextStats,
-  trimLineWhitespace,
-} from "@/lib/offline-tools"
 import { cn } from "@/lib/utils"
 
-type TextAction = "trim" | "collapse" | "deduplicate" | "clean"
+import { useTextTool } from "../hooks/use-text-tool"
+import { useTheme } from "@/features/themes/shared/theme-provider"
+import { ArcadeTextTool } from "@/features/themes/theme-arcade/text-tool"
 
 export function TextTool() {
-  const { locale } = useLocale()
-  const copy = OFFLINE_TOOL_COPY[locale]
-  const [input, setInput] = useState("")
-  const [output, setOutput] = useState("")
-  const [error, setError] = useState("")
-  const [status, setStatus] = useState("")
-  const [copied, setCopied] = useState(false)
-  const inputStats = useMemo(() => getTextStats(input), [input])
-  const outputStats = useMemo(() => getTextStats(output), [output])
+  const controller = useTextTool()
+  const { theme } = useTheme()
+  const { locale, copy, input, setInput, output, outputStats, error, status, copied, stats, invalidateResult, processText, copyOutput, useOutputAsInput, clearAll } = controller
 
-  const invalidateResult = () => {
-    setOutput("")
-    setError("")
-    setStatus("")
-    setCopied(false)
-  }
-
-  const processText = (action: TextAction) => {
-    if (!input) {
-      setError(copy.common.inputRequired)
-      setStatus("")
-      return
-    }
-
-    const handlers = {
-      trim: trimLineWhitespace,
-      collapse: collapseBlankLines,
-      deduplicate: deduplicateLines,
-      clean: cleanText,
-    } satisfies Record<TextAction, (value: string) => string>
-
-    setOutput(handlers[action](input))
-    setError("")
-    setStatus(copy.text.cleaned)
-    setCopied(false)
-  }
-
-  const copyOutput = async () => {
-    if (!output) return
-
-    try {
-      await copyTextToClipboard(output)
-      setCopied(true)
-      window.setTimeout(() => setCopied(false), 1800)
-    } catch {
-      setError(copy.common.copyFailed)
-    }
-  }
-
-  const useOutputAsInput = () => {
-    if (!output) return
-    setInput(output)
-    invalidateResult()
-  }
-
-  const clearAll = () => {
-    setInput("")
-    invalidateResult()
-  }
-
-  const stats = [
-    [copy.text.characters, inputStats.characterCount],
-    [copy.text.nonWhitespace, inputStats.nonWhitespaceCharacterCount],
-    [copy.text.words, inputStats.wordCount],
-    [copy.text.lines, inputStats.lineCount],
-  ] as const
+  if (theme === "theme-arcade") return <ArcadeTextTool controller={controller} />
 
   return (
     <div data-page="text-tool" className="utility-page offline-data-page game-page">

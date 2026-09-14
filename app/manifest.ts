@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next"
+import { DEFAULT_THEME, THEME_CONFIG } from "../lib/theme"
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -9,8 +10,8 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     scope: "/",
     display: "standalone",
-    background_color: "#101421",
-    theme_color: "#101421",
+    background_color: THEME_CONFIG[DEFAULT_THEME].themeColor,
+    theme_color: THEME_CONFIG[DEFAULT_THEME].themeColor,
     orientation: "any",
     lang: "zh-CN",
     categories: ["games", "entertainment", "utilities"],

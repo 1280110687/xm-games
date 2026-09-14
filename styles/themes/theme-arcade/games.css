@@ -1,0 +1,127 @@
+/* Game chrome: neutral boards, colored editorial controls, no glass dependency. */
+html[data-theme='theme-arcade'] .game-page:not(.utility-page) .game-summary { border-radius: 0; }
+html[data-theme='theme-arcade'] .game-page:not(.utility-page) .game-stage { border-color: #292929; border-radius: 3px; box-shadow: 4px 4px 0 #dedbd3; }
+html[data-theme='theme-arcade'] .game-stat-value[data-tone='success'], html[data-theme='theme-arcade'] .game-status-copy[data-tone='success'] { color: #18715b; }
+html[data-theme='theme-arcade'] .game-stat-value[data-tone='achievement'] { color: #96610c; }
+html[data-theme='theme-arcade'] .game-status-copy[data-tone='danger'] { color: #b12731; }
+html[data-theme='theme-arcade'] .game-status-copy[data-tone='neutral'] { color: #606064; }
+html[data-theme='theme-arcade'] .gomoku-mode-switch, html[data-theme='theme-arcade'] .chinese-chess-mode-bar {
+  display: flex; flex-wrap: wrap; width: 100%; max-width: 520px; gap: 6px; border-bottom: 1px solid #999; padding: 0 0 10px;
+}
+html[data-theme='theme-arcade'] .gomoku-mode-switch button, html[data-theme='theme-arcade'] .chinese-chess-mode-option { flex: 1; border-radius: 2px; min-height: 44px; padding: 8px; font-size: 13px; font-weight: 800; border: 1px solid #292929; background: #fffefa; cursor: pointer; }
+html[data-theme='theme-arcade'] .gomoku-mode-switch button[aria-selected='true'], html[data-theme='theme-arcade'] .chinese-chess-mode-option[aria-pressed='true'] { color: #141414; background: #ffe177; border-color: #141414; }
+html[data-theme='theme-arcade'] .chinese-chess-ai-summary { display: flex; gap: 6px; align-items: center; font-size: 12px; }
+html[data-theme='theme-arcade'] .gomoku-lan-panel, html[data-theme='theme-arcade'] .gomoku-lan-status { padding: 16px; border: 1.5px solid #292929; background: #fffefa; border-radius: 3px; }
+html[data-theme='theme-arcade'] .gomoku-lan-panel__heading { padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #aaa; }
+html[data-theme='theme-arcade'] .gomoku-lan-panel__heading h2 { font-weight: 850; font-size: 20px; }
+html[data-theme='theme-arcade'] .gomoku-lan-panel__intro, html[data-theme='theme-arcade'] .gomoku-lan-room { font-size: 14px; line-height: 1.6; }
+html[data-theme='theme-arcade'] .gomoku-lan-panel__intro > p { color: #606064; }
+html[data-theme='theme-arcade'] .gomoku-lan-room__topline strong { font: 900 28px var(--font-geist-mono), monospace; }
+html[data-theme='theme-arcade'] .gomoku-dice-overlay { backdrop-filter: none; background: rgb(20 20 20 / 45%); }
+html[data-theme='theme-arcade'] .gomoku-dice-card { border: 2px solid #141414; background: #fffefa; color: #141414; border-radius: 4px; }
+html[data-theme='theme-arcade'] .chinese-chess-ai-setup__icon { color: #b72e30; }
+html[data-theme='theme-arcade'] .chinese-chess-ai-setup__icon svg { width: 28px; height: 28px; }
+html[data-theme='theme-arcade'] .chinese-chess-ai-setup { gap: 16px; }
+html[data-theme='theme-arcade'] .chinese-chess-ai-setup__group { margin-top: 6px; }
+html[data-theme='theme-arcade'] .chinese-chess-ai-setup__group legend { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 800; margin-bottom: 8px; }
+html[data-theme='theme-arcade'] .chinese-chess-ai-setup__group legend svg { width: 18px; height: 18px; }
+html[data-theme='theme-arcade'] .chinese-chess-ai-setup__choices { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+html[data-theme='theme-arcade'] .chinese-chess-ai-setup__choices--difficulty { grid-template-columns: repeat(3,minmax(0,1fr)); }
+html[data-theme='theme-arcade'] .chinese-chess-ai-choice { min-height: 50px; border: 1px solid #292929; padding: 8px; border-radius: 3px; cursor: pointer; font-size: 13px; }
+html[data-theme='theme-arcade'] .chinese-chess-ai-choice[aria-pressed='true'] { background: #ffe177; }
+html[data-theme='theme-arcade'] .chinese-chess-ai-choice__piece { margin-right: 5px; }
+html[data-theme='theme-arcade'] .chinese-chess-ai-setup__warning { font-size: 13px; line-height: 1.6; color: #815515; }
+html[data-theme='theme-arcade'] .chinese-chess-ai-setup__footer { margin-top: 20px; }
+html[data-theme='theme-arcade'] [data-page='gomoku'] .game-stage, html[data-theme='theme-arcade'] [data-page='go'] .game-stage { background: #ecd09d; }
+html[data-theme='theme-arcade'] [data-page='chinese-chess'] .game-stage { background: #f3d9ae; }
+html[data-theme='theme-arcade'] [data-page='reversi'] .game-stage { background: #245c4b; }
+html[data-theme='theme-arcade'] [data-page='chess'] .game-stage button.bg-amber-200:not([class~='bg-yellow-400/50']) { background: #efeade; }
+html[data-theme='theme-arcade'] [data-page='chess'] .game-stage button.bg-amber-700:not([class~='bg-yellow-400/50']) { background: #81af9e; }
+html[data-theme='theme-arcade'] [data-page='chess'] .game-stage button .text-amber-50 { color: #fffefa; -webkit-text-stroke: 0.8px #141414; filter: none; }
+/* Sudoku borders retain their 3x3 grouping; selected/error states stay distinct. */
+html[data-theme='theme-arcade'] [data-page='sudoku'] .game-stage { border: 2px solid #141414; background: #fffefa; }
+html[data-theme='theme-arcade'] [data-page='sudoku'] .game-stage button { border-color: #777; }
+html[data-theme='theme-arcade'] [data-page='sudoku'] .game-stage button[aria-pressed='true']:not(.bg-red-100) { background: #ffd67e; }
+html[data-theme='theme-arcade'] [data-page='minesweeper'] .game-stage { background: #292929; }
+html[data-theme='theme-arcade'] .minesweeper-cell.bg-slate-400 { background: #ffe08a; box-shadow: inset 1px 1px #fffefa, inset -2px -2px #b8a46e; }
+html[data-theme='theme-arcade'] .minesweeper-cell.bg-slate-200 { background: #efeeeb; }
+html[data-theme='theme-arcade'] [data-page='snake'] .game-stage { padding: 0; }
+html[data-theme='theme-arcade'] [data-page='snake'] .game-stage [role='img'] { background: #235044; border-radius: 0; }
+html[data-theme='theme-arcade'] [data-page='snake'] .game-stage .bg-slate-800 { background: #d7ece1; }
+html[data-theme='theme-arcade'] [data-page='snake'] .game-stage .bg-green-400 { background: #141414; }
+html[data-theme='theme-arcade'] [data-page='snake'] .game-stage .bg-green-600 { background: #24826b; }
+html[data-theme='theme-arcade'] [data-page='snake'] .game-stage .bg-red-500 { background: #d53535; }
+html[data-theme='theme-arcade'] [data-page='snake'] .mobile-controls { display: grid; grid-template-columns: repeat(3,44px); gap: 4px; }
+html[data-theme='theme-arcade'] [data-page='snake'] .mobile-controls > button:first-child { grid-area: 1 / 2; }
+html[data-theme='theme-arcade'] [data-page='snake'] .mobile-controls > div { display: contents; }
+html[data-theme='theme-arcade'] [data-page='snake'] .mobile-controls > div > button:first-child { grid-area: 2 / 1; }
+html[data-theme='theme-arcade'] [data-page='snake'] .mobile-controls > div > div { display: none; }
+html[data-theme='theme-arcade'] [data-page='snake'] .mobile-controls > div > button:last-child { grid-area: 2 / 3; }
+html[data-theme='theme-arcade'] [data-page='snake'] .mobile-controls > button:last-child { grid-area: 2 / 2; }
+html[data-theme='theme-arcade'] [data-page='snake'] .mobile-controls button { width: 44px; height: 44px; }
+html[data-theme='theme-arcade'] .memory-dashboard { background: transparent; border: 0; border-bottom: 2px solid #141414; padding: 0 0 14px; }
+html[data-theme='theme-arcade'] .memory-kicker, html[data-theme='theme-arcade'] .memory-accent { color: #9f3033; }
+html[data-theme='theme-arcade'] .memory-difficulty-control { border-radius: 0; background: #efeeeb; }
+html[data-theme='theme-arcade'] .memory-stats { grid-template-columns: repeat(4,minmax(0,1fr)); }
+html[data-theme='theme-arcade'] .memory-stats > div { display: block; border: 0; border-left: 1px solid #999; padding: 2px 8px; min-height: 0; background: transparent; }
+html[data-theme='theme-arcade'] .memory-stats .memory-accent { display: none; }
+html[data-theme='theme-arcade'] .memory-stats p { white-space: normal; overflow-wrap: anywhere; }
+html[data-theme='theme-arcade'] .memory-board button, html[data-theme='theme-arcade'] .memory-board button > span > span { border-radius: 3px; }
+html[data-theme='theme-arcade'] .memory-board button > span > span { border: 1.5px solid #292929; box-shadow: none; }
+html[data-theme='theme-arcade'] .memory-board button > span > span:first-child { background: #ffe177; color: #141414; }
+html[data-theme='theme-arcade'] .memory-symbol { background: #fce4df; color: #922c37; }
+html[data-theme='theme-arcade'] .memory-symbol[data-tone='cyan'], html[data-theme='theme-arcade'] .memory-symbol[data-tone='emerald'] { background: #bde5d6; color: #215c50; }
+html[data-theme='theme-arcade'] .memory-symbol[data-tone='amber'], html[data-theme='theme-arcade'] .memory-symbol[data-tone='orange'] { background: #ffe177; color: #71520b; }
+html[data-theme='theme-arcade'] .memory-progress-track { background: #d9d7ce; border-radius: 0; }
+html[data-theme='theme-arcade'] .memory-progress-track > div { background: #bf383c; border-radius: 0; }
+html[data-theme='theme-arcade'] .memory-accent-pill { color: #775016; background: #ffebbb; border-color: #aa7a2c; border-radius: 3px; }
+html[data-theme='theme-arcade'] .neon-stage { background: #262827; padding: 8px; }
+html[data-theme='theme-arcade'] .neon-canvas-shell { border-radius: 0; box-shadow: none; }
+html[data-theme='theme-arcade'] .neon-breaker-accent { color: #b52c35; }
+html[data-theme='theme-arcade'] .neon-breaker-power-up { color: #225e4b; background: #cbefdc; border-color: #2b735a; border-radius: 3px; }
+html[data-theme='theme-arcade'] .neon-dashboard > .game-help { background: transparent; border: 0; border-bottom: 2px solid; border-radius: 0; padding: 0 0 12px; }
+/* The playfield deliberately keeps its high-contrast dark canvas, not an app-wide dark theme. */
+html[data-theme='theme-arcade'] .neon-stage > .pointer-events-none { display: none; }
+html[data-theme='theme-arcade'] .bingo-workspace { gap: 16px; }
+html[data-theme='theme-arcade'] .bingo-draw { background: #fff1c9; }
+html[data-theme='theme-arcade'] .bingo-draw [data-slot='card-header'] { border-bottom: 1px solid #292929; padding: 12px; }
+html[data-theme='theme-arcade'] .bingo-draw [data-slot='card-content'] { padding: 16px 12px; }
+html[data-theme='theme-arcade'] .bingo-draw .rounded-full:has(> span.max-w-24) { background: #f47d79; color: #141414; border: 2px solid #141414; box-shadow: 4px 4px 0 #292929; }
+html[data-theme='theme-arcade'] .bingo-draw .rounded-full:has(> .text-center) { border: 2px solid #292929; box-shadow: 4px 4px 0 #292929; }
+html[data-theme='theme-arcade'] .bingo-settings [data-slot='card-header'] { padding: 12px; border-bottom: 1px solid #292929; }
+html[data-theme='theme-arcade'] .bingo-cards-toolbar { border: 0; border-block: 2px solid #141414; background: transparent; }
+html[data-theme='theme-arcade'] .bingo-cards-toolbar [data-slot='card-content'] { padding-inline: 0; }
+html[data-theme='theme-arcade'] .bingo-cards-library { min-width: 0; }
+html[data-theme='theme-arcade'] .bingo-card-item { min-width: 0; background: #fffefa; }
+html[data-theme='theme-arcade'] .bingo-card-content, html[data-theme='theme-arcade'] .bingo-card-header { padding-inline: 12px; }
+html[data-theme='theme-arcade'] .bingo-card-cell { min-height: 40px; border-radius: 2px; }
+html[data-theme='theme-arcade'] .bingo-card-cell:not(.bingo-card-cell--marked):not([aria-pressed='true']) { background: #f2ede1; }
+html[data-theme='theme-arcade'] .bingo-card-cell--marked, html[data-theme='theme-arcade'] .bingo-card-cell[aria-pressed='true'] { background: #bb3438; color: white; }
+html[data-theme='theme-arcade'] .bingo-card-grid .bingo-card-cell[class~='text-amber-400'] { background: #ffe177; color: #634306; }
+html[data-theme='theme-arcade'] .bingo-lan-panel { border: 1.5px solid #292929; padding: 16px; border-radius: 3px; background: #fffefa; }
+html[data-theme='theme-arcade'] .bingo-lan-eyebrow { color: #a12b30; }
+html[data-theme='theme-arcade'] .bingo-lan-current { border-color: #292929; border-radius: 3px; background: #ffe177; }
+@media (min-width: 900px) {
+  html[data-theme='theme-arcade'] [data-page='snake'] .game-content { display: grid; grid-template-columns: minmax(0,1fr) 190px; max-width: 670px; margin-inline: auto; justify-items: center; align-content: start; }
+  html[data-theme='theme-arcade'] [data-page='snake'] .game-stage { grid-column: 1; grid-row: 1 / span 4; }
+  html[data-theme='theme-arcade'] [data-page='snake'] .game-summary, html[data-theme='theme-arcade'] [data-page='snake'] .game-actions, html[data-theme='theme-arcade'] [data-page='snake'] .game-help, html[data-theme='theme-arcade'] [data-page='snake'] .mobile-controls { grid-column: 2; }
+}
+@media (max-width: 759px) {
+  html[data-theme='theme-arcade'] [data-page='snake'] .game-content { gap: 10px; }
+  html[data-theme='theme-arcade'] [data-page='snake'] .game-stage [role='img'] > div { width: clamp(8px, calc((100svh - 310px) / 22), 15px); height: clamp(8px, calc((100svh - 310px) / 22), 15px); }
+  html[data-theme='theme-arcade'] .memory-intro { display: none; } /* Same title is in the header; unique rules remain in the help dialog. */
+  html[data-theme='theme-arcade'] .memory-stats p { font-size: 11px; }
+  html[data-theme='theme-arcade'] .memory-stats p.font-mono { font-size: 17px; }
+  html[data-theme='theme-arcade'] .memory-dashboard > div { gap: 12px; }
+  html[data-theme='theme-arcade'] .memory-board { max-width: min(100%, 390px); }
+  html[data-theme='theme-arcade'] .neon-stage { max-width: min(100%, max(180px, calc((100svh - 360px) * 0.61))); }
+  html[data-theme='theme-arcade'] .neon-dashboard { display: contents; }
+  html[data-theme='theme-arcade'] .neon-dashboard > .game-summary { order: 1; }
+  html[data-theme='theme-arcade'] .neon-dashboard > .game-actions { order: 2; padding: 8px; }
+  html[data-theme='theme-arcade'] .neon-dashboard > .game-help { order: 3; }
+  html[data-theme='theme-arcade'] .neon-footer-copy { order: 4; }
+  html[data-theme='theme-arcade'] .neon-dashboard > .game-summary .surface-card { padding-block: 8px; }
+}
+@media (max-width: 359px) {
+  html[data-theme='theme-arcade'] .bingo-card-content, html[data-theme='theme-arcade'] .bingo-card-header { padding-inline: 8px; }
+}

@@ -1,14 +1,15 @@
 export const themes = [
-  "theme-one",
-  "theme-two",
+  "theme-arcade",
   "theme-three",
   "theme-four",
 ] as const
 
 export type ThemeId = (typeof themes)[number]
 
-export const DEFAULT_THEME: ThemeId = "theme-one"
+export const DEFAULT_THEME: ThemeId = "theme-three"
 export const THEME_STORAGE_KEY = "xm-games-theme:v1"
+// Keep retired IDs only at the persistence boundary, never in active UI options.
+export const RETIRED_THEME_IDS = ["theme-one", "theme-two"] as const
 
 export const THEME_CONFIG: Record<
   ThemeId,
@@ -17,13 +18,9 @@ export const THEME_CONFIG: Record<
     themeColor: string
   }
 > = {
-  "theme-one": {
-    colorScheme: "dark",
-    themeColor: "#101421",
-  },
-  "theme-two": {
+  "theme-arcade": {
     colorScheme: "light",
-    themeColor: "#f3f5f8",
+    themeColor: "#faf9f6",
   },
   "theme-three": {
     colorScheme: "dark",
@@ -55,11 +52,13 @@ export const themeBootstrapScript = `(() => {
   const fallback = ${JSON.stringify(DEFAULT_THEME)};
   const key = ${JSON.stringify(THEME_STORAGE_KEY)};
   const allowed = ${JSON.stringify(themes)};
+  const retired = ${JSON.stringify(RETIRED_THEME_IDS)};
   const config = ${JSON.stringify(THEME_CONFIG)};
   let theme = fallback;
   try {
     const stored = localStorage.getItem(key);
     if (stored && allowed.includes(stored)) theme = stored;
+    else if (retired.includes(stored)) localStorage.setItem(key, fallback);
   } catch {}
   const root = document.documentElement;
   root.dataset.theme = theme;

@@ -1454,10 +1454,8 @@ html[data-theme='theme-three'] .game-header {
 
 html[data-theme='theme-three'] .game-header .theme-switcher-trigger,
 html[data-theme='theme-three'] .game-header .language-switcher-trigger,
-html[data-theme='theme-three'] .game-header .theme-two-settings-shortcut,
 html[data-theme='theme-three'] .home-header .theme-switcher-trigger,
-html[data-theme='theme-three'] .home-header .language-switcher-trigger,
-html[data-theme='theme-three'] .home-header .theme-two-settings-shortcut {
+html[data-theme='theme-three'] .home-header .language-switcher-trigger {
   display: none;
 }
 

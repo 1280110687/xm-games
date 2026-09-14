@@ -1,15 +1,7 @@
-import type { LucideIcon } from "lucide-react"
+import type { CatalogCategory } from "@/features/catalog/types"
 import type { TranslationKey } from "@/lib/i18n"
 
-export type ThemeThreeCategory = {
-  titleKey: TranslationKey
-  games: {
-    href: string
-    titleKey: TranslationKey
-    descKey: TranslationKey
-    icon: LucideIcon
-  }[]
-}
+export type ThemeThreeCategory = CatalogCategory
 
 /** Keep the shared catalog order and search localized names, descriptions and categories. */
 export function filterThemeThreeCatalog(

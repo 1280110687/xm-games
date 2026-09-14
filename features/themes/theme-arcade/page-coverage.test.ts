@@ -1,0 +1,60 @@
+import { describe, expect, it } from "vitest"
+import { readFileSync, readdirSync, statSync } from "node:fs"
+import { cleanText, getTextStats } from "../../../lib/offline-tools"
+import { normalizeTheme, themeBootstrapScript } from "../../../lib/theme"
+import { HOME_CATEGORIES } from "../../catalog/catalog"
+import { ARCADE_NAV_ITEMS, getArcadeEntries, getArcadeSection, getArcadeRouteSection } from "./home-model"
+
+describe("arcade full page coverage", () => {
+  it("uses a new identity without resurrecting either retired preference", () => {
+    expect(normalizeTheme("theme-arcade")).toBe("theme-arcade")
+    expect(normalizeTheme("theme-one")).toBe("theme-three")
+    expect(normalizeTheme("theme-two")).toBe("theme-three")
+  })
+  it("keeps the selected identity on every secondary route", () => {
+    expect(themeBootstrapScript).not.toContain("location.pathname")
+    expect(readFileSync("features/themes/shared/theme-provider.tsx", "utf8")).not.toContain("getThemeForPath")
+    for (const category of HOME_CATEGORIES) {
+      for (const entry of category.games) {
+        const section = category.titleKey === "categoryTools" ? "tools" : "games"
+        expect(getArcadeRouteSection(entry.href, "#arcade-tools")).toBe(section)
+        expect(getArcadeRouteSection(`${entry.href}/`, "")).toBe(section)
+      }
+    }
+    expect(getArcadeRouteSection("/", "#arcade-tools")).toBe("tools")
+    expect(getArcadeRouteSection("/settings", "#arcade-games")).toBeNull()
+    expect(getArcadeRouteSection("/unknown", "")).toBeNull()
+  })
+  it("has only three bottom destinations and retains header appearance controls", () => {
+    expect(ARCADE_NAV_ITEMS.map(item => item.key)).toEqual(["home", "games", "tools"])
+    expect(ARCADE_NAV_ITEMS.map(item => item.href)).toEqual(["/", "/#arcade-games", "/#arcade-tools"])
+    expect(readFileSync("features/themes/theme-arcade/header.tsx", "utf8")).not.toContain("!tool &&")
+  })
+  it("keeps every existing entry reachable from its game or tool shelf", () => {
+    const games = getArcadeEntries(HOME_CATEGORIES, "games", "featured")
+    const tools = getArcadeEntries(HOME_CATEGORIES, "tools", "featured")
+    expect(games).toHaveLength(16)
+    expect(tools).toHaveLength(6)
+    expect(new Set([...games, ...tools].map(item => item.href)).size).toBe(22)
+    expect(getArcadeEntries(HOME_CATEGORIES, "games", "board")).toHaveLength(5)
+    expect(getArcadeEntries(HOME_CATEGORIES, "games", "puzzle")).toHaveLength(4)
+    expect(getArcadeEntries(HOME_CATEGORIES, "games", "arcade")).toHaveLength(3)
+  })
+  it("accepts retained navigation links when returning from an unfinished page", () => {
+    expect(getArcadeSection("#theme-three-game-library")).toBe("games")
+    expect(getArcadeSection("#theme-three-tools")).toBe("tools")
+    expect(getArcadeSection("#arcade-tools")).toBe("tools")
+    expect(getArcadeSection("")).toBe("home")
+  })
+  it("keeps real text statistics and existing blank-line behavior, not mock counts", () => {
+    const input = "  Hello XM-Games  \n\nReady to play\nReady to play"
+    expect(getTextStats(input)).toEqual({ characterCount: 47, nonWhitespaceCharacterCount: 35, wordCount: 9, lineCount: 4 })
+    expect(cleanText(input)).toBe("Hello XM-Games\n\nReady to play")
+  })
+  it("ships the five illustrations locally within a small download budget", () => {
+    const dir = "public/images/theme-arcade"
+    const files = readdirSync(dir)
+    expect(files.sort()).toEqual(["bingo.webp", "gomoku.webp", "snake.webp", "tetris.webp", "tiles.webp"])
+    expect(files.reduce((bytes, file) => bytes + statSync(`${dir}/${file}`).size, 0)).toBeLessThan(100_000)
+  })
+})

@@ -1,0 +1,22 @@
+/* Watchlist as an editorial index, with existing records and transfer dialogs. */
+html[data-theme='theme-arcade'] .anime-page-toolbar { justify-content: space-between; gap: 8px; }
+html[data-theme='theme-arcade'] .anime-page-toolbar [data-slot='button'] { white-space: normal; }
+html[data-theme='theme-arcade'] .anime-library [data-slot='card'] [data-slot='button'] { border-radius: 3px; }
+html[data-theme='theme-arcade'] .anime-overview { border: 0; border-bottom: 2px solid #141414; background: transparent; padding: 0 0 16px; }
+html[data-theme='theme-arcade'] .anime-overview > .pointer-events-none { display: none; }
+html[data-theme='theme-arcade'] .anime-overview h2 { font-size: 22px; font-weight: 900; max-width: 30ch; line-height: 1.45; }
+html[data-theme='theme-arcade'] .anime-overview [data-slot='badge'] { border-radius: 2px; border: 1px solid #141414; background: #ffe693; }
+html[data-theme='theme-arcade'] .anime-overview .grid-cols-3 > div { border: 0; border-left: 1px solid #999; border-radius: 0; text-align: left; padding: 2px 12px; background: transparent; }
+html[data-theme='theme-arcade'] .anime-overview .grid-cols-3 > div > p:first-child { font-size: 30px; font-weight: 900; }
+html[data-theme='theme-arcade'] .anime-filters { border: 0; padding: 0; background: transparent; }
+html[data-theme='theme-arcade'] .anime-library > .surface-panel { background: #fff0bc; border: 1.5px solid #141414; border-radius: 3px; min-height: 230px; }
+html[data-theme='theme-arcade'] .anime-library > .grid { gap: 14px; grid-template-columns: minmax(0,1fr); }
+html[data-theme='theme-arcade'] .anime-library [data-slot='card'] { border: 0; border-top: 2px solid #141414; padding: 0; }
+html[data-theme='theme-arcade'] .anime-library [data-slot='card-content'] { grid-template-columns: 90px minmax(0,1fr); min-height: 205px; }
+html[data-theme='theme-arcade'] .anime-library [data-slot='card'] h3 { font-weight: 850; }
+html[data-theme='theme-arcade'] .anime-library [data-slot='card'] [data-slot='progress'] { border-radius: 0; height: 4px; }
+html[data-theme='theme-arcade'] .anime-library [data-slot='card'] [data-slot='badge'] { border-radius: 2px; }
+html[data-theme='theme-arcade'] .anime-library [data-slot='card'] [data-slot='button'] { min-width: 44px; }
+@media (min-width: 900px) {
+  html[data-theme='theme-arcade'] .anime-library > .grid { grid-template-columns: repeat(2,minmax(0,1fr)); column-gap: 28px; }
+}

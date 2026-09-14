@@ -2,11 +2,10 @@
 
 import {
   Layers3,
-  MoonStar,
+  Gamepad2,
   Palette,
   PanelsTopLeft,
   PencilRuler,
-  Smartphone,
   type LucideIcon,
 } from "lucide-react"
 
@@ -43,14 +42,7 @@ const THEME_COPY: Record<
     appearance: "主题风格",
     trigger: "切换主题风格",
     themes: {
-      "theme-one": {
-        name: "主题一",
-        description: "霓虹深色游戏大厅",
-      },
-      "theme-two": {
-        name: "主题二",
-        description: "iOS 灵感浅色应用",
-      },
+      "theme-arcade": { name: "主题一 · 街机编辑部", description: "珊瑚色块、硬朗线条与编辑式排版" },
       "theme-three": {
         name: "主题三",
         description: "薄荷青玻璃工作区",
@@ -65,14 +57,7 @@ const THEME_COPY: Record<
     appearance: "Appearance",
     trigger: "Switch appearance",
     themes: {
-      "theme-one": {
-        name: "Theme One",
-        description: "Neon dark game hall",
-      },
-      "theme-two": {
-        name: "Theme Two",
-        description: "iOS-inspired light app",
-      },
+      "theme-arcade": { name: "Theme One · Arcade", description: "Coral accents and bold editorial layouts" },
       "theme-three": {
         name: "Theme Three",
         description: "Mint glass workspace",
@@ -87,14 +72,7 @@ const THEME_COPY: Record<
     appearance: "ธีม",
     trigger: "เปลี่ยนธีม",
     themes: {
-      "theme-one": {
-        name: "ธีม 1",
-        description: "โถงเกมนีออนโหมดมืด",
-      },
-      "theme-two": {
-        name: "ธีม 2",
-        description: "แอปสว่างสไตล์ iOS",
-      },
+      "theme-arcade": { name: "ธีม 1 · อาร์เคด", description: "สีคอรัล เส้นคมชัด และเลย์เอาต์แบบนิตยสาร" },
       "theme-three": {
         name: "ธีม 3",
         description: "พื้นที่ทำงานกระจกสีมินต์",
@@ -108,8 +86,7 @@ const THEME_COPY: Record<
 }
 
 const THEME_ICONS: Record<ThemeId, LucideIcon> = {
-  "theme-one": MoonStar,
-  "theme-two": Smartphone,
+  "theme-arcade": Gamepad2,
   "theme-three": PanelsTopLeft,
   "theme-four": PencilRuler,
 }

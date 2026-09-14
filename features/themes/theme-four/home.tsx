@@ -9,7 +9,6 @@ import {
   Map,
   MapPinned,
   Settings2,
-  type LucideIcon,
 } from "lucide-react"
 
 import { LanguageSwitcher } from "@/components/language-switcher"
@@ -25,21 +24,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { useLocale } from "@/lib/locale-context"
-import type { Locale, TranslationKey } from "@/lib/i18n"
+import type { Locale } from "@/lib/i18n"
+import type { CatalogCategory, CatalogEntry } from "@/features/catalog/types"
 import { themeLoadsWebglExperience } from "@/lib/theme"
 import { INITIAL_SCENE_LOAD, SCENE_START_TIMEOUT_MS, sceneLoadReducer } from "./scene-loading"
 
-export type ThemeFourGame = {
-  href: string
-  titleKey: TranslationKey
-  descKey: TranslationKey
-  icon: LucideIcon
-}
-
-export type ThemeFourRoom = {
-  titleKey: TranslationKey
-  games: ThemeFourGame[]
-}
+export type ThemeFourGame = CatalogEntry
+export type ThemeFourRoom = CatalogCategory
 
 const COPY: Record<
   Locale,

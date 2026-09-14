@@ -1,14 +1,15 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { ArrowLeft, Home, Settings2 } from "lucide-react"
+import { ArrowLeft, Home } from "lucide-react"
 
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { PrefetchLink as Link } from "@/components/prefetch-link"
 import { ThemeSwitcher } from "@/features/themes/shared/theme-switcher"
 import { Button } from "@/components/ui/button"
-import { useLocale } from "@/lib/locale-context"
 import { cn } from "@/lib/utils"
+import { useTheme } from "@/features/themes/shared/theme-provider"
+import { ArcadePageHeader } from "@/features/themes/theme-arcade/header"
 
 type HeaderLayout = "simple" | "centered" | "tool" | "hero"
 type HomeLabelMode = "always" | "desktop" | "sr-only"
@@ -75,7 +76,10 @@ export function GameHeader({
   titleClassName,
   descriptionClassName,
 }: GameHeaderProps) {
-  const { t } = useLocale()
+  const { theme } = useTheme()
+  if (theme === "theme-arcade") {
+    return <ArcadePageHeader title={title} description={description} actions={actions} homeLabel={homeLabel} />
+  }
   const home = (
     <HomeLink
       label={homeLabel}
@@ -91,17 +95,6 @@ export function GameHeader({
     >
       <ThemeSwitcher compact />
       <LanguageSwitcher compact />
-      <Button
-        asChild
-        variant="outline"
-        size="sm"
-        className="theme-two-settings-shortcut"
-      >
-        <Link href="/settings">
-          <Settings2 aria-hidden="true" />
-          <span>{t("settings")}</span>
-        </Link>
-      </Button>
       {actions}
     </div>
   )

@@ -2,6 +2,7 @@ import { readdirSync, readFileSync } from "node:fs"
 import { dirname, join, relative, sep } from "node:path"
 import { describe, expect, it } from "vitest"
 import manifest from "./manifest"
+import { DEFAULT_THEME, THEME_CONFIG } from "../lib/theme"
 
 const PROJECT_ROOT = process.cwd()
 const APP_DIRECTORY = join(PROJECT_ROOT, "app")
@@ -12,6 +13,7 @@ const OFFLINE_ASSET_MANIFEST_PATH = join(
   "offline-assets.json",
 )
 const OFFLINE_ASSET_DIRECTORIES = [
+  join(PROJECT_ROOT, "public", "images", "theme-arcade"),
   join(PROJECT_ROOT, "public", "theme-four"),
   join(PROJECT_ROOT, "public", "theme-four-experience"),
 ]
@@ -82,6 +84,10 @@ function readServiceWorkerRoutes(source: string): string[] {
 }
 
 describe("web app manifest", () => {
+  it("aligns the installed splash with the active default theme", () => {
+    expect(manifest().background_color).toBe(THEME_CONFIG[DEFAULT_THEME].themeColor)
+    expect(manifest().theme_color).toBe(THEME_CONFIG[DEFAULT_THEME].themeColor)
+  })
   it("uses a stable application identity and installable icon set", () => {
     const value = manifest()
 

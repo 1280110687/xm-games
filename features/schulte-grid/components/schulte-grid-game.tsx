@@ -12,17 +12,16 @@ import {
   type ReactNode,
 } from "react"
 import {
-  Clock3,
   Focus,
   Play,
   RotateCcw,
   Square,
-  Target,
   TimerReset,
-  Trophy,
 } from "lucide-react"
 
 import { GameHeader } from "@/components/game-header"
+import { SchulteThemeFourView } from "@/features/themes/theme-four/schulte-view"
+import { ArcadeSchulteView } from "@/features/themes/theme-arcade/schulte-view"
 import { useTheme } from "@/features/themes/shared/theme-provider"
 import { Button } from "@/components/ui/button"
 import {
@@ -442,28 +441,6 @@ function SchulteLiveStatus({
   )
 }
 
-function SchulteMetric({
-  className,
-  icon,
-  label,
-  value,
-}: {
-  className?: string
-  icon: ReactNode
-  label: string
-  value: ReactNode
-}) {
-  return (
-    <div className={cn("schulte-metric", className)}>
-      <span className="schulte-metric-icon">{icon}</span>
-      <span className="schulte-metric-copy">
-        <small>{label}</small>
-        <strong>{value}</strong>
-      </span>
-    </div>
-  )
-}
-
 function SchulteRecentResults({
   level,
   records,
@@ -573,34 +550,18 @@ function SchulteTargetValue({
   return game.completionReason === "solved" ? "✓" : "—"
 }
 
-function SchulteThemeOneView(props: SchulteViewProps) {
+function SchulteThemedView({ presentation, ...props }: SchulteViewProps & { presentation: "paper" | "arcade" }) {
   const best = props.records.best[props.selectedLevel]
+  const View = presentation === "arcade" ? ArcadeSchulteView : SchulteThemeFourView
   return (
-    <main className="schulte-one-console">
-      <section className="schulte-one-status-rail">
-        <SchulteMetric
-          className="schulte-timer"
-          icon={<Clock3 aria-hidden="true" />}
-          label={props.t("schulteElapsedTime")}
-          value={formatDuration(props.elapsedMs)}
-        />
-        <SchulteMetric
-          className="schulte-target"
-          icon={<Target aria-hidden="true" />}
-          label={props.t(props.config.nextTargetKey)}
-          value={(
-            <SchulteTargetValue game={props.game} config={props.config} />
-          )}
-        />
-        <SchulteMetric
-          className="schulte-best"
-          icon={<Trophy aria-hidden="true" />}
-          label={props.t("schulteBestTime")}
-          value={best ? formatDuration(best.elapsedMs) : "—"}
-        />
-      </section>
-
-      <section className="schulte-one-stage">
+    <View
+      targetLabel={props.t(props.config.nextTargetKey)}
+      target={<SchulteTargetValue game={props.game} config={props.config} />}
+      timeLabel={props.t("schulteElapsedTime")}
+      time={formatDuration(props.elapsedMs)}
+      bestLabel={props.t("schulteBestTime")}
+      best={best ? formatDuration(best.elapsedMs) : props.t("schulteNoRecord")}
+      board={
         <SchulteBoard
           game={props.game}
           layout={props.layout}
@@ -608,9 +569,9 @@ function SchulteThemeOneView(props: SchulteViewProps) {
           onSelect={props.onSelect}
           t={props.t}
         />
-      </section>
-
-      <section className="schulte-one-controls">
+      }
+      progress={<SchulteProgress game={props.game} t={props.t} />}
+      difficulty={
         <SchulteDifficultyPicker
           level={props.selectedLevel}
           disabled={props.game.phase === "running"}
@@ -618,6 +579,8 @@ function SchulteThemeOneView(props: SchulteViewProps) {
           onChange={props.onLevelChange}
           t={props.t}
         />
+      }
+      actions={
         <SchulteActions
           phase={props.game.phase}
           onStart={props.onStart}
@@ -625,89 +588,25 @@ function SchulteThemeOneView(props: SchulteViewProps) {
           onRestart={props.onRestart}
           t={props.t}
         />
-      </section>
-
-      <SchulteProgress game={props.game} t={props.t} />
-      <SchulteNotice
-        game={props.game}
-        elapsedMs={props.elapsedMs}
-        penaltyVisible={props.penaltyVisible}
-        config={props.config}
-        t={props.t}
-      />
-      <SchulteRecentResults
-        level={props.selectedLevel}
-        records={props.records}
-        config={props.config}
-        t={props.t}
-      />
-    </main>
-  )
-}
-
-function SchulteThemeTwoView(props: SchulteViewProps) {
-  const best = props.records.best[props.selectedLevel]
-  return (
-    <main className="schulte-two-stack">
-      <article className="schulte-two-stage-card">
-        <header className="schulte-two-card-head">
-          <div>
-            <span>{props.t(props.config.nextTargetKey)}</span>
-            <strong>
-              <SchulteTargetValue game={props.game} config={props.config} />
-            </strong>
-          </div>
-          <div className="schulte-two-time">
-            <span>{props.t("schulteElapsedTime")}</span>
-            <strong>{formatDuration(props.elapsedMs)}</strong>
-          </div>
-        </header>
-        <SchulteBoard
+      }
+      notice={
+        <SchulteNotice
           game={props.game}
-          layout={props.layout}
+          elapsedMs={props.elapsedMs}
+          penaltyVisible={props.penaltyVisible}
           config={props.config}
-          onSelect={props.onSelect}
           t={props.t}
         />
-        <SchulteProgress game={props.game} t={props.t} />
-      </article>
-
-      <div className="schulte-two-control-dock">
-        <SchulteDifficultyPicker
+      }
+      recentResults={
+        <SchulteRecentResults
           level={props.selectedLevel}
-          disabled={props.game.phase === "running"}
+          records={props.records}
           config={props.config}
-          onChange={props.onLevelChange}
           t={props.t}
         />
-        <SchulteActions
-          phase={props.game.phase}
-          onStart={props.onStart}
-          onStop={props.onStop}
-          onRestart={props.onRestart}
-          t={props.t}
-        />
-        <div className="schulte-two-best">
-          <Trophy aria-hidden="true" />
-          <span>{props.t("schulteBestTime")}</span>
-          <strong>{best ? formatDuration(best.elapsedMs) : props.t("schulteNoRecord")}</strong>
-        </div>
-      </div>
-
-      <SchulteNotice
-        game={props.game}
-        elapsedMs={props.elapsedMs}
-        penaltyVisible={props.penaltyVisible}
-        config={props.config}
-        t={props.t}
-      />
-      <SchulteRecentResults
-        level={props.selectedLevel}
-        records={props.records}
-        config={props.config}
-        t={props.t}
-      />
-    </main>
+      }
+    />
   )
 }
 
@@ -955,13 +854,13 @@ function FocusSequenceGame({
     >
       <GameHeader
         layout={
-          theme === "theme-two" || theme === "theme-four" ? "tool" : "centered"
+          theme === "theme-four" ? "tool" : "centered"
         }
         homeLabel={t("appName")}
         homeLabelMode="desktop"
         title={t(config.titleKey)}
         description={
-          theme === "theme-two" || theme === "theme-four"
+          theme === "theme-four"
             ? t(config.descriptionKey)
             : undefined
         }
@@ -969,12 +868,10 @@ function FocusSequenceGame({
         titleClassName="schulte-header-title"
         descriptionClassName="schulte-header-description"
       />
-      {theme === "theme-two" || theme === "theme-four" ? (
-        <SchulteThemeTwoView {...viewProps} />
-      ) : theme === "theme-three" ? (
-        <SchulteThemeThreeView {...viewProps} />
+      {theme === "theme-four" || theme === "theme-arcade" ? (
+        <SchulteThemedView {...viewProps} presentation={theme === "theme-arcade" ? "arcade" : "paper"} />
       ) : (
-        <SchulteThemeOneView {...viewProps} />
+        <SchulteThemeThreeView {...viewProps} />
       )}
       <SchulteLiveStatus
         game={game}
