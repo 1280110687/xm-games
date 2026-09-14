@@ -46,8 +46,8 @@ const THEME_COPY: Record<
       "theme-arcade": { name: "主题一 · 街机编辑部", description: "珊瑚色块、硬朗线条与编辑式排版" },
       "theme-pocket": { name: "主题二 · 口袋启动器", description: "蓝白轻界面与立体游戏图标" },
       "theme-three": {
-        name: "主题三",
-        description: "薄荷青玻璃工作区",
+        name: "主题三 · 夜色游廊",
+        description: "月光湖景、清透玻璃与悬浮导航",
       },
       "theme-four": {
         name: "主题四",
@@ -62,8 +62,8 @@ const THEME_COPY: Record<
       "theme-arcade": { name: "Theme One · Arcade", description: "Coral accents and bold editorial layouts" },
       "theme-pocket": { name: "Theme Two · Pocket", description: "A blue-and-white launcher with playful game icons" },
       "theme-three": {
-        name: "Theme Three",
-        description: "Mint glass workspace",
+        name: "Theme Three · Night Gallery",
+        description: "Moonlit scenery, crystal glass and a floating dock",
       },
       "theme-four": {
         name: "Theme Four",
@@ -78,8 +78,8 @@ const THEME_COPY: Record<
       "theme-arcade": { name: "ธีม 1 · อาร์เคด", description: "สีคอรัล เส้นคมชัด และเลย์เอาต์แบบนิตยสาร" },
       "theme-pocket": { name: "ธีม 2 · พ็อกเก็ต", description: "หน้าจอขาวฟ้า พร้อมไอคอนเกมสามมิติ" },
       "theme-three": {
-        name: "ธีม 3",
-        description: "พื้นที่ทำงานกระจกสีมินต์",
+        name: "ธีม 3 · ไนต์แกลเลอรี",
+        description: "วิวทะเลสาบใต้แสงจันทร์ กระจกใส และแถบนำทางลอย",
       },
       "theme-four": {
         name: "ธีม 4",

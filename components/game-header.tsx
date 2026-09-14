@@ -11,6 +11,7 @@ import { cn } from "@/lib/utils"
 import { useTheme } from "@/features/themes/shared/theme-provider"
 import { ArcadePageHeader } from "@/features/themes/theme-arcade/header"
 import { PocketPageHeader } from "@/features/themes/theme-pocket/header"
+import { ThemeThreeHeader } from "@/features/themes/theme-three/header"
 
 type HeaderLayout = "simple" | "centered" | "tool" | "hero"
 type HomeLabelMode = "always" | "desktop" | "sr-only"
@@ -78,6 +79,7 @@ export function GameHeader({
   descriptionClassName,
 }: GameHeaderProps) {
   const { theme } = useTheme()
+  if (theme === "theme-three") return <ThemeThreeHeader title={title} description={description} actions={actions} homeLabel={homeLabel} />
   if (theme === "theme-pocket") return <PocketPageHeader title={title} description={description} actions={actions} homeLabel={homeLabel} />
   if (theme === "theme-arcade") {
     return <ArcadePageHeader title={title} description={description} actions={actions} homeLabel={homeLabel} />

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest"
 import { Gamepad2 } from "lucide-react"
-import { filterThemeThreeCatalog, type ThemeThreeCategory } from "./home-model"
+import { filterThemeThreeCatalog, getThemeThreeBrowseCategories, type ThemeThreeCategory } from "./home-model"
+import { HOME_CATEGORIES } from "../../catalog/catalog"
 
 const catalog: ThemeThreeCategory[] = [
   {
@@ -37,6 +38,15 @@ const messages: Record<string, string> = {
 const t = (key: string) => messages[key]
 
 describe("Theme Three sample catalog", () => {
+  it("keeps 16 games and 6 tools in separate views without losing entries", () => {
+    const games = getThemeThreeBrowseCategories(HOME_CATEGORIES, "games")
+    const tools = getThemeThreeBrowseCategories(HOME_CATEGORIES, "tools")
+    expect(games.flatMap(category => category.games)).toHaveLength(16)
+    expect(tools.flatMap(category => category.games)).toHaveLength(6)
+    expect(new Set([...games, ...tools].flatMap(category => category.games.map(game => game.href))).size).toBe(22)
+    for (const category of games) expect(getThemeThreeBrowseCategories(HOME_CATEGORIES, "games", category.titleKey)).toEqual([category])
+    expect(getThemeThreeBrowseCategories(HOME_CATEGORIES, "tools", "categoryBoard")).toEqual(tools)
+  })
   it("retains all routes and category order with a blank query", () => {
     expect(filterThemeThreeCatalog(catalog, "  ", t)).toEqual(catalog)
   })

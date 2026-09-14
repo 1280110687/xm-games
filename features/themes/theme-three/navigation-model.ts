@@ -1,6 +1,11 @@
 export const THEME_THREE_LIBRARY_HASH = "#theme-three-game-library"
 export const THEME_THREE_TOOLS_HASH = "#theme-three-tools"
 export const THEME_THREE_HOME_NAVIGATION = "theme-three:home-navigation"
+export const THEME_THREE_NAV_ITEMS = [
+  { key: "home", href: "/", hash: "" },
+  { key: "games", href: `/${THEME_THREE_LIBRARY_HASH}`, hash: THEME_THREE_LIBRARY_HASH },
+  { key: "tools", href: `/${THEME_THREE_TOOLS_HASH}`, hash: THEME_THREE_TOOLS_HASH },
+] as const
 
 const TOOL_ROUTES = new Set([
   "/anime-tracker",
@@ -31,9 +36,11 @@ const GAME_ROUTES = new Set([
 ])
 
 export function getThemeThreeNavigationSection(pathname: string, hash: string) {
+  pathname = pathname.replace(/\/+$/, "") || "/"
   if (pathname === "/") {
-    if (hash === THEME_THREE_LIBRARY_HASH) return "games"
-    if (hash === THEME_THREE_TOOLS_HASH) return "tools"
+    // Preserve the destination when switching themes and opening old bookmarks.
+    if (hash === THEME_THREE_LIBRARY_HASH || /(?:games|game-library)$/.test(hash)) return "games"
+    if (hash === THEME_THREE_TOOLS_HASH || /(?:tools|toolbox)$/.test(hash)) return "tools"
     return "home"
   }
   if (TOOL_ROUTES.has(pathname) || pathname.startsWith("/anime-tracker/")) {

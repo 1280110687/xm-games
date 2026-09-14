@@ -1,287 +1,43 @@
-/* Exterior glass only; gameplay and text content use stable inset surfaces. */
-html[data-theme='theme-three'] body [data-t3-glass] {
-  border-width: 1px;
-  border-style: solid;
-}
-
-html[data-theme='theme-three']
-  body
-  :is(
-    [data-t3-glass],
-    .game-header,
-    .theme-three-sidebar,
-    .theme-three-bottom-bar,
-    .surface-panel,
-    .surface-card,
-    .utility-page .utility-panel,
-    .settings-shell .settings-panel,
-    .app-shell[data-page='anime-tracker'] .anime-overview,
-    .app-shell[data-page='anime-tracker'] .anime-filters,
-    .app-shell[data-page='anime-tracker'] .anime-library [data-slot='card'],
-    .game-page[data-page='bingo'] [data-slot='card'],
-    .game-page[data-page='bingo-cards'] [data-slot='card'],
-    .game-page[data-page='snake'] [data-slot='card'],
-    .classic-2048-shell,
-    .tetris-handheld,
-    .schulte-three-stage,
-    .schulte-three-telemetry,
-    .schulte-recent,
-    .gomoku-lan-panel,
-    .gomoku-lan-status,
-    .bingo-lan-panel,
-    .bingo-lan-current,
-    .pwa-install-prompt,
-    .gomoku-dice-card,
-    [data-slot='dialog-content'],
-    [data-slot='alert-dialog-content'],
-    [data-slot='dropdown-menu-content'],
-    [data-slot='select-content']
-  ) {
-  color: var(--t3-ink);
-  border-color: var(--t3-edge);
-  border-top-color: rgb(235 255 250 / 0.46);
-  border-radius: var(--t3-radius);
+/* Glass belongs to outer surfaces. Never compound backdrop filters in editors or nested panels. */
+html[data-theme='theme-three'] body :is([data-t3-glass],.surface-panel,.surface-card,.settings-panel,.anime-overview,.anime-filters,.classic-2048-shell,.tetris-handheld,.schulte-three-stage,.schulte-three-telemetry,.gomoku-lan-panel,.bingo-lan-panel,.pwa-install-prompt) {
+  border: 1px solid var(--t3-edge);
   background: var(--t3-fill);
   box-shadow: var(--t3-shadow);
-  -webkit-backdrop-filter: var(--t3-filter);
-  backdrop-filter: var(--t3-filter);
+  -webkit-backdrop-filter: blur(var(--t3-blur)) saturate(115%);
+  backdrop-filter: blur(var(--t3-blur)) saturate(115%);
 }
-html[data-theme='theme-three']
-  body
-  :is(
-    [data-t3-glass='floating'],
-    .game-header,
-    .theme-three-sidebar,
-    .theme-three-bottom-bar,
-    .pwa-install-prompt,
-    .gomoku-dice-card,
-    [data-slot='dialog-content'],
-    [data-slot='alert-dialog-content'],
-    [data-slot='dropdown-menu-content'],
-    [data-slot='select-content']
-  ) {
-  /* A portal can sit over arbitrary content; keep its text backdrop denser. */
-  --t3-fill: var(--t3-floating);
-}
-html[data-theme='theme-three']
-  body
-  :is(
-    [data-slot='dialog-content'],
-    [data-slot='alert-dialog-content'],
-    [data-slot='dropdown-menu-content'],
-    [data-slot='select-content'],
-    .gomoku-dice-card
-  ) {
-  --t3-floating:
-    linear-gradient(135deg, rgb(230 255 250 / 0.12), transparent 65%),
-    rgb(24 50 56 / 0.94);
-}
-html[data-theme='theme-three']
-  body
-  :is(
-    .game-page[data-page] .surface-panel,
-    .app-shell[data-page] .surface-panel,
-    .surface-panel,
-    .surface-card,
-    [data-slot='card'],
-    [data-slot='dialog-content'],
-    .gomoku-dice-card
-  )
-  :is(.surface-panel, .surface-card, [data-slot='card']) {
-  /* Never compound backdrop filters inside a parent panel or dialog. */
-  background: var(--t3-inset);
-  box-shadow: inset 0 1px 0 rgb(235 255 250 / 0.08);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-html[data-theme='theme-three']
-  body
-  .utility-page[data-page]
-  .utility-main
-  .utility-intro.surface-panel {
-  border: 0;
-  background: none;
-  box-shadow: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-html[data-theme='theme-three']
-  body
-  :is([data-slot='dialog-overlay'], .gomoku-dice-overlay) {
-  background: rgb(5 22 29 / 0.64);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-html[data-theme='theme-three']
-  body
-  :where(a, button, input, textarea, select, [role='switch']):focus-visible {
-  outline: 2px solid var(--t3-accent);
-  outline-offset: 3px;
-}
-html[data-theme='theme-three'] body [data-slot='button'] {
-  min-height: 2.75rem;
-  border-radius: 0.8rem;
-}
-html[data-theme='theme-three']
-  body
-  [data-slot='button']:is(
-    [data-variant='outline'],
-    [data-variant='secondary'],
-    [data-variant='ghost']
-  ) {
-  color: var(--t3-ink);
-  background: var(--control-fill);
-  border-color: var(--t3-edge);
-  box-shadow: inset 0 1px 0 rgb(235 255 250 / 0.1);
-}
-html[data-theme='theme-three'] body [data-slot='button']:where(.bg-primary) {
-  color: var(--primary-foreground);
-  background: var(--t3-accent);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4);
-}
-html[data-theme='theme-three']
-  body
-  [data-slot='button']:is(
-    [data-variant='outline'],
-    [data-variant='secondary'],
-    [data-variant='ghost']
-  ):hover {
-  color: var(--t3-ink);
-  background: var(--control-hover);
-}
-html[data-theme='theme-three']
-  body
-  [data-slot='button']:where(.bg-primary):hover {
-  color: var(--primary-foreground);
-  background: #c8f7e7;
-}
-html[data-theme='theme-three']
-  body
-  :is(
-    [data-slot='input'],
-    [data-slot='select-trigger'],
-    textarea,
-    .utility-select-field select
-  ) {
-  color: var(--t3-ink);
-  border-color: var(--t3-edge);
-  background: var(--t3-inset);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-html[data-theme='theme-three'] body :is(input, textarea)::placeholder {
-  color: var(--t3-muted);
-  opacity: 1;
-}
-/* Keep semantic selection visible after the neutral button treatment. */
-html[data-theme='theme-three']
-  body
-  [data-slot='button'][data-variant]:is(
-    [aria-pressed='true'],
-    [aria-selected='true'],
-    [data-state='active'],
-    [data-active='true']
-  ) {
-  color: var(--primary-foreground);
-  background: var(--t3-accent);
-  border-color: var(--t3-accent);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.4);
-}
-
-@media (max-width: 767px) {
-  html[data-theme='theme-three']
-    body
-    :is([data-slot='input'], textarea, .utility-select-field select) {
-    font-size: 1rem;
-  }
-}
-@media (prefers-reduced-transparency: reduce) {
-  html[data-theme='theme-three']
-    body
-    :is(
-      [data-t3-glass],
-      .game-header,
-      .theme-three-sidebar,
-      .theme-three-bottom-bar,
-      .surface-panel,
-      .surface-card,
-      .utility-page .utility-panel,
-      .settings-shell .settings-panel,
-      .app-shell[data-page='anime-tracker'] .anime-overview,
-      .app-shell[data-page='anime-tracker'] .anime-filters,
-      .app-shell[data-page='anime-tracker'] .anime-library [data-slot='card'],
-      .game-page[data-page='bingo'] [data-slot='card'],
-      .game-page[data-page='bingo-cards'] [data-slot='card'],
-      .game-page[data-page='snake'] [data-slot='card'],
-      .classic-2048-shell,
-      .tetris-handheld,
-      .schulte-three-stage,
-      .schulte-three-telemetry,
-      .schulte-recent,
-      .gomoku-lan-panel,
-      .gomoku-lan-status,
-      .bingo-lan-panel,
-      .bingo-lan-current,
-      .pwa-install-prompt,
-      .gomoku-dice-card,
-      [data-slot='dialog-content'],
-      [data-slot='alert-dialog-content'],
-      [data-slot='dropdown-menu-content'],
-      [data-slot='select-content']
-    ) {
-    --t3-fill: var(--t3-solid);
-    --t3-inset: var(--t3-solid);
-    --t3-filter: none;
-    background: var(--t3-solid);
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
-  }
-}
-@supports not (
-  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
-) {
-  html[data-theme='theme-three']
-    body
-    :is(
-      [data-t3-glass],
-      .game-header,
-      .theme-three-sidebar,
-      .theme-three-bottom-bar,
-      .surface-panel,
-      .surface-card,
-      .utility-page .utility-panel,
-      .settings-shell .settings-panel,
-      .app-shell[data-page='anime-tracker'] .anime-overview,
-      .app-shell[data-page='anime-tracker'] .anime-filters,
-      .app-shell[data-page='anime-tracker'] .anime-library [data-slot='card'],
-      .game-page[data-page='bingo'] [data-slot='card'],
-      .game-page[data-page='bingo-cards'] [data-slot='card'],
-      .game-page[data-page='snake'] [data-slot='card'],
-      .classic-2048-shell,
-      .tetris-handheld,
-      .schulte-three-stage,
-      .schulte-three-telemetry,
-      .schulte-recent,
-      .gomoku-lan-panel,
-      .gomoku-lan-status,
-      .bingo-lan-panel,
-      .bingo-lan-current,
-      .pwa-install-prompt,
-      .gomoku-dice-card,
-      [data-slot='dialog-content'],
-      [data-slot='alert-dialog-content'],
-      [data-slot='dropdown-menu-content'],
-      [data-slot='select-content']
-    ) {
-    background: var(--t3-solid);
-  }
+html[data-theme='theme-three'] body [data-t3-glass='feature'] { border-color: #c5e0ff; box-shadow: inset 0 1px 2px #edf7ff, inset 2px 0 4px rgb(177 219 255 / 35%), inset -1px -2px 3px rgb(181 215 247 / 50%), 0 0 0 1px rgb(161 210 255 / 28%), 0 12px 28px rgb(0 9 22 / 30%); }
+html[data-theme='theme-three'] body [data-t3-glass='dock'] { background: rgb(44 66 91 / 60%); border-color: #adcbe9; box-shadow: var(--t3-shadow), inset 0 0 0 3px rgb(173 207 245 / 15%); }
+html[data-theme='theme-three'] body :is(.utility-panel,.anime-library [data-slot='card'],.bingo-card-item,.gomoku-lan-status,.schulte-recent,.game-summary) { background: rgb(19 37 56 / 92%); border: 1px solid var(--border); border-radius: 18px; box-shadow: inset 0 1px 0 rgb(229 243 255 / 9%); -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-theme='theme-three'] body :is(.surface-panel,.surface-card) :is(.surface-panel,.surface-card,[data-t3-glass]) { -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-theme='theme-three'] :is([data-slot='button'],[data-slot='input'],[data-slot='select-trigger']) { min-height: 44px; height: auto; border-radius: 12px; box-shadow: none; }
+html[data-theme='theme-three'] [data-slot='button'] { font-weight: 650; }
+html[data-theme='theme-three'] [data-slot='button'][data-variant='default'] { background: #bddbfa; color: #102237; border: 1px solid #d3e9ff; }
+html[data-theme='theme-three'] [data-slot='button'][data-variant='outline'] { background: #243d56; color: #edf5ff; border: 1px solid #536f8c; }
+html[data-theme='theme-three'] [data-slot='button'][data-variant='secondary'] { background: #2d4663; color: #edf5ff; }
+html[data-theme='theme-three'] :is([data-slot='input'],textarea,[data-slot='select-trigger']) { color: var(--t3-ink); border-color: #536a83; background: #14263a; font-size: 16px; }
+html[data-theme='theme-three'] :is(input,textarea)::placeholder { color: #9db3cc; opacity: 1; }
+html[data-theme='theme-three'] :is([data-slot='dropdown-menu-content'],[data-slot='dropdown-menu-sub-content'],[data-slot='select-content'],[data-slot='dialog-content'],[data-slot='alert-dialog-content']) { color: var(--t3-ink); background: var(--t3-solid); border: 1px solid var(--t3-edge); border-radius: 20px; box-shadow: 0 20px 70px rgb(0 7 19 / 60%); -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-theme='theme-three'] :is([data-slot='dialog-content'],[data-slot='alert-dialog-content']) { max-height: calc(100dvh - 32px - var(--xm-safe-area-top) - env(safe-area-inset-bottom)); overflow-y: auto; }
+html[data-theme='theme-three'] :is([data-slot='dropdown-menu-radio-item'],[data-slot='dropdown-menu-item'],[data-slot='select-item']) { min-height: 44px; }
+html[data-theme='theme-three'] [data-slot='dropdown-menu-radio-item'][data-state='checked'] { background: #324e6b; }
+html[data-theme='theme-three'] :is([data-slot='dialog-overlay'],[data-slot='alert-dialog-overlay']) { background: rgb(2 11 23 / 72%); -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-theme='theme-three'] [data-slot='tabs-list'] { background: #162a3f; padding: 4px; border-radius: 14px; height: auto; }
+html[data-theme='theme-three'] [data-slot='tabs-trigger'] { min-height: 40px; white-space: normal; border-radius: 10px; }
+html[data-theme='theme-three'] [data-slot='tabs-trigger'][data-state='active'] { color: #102237; background: #bddbfa; }
+html[data-theme='theme-three'] :is(.utility-mode-switch,.gomoku-mode-switch) button:is([aria-pressed='true'],[aria-selected='true']) { color: #102237; background: #bddbfa; }
+html[data-theme='theme-three'] :is(a,button,input,select,textarea,[tabindex='0']):focus-visible { outline: 2px solid #d5ebff; outline-offset: 3px; }
+@media (hover: hover) {
+  html[data-theme='theme-three'] :is(.t3-feature,.t3-shortcut):hover { border-color: #fff; }
+  html[data-theme='theme-three'] :is(.t3-game,.t3-handy-links a,.theme-three-bottom-item):hover { color: white; background-color: rgb(149 186 226 / 10%); }
 }
 @media (prefers-reduced-motion: reduce) {
-  html[data-theme='theme-three'] body *,
-  html[data-theme='theme-three'] body *::before,
-  html[data-theme='theme-three'] body *::after {
-    transition: none;
-    animation: none;
-    scroll-behavior: auto;
-  }
+  html[data-theme='theme-three'] :is([data-t3-glass],.t3-topbar,.theme-three-bottom-item) { transition: none; animation: none; }
+}
+@media (prefers-reduced-transparency: reduce) {
+  html[data-theme='theme-three'] body :is([data-t3-glass],.surface-panel,.surface-card,.settings-panel,.anime-overview,.anime-filters,.classic-2048-shell,.tetris-handheld,.schulte-three-stage,.schulte-three-telemetry,.gomoku-lan-panel,.bingo-lan-panel,.pwa-install-prompt) { background: var(--t3-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  html[data-theme='theme-three'] body::before { opacity: .35; }
+}
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  html[data-theme='theme-three'] body :is([data-t3-glass],.surface-panel,.surface-card,.settings-panel,.anime-overview,.anime-filters,.classic-2048-shell,.tetris-handheld,.schulte-three-stage,.schulte-three-telemetry,.gomoku-lan-panel,.bingo-lan-panel,.pwa-install-prompt) { background: var(--t3-solid); }
 }

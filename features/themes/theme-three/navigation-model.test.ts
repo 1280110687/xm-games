@@ -4,7 +4,10 @@ import {
   getThemeThreeNavigationSection,
   THEME_THREE_LIBRARY_HASH,
   THEME_THREE_TOOLS_HASH,
+  THEME_THREE_NAV_ITEMS,
 } from "./navigation-model"
+
+import { THEME_THREE_HOME_COPY } from "./home-copy"
 
 describe("Theme Three navigation", () => {
   it.each([
@@ -59,29 +62,26 @@ describe("Theme Three navigation", () => {
     expect(getThemeThreeNavigationSection("/unknown", "")).toBeUndefined()
   })
 
-  it("renders the requested labels in order with a real, search-resettable Tools anchor", () => {
-    const nav = readFileSync(
-      new URL("./theme-three-navigation.tsx", import.meta.url),
-      "utf8",
-    )
+  it("renders three destinations and does not scroll the new view to a legacy hash anchor", () => {
+    const nav = readFileSync(new URL("./theme-three-navigation.tsx", import.meta.url), "utf8")
     const home = readFileSync(new URL("./home.tsx", import.meta.url), "utf8")
-    expect(nav).toMatch(
-      /home: "首页",\s+games: "游戏库",\s+tools: "工具",\s+settings: "设置中心"/,
-    )
-    expect(nav.match(/label: copy\.(\w+)/g)).toEqual([
-      "label: copy.home",
-      "label: copy.games",
-      "label: copy.tools",
-      "label: copy.settings",
-    ])
-    expect(nav).toContain("onNavigate={onNavigate}")
-    expect(nav).toContain('window.addEventListener("popstate", syncHash)')
-    expect(home).toContain('category.titleKey === "categoryTools"')
-    expect(home).toContain("THEME_THREE_TOOLS_HASH.slice(1)")
-    expect(home).toContain(
-      "window.addEventListener(THEME_THREE_HOME_NAVIGATION, onHomeNavigation)",
-    )
+    const hook = readFileSync(new URL("./use-section.ts", import.meta.url), "utf8")
+    expect(THEME_THREE_NAV_ITEMS.map(item => item.key)).toEqual(["home", "games", "tools"])
+    expect(THEME_THREE_NAV_ITEMS.map(item => THEME_THREE_HOME_COPY.zh[item.key])).toEqual(["首页", "游戏库", "工具"])
+    expect(nav).toContain("scroll={false}")
+    expect(nav).toContain("onNavigate={() => navigateThemeThree(hash)}")
+    expect(nav).not.toContain('href="/settings"')
+    expect(hook).toContain('window.addEventListener("popstate", sync)')
+    expect(home).toContain('window.addEventListener(THEME_THREE_HOME_NAVIGATION, reset)')
     expect(home).toContain('setQuery("")')
-    expect(home).toContain("scrollIntoView()")
+    expect(home).not.toContain("scrollIntoView")
+    expect(home).not.toContain('id="theme-three-tools"')
+    expect(home).not.toContain('id="theme-three-game-library"')
+  })
+  it("keeps the selected destination across theme switches and trailing slashes", () => {
+    expect(getThemeThreeNavigationSection("/", "#pocket-tools")).toBe("tools")
+    expect(getThemeThreeNavigationSection("/", "#arcade-games")).toBe("games")
+    expect(getThemeThreeNavigationSection("/text-tool/", "")).toBe("tools")
+    expect(getThemeThreeNavigationSection("/2048/", "")).toBe("games")
   })
 })

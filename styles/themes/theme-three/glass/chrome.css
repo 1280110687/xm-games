@@ -1,100 +1,37 @@
-html[data-theme='theme-three'] body .theme-three-sidebar {
-  width: 13rem;
-  padding: 1rem 0.75rem;
+/* One sticky header and one floating dock on every Theme Three destination. */
+html[data-theme='theme-three'] body :is(.t3-home,.game-page,.app-shell[data-page='anime-tracker'],.settings-shell) { width: min(100%,1100px); margin-inline: auto; padding: var(--xm-safe-area-top) max(var(--t3-gutter),env(safe-area-inset-right)) calc(118px + env(safe-area-inset-bottom)) max(var(--t3-gutter),env(safe-area-inset-left)); background: transparent; }
+html[data-theme='theme-three'] .app-shell[data-page='anime-tracker'] > .app-container { padding: 0; }
+html[data-theme='theme-three'] .t3-topbar { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 10px; min-height: 82px; padding: 24px 4px 14px; margin: 0 -4px; border-radius: 0 0 22px 22px; }
+html[data-theme='theme-three'] .t3-topbar[data-scrolled='true'] { background: rgb(15 30 47 / 94%); box-shadow: 0 8px 20px rgb(0 8 22 / 16%); padding-top: max(12px,var(--xm-safe-area-top)); }
+html[data-theme='theme-three'] .t3-wordmark { display: flex; align-items: center; gap: 9px; color: #e6f2ff; min-width: 0; margin-right: auto; font-size: 18px; font-weight: 750; letter-spacing: -.4px; }
+html[data-theme='theme-three'] .t3-wordmark svg { width: 23px; height: 23px; flex-shrink: 0; stroke-width: 1.8; }
+html[data-theme='theme-three'] .t3-topbar-controls { display: flex; gap: 10px; margin-left: auto; flex-shrink: 0; }
+html[data-theme='theme-three'] .t3-topbar-controls :is(.language-switcher-trigger,.theme-switcher-trigger) { display: grid; place-items: center; justify-content: center; gap: 0; width: 44px !important; height: 44px !important; min-width: 44px; padding: 0 !important; border-radius: 50%; color: var(--t3-ink); border: 1px solid var(--t3-edge); background: rgb(134 167 207 / 17%); box-shadow: inset 0 1px 1px rgb(255 255 255 / 36%), 0 4px 10px rgb(0 8 22 / 12%); }
+html[data-theme='theme-three'] .t3-topbar-controls :is(.language-switcher-compact-label,.theme-current-label,.theme-chevron) { display: none; }
+html[data-theme='theme-three'] .t3-topbar-controls .language-switcher-trigger > svg:not(:first-child) { display: none; }
+html[data-theme='theme-three'] .t3-topbar-controls :is(.language-switcher-trigger,.theme-switcher-trigger) svg { width: 23px; height: 23px; color: inherit; stroke-width: 1.8; }
+html[data-theme='theme-three'] .t3-page-header { padding-block: 14px; min-height: 72px; margin-bottom: 14px; }
+html[data-theme='theme-three'] .t3-page-header h1 { flex: 1; min-width: 0; font-size: 18px; line-height: 1.4; font-weight: 700; overflow-wrap: anywhere; }
+html[data-theme='theme-three'] .t3-back { display: grid; place-items: center; width: 40px; height: 44px; flex-shrink: 0; }
+html[data-theme='theme-three'] .t3-back svg { width: 22px; height: 22px; }
+html[data-theme='theme-three'] .t3-page-context { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: -2px 0 18px; padding: 10px 12px; border-radius: 12px; background: rgb(18 34 54 / 90%); }
+html[data-theme='theme-three'] .t3-page-context > p { color: var(--t3-muted); font-size: 13px; line-height: 1.65; flex: 1; min-width: 200px; }
+html[data-theme='theme-three'] .t3-page-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+html[data-theme='theme-three'] .theme-three-bottom-bar { position: fixed; z-index: 50; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); left: 50%; bottom: calc(32px + env(safe-area-inset-bottom)); transform: translateX(-50%); width: min(calc(100% - 56px),480px); min-height: 68px; padding: 4px; border-radius: 36px; }
+html[data-theme='theme-three'] .theme-three-bottom-item { display: flex; min-width: 0; align-items: center; justify-content: center; flex-direction: column; gap: 4px; padding: 7px 4px; border-radius: 30px; color: #c1d5eb; font-size: 12px; line-height: 1.3; text-align: center; }
+html[data-theme='theme-three'] .theme-three-bottom-item svg { width: 23px; height: 23px; stroke-width: 1.8; }
+html[data-theme='theme-three'] .theme-three-bottom-item[aria-current] { color: #f7fbff; background: rgb(152 196 247 / 26%); box-shadow: inset 0 1px 2px rgb(235 250 255 / 72%), inset 0 -1px 2px rgb(179 217 255 / 35%); }
+html[data-theme='theme-three'] .theme-three-bottom-item[aria-current] svg { filter: drop-shadow(0 0 6px #75b8ff); }
+@media (min-width: 760px) {
+  html[data-theme='theme-three'] { --t3-gutter: 32px; }
+  html[data-theme='theme-three'] .t3-topbar { min-height: 94px; }
+  html[data-theme='theme-three'] .t3-wordmark { font-size: 22px; }
+  html[data-theme='theme-three'] .theme-three-bottom-bar { width: 390px; }
 }
-
-html[data-theme='theme-three'] body .theme-three-sidebar-brand {
-  padding-inline: 0.35rem;
-}
-
-html[data-theme='theme-three'] body .theme-three-sidebar-brand small,
-html[data-theme='theme-three'] body .theme-three-sidebar-workspace > p {
-  color: var(--t3-muted);
-}
-
-html[data-theme='theme-three'] body .theme-three-sidebar-workspace {
-  border: 0;
-  background: none;
-  padding: 0.6rem;
-}
-
-html[data-theme='theme-three'] body .theme-three-system-status {
-  display: none;
-}
-
-html[data-theme='theme-three'] body .theme-three-sidebar-link,
-html[data-theme='theme-three'] body .theme-three-bottom-item {
-  color: var(--t3-muted);
-}
-
-html[data-theme='theme-three'] body .theme-three-sidebar-link.is-active,
-html[data-theme='theme-three'] body .theme-three-bottom-item.is-active {
-  color: var(--t3-ink);
-  background: rgb(198 241 224 / 0.15);
-  box-shadow: inset 0 1px 0 rgb(240 255 250 / 0.2);
-}
-
-html[data-theme='theme-three'] body .theme-three-sidebar-link.is-active::after,
-html[data-theme='theme-three'] body .theme-three-bottom-item.is-active::before {
-  display: none;
-}
-
-html[data-theme='theme-three'] body .theme-three-nav-icon,
-html[data-theme='theme-three']
-  body
-  .theme-three-sidebar-link.is-active
-  .theme-three-nav-icon {
-  border: 0;
-  color: inherit;
-  background: none;
-}
-
-html[data-theme='theme-three'] body .theme-three-brand-mark {
-  background: var(--t3-accent);
-  box-shadow: none;
-}
-
-html[data-theme='theme-three'] body .theme-three-bottom-bar {
-  max-width: 32rem;
-  min-height: 4.5rem;
-  margin-inline: auto;
-  padding: 0.35rem;
-}
-
-html[data-theme='theme-three'] body .theme-three-bottom-item {
-  min-height: 3.6rem;
-  font-size: 0.6875rem;
-  line-height: 1.25;
-}
-
-html[data-theme='theme-three'] body .theme-three-bottom-item svg {
-  width: 1.2rem;
-  height: 1.2rem;
-}
-
-html[data-theme='theme-three'] body .game-header {
-  max-width: 76rem;
-  width: 100%;
-  margin: 0 auto;
-  padding: 0.75rem;
-}
-
-html[data-theme='theme-three'] body .game-header [data-layout-slot='title'] {
-  font-size: 1.05rem;
-  color: var(--t3-ink);
-  white-space: normal;
-  line-height: 1.5;
-}
-
-html[data-theme='theme-three']
-  body
-  .game-header
-  [data-layout-slot='description'] {
-  display: none;
-}
-
-@media (min-width: 1024px) {
-  html[data-theme='theme-three'] body :is(.app-shell, .game-page) {
-    padding-left: 16rem;
-  }
+@media (max-width: 359px) {
+  html[data-theme='theme-three'] { --t3-gutter: 14px; }
+  html[data-theme='theme-three'] .t3-wordmark { font-size: 17px; gap: 6px; }
+  html[data-theme='theme-three'] .t3-topbar-controls { gap: 6px; }
+  html[data-theme='theme-three'] .t3-page-header { gap: 4px; }
+  html[data-theme='theme-three'] .t3-page-header h1 { font-size: 16px; }
 }

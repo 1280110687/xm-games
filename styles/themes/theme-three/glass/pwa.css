@@ -1,0 +1,22 @@
+/* Installation stays above the dock; the guide itself uses the shared solid dialog. */
+html[data-theme='theme-three'] body .pwa-install-prompt { position: fixed; z-index: 60; right: max(16px,env(safe-area-inset-right)); bottom: calc(116px + env(safe-area-inset-bottom)); width: min(380px,calc(100% - 32px)); max-height: calc(100dvh - 140px - var(--xm-safe-area-top) - env(safe-area-inset-bottom)); overflow-y: auto; padding: 20px; border-radius: 22px; background: #17283b; }
+html[data-theme='theme-three'] .pwa-install-prompt__close { position: absolute; top: 7px; right: 7px; display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; color: var(--t3-muted); cursor: pointer; }
+html[data-theme='theme-three'] .pwa-install-prompt__close svg { width: 19px; height: 19px; }
+html[data-theme='theme-three'] .pwa-install-prompt__brand { display: flex; align-items: center; gap: 12px; padding-right: 24px; }
+html[data-theme='theme-three'] .pwa-install-prompt__icon { flex-shrink: 0; width: 46px; height: 46px; overflow: hidden; border-radius: 12px; }
+html[data-theme='theme-three'] .pwa-install-prompt__eyebrow { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--t3-muted); }
+html[data-theme='theme-three'] .pwa-install-prompt__eyebrow svg { width: 14px; height: 14px; }
+html[data-theme='theme-three'] .pwa-install-prompt__brand h2 { font-size: 17px; line-height: 1.4; font-weight: 700; margin-top: 3px; }
+html[data-theme='theme-three'] .pwa-install-prompt__description { margin-top: 14px; color: var(--t3-muted); font-size: 13px; line-height: 1.6; }
+html[data-theme='theme-three'] .pwa-install-prompt__benefits { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 12px; }
+html[data-theme='theme-three'] .pwa-install-prompt__benefits span { display: flex; align-items: center; gap: 5px; font-size: 11px; }
+html[data-theme='theme-three'] .pwa-install-prompt__benefits svg { width: 15px; height: 15px; }
+html[data-theme='theme-three'] .pwa-install-prompt__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+html[data-theme='theme-three'] .pwa-install-prompt__actions button { white-space: normal; }
+html[data-theme='theme-three'] .pwa-install-prompt__error { color: #ffb4bc; font-size: 13px; margin-top: 10px; }
+html[data-theme='theme-three'] .pwa-install-prompt__steps { display: grid; gap: 16px; }
+html[data-theme='theme-three'] .pwa-install-prompt__steps li { display: flex; gap: 12px; align-items: center; }
+html[data-theme='theme-three'] .pwa-install-prompt__steps li > span { display: grid; place-items: center; width: 42px; height: 42px; flex-shrink: 0; border-radius: 12px; background: #2b4662; }
+html[data-theme='theme-three'] .pwa-install-prompt__steps svg { width: 22px; height: 22px; }
+html[data-theme='theme-three'] .pwa-install-prompt__steps strong { font-size: 11px; color: var(--t3-muted); }
+html[data-theme='theme-three'] .pwa-install-prompt__steps p { font-size: 14px; line-height: 1.6; }

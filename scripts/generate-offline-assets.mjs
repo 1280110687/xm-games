@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url"
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..")
 const publicRoot = resolve(projectRoot, "public")
 const outputPath = resolve(publicRoot, "offline-assets.json")
-const offlineDirectories = ["theme-four", "theme-four-experience", "images/theme-arcade", "images/theme-pocket"]
+const offlineDirectories = ["theme-four", "theme-four-experience", "images/theme-arcade", "images/theme-pocket", "images/theme-three"]
 
 async function collectFiles(directory) {
   const entries = await readdir(directory, { withFileTypes: true })

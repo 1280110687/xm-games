@@ -26,7 +26,7 @@ export const THEME_CONFIG: Record<
   "theme-pocket": { colorScheme: "light", themeColor: "#f3f6fa" },
   "theme-three": {
     colorScheme: "dark",
-    themeColor: "#142d35",
+    themeColor: "#0c1827",
   },
   "theme-four": {
     colorScheme: "light",

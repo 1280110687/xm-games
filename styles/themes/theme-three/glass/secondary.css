@@ -1,320 +1,96 @@
-/* Shared secondary-page chrome. Board geometry and game state remain route-owned. */
-html[data-theme='theme-three']
-  body
-  :is(.anime-library [data-slot='card'], .bingo-card-item) {
-  /* Repeated library/game cards keep the glass edge without a blur layer per item. */
-  --t3-filter: none;
-}
-
-html[data-theme='theme-three']
-  body
-  .game-page:not([data-page='2048']):not([data-page='tetris'])
-  .game-content {
-  border-color: transparent;
-  background: none;
-  box-shadow: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-
-html[data-theme='theme-three']
-  body
-  :is(
-    .settings-description,
-    .settings-row-description,
-    .settings-storage-note,
-    .game-help,
-    .utility-note,
-    .utility-password-field,
-    .utility-select-field,
-    [data-slot='dialog-description']
-  ) {
-  color: var(--t3-muted);
-}
-
-html[data-theme='theme-three'] body .settings-page-header {
-  padding: 1rem 0;
-  border: 0;
-  background: none;
-  box-shadow: none;
-}
-
-html[data-theme='theme-three'] body .settings-main {
-  grid-template-columns: minmax(0, 1fr);
-  max-width: 56rem;
-  margin-inline: auto;
-}
-
-html[data-theme='theme-three'] body .settings-storage-note {
-  order: 0;
-  display: flex;
-  align-items: flex-start;
-  border: 0;
-  background: none;
-  box-shadow: none;
-  font-size: 0.8125rem;
-}
-
-html[data-theme='theme-three'] body .settings-row {
-  padding: 1.5rem;
-  gap: 1rem;
-}
-
-html[data-theme='theme-three'] body .settings-row-icon {
-  color: var(--t3-accent);
-  background: rgb(197 242 224 / 0.08);
-  border-color: var(--t3-edge);
-}
-
-html[data-theme='theme-three'] body .settings-row-description {
-  font-size: 0.8125rem;
-}
-
-html[data-theme='theme-three'] body .settings-control .theme-current-label {
-  display: inline;
-}
-
-html[data-theme='theme-three'] body .language-switcher-trigger > svg {
-  color: var(--t3-accent);
-}
-
-html[data-theme='theme-three']
-  body
-  .app-shell[data-page='anime-tracker']
-  .anime-overview
-  > div:first-child {
-  opacity: 0.12;
-}
-
-html[data-theme='theme-three']
-  body
-  .app-shell[data-page='anime-tracker']
-  .game-header {
-  margin-bottom: 0.85rem;
-}
-
-html[data-theme='theme-three']
-  body
-  .app-shell[data-page='anime-tracker']
-  .anime-overview
-  .grid.grid-cols-3
-  > div {
-  border: 0;
-  border-left: 1px solid var(--t3-edge);
-  border-radius: 0;
-  background: none;
-}
-
-html[data-theme='theme-three']
-  body
-  .app-shell[data-page='anime-tracker']
-  .anime-filters {
-  padding: 1rem;
-}
-
-html[data-theme='theme-three'] body .game-help {
-  font-size: 0.8125rem;
-  line-height: 1.6;
-}
-
-html[data-theme='theme-three'] body .chinese-chess-ai-setup__group legend {
-  color: var(--t3-muted);
-  font-size: 0.8125rem;
-}
-
-html[data-theme='theme-three'] body .chinese-chess-ai-setup__group legend svg {
-  color: var(--t3-accent);
-}
-
-html[data-theme='theme-three'] body .classic-2048-message {
-  background: var(--t3-solid);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-
-html[data-theme='theme-three'] body .neon-stage .backdrop-blur-md {
-  background: var(--t3-solid);
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-
-html[data-theme='theme-three']
-  body
-  :is(
-    .schulte-three-hud small,
-    .schulte-progress-block > span,
-    .schulte-level-option,
-    .schulte-three-best span,
-    .schulte-notice-slot,
-    .schulte-recent > header small,
-    .schulte-recent-empty,
-    .schulte-recent-item > small
-  ) {
-  color: var(--t3-muted);
-}
-
-html[data-theme='theme-three'] body .schulte-level-option.is-active {
-  color: var(--primary-foreground);
-  background: var(--t3-accent);
-  box-shadow: none;
-}
-
-html[data-theme='theme-three'] body .schulte-notice-slot {
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-html[data-theme='theme-three']
-  body
-  :is(
-    .gomoku-lan-panel__heading p,
-    .gomoku-lan-room__invite p,
-    .gomoku-lan-room__secure,
-    .gomoku-lan-panel__join label,
-    .gomoku-lan-room__topline span,
-    .gomoku-lan-status__room span
-  ) {
-  color: var(--t3-muted);
-  font-size: 0.8125rem;
-  line-height: 1.6;
-}
-
-html[data-theme='theme-three']
-  body
-  .gomoku-lan-panel__entry
-  [data-variant='default'] {
-  color: var(--primary-foreground);
-  background: var(--t3-accent);
-  box-shadow: none;
-}
-
-html[data-theme='theme-three'] body .gomoku-lan-panel__divider::before {
-  display: none;
-}
-
-html[data-theme='theme-three']
-  body
-  :is(
-    .classic-2048-score span,
-    .classic-2048-intro,
-    .classic-2048-help,
-    .classic-tetris-help
-  ) {
-  color: var(--t3-muted);
-}
-
-html[data-theme='theme-three']
-  body
-  :is(.gomoku-mode-switch, .bingo-mode-switch, .chinese-chess-mode-bar) {
-  background: var(--t3-inset);
-  border-color: var(--t3-edge);
-  box-shadow: none;
-}
-
-html[data-theme='theme-three']
-  body
-  :is(
-    .gomoku-lan-panel,
-    .gomoku-lan-status,
-    .pwa-install-prompt,
-    .schulte-three-stage
-  )::before,
-html[data-theme='theme-three'] body .schulte-three-stage::after {
-  display: none;
-}
-
-html[data-theme='theme-three'] body .schulte-three-hud > span {
-  background: var(--t3-solid);
-  box-shadow: none;
-  -webkit-backdrop-filter: none;
-  backdrop-filter: none;
-}
-
-@media (max-width: 767px) {
-  /* The mode switch added a fourth row to Bingo's old three-row viewport grid.
-     Let the page scroll so drawing/settings never collapse beneath the number board. */
-  html[data-theme='theme-three'] body .game-page[data-page='bingo'] {
-    height: auto;
-    min-height: 100dvh;
-    overflow-x: hidden;
-    overflow-y: auto;
-  }
-  html[data-theme='theme-three']
-    body
-    .game-page[data-page='bingo']
-    .game-content {
-    display: flex;
-    height: auto;
-    flex-direction: column;
-    gap: 0.75rem;
-    overflow: visible;
-  }
-  html[data-theme='theme-three']
-    body
-    .game-page[data-page='bingo']
-    .bingo-workspace {
-    min-height: auto;
-    overflow: visible;
-    gap: 0.75rem;
-  }
-  html[data-theme='theme-three']
-    body
-    .game-page[data-page='bingo']
-    :is(.bingo-draw, .bingo-settings, .bingo-board) {
-    flex-shrink: 0;
-    max-height: none;
-  }
-  html[data-theme='theme-three']
-    body
-    .game-page[data-page='bingo']
-    .bingo-mode-switch {
-    margin-bottom: 0;
-  }
-  html[data-theme='theme-three']
-    body
-    .game-page[data-page='bingo']
-    .bingo-board
-    [data-slot='card-content'] {
-    max-height: 28rem;
-  }
-  html[data-theme='theme-three']
-    body
-    .game-page[data-page='bingo']
-    .bingo-settings-controls {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.75rem;
-  }
-  html[data-theme='theme-three']
-    body
-    .game-page[data-page='bingo']
-    .bingo-settings-controls
-    label {
-    white-space: normal;
-  }
-  html[data-theme='theme-three'] body .settings-row {
-    grid-template-columns: auto minmax(0, 1fr);
-    padding: 1.1rem;
-  }
-  html[data-theme='theme-three'] body .settings-control {
-    grid-column: 1 / -1;
-    width: 100%;
-    min-height: 2.75rem;
-    justify-content: flex-start;
-  }
-  html[data-theme='theme-three'] body .settings-control .theme-current-label {
-    flex: 1;
-    text-align: left;
-  }
-}
-
-/* Match the layer of the switcher's !w-* utilities: layered important rules
-   outrank unlayered important declarations in the production Tailwind bundle. */
-@layer utilities {
-  @media (max-width: 767px) {
-    html[data-theme='theme-three']
-      body
-      .settings-control.language-switcher-trigger {
-      width: 100% !important;
-    }
-  }
+/* Secondary composition; shared game engines and board semantics are untouched. */
+html[data-theme='theme-three'] .game-page > .game-content { width: 100%; min-width: 0; padding-top: 0; margin-top: 0; }
+html[data-theme='theme-three'] .game-help { color: var(--t3-muted); font-size: 13px; line-height: 1.65; }
+html[data-theme='theme-three'] .game-status-banner { border: 1px solid #766a4d; background: #3e382c; color: #f2d7a4; border-radius: 12px; }
+html[data-theme='theme-three'] .game-actions [data-slot='button'] { white-space: normal; }
+html[data-theme='theme-three'] .game-stage { border-radius: 16px; box-shadow: 0 10px 28px rgb(0 10 25 / 25%); }
+html[data-theme='theme-three'] :is(.gomoku-mode-switch,.chinese-chess-mode-bar) { display: flex; flex-wrap: wrap; gap: 6px; width: min(100%,520px); padding: 4px; border: 1px solid var(--border); border-radius: 14px; background: #172a40; }
+html[data-theme='theme-three'] :is(.gomoku-mode-switch button,.chinese-chess-mode-option) { min-height: 44px; min-width: 0; flex: 1; padding: 8px; border-radius: 10px; color: var(--t3-muted); font-size: 13px; font-weight: 650; cursor: pointer; }
+html[data-theme='theme-three'] :is(.gomoku-mode-switch button[aria-selected='true'],.chinese-chess-mode-option[aria-pressed='true']) { color: #102237; background: #bddbfa; }
+html[data-theme='theme-three'] .chinese-chess-ai-summary { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--t3-muted); }
+html[data-theme='theme-three'] :is(.gomoku-lan-panel,.gomoku-lan-status,.bingo-lan-panel) { padding: 18px; border-radius: 20px; }
+html[data-theme='theme-three'] .gomoku-lan-panel__heading { padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid var(--separator); }
+html[data-theme='theme-three'] .gomoku-lan-panel__heading h2 { font-size: 20px; font-weight: 700; }
+html[data-theme='theme-three'] :is(.gomoku-lan-panel__intro,.gomoku-lan-room) { font-size: 14px; line-height: 1.6; }
+html[data-theme='theme-three'] .gomoku-lan-room__topline strong { font: 700 28px var(--font-geist-mono),monospace; color: var(--t3-accent); }
+html[data-theme='theme-three'] .gomoku-dice-card { background: var(--t3-solid); border: 1px solid var(--t3-edge); border-radius: 24px; color: var(--foreground); }
+html[data-theme='theme-three'] .chinese-chess-ai-setup__icon svg { width: 28px; height: 28px; }
+html[data-theme='theme-three'] .chinese-chess-ai-setup__group { margin-top: 14px; }
+html[data-theme='theme-three'] .chinese-chess-ai-setup__group legend { display: flex; gap: 6px; align-items: center; font-size: 13px; font-weight: 650; margin-bottom: 8px; }
+html[data-theme='theme-three'] .chinese-chess-ai-setup__group legend svg { width: 18px; height: 18px; }
+html[data-theme='theme-three'] .chinese-chess-ai-setup__choices { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+html[data-theme='theme-three'] .chinese-chess-ai-setup__choices--difficulty { grid-template-columns: repeat(3,minmax(0,1fr)); }
+html[data-theme='theme-three'] .chinese-chess-ai-choice { min-height: 50px; padding: 8px; border: 1px solid var(--border); border-radius: 12px; font-size: 13px; cursor: pointer; }
+html[data-theme='theme-three'] .chinese-chess-ai-choice[aria-pressed='true'] { color: #102237; background: #bddbfa; }
+html[data-theme='theme-three'] .chinese-chess-ai-choice__piece { margin-right: 5px; }
+html[data-theme='theme-three'] .chinese-chess-ai-setup__warning { color: #e2c999; font-size: 13px; line-height: 1.6; }
+html[data-theme='theme-three'] .chinese-chess-ai-setup__footer { margin-top: 20px; }
+html[data-theme='theme-three'] body .classic-2048-shell { width: min(100%,900px); min-height: 0; }
+html[data-theme='theme-three'] body .tetris-handheld { width: min(100%,480px); min-height: 0; }
+html[data-theme='theme-three'] body :is(.classic-2048-score span,.classic-2048-intro,.classic-2048-help,.classic-tetris-help,.tetris-status-label,.schulte-three-hud small,.schulte-recent-empty,.schulte-notice-slot) { color: var(--t3-muted); }
+html[data-theme='theme-three'] body .classic-2048-logo { display: none; }
+html[data-theme='theme-three'] body .classic-2048-heading { justify-content: flex-end; padding-bottom: 0; border: 0; }
+html[data-theme='theme-three'] body .classic-2048-scores { width: 100%; }
+html[data-theme='theme-three'] body .classic-2048-score { flex: 1; min-height: 46px; background: #1d354e; }
+html[data-theme='theme-three'] body .classic-2048-score span { font-size: 11px; }
+html[data-theme='theme-three'] body .classic-2048-message { background: var(--t3-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-theme='theme-three'] body .schulte-three-stage::before, html[data-theme='theme-three'] body .schulte-three-stage::after { display: none; }
+html[data-theme='theme-three'] body .schulte-three-hud > span { background: var(--t3-solid); box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; }
+html[data-theme='theme-three'] body .schulte-page { padding-bottom: calc(106px + env(safe-area-inset-bottom)); }
+html[data-theme='theme-three'] body .schulte-three-console { width: 100%; }
+html[data-theme='theme-three'] .schulte-notice-slot { white-space: normal; overflow-wrap: anywhere; }
+html[data-theme='theme-three'] .settings-panel { padding-inline: 20px; border-radius: 20px; }
+html[data-theme='theme-three'] .settings-main { display: grid; gap: 20px; }
+html[data-theme='theme-three'] .settings-row { display: grid; grid-template-columns: 30px minmax(0,1fr) auto; align-items: center; gap: 12px; padding-block: 20px; }
+html[data-theme='theme-three'] .settings-row + .settings-row { border-top: 1px solid var(--separator); }
+html[data-theme='theme-three'] .settings-row-title { display: block; font-size: 18px; font-weight: 650; }
+html[data-theme='theme-three'] :is(.settings-description,.settings-row-description,.settings-storage-note) { color: var(--t3-muted); font-size: 13px; line-height: 1.65; }
+html[data-theme='theme-three'] .settings-storage-note { display: flex; gap: 10px; }
+html[data-theme='theme-three'] .settings-storage-note svg { flex-shrink: 0; width: 20px; }
+html[data-theme='theme-three'] .settings-control .theme-current-label { display: inline; }
+html[data-theme='theme-three'] .anime-page-toolbar { justify-content: space-between; gap: 8px; }
+html[data-theme='theme-three'] .anime-page-toolbar [data-slot='button'] { white-space: normal; }
+html[data-theme='theme-three'] .anime-overview { border-radius: 22px; }
+html[data-theme='theme-three'] .anime-overview > .pointer-events-none { display: none; }
+html[data-theme='theme-three'] .anime-overview h2 { font-size: 24px; font-weight: 700; line-height: 1.4; }
+html[data-theme='theme-three'] .anime-overview .grid-cols-3 > div { background: transparent; border: 0; border-left: 1px solid var(--separator); border-radius: 0; }
+html[data-theme='theme-three'] body .app-shell[data-page='anime-tracker'] .anime-filters { position: relative; top: auto; border-radius: 18px; }
+html[data-theme='theme-three'] .anime-library > .grid { gap: 16px; }
+html[data-theme='theme-three'] .anime-library [data-slot='card'] [data-slot='button'] { min-width: 44px; }
+html[data-theme='theme-three'] .memory-stats { grid-template-columns: repeat(4,minmax(0,1fr)); }
+html[data-theme='theme-three'] .memory-stats > div { display: block; min-height: 0; padding: 8px 4px; text-align: center; background: #1c344f; border: 0; border-radius: 12px; }
+html[data-theme='theme-three'] .memory-stats .memory-accent { display: none; }
+html[data-theme='theme-three'] .memory-stats p { white-space: normal; overflow-wrap: anywhere; }
+html[data-theme='theme-three'] :is(.memory-kicker,.memory-accent,.neon-breaker-accent) { color: var(--t3-accent); }
+html[data-theme='theme-three'] .neon-stage > .pointer-events-none { display: none; }
+html[data-theme='theme-three'] .neon-dashboard :is(.game-help,.game-actions) { border-radius: 20px; }
+html[data-theme='theme-three'] .neon-dashboard .game-summary { padding: 10px; }
+html[data-theme='theme-three'] .neon-dashboard .surface-card { border-radius: 12px; box-shadow: none; }
+html[data-theme='theme-three'] [data-page='snake'] .game-stage { padding: 0; overflow: hidden; }
+html[data-theme='theme-three'] [data-page='snake'] .mobile-controls { display: grid; grid-template-columns: repeat(3,44px); gap: 5px; }
+html[data-theme='theme-three'] [data-page='snake'] .mobile-controls > button:first-child { grid-area: 1 / 2; }
+html[data-theme='theme-three'] [data-page='snake'] .mobile-controls > div { display: contents; }
+html[data-theme='theme-three'] [data-page='snake'] .mobile-controls > div > button:first-child { grid-area: 2 / 1; }
+html[data-theme='theme-three'] [data-page='snake'] .mobile-controls > div > button:last-child { grid-area: 2 / 3; }
+html[data-theme='theme-three'] [data-page='snake'] .mobile-controls > div > div { display: none; }
+html[data-theme='theme-three'] [data-page='snake'] .mobile-controls > button:last-child { grid-area: 2 / 2; }
+html[data-theme='theme-three'] [data-page='snake'] .mobile-controls button { width: 44px; height: 44px; }
+html[data-theme='theme-three'] .bingo-workspace { gap: 18px; }
+html[data-theme='theme-three'] :is(.bingo-card-item,.bingo-cards-library) { min-width: 0; }
+html[data-theme='theme-three'] :is(.bingo-card-content,.bingo-card-header) { padding-inline: 12px; }
+html[data-theme='theme-three'] .bingo-card-cell { min-height: 40px; }
+html[data-theme='theme-three'] .bingo-settings-controls label { white-space: normal; }
+@media (max-width: 759px) {
+  html[data-theme='theme-three'] .game-page[data-page='bingo'] .game-content { display: flex; height: auto; flex-direction: column; gap: 12px; overflow: visible; }
+  html[data-theme='theme-three'] .game-page[data-page='bingo'] { height: auto; overflow-y: auto; }
+  html[data-theme='theme-three'] .bingo-settings-controls { grid-template-columns: minmax(0,1fr); }
+  html[data-theme='theme-three'] .memory-intro { display: none; }
+  html[data-theme='theme-three'] .memory-stats p { font-size: 11px; }
+  html[data-theme='theme-three'] .memory-stats p.font-mono { font-size: 17px; }
+  html[data-theme='theme-three'] .memory-board { max-width: min(100%,390px); }
+  html[data-theme='theme-three'] [data-page='snake'] .game-stage [role='img'] > div { width: clamp(8px,calc((100svh - 355px) / 22),15px); height: clamp(8px,calc((100svh - 355px) / 22),15px); }
+  html[data-theme='theme-three'] .neon-stage { max-width: min(100%,max(180px,calc((100svh - 380px) * .61))); }
+  html[data-theme='theme-three'] .neon-dashboard .game-actions { order: -1; }
+  html[data-theme='theme-three'] .settings-row { grid-template-columns: 28px minmax(0,1fr); }
+  html[data-theme='theme-three'] .settings-control { grid-column: 2; justify-self: start; }
 }

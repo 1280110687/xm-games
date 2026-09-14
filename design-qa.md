@@ -1,3 +1,103 @@
+# Theme Three — Night Gallery implementation QA
+
+## Commit readiness verification
+
+2026-09-14: after the user requested commit/sync, reran `pnpm verify` on the complete change set including the icon alignment fix. Lint, experience lint, TypeScript and production build passed; 574 tests passed, two existing tests skipped. Staged diff whitespace check passed. The upstream branch was fetched and was aligned before this commit. Only Theme Three implementation, shared dispatch/config hooks, local production WebP assets, offline manifest coverage and this QA record are included; generated screenshots and build output remain ignored. Earlier statements below describe their original validation stage.
+
+## Follow-up: language icon alignment
+
+2026-09-14: user screenshot exposed the language glyph sitting 9.5 CSS px left of center. The grid trigger retained SelectTrigger's `justify-content: space-between`; `place-items: center` alone did not center its grid track. Explicit `justify-content: center` and zero internal gap now apply to both Theme Three header controls. No shared language logic or other theme styling changed.
+
+Browser checks on the game-library view and `/text-tool`: both buttons 44 × 44 px, both icons 23 × 23 px, X/Y center offsets exactly zero. Language menu opens and closes normally. Regression test reproduced the missing alignment declarations before the CSS fix; focused suite now 45 passed, targeted ESLint and `git diff --check` passed. Full application build was not rerun for this CSS-only follow-up. Prior validation below belongs to the initial rollout.
+
+Date: 2026-09-14. Local preview: http://localhost:4412/.
+
+## Comparison target and evidence
+
+- Selected source: `/Users/mimi/Documents/Improvement/xm-games/output/theme-three-review-2026-09-14/option-1.png` (Option 1, selected by the user).
+- Final implementation: `/Users/mimi/Documents/Improvement/xm-games/output/theme-three-implementation/home-final.png`.
+- Combined, side-by-side comparison: `/Users/mimi/Documents/Improvement/xm-games/output/theme-three-implementation/comparison-final.png` (source left, implementation right).
+- Source raster 853 × 1844 normalized to 390 × 844 CSS pixels. Implementation captured at 390 × 844, screenshot 390 × 844, effective capture density 1 pixel per CSS pixel. No browser/device frame included. Final combined image 780 × 844.
+- State: `/`, Theme Three, Chinese, empty search, Home selected, no menu open, scroll top. Read and compared the actual combined image, not source paths alone.
+- Full-view content, icon edges and small copy are readable at this size; focused crops were not necessary. Narrow-layout screenshots were also inspected at their native 320 px width.
+- Source does not specify desktop, secondary screens, search, filters, menus or reduced-transparency states. These are deliberate responsive/product extensions, not pixel-match claims.
+
+## Findings and comparison history
+
+1. Initial comparison (`comparison-v2.png`): P2 excessive panel edging, hard art backdrop, excessive vertical spacing and scenery detail. Softened edge/shadow tokens, adjusted feature copy/handy section rhythm, blended the generated assets and softened the background. Revised evidence: `comparison-v3.png`.
+2. Navigation testing: P2 legacy anchors scrolled the newly separate library/tools views under the sticky header. Removed legacy destination IDs from the actual list element, retained hash compatibility and disabled automatic anchor scrolling. Repeated Tools click and reload: title visible, `scrollY: 0`, six tool entries. Added regression assertions.
+3. Secondary review: P2 Tetris help squeezed into a narrow column alongside the handheld; changed the containing flex direction to column. P2 Neon controls appeared after a long dashboard; placed actions first on mobile and supplied missing panel radii. Evidence: initial `route-tetris.png` / `route-neon-breaker.png` and revised `tetris-320-final.png` / `neon-320-final.png`.
+4. Small-screen review: P2 featured art overlapped English/Thai description at 320 px. Reduced and shifted the art at the narrow breakpoint, faded supporting-art edges. Evidence: `home-en-320-viewport.png`, `home-th-320.png`, revised `home-en-320-final.png`, `home-th-320-final.png`. Added a radial edge mask to remove the remaining dark rectangular artwork edge; inspected the final 390 px combined comparison.
+5. Desktop review: P2 uneven category heights left a large grid hole. Used two flowing columns without splitting category groups; final evidence `library-desktop-final.png`.
+6. Final comparison: no remaining actionable P0/P1/P2 differences in the inspected states. The final image retains the selected hierarchy, scenery, glass material, three illustrated game destinations, handy tools row, icon-only controls and floating three-item dock.
+
+## Required fidelity surfaces
+
+- Typography: existing Geist with system Chinese/Thai fallback; optical hierarchy checked at 390, 320 and 1280 CSS widths. The source family is not supplied, so exact font identity is not claimed. Existing [Geist](https://vercel.com/font) and [Lucide Gamepad2](https://lucide.dev/icons/gamepad-2) references were inspected. Equal 23 px header icons in 44 px controls; functional text and labels remain live text, not rasterized.
+- Layout: source feature ~246 px tall retained on standard mobile; compact header/search/feature/two supporting cards/tools/dock rhythm preserved. Desktop feature-plus-stacked-shortcuts arrangement and two-column workspaces are intentional responsive adaptations. Long screens scroll with bottom clearance. No fixed-height clipping was introduced.
+- Colors/materials: navy `#0c1827`, silver-blue ink `#edf5ff`, accents `#bcdcff`; outer-only glass and readable opaque editors/results. Secondary scenic backdrop dimmed for help/control contrast. Semantic board/piece colors intentionally retained. Not claiming a full automated WCAG contrast audit.
+- Image quality: all four new images are real generated raster assets, optimized to local WebP; inspected for crop/clarity/compression and baked-checkerboard defects. The failed checkerboard attempt was replaced through ImageGen. Current four assets total 198,760 bytes. No new WebGL or image-rendering dependency. Final imagery is a faithful art-direction recreation, not the exact raster from the mock.
+- Copy/content: approved Chinese headline, supporting text, featured 2048, Gomoku/Snake and two handy tools kept; English and Thai localized, no fake metrics/status bars. Library contains 16 real games; Tools contains six real destinations. No settings entry added to navigation.
+
+## Browser coverage
+
+Evidence directory: `/Users/mimi/Documents/Improvement/xm-games/output/theme-three-implementation/`.
+
+- All 22 secondary destinations opened directly at 390 × 844; first-screen captures inspected in `routes-sheet-1.png` through `routes-sheet-4.png`. Each page reported viewport width = document width = 390; raw measurements in `routes.json`.
+- Routes: `/bingo`, `/bingo-cards`, `/chinese-chess`, `/chess`, `/go`, `/gomoku`, `/reversi`, `/schulte-grid`, `/alternating-trail`, `/minesweeper`, `/2048`, `/sudoku`, `/memory-match`, `/tetris`, `/snake`, `/neon-breaker`, `/anime-tracker`, `/text-crypto`, `/qr-code`, `/json-tool`, `/base64-tool`, `/text-tool`.
+- 320 × 690: Chinese/English/Thai Home, scroll to last content, sticky header, Tetris, Neon and game-rules dialog. Short screens intentionally scroll; fixed dock does not make final content inaccessible. Rules dialog visual evidence `rules-320.png`; Escape-close completion was not independently established, so no keyboard-dismissal pass is claimed.
+- 1280 × 900: Home, Library, Tools and text-cleanup workspace. Evidence `home-desktop.png`, `library-desktop-final.png`, `tools-desktop.png`, `text-desktop.png`.
+- Interactions: search no-results state; clear search; category filter; three primary destinations; Tools hash reload; secondary tool return to Tools. Text cleanup synthetic input produced `alpha\n\nbeta`, then input/output were cleared. No saved anime/game data was cleared; no transfer or network room was created.
+- Theme One and Two switched successfully and inspected via `theme-one-regression.png` and `theme-two-regression.png`; their source layouts/assets were not edited.
+- Emulated reduced-transparency and reduced-motion: actual outer panels computed `backdrop-filter: none` and background `rgb(23, 40, 59)`. Evidence `reduced-transparency.png`. Emulation restored afterward.
+- Browser console errors: none observed in the reviewed route/interaction session.
+
+## Code verification and boundaries
+
+- `pnpm verify`: passed lint, experience lint, TypeScript, production build, 573 tests; two tests skipped by existing suites (78 files passed, one skipped). Repeated after primary QA fixes.
+- Focused Theme Three suite: 44 tests passed. CSS parsing/scoping, route-lazy game CSS, navigation, catalog coverage, fallback materials, asset budget and offline manifest assertions included.
+- `git diff --check`: passed.
+- Existing Theme Four build warnings remain: large Vite chunks and a texture URL resolved at runtime. They did not fail the build and are outside this theme redesign.
+- Retired `styles/themes/theme-three/foundation.css` removed from source/imports; recoverable in Git. Shared game/tool engines, saved data, Redis transfer, API endpoints and Theme Four source unchanged.
+- Four new local URLs included in the generated offline asset list. No claim of iOS/Android installed-PWA cold-start or real-device GPU performance validation; those still require device testing. Unsupported-backdrop fallback covered structurally, not an actual legacy-engine run.
+- No commit, push or deployment performed. QA images/source prompts remain local ignored artifacts.
+
+## Asset provenance
+
+All assets generated with built-in ImageGen using the selected Option 1 reference, then mechanically resized/encoded with Sharp. No third-party source code/artwork copied into the implementation.
+
+| Production file | Dimensions | Bytes | Saved generation prompt |
+| --- | --- | --- | --- |
+| `public/images/theme-three/night-lake.webp` | 780 × 1688 | 139200 | `output/theme-three-assets/night-lake-prompt.md` |
+| `public/images/theme-three/crystal-2048.webp` | 600 × 600 | 46576 | `output/theme-three-assets/crystal-2048-prompt.md` |
+| `public/images/theme-three/gomoku.webp` | 320 × 260 | 4804 | `output/theme-three-assets/gomoku-prompt.md` |
+| `public/images/theme-three/snake.webp` | 320 × 260 | 8180 | `output/theme-three-assets/snake-prompt.md` |
+
+Source PNGs are alongside these prompts. Asset subagents were limited to raster generation; application implementation remained in the main task.
+
+## Follow-up polish / open questions
+
+- P3: generated scenery has different cloud/ridge detail; rendered glass is slightly darker, and selected-dock lighting is more restrained than the concept. Intentional readability/asset differences, not exact-raster claims.
+- P3: small helper text can be increased further if the user prefers readability over concept density.
+- Real installed PWA / Safari touch-device validation remains a release check, not completed evidence.
+
+## Implementation checklist
+
+- [x] Selected Option 1 implemented in the existing app.
+- [x] Home, Library, Tools and secondary shell integrated.
+- [x] Local assets / offline manifest / performance fallbacks supplied.
+- [x] Source-versus-render comparison repeated after fixes.
+- [x] Responsive, language, routing and theme-isolation checks completed within the stated coverage.
+- [x] Validation and residual device-test limitations recorded.
+
+final result: passed
+
+---
+
+## Prior theme QA records (preserved)
+
+The following historical records predate the current Night Gallery implementation.
+
 # Theme One — Secondary Page Rollout (latest)
 
 2026-09-14. User approved extending the selected arcade design to secondary
