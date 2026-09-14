@@ -2,6 +2,7 @@
 
 import {
   Layers3,
+  LayoutGrid,
   Gamepad2,
   Palette,
   PanelsTopLeft,
@@ -43,6 +44,7 @@ const THEME_COPY: Record<
     trigger: "切换主题风格",
     themes: {
       "theme-arcade": { name: "主题一 · 街机编辑部", description: "珊瑚色块、硬朗线条与编辑式排版" },
+      "theme-pocket": { name: "主题二 · 口袋启动器", description: "蓝白轻界面与立体游戏图标" },
       "theme-three": {
         name: "主题三",
         description: "薄荷青玻璃工作区",
@@ -58,6 +60,7 @@ const THEME_COPY: Record<
     trigger: "Switch appearance",
     themes: {
       "theme-arcade": { name: "Theme One · Arcade", description: "Coral accents and bold editorial layouts" },
+      "theme-pocket": { name: "Theme Two · Pocket", description: "A blue-and-white launcher with playful game icons" },
       "theme-three": {
         name: "Theme Three",
         description: "Mint glass workspace",
@@ -73,6 +76,7 @@ const THEME_COPY: Record<
     trigger: "เปลี่ยนธีม",
     themes: {
       "theme-arcade": { name: "ธีม 1 · อาร์เคด", description: "สีคอรัล เส้นคมชัด และเลย์เอาต์แบบนิตยสาร" },
+      "theme-pocket": { name: "ธีม 2 · พ็อกเก็ต", description: "หน้าจอขาวฟ้า พร้อมไอคอนเกมสามมิติ" },
       "theme-three": {
         name: "ธีม 3",
         description: "พื้นที่ทำงานกระจกสีมินต์",
@@ -86,6 +90,7 @@ const THEME_COPY: Record<
 }
 
 const THEME_ICONS: Record<ThemeId, LucideIcon> = {
+  "theme-pocket": LayoutGrid,
   "theme-arcade": Gamepad2,
   "theme-three": PanelsTopLeft,
   "theme-four": PencilRuler,

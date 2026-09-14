@@ -1230,3 +1230,76 @@ QA (2026-08-09)** above. The final production preview was restarted after the
 complete build and no actionable P0, P1, or P2 findings remain.
 
 final result: passed
+
+---
+
+# Theme Two Pocket selected-image implementation QA (2026-09-14)
+
+## Scope and reference
+
+User selected displayed option 2 unchanged: the blue-white pocket launcher. Reference file: `/Users/mimi/.codex/generated_images/019feb77-4fc5-7a12-9663-08490176993a/exec-27e5a9fb-12e8-4b4f-b07e-bf340342585d.png` (853 × 1844). The source and rendered page were normalized to 390 × 844 and visually inspected together, not separately scored from memory.
+
+The implementation remains in the existing Next.js/PWA application, with an independent `theme-pocket` presentation and no new dependencies or domain-state rewrites. Secondary pages inherit the selected visual language; the mockup supplied only the home screen, so secondary page fidelity means coherent adaptation, not a claimed pixel match to nonexistent designs.
+
+## Blocking findings and corrections
+
+| Priority | Evidence | Correction | Result |
+| --- | --- | --- | --- |
+| P1 | Initial development compilation saw imports before new files existed | Completed the independent CSS files and invalidated the entry stylesheet; production compilation succeeds | Closed |
+| P2 | `compare-v1.png`: tabs/game grid began about 10px too low and cumulative spacing pushed the anime entry under the dock at 390 × 844 | Reduced headline, grid row and section gaps; tuned document illustration footprint | Closed in `compare-final.png` |
+| P2 | English at 320px broke Featured across two lines | Responsive 12–15px category labels with single-line layout | Closed: all four controls 36px high, scrollWidth equals clientWidth |
+| P1 | Full verification found the test-only offline directory inventory omitted seven new files | Added the pocket directory to independent manifest coverage assertions; retained all previous directories | Closed: full suite passes |
+
+## Final fidelity comparison
+
+- Combined source/render: `output/theme-pocket-qa/compare-final.png` (reference left, implementation right). First iteration retained as `compare-v1.png`.
+- Typography: same hierarchy of compact brand, prominent Chinese title, centered game labels, tool section heading and smaller descriptions. Native font rendering yields minor weight differences (P3).
+- Spacing: 20px mobile gutters, three columns, approximately 106px illustrations, two game rows; feature and anime entries now appear above the dock at the reference viewport.
+- Color: cool off-white background, clear blue selected pills and actions, pale blue feature card, white anime/dock surfaces. No theme-one black rules or coral blocks were reused.
+- Imagery: seven fresh raster assets inserted separately. Small generated object/lighting differences from the reference remain cosmetic (P3); no placeholder or screenshot-as-UI substitution.
+- Copy: selected Chinese home copy and ordering retained; all visible controls use working application actions. No unsupported counts, recent activity, account or settings-center section added.
+
+## Responsive, behavior and regression evidence
+
+- All 22 catalog routes checked at 390 × 844 and 320 × 740: theme remains pocket, page headers present, document width equals viewport, no horizontal overflow from main/section/article/input/textarea/navigation. JSON evidence: `routes-390.json`, `routes-320.json`.
+- Screenshots visually inspected in contact sheets `secondary-contact.png`, `games-contact.png`, `games2-contact.png`; individual captures retained. Game boards preserve semantic colors and shared controls. Tool forms/results, watchlist and transfer entry remain intact.
+- Desktop 1280 × 900: six-column home grid and two-column tool panels; `home-desktop.png`, `text-tool-desktop.png`.
+- Chinese, English and Thai home states inspected at 320px; final English evidence `home-en-320.png`. Browser locale restored to Chinese.
+- Category selection changes entries; game library exposes 16 entries, tools expose 6. Back-to-tools, home navigation and reload preserve the selected appearance.
+- Text cleanup actual input `  Pocket QA  \n\nReady\nReady` produces `Pocket QA\n\nReady`. No clipboard export or user record mutation performed.
+- Schulte start and click 1 produce target 2 and progress 1/25; navigated away without completing/stopping a recorded attempt.
+- Sticky header observed while scrolling the text result. Safe-area and reduced-motion behavior covered by theme CSS and assertions; no claim of physical iPhone validation.
+- Representative text-tool captures for retained themes: `regression-arcade.png`, `regression-glass.png`, `regression-paper.png`. Their layouts remain visually independent.
+
+## Verification and limitations
+
+`pnpm verify` passes: lint, TypeScript, both 3D builds, Next.js production build, 78 test files / 568 tests passed; 1 file / 2 tests remain skipped. Offline manifest includes 277 assets, including all seven pocket WebPs (82,548 bytes combined). Existing 3D chunk-size and runtime paper-texture warnings are unchanged.
+
+No new P0/P1/P2 finding remains in the inspected scope. No device PWA installation, offline cold start or full 3D room regression was performed. All evidence is local under `output/theme-pocket-qa/`; no deployment or Git synchronization was authorized in this turn. Temporary viewport override restored; preview kept on the chosen theme.
+
+final result: passed
+
+## Follow-up: full game-cover consistency (2026-09-14)
+
+User feedback identified a real visual inconsistency: the six original glossy game illustrations were mixed with ten generic line-icon tiles outside Featured. This supersedes the earlier acceptance of those fallback tiles; all 16 catalog games now have individual raster covers in the same 3D material family.
+
+- Added 10 new 320 × 320 WebPs via built-in ImageGen, 163,872 bytes combined; existing covers and layout were not changed. All 17 pocket assets total 246,420 bytes, while the original featured payload remains 82,548 bytes.
+- Inspected original generated images, optimized `all-covers.png` contact sheet, and three real category screenshots together in `output/theme-pocket-covers-qa/categories.png`. Chess subjects, number/letter tiles, matching stars, mine/flag and brick-breaker scene remain recognizable at thumbnail size.
+- Browser: board 5/5, puzzle 6/6, arcade 5/5 covers loaded; full library 16 images loaded, zero line-icon fallback tiles. At 320px, all six puzzle images measured approximately 89.33px square and document width stayed 320px. Clicking the Memory Match cover opened `/memory-match` with its original game UI.
+- Coverage regression started red with exactly the 10 missing routes, then passed. Offline inventory now includes all 287 assets. `pnpm verify` passed: lint, types, production builds, 569 tests; 2 existing tests skipped. No real-device offline cold-start claim.
+- Production paths and exact prompt set: `docs/theme-pocket-cover-prompts.md`. No Git commit, push or deployment performed.
+
+final result: passed
+
+## Follow-up: tool artwork consistency (2026-09-14)
+
+The user identified the remaining mismatch between glossy game covers and line-icon tool entries. All six tool entries now use the same 3D illustration family; the home anime shortcut reuses its catalog artwork, and text cleanup reuses the existing transparent document illustration. Header/dock controls and navigation arrows remain outline UI glyphs. No tool logic or other theme was changed.
+
+- Built-in ImageGen produced five independent covers from the existing documents and 2048 style references; no screenshot-as-UI or new icon library. Exact prompts: `docs/theme-pocket-tool-prompts.md`. QR artwork is decorative, not a generated user QR code.
+- Production assets are 320 × 320 WebP quality 85. New files total 52,102 bytes; the six tool images total 65,174 bytes, all 22 theme assets 298,522 bytes, and featured home plus both tool illustrations 91,716 bytes. Existing game budget stays independently enforced.
+- Visually inspected optimized `tools-contact.png`, `tools-390.png`, `home-390.png`, `tools-320.png`, and `tools-desktop.png` under `output/theme-pocket-tools-qa/`. All six artwork frames remain 48 × 48px and images loaded at mobile/desktop widths. No horizontal overflow at 320, 390 or 1280px. At 390 × 844, the home anime card ends about 10px above the dock. Desktop keeps two columns.
+- Clicking the JSON entry navigates to the original JSON tool UI. Text and action semantics remain intact; decorative images have empty alt text, with accessible entry names provided by existing localized titles/descriptions.
+- New coverage checks first failed on the old line-icon home and five missing files, then passed. Offline manifest now contains 292 files. Full `pnpm verify` passes lint, types, both 3D builds, Next.js production build, 78 test files / 570 tests; 1 file / 2 tests remain skipped. Existing 3D warnings unchanged. No real-device offline cold-start claim.
+- Viewport override reset; preview retained on the chosen theme's tools section. No commit, push or deployment performed.
+
+final result: passed

@@ -7,6 +7,7 @@ const PROJECT_ROOT = process.cwd()
 const CLASSIC_STYLE_IMPORTS = [
   "classic-games.css",
   "@/styles/themes/theme-arcade/classic-games.css",
+  "@/styles/themes/theme-pocket/classic-games.css",
   "@/styles/themes/theme-three/classic-games.css",
   "@/styles/themes/theme-four/classic-games.css",
 ] as const
@@ -14,6 +15,7 @@ const CLASSIC_STYLE_IMPORTS = [
 const FOCUS_STYLE_IMPORTS = [
   "schulte-grid.css",
   "@/styles/themes/theme-arcade/schulte-grid.css",
+  "@/styles/themes/theme-pocket/schulte-grid.css",
   "@/styles/themes/theme-three/schulte-grid.css",
   "@/styles/themes/theme-four/schulte-grid.css",
 ] as const

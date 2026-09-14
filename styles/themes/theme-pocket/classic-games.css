@@ -1,0 +1,78 @@
+/* Route-only pocket game console, independent of the other theme presentations. */
+html[data-theme='theme-pocket'] :is(.classic-2048-content,.classic-tetris-content) { width: min(100%,470px); margin-inline: auto; }
+html[data-theme='theme-pocket'] .classic-2048-shell { padding: 18px; border-radius: 24px; background: white; }
+html[data-theme='theme-pocket'] .classic-2048-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+html[data-theme='theme-pocket'] .classic-2048-logo { font-size: clamp(42px,13vw,68px); font-weight: 850; color: #2860ed; letter-spacing: -3px; line-height: 1.2; }
+html[data-theme='theme-pocket'] .classic-2048-scores { display: flex; gap: 6px; }
+html[data-theme='theme-pocket'] .classic-2048-score { display: grid; place-items: center; padding: 8px 10px; min-width: 62px; border-radius: 12px; background: #edf3ff; }
+html[data-theme='theme-pocket'] .classic-2048-score span { font-size: 11px; color: #566278; }
+html[data-theme='theme-pocket'] .classic-2048-score strong { font-size: 23px; color: #2458d6; }
+html[data-theme='theme-pocket'] .classic-2048-intro { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 14px 0; font-size: 13px; color: #566278; }
+html[data-theme='theme-pocket'] .classic-2048-new-game { flex-shrink: 0; }
+html[data-theme='theme-pocket'] .classic-2048-board { width: 100%; aspect-ratio: 1; padding: 8px; background: #cfddf3; border-radius: 18px; }
+html[data-theme='theme-pocket'] .classic-2048-grid { gap: 7px; }
+html[data-theme='theme-pocket'] .classic-2048-cell { background: #e6eefb; border-radius: 11px; font-size: clamp(24px,8vw,45px); }
+html[data-theme='theme-pocket'] .classic-2048-cell.tile-2 { background: white; color: #345a95; }
+html[data-theme='theme-pocket'] .classic-2048-cell.tile-4 { background: #b5d4ff; color: #224b87; }
+html[data-theme='theme-pocket'] .classic-2048-cell.tile-8 { background: #699eed; color: white; }
+html[data-theme='theme-pocket'] .classic-2048-cell.tile-16 { background: #3878df; color: white; }
+html[data-theme='theme-pocket'] .classic-2048-cell.tile-32 { background: #2359c5; color: white; }
+html[data-theme='theme-pocket'] .classic-2048-cell.tile-64 { background: #20428a; color: white; }
+html[data-theme='theme-pocket'] .classic-2048-cell:is(.tile-128,.tile-256,.tile-512) { background: #ffc766; color: #684017; font-size: clamp(20px,6vw,36px); }
+html[data-theme='theme-pocket'] .classic-2048-cell:is(.tile-1024,.tile-2048,.tile-super) { background: #eca527; color: #432a08; font-size: clamp(17px,5vw,30px); }
+html[data-theme='theme-pocket'] .classic-2048-message { padding: 20px; gap: 16px; background: rgb(247 250 255 / 95%); border-radius: 18px; }
+html[data-theme='theme-pocket'] .classic-2048-message strong { font-size: 28px; font-weight: 800; }
+html[data-theme='theme-pocket'] .classic-2048-message-actions { gap: 10px; }
+html[data-theme='theme-pocket'] .classic-2048-controls { display: flex; justify-content: center; gap: 8px; margin-top: 16px; }
+html[data-theme='theme-pocket'] .classic-2048-controls button { min-width: 44px; }
+html[data-theme='theme-pocket'] .classic-2048-help { margin-top: 14px; font-size: 12px; line-height: 1.6; color: #566278; }
+html[data-theme='theme-pocket'] .tetris-handheld { --tetris-cell: clamp(10px,calc((100svh - 380px) / 20),22px); --tetris-preview-cell: 12px; padding: 18px; border-radius: 24px; background: white; }
+html[data-theme='theme-pocket'] .tetris-brand { display: flex; gap: 8px; align-items: center; font-size: 20px; font-weight: 800; color: #2860ed; margin-bottom: 14px; }
+html[data-theme='theme-pocket'] .tetris-brand svg { width: 24px; height: 24px; }
+html[data-theme='theme-pocket'] .tetris-screen-frame { padding: 10px; border-radius: 16px; background: #dce7f8; }
+html[data-theme='theme-pocket'] .tetris-lcd { display: flex; gap: 12px; justify-content: center; padding: 10px; border-radius: 10px; background: #15233e; color: white; }
+html[data-theme='theme-pocket'] .tetris-board { background: #0d1830; border: 1px solid #4d658d; }
+html[data-theme='theme-pocket'] .tetris-cell { width: var(--tetris-cell); height: var(--tetris-cell); border: 1px solid rgb(121 155 210 / 10%); }
+html[data-theme='theme-pocket'] .tetris-preview-cell { width: var(--tetris-preview-cell); height: var(--tetris-preview-cell); }
+html[data-theme='theme-pocket'] :is(.tetris-cell,.tetris-preview-cell).is-filled { background: #5ed5e8; border: 1px solid rgb(255 255 255 / 25%); border-radius: 2px; }
+html[data-theme='theme-pocket'] :is(.tetris-cell,.tetris-preview-cell)[data-piece='O'] { background: #ffcc59; }
+html[data-theme='theme-pocket'] :is(.tetris-cell,.tetris-preview-cell)[data-piece='T'] { background: #a275ef; }
+html[data-theme='theme-pocket'] :is(.tetris-cell,.tetris-preview-cell)[data-piece='L'] { background: #f0a259; }
+html[data-theme='theme-pocket'] :is(.tetris-cell,.tetris-preview-cell)[data-piece='J'] { background: #4386f1; }
+html[data-theme='theme-pocket'] :is(.tetris-cell,.tetris-preview-cell)[data-piece='S'] { background: #6dbf73; }
+html[data-theme='theme-pocket'] :is(.tetris-cell,.tetris-preview-cell)[data-piece='Z'] { background: #f27179; }
+html[data-theme='theme-pocket'] :is(.tetris-cell,.tetris-preview-cell).is-filled::after { border: 1px solid rgb(255 255 255 / 20%); }
+html[data-theme='theme-pocket'] .tetris-lcd-panel { display: flex; flex-direction: column; min-width: 48px; width: 100px; gap: 14px; }
+html[data-theme='theme-pocket'] .tetris-lcd-stat { display: grid; gap: 3px; }
+html[data-theme='theme-pocket'] .tetris-lcd-stat span, html[data-theme='theme-pocket'] .tetris-next > span { font-size: 10px; color: #bacbea; }
+html[data-theme='theme-pocket'] .tetris-lcd-stat strong { font: 700 21px var(--font-geist-mono),monospace; }
+html[data-theme='theme-pocket'] .tetris-lcd-stat-row { display: flex; gap: 12px; }
+html[data-theme='theme-pocket'] .tetris-next { display: grid; gap: 6px; }
+html[data-theme='theme-pocket'] .tetris-lcd-sound { display: flex; gap: 5px; align-items: center; margin-top: auto; font-size: 9px; color: #bacbea; }
+html[data-theme='theme-pocket'] .tetris-lcd-sound svg { width: 16px; height: 16px; }
+html[data-theme='theme-pocket'] .tetris-screen-message { background: rgb(13 24 48 / 92%); color: white; font-size: 13px; }
+html[data-theme='theme-pocket'] .tetris-screen-message strong { font-size: 16px; }
+html[data-theme='theme-pocket'] .tetris-control-deck { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: end; gap: 12px; margin-top: 14px; }
+html[data-theme='theme-pocket'] .tetris-function-row { display: flex; gap: 4px; margin-bottom: 10px; }
+html[data-theme='theme-pocket'] .tetris-function-button { display: flex; flex: 1; flex-direction: column; align-items: center; justify-content: center; min-width: 0; min-height: 44px; color: #566278; }
+html[data-theme='theme-pocket'] .tetris-function-button svg { width: 18px; height: 18px; }
+html[data-theme='theme-pocket'] .tetris-function-button small { font-size: 10px; }
+html[data-theme='theme-pocket'] .tetris-drop-button { display: flex; align-items: center; justify-content: center; gap: 5px; width: 100%; padding: 8px; min-height: 44px; border-radius: 12px; background: #2860ed; color: white; font-weight: 700; }
+html[data-theme='theme-pocket'] .tetris-drop-button svg { width: 20px; height: 20px; }
+html[data-theme='theme-pocket'] .tetris-dpad { display: grid; grid-template-columns: repeat(3,44px); grid-template-rows: repeat(2,44px); gap: 4px; }
+html[data-theme='theme-pocket'] .tetris-dpad-button { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: #eaf1ff; color: #2860ed; }
+html[data-theme='theme-pocket'] .tetris-dpad-button svg { width: 23px; height: 23px; }
+html[data-theme='theme-pocket'] .tetris-dpad-button small { display: none; }
+html[data-theme='theme-pocket'] .tetris-dpad-button.is-rotate { grid-area: 1 / 2; }
+html[data-theme='theme-pocket'] .tetris-dpad-button.is-left { grid-area: 2 / 1; }
+html[data-theme='theme-pocket'] .tetris-dpad-button.is-down { grid-area: 2 / 2; }
+html[data-theme='theme-pocket'] .tetris-dpad-button.is-right { grid-area: 2 / 3; }
+html[data-theme='theme-pocket'] .classic-tetris-help { text-align: center; font-size: 12px; line-height: 1.6; color: #566278; margin-top: 14px; }
+@media (max-width: 359px) {
+  html[data-theme='theme-pocket'] :is(.classic-2048-shell,.tetris-handheld) { padding: 10px; }
+  html[data-theme='theme-pocket'] .tetris-screen-frame, html[data-theme='theme-pocket'] .tetris-lcd { padding: 6px; }
+  html[data-theme='theme-pocket'] .tetris-control-deck { gap: 6px; }
+  html[data-theme='theme-pocket'] .tetris-lcd { gap: 8px; }
+  html[data-theme='theme-pocket'] .tetris-lcd-panel { gap: 8px; }
+  html[data-theme='theme-pocket'] .tetris-lcd-stat strong { font-size: 17px; }
+}

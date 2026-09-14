@@ -1,5 +1,6 @@
 export const themes = [
   "theme-arcade",
+  "theme-pocket",
   "theme-three",
   "theme-four",
 ] as const
@@ -22,6 +23,7 @@ export const THEME_CONFIG: Record<
     colorScheme: "light",
     themeColor: "#faf9f6",
   },
+  "theme-pocket": { colorScheme: "light", themeColor: "#f3f6fa" },
   "theme-three": {
     colorScheme: "dark",
     themeColor: "#142d35",

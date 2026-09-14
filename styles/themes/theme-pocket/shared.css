@@ -1,0 +1,44 @@
+/* Theme-owned surfaces, with no dependency on another theme's layout or CSS. */
+html[data-theme='theme-pocket'] :is(.game-page,.app-shell[data-page='anime-tracker'],.settings-shell) { width: min(100%,1100px); margin-inline: auto; padding: var(--pocket-top) max(var(--pocket-gutter),env(safe-area-inset-right)) calc(96px + env(safe-area-inset-bottom)) max(var(--pocket-gutter),env(safe-area-inset-left)); background: var(--background); color: var(--foreground); }
+html[data-theme='theme-pocket'] .app-shell[data-page='anime-tracker'] > .app-container { padding: 0; }
+.pocket-page-header { margin-bottom: 22px; gap: 10px; }
+.pocket-page-header h1 { flex: 1; min-width: 0; font-size: 20px; font-weight: 750; line-height: 1.3; overflow-wrap: anywhere; }
+.pocket-back { width: 40px; height: 40px; flex-shrink: 0; display: grid; place-items: center; border-radius: 50%; background: white; }
+.pocket-back svg { width: 22px; height: 22px; }
+.pocket-page-context { margin: -4px 0 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.pocket-page-context > p { flex: 1; min-width: 180px; color: var(--muted-foreground); font-size: 13px; line-height: 1.6; }
+.pocket-page-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+html[data-theme='theme-pocket'] .game-page > .game-content { padding-top: 0; width: 100%; min-width: 0; }
+html[data-theme='theme-pocket'] :is(.surface-panel,.surface-card,[data-slot='card']) { border: 1px solid #e5ebf4; border-radius: 20px; background: #fff; color: var(--foreground); box-shadow: 0 5px 20px rgb(41 78 140 / 3%); backdrop-filter: none; }
+html[data-theme='theme-pocket'] :is([data-slot='button'],[data-slot='select-trigger'],[data-slot='input']) { min-height: 44px; height: auto; border-radius: 12px; box-shadow: none; }
+html[data-theme='theme-pocket'] [data-slot='button'] { font-weight: 650; }
+html[data-theme='theme-pocket'] [data-slot='button'][data-variant='default'] { color: white; background: #2860ed; }
+html[data-theme='theme-pocket'] [data-slot='button'][data-variant='outline'] { color: #244c98; background: #fff; border: 1px solid #d4e1f7; }
+html[data-theme='theme-pocket'] [data-slot='button'][data-variant='secondary'] { color: #2458b8; background: #e7efff; }
+html[data-theme='theme-pocket'] [data-slot='button'][data-size='icon'] { min-width: 44px; }
+html[data-theme='theme-pocket'] :is([data-slot='input'],textarea,[data-slot='select-trigger']) { background: #f8faff; color: var(--foreground); border-color: #d9e3f2; font-size: 16px; }
+html[data-theme='theme-pocket'] :is([data-slot='dropdown-menu-content'],[data-slot='dropdown-menu-sub-content'],[data-slot='select-content'],[data-slot='dialog-content'],[data-slot='alert-dialog-content']) { color: var(--foreground); background: white; border: 1px solid #e0e8f5; border-radius: 20px; box-shadow: 0 12px 48px rgb(28 54 100 / 16%); backdrop-filter: none; }
+html[data-theme='theme-pocket'] :is([data-slot='dialog-content'],[data-slot='alert-dialog-content']) { max-height: calc(100dvh - 32px - var(--xm-safe-area-top) - env(safe-area-inset-bottom)); overflow-y: auto; }
+html[data-theme='theme-pocket'] :is([data-slot='dropdown-menu-radio-item'],[data-slot='dropdown-menu-item'],[data-slot='select-item']) { min-height: 40px; }
+html[data-theme='theme-pocket'] [data-slot='dropdown-menu-radio-item'][data-state='checked'] { background: #e9f1ff; }
+html[data-theme='theme-pocket'] :is([data-slot='dialog-overlay'],[data-slot='alert-dialog-overlay']) { background: rgb(20 38 68 / 40%); backdrop-filter: none; }
+html[data-theme='theme-pocket'] [data-slot='tabs-list'] { background: #e8eef7; border-radius: 14px; height: auto; padding: 4px; }
+html[data-theme='theme-pocket'] [data-slot='tabs-trigger'] { border-radius: 10px; min-height: 40px; white-space: normal; }
+html[data-theme='theme-pocket'] [data-slot='tabs-trigger'][data-state='active'] { color: #2458d6; background: #fff; box-shadow: 0 2px 6px rgb(25 53 100 / 8%); }
+html[data-theme='theme-pocket'] :is(a,button,input,select,textarea,[tabindex='0']):focus-visible { outline: 3px solid #2860ed; outline-offset: 3px; }
+html[data-theme='theme-pocket'] .game-help { line-height: 1.65; }
+html[data-theme='theme-pocket'] .game-status-banner { color: #825819; background: #fff2d4; border: 1px solid #eddaad; border-radius: 14px; }
+html[data-theme='theme-pocket'] .game-actions { max-width: 100%; }
+html[data-theme='theme-pocket'] .game-actions [data-slot='button'] { white-space: normal; }
+html[data-theme='theme-pocket'] .settings-panel { padding: 4px 20px; }
+html[data-theme='theme-pocket'] .settings-row { display: grid; grid-template-columns: 30px minmax(0,1fr) auto; align-items: center; gap: 12px; padding-block: 20px; }
+html[data-theme='theme-pocket'] .settings-row + .settings-row { border-top: 1px solid var(--border); }
+html[data-theme='theme-pocket'] .settings-row-title { font-size: 18px; font-weight: 700; display: block; }
+html[data-theme='theme-pocket'] .settings-row-description { display: block; color: var(--muted-foreground); font-size: 13px; margin-top: 5px; }
+html[data-theme='theme-pocket'] .settings-storage-note { display: flex; gap: 10px; margin-top: 20px; font-size: 13px; color: var(--muted-foreground); }
+html[data-theme='theme-pocket'] .settings-storage-note svg { width: 20px; flex-shrink: 0; }
+@media (max-width: 480px) {
+  .pocket-page-header h1 { font-size: 18px; }.pocket-page-header { gap: 8px; }
+  html[data-theme='theme-pocket'] .settings-row { grid-template-columns: 28px minmax(0,1fr); }
+  html[data-theme='theme-pocket'] .settings-control { grid-column: 2; justify-self: start; }
+}

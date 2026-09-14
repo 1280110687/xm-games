@@ -14,6 +14,7 @@ const OFFLINE_ASSET_MANIFEST_PATH = join(
 )
 const OFFLINE_ASSET_DIRECTORIES = [
   join(PROJECT_ROOT, "public", "images", "theme-arcade"),
+  join(PROJECT_ROOT, "public", "images", "theme-pocket"),
   join(PROJECT_ROOT, "public", "theme-four"),
   join(PROJECT_ROOT, "public", "theme-four-experience"),
 ]
