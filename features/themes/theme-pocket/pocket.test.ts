@@ -86,4 +86,19 @@ describe("pocket launcher", () => {
     expect(read("components/game-header.tsx")).toContain("<PocketPageHeader")
     expect(read("features/schulte-grid/components/schulte-grid-game.tsx")).toContain("PocketSchulteView")
   })
+  it("centers header icons without inheriting the select trigger's space-between alignment", () => {
+    const declarations: Record<string, string> = {}
+    postcss.parse(read("styles/themes/theme-pocket/index.css")).walkRules(rule => {
+      if (rule.selector !== "html[data-theme='theme-pocket'] .pocket-header-controls :is(.language-switcher-trigger,.theme-switcher-trigger)") return
+      rule.walkDecls(decl => { declarations[decl.prop] = decl.value })
+    })
+    expect(declarations).toMatchObject({
+      display: "grid",
+      "place-items": "center",
+      "justify-content": "center",
+      gap: "0",
+      width: "40px",
+      height: "40px",
+    })
+  })
 })

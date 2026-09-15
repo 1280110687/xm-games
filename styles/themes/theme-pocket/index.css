@@ -22,7 +22,7 @@ html[data-theme='theme-pocket'] body { background: var(--background); }
 .pocket-brand svg { width: 27px; height: 27px; stroke-width: 2; }
 .pocket-brand strong { font-size: 24px; line-height: 1; font-weight: 850; letter-spacing: -1px; white-space: nowrap; }
 .pocket-header-controls { display: flex; gap: 9px; flex-shrink: 0; }
-html[data-theme='theme-pocket'] .pocket-header-controls :is(.language-switcher-trigger,.theme-switcher-trigger) { display: grid; place-items: center; width: 40px !important; height: 40px; min-height: 40px; min-width: 40px; padding: 0 !important; border: 0; border-radius: 50%; color: var(--foreground); background: #e9eef5; box-shadow: none; }
+html[data-theme='theme-pocket'] .pocket-header-controls :is(.language-switcher-trigger,.theme-switcher-trigger) { display: grid; place-items: center; justify-content: center; gap: 0; width: 40px !important; height: 40px; min-height: 40px; min-width: 40px; padding: 0 !important; border: 0; border-radius: 50%; color: var(--foreground); background: #e9eef5; box-shadow: none; }
 html[data-theme='theme-pocket'] .pocket-header-controls svg { width: 24px; height: 24px; color: inherit; stroke-width: 2; }
 html[data-theme='theme-pocket'] .pocket-header-controls .language-switcher-trigger > :not(svg:first-child) { display: none; }
 .pocket-main { padding-top: 23px; }
