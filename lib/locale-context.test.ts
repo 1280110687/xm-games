@@ -6,6 +6,7 @@ import { parse } from "postcss"
 import { describe, expect, it, vi } from "vitest"
 
 vi.mock("next/navigation", () => ({ usePathname: () => "/gomoku" }))
+vi.mock("@/features/themes/shared/theme-provider", () => ({ useTheme: () => ({ isResolved: true, styleError: false }) }))
 
 import { LocaleProvider, useLocale } from "./locale-context"
 

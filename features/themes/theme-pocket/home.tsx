@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import Image from "next/image"
+import { PocketArt } from "./art-image"
+import { POCKET_DOCUMENT_SIZES, POCKET_GAME_SIZES } from "./art"
 import { ArrowRight, ChevronRight } from "lucide-react"
 import { PrefetchLink as Link } from "@/components/prefetch-link"
 import { useLocale } from "@/lib/locale-context"
@@ -36,12 +37,12 @@ export function PocketHome({ categories }: { categories: CatalogCategory[] }) {
       </div>}
       {section === "tools" ? <section className="pocket-tool-list" aria-label={copy.tools}>
         {entries.map(entry => <Link key={entry.href} href={entry.href}>
-          <Image className="pocket-tool-icon" src={`/images/theme-pocket/${POCKET_TOOL_ART[entry.href]}.webp`} alt="" width={320} height={320} unoptimized />
+          <PocketArt className="pocket-tool-icon" name={POCKET_TOOL_ART[entry.href]} sizes="48px" />
           <span><h2>{t(entry.titleKey)}</h2><p>{t(entry.descKey)}</p></span><ChevronRight aria-hidden="true" />
         </Link>)}
       </section> : <section className="pocket-game-grid" aria-label={copy.games}>
         {entries.map(entry => <Link href={entry.href} key={entry.href} className="pocket-game">
-          {POCKET_ART[entry.href] ? <Image src={`/images/theme-pocket/${POCKET_ART[entry.href]}.webp`} alt="" width={320} height={320} unoptimized priority={section === "home"} />
+          {POCKET_ART[entry.href] ? <PocketArt name={POCKET_ART[entry.href]} sizes={POCKET_GAME_SIZES} eager={section === "home"} />
             : <span className="pocket-game-symbol"><entry.icon aria-hidden="true" /></span>}
           <span>{entry.href === "/bingo" ? "BINGO" : t(entry.titleKey)}</span>
         </Link>)}
@@ -51,12 +52,12 @@ export function PocketHome({ categories }: { categories: CatalogCategory[] }) {
         <section className="pocket-handy" aria-labelledby="pocket-handy-title">
           <h2 id="pocket-handy-title">{copy.handy}</h2>
           <Link className="pocket-text-entry" href="/text-tool">
-            <Image src={`/images/theme-pocket/${POCKET_TOOL_ART["/text-tool"]}.webp`} alt="" width={320} height={320} unoptimized />
+            <PocketArt name={POCKET_TOOL_ART["/text-tool"]} sizes={POCKET_DOCUMENT_SIZES} critical />
             <span><strong>{copy.text}</strong><small>{copy.textDescription}</small></span>
             <span className="pocket-entry-arrow"><ArrowRight aria-hidden="true" /></span>
           </Link>
           <Link className="pocket-anime-entry" href="/anime-tracker">
-            <Image className="pocket-tool-icon" src={`/images/theme-pocket/${POCKET_TOOL_ART["/anime-tracker"]}.webp`} alt="" width={320} height={320} unoptimized />
+            <PocketArt className="pocket-tool-icon" name={POCKET_TOOL_ART["/anime-tracker"]} sizes="48px" />
             <strong>{t("animeTracker")}</strong><ChevronRight aria-hidden="true" />
           </Link>
         </section>

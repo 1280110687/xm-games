@@ -1,4 +1,4 @@
-import { readdir, writeFile } from "node:fs/promises"
+import { readFile, readdir, writeFile } from "node:fs/promises"
 import { dirname, join, relative, resolve, sep } from "node:path"
 import { fileURLToPath } from "node:url"
 
@@ -30,7 +30,11 @@ const assets = (
   await Promise.all(
     offlineDirectories.map((directory) => collectFiles(resolve(publicRoot, directory))),
   )
-).flat().sort()
+).flat()
+// Only include this build's content-hashed styles, not stale dev variants.
+const themeStyles = JSON.parse(await readFile(resolve(projectRoot, "lib/generated/theme-styles.json"), "utf8"))
+assets.push(...Object.values(themeStyles))
+assets.sort()
 
 await writeFile(
   outputPath,

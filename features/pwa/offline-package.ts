@@ -1,3 +1,5 @@
+import { ensurePwaRegistration } from "./registration"
+
 export type OfflinePackageScope = "core" | "full"
 
 export type OfflinePackageResult = {
@@ -19,7 +21,7 @@ async function sendPreparationRequest(
   scope: OfflinePackageScope,
   registration?: ServiceWorkerRegistration,
 ): Promise<OfflinePackageResult> {
-  const readyRegistration = registration ?? await navigator.serviceWorker.ready
+  const readyRegistration = registration ?? await ensurePwaRegistration()
   const worker = readyRegistration.active
 
   if (!worker) {

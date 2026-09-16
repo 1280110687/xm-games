@@ -13,7 +13,7 @@ const NAVIGATION_FILES = [
 ]
 
 describe("route navigation performance", () => {
-  it("allows visible route links to use Next.js prefetching", () => {
+  it("routes navigation through the shared intent-aware prefetch policy", () => {
     for (const file of NAVIGATION_FILES) {
       const source = readFileSync(join(PROJECT_ROOT, file), "utf8")
 
@@ -29,7 +29,7 @@ describe("route navigation performance", () => {
     )
 
     expect(source).toContain('window.addEventListener("offline", handleOffline)')
-    expect(source).toContain("prefetch={online ? prefetch : false}")
+    expect(source).toContain("prefetch={online && (intent || prefetch === true) ? prefetch : false}")
   })
 
   it("delays the loading label and uses cached documents while offline", () => {

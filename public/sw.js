@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v25"
+const CACHE_VERSION = "v26"
 const SHELL_CACHE = `xm-games-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `xm-games-runtime-${CACHE_VERSION}`
 const OWNED_CACHE_PREFIX = "xm-games-"
@@ -144,8 +144,10 @@ async function precacheCoreShell() {
     OFFLINE_WARM_CONCURRENCY,
     (resource) => fetchAndCacheIfMissing(cache, resource),
   )
+  const themeStyles = (await readOfflineAssetManifest(cache))
+    .filter(asset => asset.startsWith("/theme-styles/"))
   await mapWithConcurrency(
-    [...extractNextStaticResources(homeHtml)],
+    [...extractNextStaticResources(homeHtml), ...themeStyles],
     OFFLINE_WARM_CONCURRENCY,
     (resource) => fetchAndCacheIfMissing(cache, resource),
   )
@@ -399,8 +401,9 @@ async function cachedRangeResponse(request) {
 self.addEventListener("install", (event) => {
   // Do not call skipWaiting here. An update must stay waiting until existing
   // tabs using the previous Next.js chunks have closed or accepted an update.
-  // A worker is not install-ready until every app route and its Next.js chunks
-  // can open offline. Heavy Theme Four assets are still prepared separately.
+  // Registration is deferred by the host until idle or explicit install intent.
+  // Keep route completeness here so activating an update cannot discard the
+  // previous offline package before its replacement is ready.
   event.waitUntil(warmApplicationShell())
 })
 

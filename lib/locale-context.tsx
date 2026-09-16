@@ -11,6 +11,7 @@ import {
   type TranslationKey,
 } from "./i18n"
 import { getPageMetadata } from "./page-metadata"
+import { useTheme } from "@/features/themes/shared/theme-provider"
 
 interface LocaleContextType {
   locale: Locale
@@ -24,6 +25,7 @@ const LOCALE_STORAGE_KEY = "xm-games-locale"
 
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname()
+  const { isResolved, styleError } = useTheme()
   // Server HTML and the first hydration render must agree. Do not mount page
   // content with a fallback language before browser preferences are available.
   const [locale, setLocaleState] = useState<Locale | null>(null)
@@ -71,7 +73,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     }
   }
 
-  if (locale === null) {
+  if (locale === null || !isResolved) {
     return (
       <div className="locale-startup" data-locale-pending="true" role="status" aria-busy="true" aria-label="XM-Games">
         <span className="locale-startup-placeholder" aria-hidden="true">
@@ -80,6 +82,9 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
         <span className="locale-startup-brand" aria-hidden="true">
           <span className="locale-startup-brand-accent">XM</span>-GAMES
         </span>
+        {styleError && <button type="button" onClick={() => window.location.reload()}>
+          {locale === "zh" ? "加载失败，点击重试" : locale === "th" ? "โหลดไม่สำเร็จ ลองอีกครั้ง" : "Loading failed. Retry"}
+        </button>}
       </div>
     )
   }

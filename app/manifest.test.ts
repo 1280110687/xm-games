@@ -141,7 +141,7 @@ describe("service worker shell", () => {
     expect(installHandler).not.toContain("self.skipWaiting()")
   })
 
-  it("installs every app route while leaving heavy experience assets for later", () => {
+  it("retains complete route coverage before activating an update", () => {
     const installHandler = source.match(
       /self\.addEventListener\("install"[\s\S]*?(?=self\.addEventListener\("message")/,
     )?.[0]
@@ -165,7 +165,9 @@ describe("service worker shell", () => {
     ) as { version: number; assets: string[] }
     const expectedAssets = OFFLINE_ASSET_DIRECTORIES
       .flatMap(collectOfflineAssets)
-      .sort()
+    const themeStyles = JSON.parse(readFileSync(join(PROJECT_ROOT, "lib/generated/theme-styles.json"), "utf8"))
+    expectedAssets.push(...Object.values(themeStyles) as string[])
+    expectedAssets.sort()
 
     expect(manifest.version).toBe(1)
     expect(manifest.assets).toEqual(expectedAssets)

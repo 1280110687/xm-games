@@ -61,7 +61,7 @@ describe("pocket launcher", () => {
   })
   it("ships all covers offline while retaining the featured download budget", () => {
     const dir = "public/images/theme-pocket"
-    const files = readdirSync(dir).sort()
+    const files = readdirSync(dir).filter(file => file.endsWith(".webp")).sort()
     expect(files).toEqual([...Object.values(POCKET_ART),...Object.values(POCKET_TOOL_ART)].map(name => `${name}.webp`).sort())
     for (const file of files) {
       expect(readFileSync(`${dir}/${file}`).subarray(8,12).toString()).toBe("WEBP")

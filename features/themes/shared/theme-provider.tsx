@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
   type ReactNode,
 } from "react"
@@ -18,10 +19,12 @@ import {
   themeUsesDarkChrome,
   type ThemeId,
 } from "@/lib/theme"
+import { loadThemeStyle } from "@/lib/theme-resources"
 
 interface ThemeContextValue {
   theme: ThemeId
   isResolved: boolean
+  styleError: boolean
   setTheme: (theme: ThemeId) => void
 }
 
@@ -56,6 +59,25 @@ function readStoredTheme(): ThemeId {
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<ThemeId>(DEFAULT_THEME)
   const [isResolved, setIsResolved] = useState(false)
+  const [styleError, setStyleError] = useState(false)
+  const requestRef = useRef(0)
+
+  const loadTheme = useCallback(async (nextTheme: ThemeId, persist = false) => {
+    const request = ++requestRef.current
+    setStyleError(false)
+    try {
+      await loadThemeStyle(nextTheme)
+      if (request !== requestRef.current) return
+      setThemeState(nextTheme)
+      applyTheme(nextTheme)
+      setIsResolved(true)
+      if (persist) {
+        try { localStorage.setItem(THEME_STORAGE_KEY, nextTheme) } catch { /* Optional persistence. */ }
+      }
+    } catch {
+      if (request === requestRef.current) setStyleError(true)
+    }
+  }, [])
 
   useEffect(() => {
     const handleStorage = (event: StorageEvent) => {
@@ -63,33 +85,27 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       const nextTheme = event.key === null
         ? DEFAULT_THEME
         : normalizeTheme(event.newValue)
-      setThemeState(nextTheme)
-      applyTheme(nextTheme)
+      void loadTheme(nextTheme)
     }
 
     window.addEventListener("storage", handleStorage)
 
     const initialTheme = readStoredTheme()
-    setThemeState(initialTheme)
-    applyTheme(initialTheme)
-    setIsResolved(true)
+    void loadTheme(initialTheme)
 
-    return () => window.removeEventListener("storage", handleStorage)
-  }, [])
+    return () => {
+      window.removeEventListener("storage", handleStorage)
+      requestRef.current += 1
+    }
+  }, [loadTheme])
 
   const setTheme = useCallback((nextTheme: ThemeId) => {
-    setThemeState(nextTheme)
-    applyTheme(nextTheme)
-    try {
-      localStorage.setItem(THEME_STORAGE_KEY, nextTheme)
-    } catch {
-      // Theme switching remains available when storage is restricted.
-    }
-  }, [])
+    void loadTheme(nextTheme, true)
+  }, [loadTheme])
 
   const value = useMemo(
-    () => ({ theme, isResolved, setTheme }),
-    [isResolved, theme, setTheme],
+    () => ({ theme, isResolved, styleError, setTheme }),
+    [isResolved, styleError, theme, setTheme],
   )
 
   return (

@@ -109,7 +109,7 @@ export function ThemeSwitcher({
   className?: string
 }) {
   const { locale } = useLocale()
-  const { theme, setTheme } = useTheme()
+  const { theme, styleError, setTheme } = useTheme()
   const copy = THEME_COPY[locale]
   const currentTheme = copy.themes[theme]
 
@@ -126,6 +126,7 @@ export function ThemeSwitcher({
             className,
           )}
           aria-label={`${copy.trigger}: ${currentTheme.name}`}
+          title={styleError ? (locale === "zh" ? "主题加载失败，请重试" : locale === "th" ? "โหลดธีมไม่สำเร็จ ลองอีกครั้ง" : "Theme failed to load. Please retry.") : undefined}
         >
           <Palette className="size-4" aria-hidden="true" />
           {!compact && (

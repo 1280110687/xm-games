@@ -44,7 +44,7 @@ html[data-theme='theme-pocket'] .pocket-header-controls .language-switcher-trigg
 .pocket-text-entry { display: grid; grid-template-columns: 127px minmax(0,1fr) 44px; gap: 0; align-items: center; border-radius: 17px; min-height: 110px; background: #dbeaff; padding: 6px 16px 6px 8px; }
 .pocket-text-entry > img { width: 106px; height: 100px; object-fit: contain; transform: scale(1.18); }
 .pocket-text-entry strong { font-size: 20px; font-weight: 750; display: block; line-height: 1.4; }
-.pocket-text-entry small { display: block; color: #566b8c; font-size: 13px; font-weight: 550; line-height: 1.5; margin-top: 3px; }
+.pocket-text-entry small { display: block; color: #4f6382; font-size: 13px; font-weight: 550; line-height: 1.5; margin-top: 3px; }
 .pocket-entry-arrow { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; color: white; background: linear-gradient(135deg,#4084ff,#2458e5); }
 .pocket-entry-arrow svg { width: 25px; height: 25px; }
 .pocket-anime-entry { display: flex; align-items: center; gap: 14px; padding: 6px 14px; margin-top: 10px; border-radius: 17px; min-height: 58px; background: #fff; }

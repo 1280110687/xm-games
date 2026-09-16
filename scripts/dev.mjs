@@ -1,5 +1,16 @@
 import { spawn } from "node:child_process"
 import { setTimeout as delay } from "node:timers/promises"
+import { watch } from "node:fs"
+import { buildThemeAssets } from "./build-theme-assets.mjs"
+
+await buildThemeAssets()
+let themeBuild = Promise.resolve()
+const themeWatcher = watch(new URL("../styles/themes", import.meta.url), { recursive: true }, () => {
+  themeBuild = themeBuild.then(buildThemeAssets).catch(error => console.error(error.message))
+})
+const safeAreaWatcher = watch(new URL("../app/pwa-safe-area.css", import.meta.url), () => {
+  themeBuild = themeBuild.then(buildThemeAssets).catch(error => console.error(error.message))
+})
 
 // Next proxies both Vite servers so iframe messages retain same-origin checks.
 const children = []
@@ -7,6 +18,8 @@ let stopping = false
 function stop(code = 0) {
   if (stopping) return
   stopping = true
+  themeWatcher.close()
+  safeAreaWatcher.close()
   for (const child of children) {
     if (!child.pid) continue
     try {

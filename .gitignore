@@ -10,6 +10,9 @@
 /apps/*/package-lock.json
 /public/theme-four-experience/
 /public/offline-assets.json
+/public/theme-styles/
+/public/images/theme-pocket/responsive/
+/lib/generated/theme-styles.json
 /public/.experience-stage-*/
 
 # next.js

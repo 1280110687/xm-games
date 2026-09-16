@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 
 import { prepareOfflinePackage } from "@/features/pwa/offline-package"
+import { ensurePwaRegistration } from "@/features/pwa/registration"
 
 const PWA_CACHE_PREFIX = "xm-games-"
 const DEVELOPMENT_CLEANUP_KEY = "xm-games-pwa-development-cleaned:v1"
@@ -94,26 +95,6 @@ export function PwaRegister() {
         })
     }
 
-    const scheduleOfflineWarmup = (registration: ServiceWorkerRegistration) => {
-      const installed = isInstalledPwa()
-      warmupTimer = window.setTimeout(() => {
-        if (cancelled) return
-
-        const warm = () => {
-          if (cancelled) return
-          prepare(registration, installed ? "full" : "core")
-        }
-
-        if (typeof window.requestIdleCallback === "function") {
-          idleCallback = window.requestIdleCallback(warm, {
-            timeout: OFFLINE_WARMUP_IDLE_TIMEOUT_MS,
-          })
-        } else {
-          warm()
-        }
-      }, installed ? 0 : WEB_OFFLINE_WARMUP_DELAY_MS)
-    }
-
     let readyRegistration: ServiceWorkerRegistration | null = null
     const handleInstalled = () => {
       if (cancelled || !readyRegistration) return
@@ -122,27 +103,39 @@ export function PwaRegister() {
 
     const register = async () => {
       try {
-        await navigator.serviceWorker.register("/sw.js", {
-          scope: "/",
-          updateViaCache: "none",
-        })
-        readyRegistration = await navigator.serviceWorker.ready
-        if (!cancelled) scheduleOfflineWarmup(readyRegistration)
+        readyRegistration = await ensurePwaRegistration()
+        if (!cancelled) prepare(readyRegistration, isInstalledPwa() ? "full" : "core")
       } catch (error: unknown) {
         console.warn("[pwa] Service worker registration failed:", error)
       }
     }
 
+    // Delay registration itself: a newly registered worker starts installing
+    // immediately. Delaying only a later warmup message does not protect LCP.
+    const scheduleRegistration = () => {
+      const installed = isInstalledPwa()
+      warmupTimer = window.setTimeout(() => {
+        if (cancelled) return
+        if (typeof window.requestIdleCallback === "function") {
+          idleCallback = window.requestIdleCallback(() => {
+            if (!cancelled) void register()
+          }, { timeout: OFFLINE_WARMUP_IDLE_TIMEOUT_MS })
+        } else {
+          void register()
+        }
+      }, installed ? 0 : WEB_OFFLINE_WARMUP_DELAY_MS)
+    }
+
     if (document.readyState === "complete") {
-      void register()
+      scheduleRegistration()
     } else {
-      window.addEventListener("load", register, { once: true })
+      window.addEventListener("load", scheduleRegistration, { once: true })
     }
     window.addEventListener("appinstalled", handleInstalled)
 
     return () => {
       cancelled = true
-      window.removeEventListener("load", register)
+      window.removeEventListener("load", scheduleRegistration)
       window.removeEventListener("appinstalled", handleInstalled)
       if (warmupTimer !== null) window.clearTimeout(warmupTimer)
       if (idleCallback !== null) window.cancelIdleCallback?.(idleCallback)

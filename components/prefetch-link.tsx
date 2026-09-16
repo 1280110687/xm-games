@@ -7,10 +7,11 @@ import type { ComponentProps } from "react"
 type PrefetchLinkProps = ComponentProps<typeof NextLink>
 
 export const PrefetchLink = forwardRef<HTMLAnchorElement, PrefetchLinkProps>(
-  function PrefetchLink({ prefetch, ...props }, ref) {
+  function PrefetchLink({ prefetch, onPointerEnter, onTouchStart, onFocus, ...props }, ref) {
     // Start with prefetching disabled so an offline document does not enqueue
     // RSC requests before hydration has observed navigator.onLine.
     const [online, setOnline] = useState(false)
+    const [intent, setIntent] = useState(false)
 
     useEffect(() => {
       const handleOnline = () => setOnline(true)
@@ -29,7 +30,10 @@ export const PrefetchLink = forwardRef<HTMLAnchorElement, PrefetchLinkProps>(
       <NextLink
         ref={ref}
         {...props}
-        prefetch={online ? prefetch : false}
+        prefetch={online && (intent || prefetch === true) ? prefetch : false}
+        onPointerEnter={(event) => { setIntent(true); onPointerEnter?.(event) }}
+        onTouchStart={(event) => { setIntent(true); onTouchStart?.(event) }}
+        onFocus={(event) => { setIntent(true); onFocus?.(event) }}
       />
     )
   },

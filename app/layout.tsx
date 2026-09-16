@@ -10,12 +10,8 @@ import { RouteProgress } from '@/components/route-progress'
 import { DEFAULT_LOCALE, localeHtmlLang } from '@/lib/i18n'
 import { getPageMetadata } from '@/lib/page-metadata'
 import { DEFAULT_THEME, THEME_CONFIG, themeBootstrapScript, themeUsesDarkChrome } from '@/lib/theme'
+import { themeResourcesBootstrapScript } from '@/lib/theme-resources'
 import './globals.css'
-import '@/styles/themes/theme-three/index.css'
-import '@/styles/themes/theme-four/index.css'
-import '@/styles/themes/theme-arcade/index.css'
-import '@/styles/themes/theme-pocket/index.css'
-import '@/styles/themes/theme-retro/index.css'
 import './pwa-safe-area.css'
 
 const geist = Geist({
@@ -25,6 +21,7 @@ const geist = Geist({
 const geistMono = Geist_Mono({
   subsets: ['latin'],
   variable: '--font-geist-mono',
+  preload: false,
 })
 
 export const metadata: Metadata = {
@@ -60,9 +57,6 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  minimumScale: 1,
-  maximumScale: 1,
-  userScalable: false,
   themeColor: THEME_CONFIG[DEFAULT_THEME].themeColor,
   viewportFit: 'cover',
 }
@@ -80,13 +74,15 @@ export default function RootLayout({
       data-theme={DEFAULT_THEME}
       suppressHydrationWarning
     >
-      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
-        <PwaRegister />
+      <head>
         <script
           id="xm-games-theme-bootstrap"
           suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
+          dangerouslySetInnerHTML={{ __html: themeBootstrapScript + themeResourcesBootstrapScript }}
         />
+      </head>
+      <body className={`${geist.variable} ${geistMono.variable} font-sans antialiased`}>
+        <PwaRegister />
         <ThemeProvider>
           <LocaleProvider>
             <RouteProgress />

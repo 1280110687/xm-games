@@ -1,3 +1,5 @@
+import { PHASE_DEVELOPMENT_SERVER, PHASE_PRODUCTION_BUILD } from 'next/constants.js'
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // The draggable Next.js development indicator can conflict with fixed
@@ -21,4 +23,12 @@ const nextConfig = {
   },
 }
 
-export default nextConfig
+export default async function configureNext(phase) {
+  // Production servers serve the assets generated at build time. Do not require
+  // build-only dependencies or a writable public directory in `next start`.
+  if (phase === PHASE_DEVELOPMENT_SERVER || phase === PHASE_PRODUCTION_BUILD) {
+    const { buildThemeAssets } = await import('./scripts/build-theme-assets.mjs')
+    await buildThemeAssets()
+  }
+  return nextConfig
+}
