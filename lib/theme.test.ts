@@ -54,6 +54,19 @@ function runBootstrap(storedTheme: string | null, storageError = false, writeErr
 }
 
 describe("theme configuration", () => {
+  it("uses Theme Two (Pocket) as the default", () => {
+    expect(DEFAULT_THEME).toBe("theme-pocket")
+  })
+
+  it.each(["/", "/text-tool", "/2048"])("initializes a first visit to %s with Pocket before first paint", pathname => {
+    const { root, classes, themeColor, writes } = runBootstrap(null, false, false, pathname)
+    expect(root.dataset.theme).toBe("theme-pocket")
+    expect(root.style.colorScheme).toBe("light")
+    expect(classes.has("dark")).toBe(false)
+    expect(themeColor.content).toBe("#f3f6fa")
+    expect(writes).toEqual([])
+  })
+
   it("accepts only active themes", () => {
     expect(isThemeId("theme-arcade")).toBe(true)
     expect(isThemeId("theme-one")).toBe(false)
@@ -99,11 +112,11 @@ describe("theme configuration", () => {
 
   it.each(["theme-one", "theme-two"])("migrates retired %s before first paint", (retired) => {
     const { root, classes, themeColor, writes } = runBootstrap(retired)
-    expect(root.dataset.theme).toBe("theme-three")
-    expect(root.style.colorScheme).toBe("dark")
-    expect(classes.has("dark")).toBe(true)
-    expect(themeColor.content).toBe(THEME_CONFIG["theme-three"].themeColor)
-    expect(writes).toEqual([["xm-games-theme:v1", "theme-three"]])
+    expect(root.dataset.theme).toBe("theme-pocket")
+    expect(root.style.colorScheme).toBe("light")
+    expect(classes.has("dark")).toBe(false)
+    expect(themeColor.content).toBe(THEME_CONFIG["theme-pocket"].themeColor)
+    expect(writes).toEqual([["xm-games-theme:v1", "theme-pocket"]])
   })
 
   it.each(["/", "/text-tool", "/2048"])("restores retro before first paint on %s", pathname => {
@@ -148,8 +161,8 @@ describe("theme configuration", () => {
     ] as const) {
       const { root, classes, themeColor } = runBootstrap(storedTheme, storageError)
       expect(root.dataset.theme).toBe(DEFAULT_THEME)
-      expect(root.style.colorScheme).toBe("dark")
-      expect(classes.has("dark")).toBe(true)
+      expect(root.style.colorScheme).toBe("light")
+      expect(classes.has("dark")).toBe(false)
       expect(themeColor.content).toBe(THEME_CONFIG[DEFAULT_THEME].themeColor)
     }
   })

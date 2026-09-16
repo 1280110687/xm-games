@@ -7,11 +7,11 @@ import { DEFAULT_THEME, normalizeTheme, themes } from "../../../lib/theme"
 const read = (path: string) => readFileSync(resolve(path), "utf8")
 
 describe("legacy theme retirement", () => {
-  it("offers only the retained themes and migrates old preferences to glass", () => {
+  it("offers only active themes and migrates retired preferences to Pocket", () => {
     expect(themes).toEqual(["theme-arcade", "theme-pocket", "theme-three", "theme-four", "theme-retro"])
-    expect(DEFAULT_THEME).toBe("theme-three")
-    expect(normalizeTheme("theme-one")).toBe("theme-three")
-    expect(normalizeTheme("theme-two")).toBe("theme-three")
+    expect(DEFAULT_THEME).toBe("theme-pocket")
+    expect(normalizeTheme("theme-one")).toBe("theme-pocket")
+    expect(normalizeTheme("theme-two")).toBe("theme-pocket")
   })
 
   it("removes legacy theme entry points and exclusive styles", () => {

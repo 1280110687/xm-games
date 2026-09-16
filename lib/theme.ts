@@ -8,7 +8,7 @@ export const themes = [
 
 export type ThemeId = (typeof themes)[number]
 
-export const DEFAULT_THEME: ThemeId = "theme-three"
+export const DEFAULT_THEME: ThemeId = "theme-pocket"
 export const THEME_STORAGE_KEY = "xm-games-theme:v1"
 // Keep retired IDs only at the persistence boundary, never in active UI options.
 export const RETIRED_THEME_IDS = ["theme-one", "theme-two"] as const

@@ -10,7 +10,7 @@ const read = (path: string) => readFileSync(path, "utf8")
 describe("pocket launcher", () => {
   it("has its own theme identity and preserves retired preference migration", () => {
     expect(normalizeTheme("theme-pocket")).toBe("theme-pocket")
-    expect(normalizeTheme("theme-two")).toBe("theme-three")
+    expect(normalizeTheme("theme-two")).toBe("theme-pocket")
     expect(themeLoadsWebglExperience("theme-pocket")).toBe(false)
     expect(themeBootstrapScript).toContain('"theme-pocket"')
   })

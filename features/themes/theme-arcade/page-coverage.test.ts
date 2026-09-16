@@ -9,8 +9,8 @@ import { ARCADE_NAV_ITEMS, getArcadeEntries, getArcadeSection, getArcadeRouteSec
 describe("arcade full page coverage", () => {
   it("uses a new identity without resurrecting either retired preference", () => {
     expect(normalizeTheme("theme-arcade")).toBe("theme-arcade")
-    expect(normalizeTheme("theme-one")).toBe("theme-three")
-    expect(normalizeTheme("theme-two")).toBe("theme-three")
+    expect(normalizeTheme("theme-one")).toBe("theme-pocket")
+    expect(normalizeTheme("theme-two")).toBe("theme-pocket")
   })
   it("keeps the selected identity on every secondary route", () => {
     expect(themeBootstrapScript).not.toContain("location.pathname")
