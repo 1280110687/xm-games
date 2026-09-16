@@ -60,6 +60,7 @@ describe("theme configuration", () => {
     expect(isThemeId("theme-two")).toBe(false)
     expect(isThemeId("theme-three")).toBe(true)
     expect(isThemeId("theme-four")).toBe(true)
+    expect(isThemeId("theme-retro")).toBe(true)
     expect(Object.keys(THEME_CONFIG)).toEqual([...themes])
   })
 
@@ -103,6 +104,15 @@ describe("theme configuration", () => {
     expect(classes.has("dark")).toBe(true)
     expect(themeColor.content).toBe(THEME_CONFIG["theme-three"].themeColor)
     expect(writes).toEqual([["xm-games-theme:v1", "theme-three"]])
+  })
+
+  it.each(["/", "/text-tool", "/2048"])("restores retro before first paint on %s", pathname => {
+    const { root, classes, themeColor, writes } = runBootstrap("theme-retro", false, false, pathname)
+    expect(root.dataset.theme).toBe("theme-retro")
+    expect(root.style.colorScheme).toBe("light")
+    expect(classes.has("dark")).toBe(false)
+    expect(themeColor.content).toBe("#e6e3da")
+    expect(writes).toEqual([])
   })
 
   it("still renders the fallback when migration cannot be persisted", () => {

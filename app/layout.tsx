@@ -15,6 +15,7 @@ import '@/styles/themes/theme-three/index.css'
 import '@/styles/themes/theme-four/index.css'
 import '@/styles/themes/theme-arcade/index.css'
 import '@/styles/themes/theme-pocket/index.css'
+import '@/styles/themes/theme-retro/index.css'
 import './pwa-safe-area.css'
 
 const geist = Geist({

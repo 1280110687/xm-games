@@ -12,6 +12,7 @@ import { useTheme } from "@/features/themes/shared/theme-provider"
 import { ArcadePageHeader } from "@/features/themes/theme-arcade/header"
 import { PocketPageHeader } from "@/features/themes/theme-pocket/header"
 import { ThemeThreeHeader } from "@/features/themes/theme-three/header"
+import { RetroPageHeader } from "@/features/themes/theme-retro/header"
 
 type HeaderLayout = "simple" | "centered" | "tool" | "hero"
 type HomeLabelMode = "always" | "desktop" | "sr-only"
@@ -79,6 +80,7 @@ export function GameHeader({
   descriptionClassName,
 }: GameHeaderProps) {
   const { theme } = useTheme()
+  if (theme === "theme-retro") return <RetroPageHeader title={title} description={description} actions={actions} homeLabel={homeLabel} />
   if (theme === "theme-three") return <ThemeThreeHeader title={title} description={description} actions={actions} homeLabel={homeLabel} />
   if (theme === "theme-pocket") return <PocketPageHeader title={title} description={description} actions={actions} homeLabel={homeLabel} />
   if (theme === "theme-arcade") {

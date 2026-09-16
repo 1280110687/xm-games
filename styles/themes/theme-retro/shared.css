@@ -1,0 +1,44 @@
+/* Theme-owned surfaces, with no dependency on another theme's layout or CSS. */
+html[data-theme='theme-retro'] :is(.game-page,.app-shell[data-page='anime-tracker'],.settings-shell) { width: min(100%,1100px); margin-inline: auto; padding: var(--retro-top) max(var(--retro-gutter),env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(var(--retro-gutter),env(safe-area-inset-left)); background: var(--background); color: var(--foreground); }
+html[data-theme='theme-retro'] .app-shell[data-page='anime-tracker'] > .app-container { padding: 0; }
+.retro-page-header { margin-bottom: 22px; gap: 10px; }
+.retro-page-header h1 { flex: 1; min-width: 0; font-size: 20px; font-weight: 750; line-height: 1.3; overflow-wrap: anywhere; }
+.retro-back { width: 40px; height: 40px; flex-shrink: 0; display: grid; place-items: center; border-radius: 50%; background: #f5f2e9; }
+.retro-back svg { width: 22px; height: 22px; }
+.retro-page-context { margin: -4px 0 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+.retro-page-context > p { flex: 1; min-width: 180px; color: var(--muted-foreground); font-size: 13px; line-height: 1.6; }
+.retro-page-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
+html[data-theme='theme-retro'] .game-page > .game-content { padding-top: 0; width: 100%; min-width: 0; }
+html[data-theme='theme-retro'] :is(.surface-panel,.surface-card,[data-slot='card']) { border: 1px solid #dfdfce; border-radius: 6px; background: #f5f2e9; color: var(--foreground); box-shadow: 0 5px 20px rgb(51 51 40 / 3%); backdrop-filter: none; }
+html[data-theme='theme-retro'] :is([data-slot='button'],[data-slot='select-trigger'],[data-slot='input']) { min-height: 44px; height: auto; border-radius: 6px; box-shadow: none; }
+html[data-theme='theme-retro'] [data-slot='button'] { font-weight: 650; }
+html[data-theme='theme-retro'] [data-slot='button'][data-variant='default'] { color: white; background: #9b431f; }
+html[data-theme='theme-retro'] [data-slot='button'][data-variant='outline'] { color: #3f482d; background: #f5f2e9; border: 1px solid #dfdfce; }
+html[data-theme='theme-retro'] [data-slot='button'][data-variant='secondary'] { color: #4b533b; background: #dfdfce; }
+html[data-theme='theme-retro'] [data-slot='button'][data-size='icon'] { min-width: 44px; }
+html[data-theme='theme-retro'] :is([data-slot='input'],textarea,[data-slot='select-trigger']) { background: #dfdfce; color: var(--foreground); border-color: #dfdfce; font-size: 16px; }
+html[data-theme='theme-retro'] :is([data-slot='dropdown-menu-content'],[data-slot='dropdown-menu-sub-content'],[data-slot='select-content'],[data-slot='dialog-content'],[data-slot='alert-dialog-content']) { color: var(--foreground); background: #f5f2e9; border: 1px solid #dfdfce; border-radius: 6px; box-shadow: 0 12px 48px rgb(51 51 40 / 16%); backdrop-filter: none; }
+html[data-theme='theme-retro'] :is([data-slot='dialog-content'],[data-slot='alert-dialog-content']) { max-height: calc(100dvh - 32px - var(--xm-safe-area-top) - env(safe-area-inset-bottom)); overflow-y: auto; }
+html[data-theme='theme-retro'] :is([data-slot='dropdown-menu-radio-item'],[data-slot='dropdown-menu-item'],[data-slot='select-item']) { min-height: 40px; }
+html[data-theme='theme-retro'] [data-slot='dropdown-menu-radio-item'][data-state='checked'] { background: #dfdfce; }
+html[data-theme='theme-retro'] :is([data-slot='dialog-overlay'],[data-slot='alert-dialog-overlay']) { background: rgb(51 51 40 / 40%); backdrop-filter: none; }
+html[data-theme='theme-retro'] [data-slot='tabs-list'] { background: #dfdfce; border-radius: 6px; height: auto; padding: 4px; }
+html[data-theme='theme-retro'] [data-slot='tabs-trigger'] { border-radius: 6px; min-height: 40px; white-space: normal; }
+html[data-theme='theme-retro'] [data-slot='tabs-trigger'][data-state='active'] { color: #46552e; background: #f5f2e9; box-shadow: 0 2px 6px rgb(51 51 40 / 8%); }
+html[data-theme='theme-retro'] :is(a,button,input,select,textarea,[tabindex='0']):focus-visible { outline: 3px solid #9b431f; outline-offset: 3px; }
+html[data-theme='theme-retro'] .game-help { line-height: 1.65; }
+html[data-theme='theme-retro'] .game-status-banner { color: #825819; background: #fff2d4; border: 1px solid #eddaad; border-radius: 6px; }
+html[data-theme='theme-retro'] .game-actions { max-width: 100%; }
+html[data-theme='theme-retro'] .game-actions [data-slot='button'] { white-space: normal; }
+html[data-theme='theme-retro'] .settings-panel { padding: 4px 20px; }
+html[data-theme='theme-retro'] .settings-row { display: grid; grid-template-columns: 30px minmax(0,1fr) auto; align-items: center; gap: 12px; padding-block: 20px; }
+html[data-theme='theme-retro'] .settings-row + .settings-row { border-top: 1px solid var(--border); }
+html[data-theme='theme-retro'] .settings-row-title { font-size: 18px; font-weight: 700; display: block; }
+html[data-theme='theme-retro'] .settings-row-description { display: block; color: var(--muted-foreground); font-size: 13px; margin-top: 5px; }
+html[data-theme='theme-retro'] .settings-storage-note { display: flex; gap: 10px; margin-top: 20px; font-size: 13px; color: var(--muted-foreground); }
+html[data-theme='theme-retro'] .settings-storage-note svg { width: 20px; flex-shrink: 0; }
+@media (max-width: 480px) {
+  .retro-page-header h1 { font-size: 18px; }.retro-page-header { gap: 8px; }
+  html[data-theme='theme-retro'] .settings-row { grid-template-columns: 28px minmax(0,1fr); }
+  html[data-theme='theme-retro'] .settings-control { grid-column: 2; justify-self: start; }
+}

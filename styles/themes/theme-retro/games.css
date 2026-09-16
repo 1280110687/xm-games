@@ -1,0 +1,97 @@
+/* Only game chrome is themed; boards retain rule-significant colors and geometry. */
+html[data-theme='theme-retro'] .game-stage { border-radius: 6px; border-color: #dfdfce; box-shadow: 0 8px 24px rgb(51 51 40 / 6%); }
+html[data-theme='theme-retro'] .game-stat-value[data-tone='success'], html[data-theme='theme-retro'] .game-status-copy[data-tone='success'] { color: #287059; }
+html[data-theme='theme-retro'] .game-stat-value[data-tone='achievement'] { color: #956012; }
+html[data-theme='theme-retro'] .game-status-copy[data-tone='danger'] { color: #bf2940; }
+html[data-theme='theme-retro'] .game-status-copy[data-tone='neutral'] { color: #62645b; }
+html[data-theme='theme-retro'] :is(.gomoku-mode-switch,.chinese-chess-mode-bar) { display: flex; flex-wrap: wrap; gap: 6px; width: min(100%,520px); padding: 5px; border-radius: 6px; background: #dfdfce; }
+html[data-theme='theme-retro'] :is(.gomoku-mode-switch button,.chinese-chess-mode-option) { min-height: 44px; min-width: 0; flex: 1; padding: 8px; border-radius: 6px; background: transparent; color: #62645b; font-size: 13px; font-weight: 650; cursor: pointer; }
+html[data-theme='theme-retro'] .gomoku-mode-switch button[aria-selected='true'], html[data-theme='theme-retro'] .chinese-chess-mode-option[aria-pressed='true'] { color: #46552e; background: #f5f2e9; box-shadow: 0 2px 8px rgb(51 51 40 / 8%); }
+html[data-theme='theme-retro'] .chinese-chess-ai-summary { display: flex; align-items: center; gap: 6px; font-size: 12px; }
+html[data-theme='theme-retro'] :is(.gomoku-lan-panel,.gomoku-lan-status,.bingo-lan-panel) { padding: 18px; border-radius: 6px; background: #f5f2e9; border: 1px solid #dfdfce; }
+html[data-theme='theme-retro'] .gomoku-lan-panel__heading { padding-bottom: 12px; margin-bottom: 12px; border-bottom: 1px solid #dfdfce; }
+html[data-theme='theme-retro'] .gomoku-lan-panel__heading h2 { font-size: 20px; font-weight: 750; }
+html[data-theme='theme-retro'] :is(.gomoku-lan-panel__intro,.gomoku-lan-room) { font-size: 14px; line-height: 1.6; }
+html[data-theme='theme-retro'] .gomoku-lan-room__topline strong { font: 750 28px var(--font-geist-mono),monospace; color: #9b431f; }
+html[data-theme='theme-retro'] .gomoku-dice-overlay { background: rgb(51 51 40 / 40%); backdrop-filter: none; }
+html[data-theme='theme-retro'] .gomoku-dice-card { background: #f5f2e9; border: 1px solid #dfdfce; border-radius: 6px; color: var(--foreground); }
+html[data-theme='theme-retro'] .chinese-chess-ai-setup__icon { color: #9b431f; }
+html[data-theme='theme-retro'] .chinese-chess-ai-setup__icon svg { width: 28px; height: 28px; }
+html[data-theme='theme-retro'] .chinese-chess-ai-setup__group { margin-top: 14px; }
+html[data-theme='theme-retro'] .chinese-chess-ai-setup__group legend { display: flex; gap: 6px; align-items: center; font-size: 13px; font-weight: 700; margin-bottom: 8px; }
+html[data-theme='theme-retro'] .chinese-chess-ai-setup__group legend svg { width: 18px; height: 18px; }
+html[data-theme='theme-retro'] .chinese-chess-ai-setup__choices { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+html[data-theme='theme-retro'] .chinese-chess-ai-setup__choices--difficulty { grid-template-columns: repeat(3,minmax(0,1fr)); }
+html[data-theme='theme-retro'] .chinese-chess-ai-choice { min-height: 50px; padding: 8px; border: 1px solid #dfdfce; border-radius: 6px; font-size: 13px; cursor: pointer; }
+html[data-theme='theme-retro'] .chinese-chess-ai-choice[aria-pressed='true'] { background: #dfdfce; color: #46552e; border-color: #9b431f; }
+html[data-theme='theme-retro'] .chinese-chess-ai-choice__piece { margin-right: 5px; }
+html[data-theme='theme-retro'] .chinese-chess-ai-setup__warning { font-size: 13px; line-height: 1.6; color: #956012; }
+html[data-theme='theme-retro'] .chinese-chess-ai-setup__footer { margin-top: 20px; }
+html[data-theme='theme-retro'] [data-page='chess'] .game-stage button.bg-amber-200:not([class~='bg-yellow-400/50']) { background: #dfdfce; }
+html[data-theme='theme-retro'] [data-page='chess'] .game-stage button.bg-amber-700:not([class~='bg-yellow-400/50']) { background: #839367; }
+html[data-theme='theme-retro'] [data-page='chess'] .game-stage button .text-amber-50 { color: #f5f2e9; -webkit-text-stroke: .7px #303c21; }
+html[data-theme='theme-retro'] [data-page='sudoku'] .game-stage { background: #f5f2e9; border-color: #576744; }
+html[data-theme='theme-retro'] [data-page='sudoku'] .game-stage button[aria-pressed='true']:not(.bg-red-100) { background: #bdc6a5; }
+html[data-theme='theme-retro'] .minesweeper-cell.bg-slate-400 { background: #bdc6a5; box-shadow: inset 1px 1px #f5f2e9, inset -1px -1px #7a8861; }
+html[data-theme='theme-retro'] .minesweeper-cell.bg-slate-200 { background: #dfdfce; }
+html[data-theme='theme-retro'] [data-page='snake'] .game-stage { padding: 0; overflow: hidden; }
+html[data-theme='theme-retro'] [data-page='snake'] .mobile-controls { display: grid; grid-template-columns: repeat(3,44px); gap: 5px; }
+html[data-theme='theme-retro'] [data-page='snake'] .mobile-controls > button:first-child { grid-area: 1 / 2; }
+html[data-theme='theme-retro'] [data-page='snake'] .mobile-controls > div { display: contents; }
+html[data-theme='theme-retro'] [data-page='snake'] .mobile-controls > div > button:first-child { grid-area: 2 / 1; }
+html[data-theme='theme-retro'] [data-page='snake'] .mobile-controls > div > button:last-child { grid-area: 2 / 3; }
+html[data-theme='theme-retro'] [data-page='snake'] .mobile-controls > div > div { display: none; }
+html[data-theme='theme-retro'] [data-page='snake'] .mobile-controls > button:last-child { grid-area: 2 / 2; }
+html[data-theme='theme-retro'] [data-page='snake'] .mobile-controls button { width: 44px; height: 44px; }
+html[data-theme='theme-retro'] .memory-dashboard { border: 0; background: #dfdfce; border-radius: 6px; }
+html[data-theme='theme-retro'] :is(.memory-kicker,.memory-accent,.neon-breaker-accent) { color: #9b431f; }
+html[data-theme='theme-retro'] .memory-stats { grid-template-columns: repeat(4,minmax(0,1fr)); }
+html[data-theme='theme-retro'] .memory-stats > div { display: block; min-height: 0; padding: 8px 4px; text-align: center; background: #f5f2e9; border: 0; border-radius: 6px; }
+html[data-theme='theme-retro'] .memory-stats .memory-accent { display: none; }
+html[data-theme='theme-retro'] .memory-stats p { white-space: normal; overflow-wrap: anywhere; }
+html[data-theme='theme-retro'] .memory-board button > span > span { border: 1px solid #dfdfce; box-shadow: none; }
+html[data-theme='theme-retro'] .memory-board button > span > span:first-child { color: white; background: #596c38; }
+html[data-theme='theme-retro'] .memory-symbol { background: #dfdfce; color: #46552e; }
+html[data-theme='theme-retro'] .memory-progress-track { background: #dfdfce; }
+html[data-theme='theme-retro'] .memory-progress-track > div { background: #9b431f; }
+html[data-theme='theme-retro'] .neon-stage { padding: 8px; }
+html[data-theme='theme-retro'] .neon-canvas-shell { border-radius: 6px; box-shadow: none; }
+html[data-theme='theme-retro'] .neon-stage > .pointer-events-none { display: none; }
+html[data-theme='theme-retro'] .neon-breaker-power-up { color: #286a57; background: #dfdfce; border-color: #b3dccc; }
+html[data-theme='theme-retro'] .bingo-draw { background: #dfdfce; }
+html[data-theme='theme-retro'] .bingo-number-grid > div:not([role='img']) { color: #465438; }
+html[data-theme='theme-retro'] .bingo-workspace { gap: 18px; }
+html[data-theme='theme-retro'] .bingo-cards-toolbar { background: #f5f2e9; }
+html[data-theme='theme-retro'] :is(.bingo-card-item,.bingo-cards-library) { min-width: 0; }
+html[data-theme='theme-retro'] :is(.bingo-card-content,.bingo-card-header) { padding-inline: 12px; }
+html[data-theme='theme-retro'] .bingo-card-cell { min-height: 40px; border-radius: 6px; }
+html[data-theme='theme-retro'] .bingo-card-cell:not(.bingo-card-cell--marked):not([aria-pressed='true']) { background: #dfdfce; }
+html[data-theme='theme-retro'] .bingo-card-cell--marked, html[data-theme='theme-retro'] .bingo-card-cell[aria-pressed='true'] { background: #9b431f; color: white; }
+html[data-theme='theme-retro'] .bingo-card-grid .bingo-card-cell[class~='text-amber-400'] { background: #fff1cc; color: #825919; }
+html[data-theme='theme-retro'] .bingo-lan-eyebrow { color: #9b431f; }
+html[data-theme='theme-retro'] .bingo-lan-current { color: #46552e; background: #dfdfce; border-color: #bdc6a5; border-radius: 6px; }
+/* Watchlist and cross-device transfer continue to use the shared data controller. */
+html[data-theme='theme-retro'] .anime-page-toolbar { justify-content: space-between; gap: 8px; }
+html[data-theme='theme-retro'] .anime-page-toolbar [data-slot='button'] { white-space: normal; }
+html[data-theme='theme-retro'] .anime-overview { border-radius: 6px; border: 0; background: #dfdfce; }
+html[data-theme='theme-retro'] .anime-overview > .pointer-events-none { display: none; }
+html[data-theme='theme-retro'] .anime-overview h2 { font-size: 24px; font-weight: 750; line-height: 1.4; }
+html[data-theme='theme-retro'] .anime-overview [data-slot='badge'] { background: #f5f2e9; color: #9b431f; border-color: #dfdfce; }
+html[data-theme='theme-retro'] .anime-overview .grid-cols-3 > div { background: #f5f2e9; border: 0; border-radius: 6px; }
+html[data-theme='theme-retro'] .anime-filters { border: 0; background: #f5f2e9; border-radius: 6px; }
+html[data-theme='theme-retro'] .anime-library > .grid { gap: 16px; }
+html[data-theme='theme-retro'] .anime-library > .surface-panel { background: #f5f2e9; min-height: 230px; }
+html[data-theme='theme-retro'] .anime-library [data-slot='card'] [data-slot='button'] { min-width: 44px; }
+@media (max-width: 759px) {
+  html[data-theme='theme-retro'] .memory-intro { display: none; }
+  html[data-theme='theme-retro'] .memory-stats p { font-size: 11px; }
+  html[data-theme='theme-retro'] .memory-stats p.font-mono { font-size: 17px; }
+  html[data-theme='theme-retro'] .memory-board { max-width: min(100%,390px); }
+  html[data-theme='theme-retro'] [data-page='snake'] .game-stage [role='img'] > div { width: clamp(8px,calc((100svh - 335px) / 22),15px); height: clamp(8px,calc((100svh - 335px) / 22),15px); }
+  html[data-theme='theme-retro'] .neon-stage { max-width: min(100%,max(180px,calc((100svh - 360px) * .61))); }
+  html[data-theme='theme-retro'] .neon-dashboard { display: contents; }
+  html[data-theme='theme-retro'] .neon-dashboard > .game-summary { order: 1; }
+  html[data-theme='theme-retro'] .neon-dashboard > .game-actions { order: 2; }
+  html[data-theme='theme-retro'] .neon-dashboard > .game-help { order: 3; }
+  html[data-theme='theme-retro'] .neon-footer-copy { order: 4; }
+}

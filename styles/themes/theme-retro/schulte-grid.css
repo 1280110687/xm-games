@@ -1,0 +1,18 @@
+/* Route-only theme presentation. The shared exercise engine owns all states. */
+html[data-theme='theme-retro'] .game-page[data-focus-exercise] { --schulte-board-size: min(100%,370px); --schulte-cell-fill: #dfdfce; --schulte-cell-stroke: #bdc6a5; --schulte-cell-text: #173b76; --schulte-board-fill: #f5f2e9; --schulte-progress: #9b431f; --schulte-progress-track: #dfdfce; }
+.retro-focus { width: min(100%,880px); margin-inline: auto; display: grid; gap: 16px; }
+.retro-focus-play { min-width: 0; padding: 18px; border-radius: 6px; background: #f5f2e9; }
+.retro-focus-score { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+.retro-focus-score > div { display: grid; gap: 3px; text-align: center; background: #dfdfce; border-radius: 6px; padding: 10px; }
+.retro-focus-score span { color: #62645b; font-size: 12px; }.retro-focus-score strong { color: #9b431f; font: 700 26px var(--font-geist-mono),monospace; }
+.retro-focus-options { display: flex; flex-direction: column; gap: 14px; border-radius: 6px; padding: 18px; background: #f5f2e9; }
+.retro-focus-best { display: flex; justify-content: space-between; gap: 8px; color: #62645b; font-size: 13px; padding-top: 12px; border-top: 1px solid #dfdfce; }
+html[data-theme='theme-retro'] .schulte-board-shell { margin: 0 auto 14px; }
+html[data-theme='theme-retro'] .schulte-level-picker { gap: 7px; }
+html[data-theme='theme-retro'] .schulte-level-option { min-height: 44px; border: 1px solid #dfdfce; border-radius: 6px; background: #dfdfce; }
+html[data-theme='theme-retro'] .schulte-level-option[aria-pressed='true'] { color: white; background: #9b431f; border-color: #9b431f; }
+html[data-theme='theme-retro'] .schulte-notice-slot { white-space: normal; font-size: 13px; line-height: 1.6; min-height: 36px; overflow: visible; }
+html[data-theme='theme-retro'] .schulte-recent { padding: 18px; border-radius: 6px; background: #f5f2e9; }
+html[data-theme='theme-retro'] .schulte-recent-item { padding: 10px; border-radius: 6px; background: #dfdfce; }
+html[data-theme='theme-retro'] .schulte-cell:focus-visible path { stroke: #9b431f; stroke-width: 5px; }
+@media (min-width: 760px) { .retro-focus { grid-template-columns: minmax(0,1.2fr) minmax(250px,1fr); align-items: start; }.retro-focus .schulte-recent { grid-column: 1 / -1; } }

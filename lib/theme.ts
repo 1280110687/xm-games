@@ -3,6 +3,7 @@ export const themes = [
   "theme-pocket",
   "theme-three",
   "theme-four",
+  "theme-retro",
 ] as const
 
 export type ThemeId = (typeof themes)[number]
@@ -32,6 +33,7 @@ export const THEME_CONFIG: Record<
     colorScheme: "light",
     themeColor: "#e9e1d2",
   },
+  "theme-retro": { colorScheme: "light", themeColor: "#e6e3da" },
 }
 
 export function isThemeId(value: unknown): value is ThemeId {

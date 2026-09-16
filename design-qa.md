@@ -1,3 +1,72 @@
+# Theme Five — Retro Handheld implementation QA
+
+Date: 2026-09-16. New theme ID: `theme-retro`. Existing four themes and the default `theme-three` remain available. Implemented in the existing application, not a separate prototype.
+
+## Source and comparison evidence
+
+- Selected source: `/Users/mimi/.codex/generated_images/019feb77-4fc5-7a12-9663-08490176993a/exec-7ed9ce3a-940a-414c-94f4-458e24cdd708.png` (user selected Option 1).
+- Implementation: `/Users/mimi/Documents/Improvement/xm-games/output/theme-retro-qa/home-final.png`, production preview `http://localhost:4413/`.
+- Full comparison: `/Users/mimi/Documents/Improvement/xm-games/output/theme-retro-qa/comparison-final.png` (source left, implementation right).
+- Focused header/control comparison: `/Users/mimi/Documents/Improvement/xm-games/output/theme-retro-qa/controls-comparison-final.png` (source top, implementation bottom).
+- Source 853 × 1844 normalized to 390 × 844. Browser viewport and capture both 390 × 844, effective capture density 1. No device bezel/status bar added. Browser screenshot bytes are JPEG despite the local `.png` evidence filenames; Sharp reads their actual format and exports combined comparisons as PNG.
+- Matching state: Chinese, Theme Five home, 2048 selected, no open menus. Additional 320 × 690, 768 × 1024, 1280 × 900 responsive evidence is in the same directory.
+
+## Findings and comparison history
+
+1. **P1, pixel title wrapping.** `compare-v1.png` showed 2048 split across two lines. A bounded Silkscreen size, tighter tracking and `white-space: nowrap` restored a single-line display. `compare-v2.png` and final comparison verify it.
+2. **P2, control placement/material fidelity.** Initial mode/LCD spacing was too low and cartridge selection marker was below the rack. Reduced the top spacing and moved the marker above the selected cartridge. Replaced the temporary text-glyph footer with generated speaker-grille artwork. Final comparison retains the same screen/cartridge/start/tools hierarchy.
+3. **P2, right arrow hit area.** The first grid placed part of the next-game button near the scrollbar. Moved both 44 × 64 px arrow targets inside the viewport, with positioned edges. Rechecked next/previous selection and the primary destination; selecting Snake updates the action to `/snake`, returning selects `/2048`.
+4. **P2, stale development stylesheet during narrow-screen QA.** Browser still served an earlier imported stylesheet; the new footer image rendered at its attribute width and overflowed to 340 px. Restarted the dev preview and rechecked the actual computed rule (150 × 30 px). Chinese, English and Thai final home captures all report viewport/document width 320/320. No clipping workaround was added.
+5. **P2, tablet title overlaps artwork.** `home-tablet-v1.png` showed the desktop 64 px title covering the 2048 board at 768 px. Changed desktop font size/padding/gaps to bounded fluid values. Production `home-tablet-final.png` verifies distinct readable title and board.
+6. **P2, secondary contrast.** Theme-owned Bingo column labels were too pale; set dark olive labels without changing drawn-number states. Removed an inherited blue fact-label accent from the new tool stylesheet. Production narrow-screen tool capture verifies olive fact labels.
+7. **Final comparison:** no remaining actionable P0/P1/P2 findings in inspected states. P3 differences are recorded below; this is not an exact-raster claim.
+
+## Required fidelity surfaces
+
+- **Fonts/typography:** existing Geist/system Chinese and Thai fallback for functional UI; local OFL Silkscreen Bold for the LCD number. Source font file was not supplied; Silkscreen was selected from its official repository as a similar pixel display face. Font weight, one-line title, multiline descriptions, long catalog names and menu labels checked. Library artwork is hidden from assistive technology to avoid reading each live game title twice.
+- **Spacing/layout:** mobile shell, top two-mode selector, LCD, three selectable cartridges, tactile primary action and two tool shortcuts follow the source order. No bottom dock is added. Desktop deliberately uses screen/control columns; all content remains scrollable on shorter phones. Secondary pages have a sticky back/title/icon header and local workspaces. No new settings destination.
+- **Colors/tokens:** warm grey shell, olive LCD/ink, burnt orange primary controls and shallow inset/raised surfaces. Active mode uses dark text for contrast; supporting buttons use darker orange with white text. All surface tokens are defined for the theme. Rule-significant game colors (e.g. chess pieces, numbered mines, falling pieces) are retained. No claim of a full automated WCAG audit.
+- **Image quality:** seven generated raster assets (120,002 bytes total), local WebP; no whole-screen screenshot used as UI. Transparent Gomoku/Snake/2048 art and speaker vents checked for background artifacts. Blank cartridge and bezel images are separate from live text/controls. 30,632-byte Silkscreen font is local. No new rendering/dependency package.
+- **Copy/content:** real catalog includes 16 games and six tools. Chinese/English/Thai copy provided. Removed the mock's unverified founding year and unconditional offline slogan; uses “随时玩一局”/localized equivalents. All controls navigate to real application routes and keep shared game/tool/data behavior.
+- **Icons/accessibility:** existing consistent Lucide line icons. Home and secondary globe/palette buttons measured 44 × 44 px, icons 24 × 24 px, X/Y center offsets zero. Search labels, selection states, focus indicators and reduced-motion CSS are present. Not a screen-reader certification.
+
+## Browser and functional evidence
+
+- All 22 catalog routes opened at 390 × 844. Each reported the new secondary header and document width 390. See `routes.json`, `route-*.png`, `sheet-*.png`, `rest-sheet-*.png`.
+- 320 × 690: Chinese/English/Thai home, alternate cartridges, Tetris, Neon Breaker, Text tool and Schulte. Final selected secondary widths 320/320; `languages-final.png` and `small-routes.png` inspected.
+- 768 × 1024: tablet home final verified after title fix. 1280 × 900: home, cartridge library and tools (`*-desktop.png`).
+- Search no-results, clear search, board-game category filter, carousel previous/next, start-game action, tools hash refresh, and secondary return-to-tools tested.
+- Text tool synthetic input `  alpha  \n\n\n beta\nbeta  ` returned `alpha\n\nbeta`, then cleared. No existing saved watchlist/game records were deleted or changed; no transfer or network room was created.
+- Existing themes One/Two/Three switched and rendered; Theme Four entered the 3D corridor beyond its loading phase. Their screenshots are `theme-*-regression.png`; their own source files were not modified.
+
+## Offline/PWA verification
+
+- Added theme imagery and local font directory to generated offline manifest coverage (305 assets total). `public/offline-assets.json` remains an ignored build artifact generated by the existing build pipeline.
+- Bumped service-worker cache v22 → v23, necessary because old caches retain their offline manifest. Existing installed apps need a network update before new theme assets are available offline.
+- Production test on a separate localhost:4413 origin: used the existing manual-install guide to initiate full-package preparation, then browser network emulation set offline. Home reload succeeded with LCD/font/art. Opened Base64 from Tools, refreshed, encoded `XM-Games` to `WE0tR2FtZXM=` successfully, then cleared input. Returned home, started 2048 and refreshed successfully. Evidence: `offline-home.png`, `offline-base64.png`, `offline-2048.png`.
+- Console inspection recorded expected failed offline RSC requests followed by successful browser-navigation fallback for Base64, Tools and 2048. No claim of a completely error-free offline console.
+- Network emulation restored. The temporary iPhone user-agent was only for exercising the manual guide in the desktop browser; this is **not real iOS/Safari/installed-PWA device validation**. The temporary test tab is closed at handoff.
+
+## Code checks and delivery boundaries
+
+- Initial regression tests failed for missing registration/dispatch before implementation (after correcting the test's module path).
+- `pnpm verify`: lint, experience lint, TypeScript, production build and 593 tests passed; two existing tests skipped. Production build and 53 focused tests rerun after the final tablet CSS adjustment; final lint, TypeScript and full 593-test suite rerun successfully before commit. `git diff --check` passed.
+- Theme-owned CSS parses; tests cover catalog completeness, locale keys, hash/route mapping, wraparound, startup restoration, style splitting, local assets and offline manifest coverage.
+- Existing Theme Four build warnings about large chunks and a runtime-resolved texture remain outside this change.
+- New visual implementation is isolated under `features/themes/theme-retro`, `styles/themes/theme-retro`, and local asset/font directories. Shared dispatch/config/focus hooks and offline manifest/cache version are the only integration changes. No business engine, API, Redis transfer or saved-data schema changed.
+- Generated raw images and QA screenshots remain ignored under `output/`; font OFL license and asset provenance are included. No new deployment is claimed.
+
+## Follow-up polish / limitations
+
+- P3: generated cartridge/bezel details and Silkscreen pixel shapes differ from the concept; physical texture is intentionally subtle. Existing line icons are used for non-featured catalog cartridges in a uniform olive label treatment.
+- Actual installed iOS/Android devices and exhaustive gameplay states require separate device/gameplay testing.
+
+Implementation checklist: registration, home/library/tools, secondary headers/workspaces, languages, responsive QA, route CSS isolation, offline assets/cache update and verification complete.
+
+final result: passed
+
+---
+
 # Theme Three — Night Gallery implementation QA
 
 ## Commit readiness verification

@@ -3,6 +3,7 @@ import { getPageMetadata } from "@/lib/page-metadata"
 import "../classic-games.css"
 import "@/styles/themes/theme-arcade/classic-games.css"
 import "@/styles/themes/theme-pocket/classic-games.css"
+import "@/styles/themes/theme-retro/classic-games.css"
 
 import "@/styles/themes/theme-three/classic-games.css"
 import "@/styles/themes/theme-four/classic-games.css"

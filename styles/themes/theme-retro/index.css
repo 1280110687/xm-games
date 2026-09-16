@@ -1,0 +1,102 @@
+@import './shared.css';
+@import './tools.css';
+@import './games.css';
+
+@font-face { font-family: 'Retro Silkscreen'; src: url('/fonts/silkscreen/Silkscreen-Bold.ttf') format('truetype'); font-weight: 700; font-style: normal; font-display: swap; }
+
+html[data-theme='theme-retro'] {
+  color-scheme: light;
+  --background: #e6e3da; --foreground: #292a26; --card: #f0ede4; --card-foreground: #292a26;
+  --popover: #f5f2e9; --popover-foreground: #292a26; --primary: #9b431f; --primary-foreground: #fff;
+  --secondary: #d8dbc9; --secondary-foreground: #3f482d; --muted: #dddfd0; --muted-foreground: #62645b;
+  --accent: #d5ddbe; --accent-foreground: #354321; --border: #b5b5a7; --input: #b5b5a7; --ring: #9b431f;
+  --destructive: #b32c2c; --destructive-foreground: #fff; --radius: .375rem;
+  --retro-gutter: 18px; --retro-top: calc(var(--xm-safe-area-top, 0px) + 12px);
+  --retro-lcd: #b7c58e; --retro-ink: #354321; --retro-orange: #cf6b32;
+  --surface-low: #e3e1d5; --surface: #eeece3; --surface-high: #f5f2e9;
+}
+html[data-theme='theme-retro'] body { background: var(--background) url('/images/theme-retro/shell-texture.webp') repeat; background-size: 220px; }
+.retro-page { width: min(100%, 1040px); margin-inline: auto; padding: var(--retro-top) max(var(--retro-gutter),env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(var(--retro-gutter),env(safe-area-inset-left)); min-height: 100svh; }
+.retro-header { position: sticky; top: var(--retro-top); z-index: 40; isolation: isolate; min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.retro-header::before { content: ''; position: absolute; z-index: -1; inset: calc(-1 * var(--retro-top)) calc(-1 * var(--retro-gutter)) -8px; background: var(--background) url('/images/theme-retro/shell-texture.webp') repeat; background-size: 220px; pointer-events: none; }
+.retro-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.retro-brand > span { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 6px; background: var(--retro-orange); box-shadow: inset 0 1px 1px #f7b88b,0 2px 2px #0003; }
+.retro-brand svg { width: 27px; height: 27px; stroke-width: 2.3; }
+.retro-brand strong { font-size: 25px; font-weight: 850; letter-spacing: -1.1px; white-space: nowrap; }
+.retro-header-controls { display: flex; gap: 7px; flex-shrink: 0; }
+html[data-theme='theme-retro'] .retro-header-controls :is(.language-switcher-trigger,.theme-switcher-trigger) { display: grid; place-items: center; justify-content: center; gap: 0; width: 44px !important; height: 44px; min-height: 44px; min-width: 44px; padding: 0 !important; border: 1px solid #b8b9af; border-radius: 50%; color: var(--foreground); background: #e9e7de; box-shadow: inset 0 1px 1px #fff9,0 2px 3px #0001; }
+html[data-theme='theme-retro'] .retro-header-controls svg { width: 24px; height: 24px; color: inherit; stroke-width: 1.8; }
+html[data-theme='theme-retro'] .retro-header-controls .language-switcher-trigger > :not(svg:first-child) { display: none; }
+.retro-mode { display: grid; grid-template-columns: 1fr 1fr; margin: 8px 0 10px; border: 1px solid #b3b3a7; border-radius: 7px; padding: 2px; background: #d1d1c6; box-shadow: inset 0 2px 3px #0001,0 1px 1px #fff8; }
+.retro-mode a { display: grid; place-items: center; min-height: 38px; border-radius: 4px; color: #595c52; font-size: 17px; font-weight: 750; letter-spacing: 2px; }
+.retro-mode a[aria-current='page'] { background: var(--retro-orange); color: #292a26; box-shadow: inset 0 1px 1px #ffc598,0 2px 3px #0003; }
+.retro-lcd { position: relative; width: 100%; aspect-ratio: 4 / 3; background: url('/images/theme-retro/lcd-frame.webp') center / 100% 100% no-repeat; }
+.retro-lcd-content { position: absolute; inset: 6% 4% 12%; padding: 22px 18px; color: var(--retro-ink); }
+.retro-lcd-category { display: block; font-size: 15px; font-weight: 700; }
+.retro-lcd-motto { position: absolute; right: 16px; top: 17px; font: 700 6px/1.5 var(--font-geist-mono),monospace; letter-spacing: 1px; text-align: right; opacity: .75; }
+.retro-lcd h1 { width: 54%; margin: 17px 0 10px; font-size: clamp(22px,7.5vw,34px); line-height: 1.1; font-weight: 800; overflow-wrap: anywhere; }
+.retro-lcd h1.retro-pixel-title { font: 700 clamp(34px,11vw,46px)/1 'Retro Silkscreen',monospace; letter-spacing: -4px; margin-left: -3px; white-space: nowrap; }
+.retro-lcd p { width: 55%; font-size: 13px; font-weight: 600; white-space: pre-line; line-height: 1.6; }
+.retro-lcd .retro-game-art { position: absolute; width: 44%; height: auto; aspect-ratio: 1; right: 2%; top: 25%; object-fit: contain; }
+.retro-lcd-indicator { position: absolute; bottom: 13px; left: 18px; font-size: 20px; letter-spacing: 3px; }
+.retro-lcd-brand { position: absolute; bottom: 4.1%; left: 8%; right: 8%; display: flex; align-items: center; justify-content: space-between; color: #c5c8bd; font: 500 7px var(--font-geist-mono),monospace; letter-spacing: 1px; }
+.retro-lcd-brand b { font-size: 9px; }
+.retro-rack { position: relative; display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); align-items: center; gap: 3px; padding: 18px 17px 20px; }
+.retro-rack-arrow { position: absolute; top: 50%; transform: translateY(-50%); z-index: 1; display: grid; place-items: center; width: 44px; min-height: 64px; color: #4f5546; cursor: pointer; }
+.retro-rack-arrow:first-child { left: -16px; }.retro-rack-arrow:last-child { right: -16px; }.retro-rack-arrow svg { width: 22px; }
+.retro-cartridge { position: relative; display: block; width: 100%; aspect-ratio: 400 / 520; background: url('/images/theme-retro/cartridge.webp') center / contain no-repeat; color: var(--retro-ink); min-width: 0; border-radius: 5px; }
+button.retro-cartridge { cursor: pointer; filter: saturate(.8); }
+.retro-cartridge-label { position: absolute; inset: 26% 12% 12%; display: flex; flex-direction: column; justify-content: space-between; align-items: center; background: #b8c493; padding: 6% 4% 8%; box-shadow: inset 0 1px 3px #0003; border-radius: 2px; }
+.retro-cartridge-label .retro-game-art { width: 100%; min-height: 0; flex: 1; object-fit: contain; }
+.retro-cartridge-label strong { font-size: 12px; text-align: center; line-height: 1.25; margin-top: 3px; overflow-wrap: anywhere; }
+.retro-cartridge[aria-pressed='true'] { transform: translateY(-5px); filter: none; box-shadow: 0 3px 3px #0002; }
+.retro-cartridge[aria-pressed='true']::before { content: ''; position: absolute; inset: 5% 8% auto; height: 17%; background: #c36d38; mix-blend-mode: multiply; border-radius: 4px 4px 0 0; }
+.retro-cartridge[aria-pressed='true']::after { content: '▾'; position: absolute; top: -25px; left: 0; right: 0; text-align: center; color: #a6532b; font-size: 22px; }
+.retro-start { min-height: 60px; width: 100%; display: flex; justify-content: center; align-items: center; gap: 23px; padding: 12px 16px; background: var(--retro-orange); border: 1px solid #a35a31; border-radius: 8px; font-size: 24px; line-height: 1.3; font-weight: 800; box-shadow: inset 0 1px 2px #ffd0a5,0 4px 0 #93532e,0 6px 8px #0002; }
+.retro-start svg { width: 26px; height: 26px; flex-shrink: 0; }
+.retro-all { min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 14px; font-weight: 700; margin-top: 4px; }
+.retro-all svg { width: 18px; }
+.retro-handy { border-top: 1px solid #b6b7ac; padding-top: 16px; }
+.retro-handy h2 { font-size: 21px; line-height: 1.4; font-weight: 800; }
+.retro-handy > div { display: grid; grid-template-columns: 1fr 1fr; margin-top: 8px; }
+.retro-handy a { display: flex; align-items: center; gap: 10px; min-height: 54px; padding-right: 10px; }
+.retro-handy a + a { padding-left: 17px; border-left: 1px solid #bbbdaf; }
+.retro-handy a > svg:first-child { width: 28px; height: 28px; stroke-width: 1.7; flex-shrink: 0; }
+.retro-handy strong { font-size: 14px; font-weight: 700; }.retro-handy a > svg:last-child { width: 14px; height: 18px; margin-left: auto; flex-shrink: 0; }
+.retro-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 21px; padding-top: 12px; border-top: 1px solid #b6b7ac; color: #676b5e; }
+.retro-footer > img { width: 150px; height: 30px; object-fit: contain; }.retro-footer b { font: 700 9px var(--font-geist-mono),monospace; letter-spacing: 1px; }
+.retro-section-heading { display: flex; justify-content: space-between; gap: 16px; align-items: center; padding: 10px 0 18px; }
+.retro-section-heading h1 { font-size: 26px; font-weight: 800; }.retro-section-heading > span { font: 700 24px 'Retro Silkscreen',monospace; color: #626b50; }
+.retro-search { display: flex; align-items: center; gap: 10px; background: #c9d0b3; border: 2px solid #666f55; box-shadow: inset 0 2px 4px #0002; border-radius: 4px; padding-left: 12px; }
+.retro-search > svg { width: 20px; flex-shrink: 0; }.retro-search input { width: 100%; min-width: 0; height: 46px; background: transparent !important; border: 0; outline-offset: -3px !important; }
+.retro-search button { width: 44px; height: 44px; flex-shrink: 0; display: grid; place-items: center; cursor: pointer; }.retro-search button svg { width: 18px; }
+.retro-filters { display: flex; flex-wrap: wrap; gap: 7px; padding: 14px 0; }
+.retro-filters button { padding: 8px 11px; min-height: 44px; border: 1px solid #b5b5a7; border-radius: 5px; box-shadow: 0 2px 1px #0001; font-size: 13px; cursor: pointer; background: #eeece3; }
+.retro-filters button[aria-pressed='true'] { background: #465438; color: #f4f3e9; border-color: #465438; }
+.retro-library-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 20px 12px; padding-top: 4px; }
+.retro-library-game { display: flex; flex-direction: column; align-items: center; gap: 7px; min-width: 0; text-align: center; font-size: 13px; font-weight: 700; overflow-wrap: anywhere; }
+.retro-library-game .retro-cartridge-label strong { font-size: 10px; }.retro-library-game .retro-game-symbol { width: 70%; }
+.retro-empty { padding: 48px 8px; text-align: center; color: var(--muted-foreground); }
+.retro-tool-entry { display: grid; grid-template-columns: 52px minmax(0,1fr) 18px; gap: 14px; align-items: center; padding: 20px 0; border-top: 1px solid #b6b7ac; }
+.retro-tool-symbol { width: 52px; height: 58px; display: grid; place-items: center; border: 3px solid #676c5d; background: #bdc89b; color: #3b4a29; border-radius: 5px; box-shadow: inset 0 1px 3px #0004,0 2px 1px #fff6; }
+.retro-tool-symbol svg { width: 30px; height: 30px; stroke-width: 1.6; }
+.retro-tool-entry small { font: 600 10px var(--font-geist-mono),monospace; color: var(--muted-foreground); }.retro-tool-entry h2 { font-size: 18px; font-weight: 750; }.retro-tool-entry p { font-size: 12px; line-height: 1.6; margin-top: 4px; color: var(--muted-foreground); overflow-wrap: anywhere; }.retro-tool-entry > svg { width: 18px; }
+html[data-theme='theme-retro'] .retro-back { width: 44px; height: 44px; background: #eeece3; border: 1px solid #b5b5a7; box-shadow: 0 2px 2px #0001; }
+html[data-theme='theme-retro'] .surface-panel { box-shadow: inset 0 1px #fff9,0 2px 3px #0001; }
+@media (min-width: 760px) {
+  html[data-theme='theme-retro'] { --retro-gutter: 32px; --retro-top: calc(var(--xm-safe-area-top,0px) + 24px); }
+  .retro-mode { width: 360px; margin-block: 22px; }
+  .retro-console { display: grid; grid-template-columns: 1.05fr 1fr; gap: 30px; align-items: center; }
+  .retro-lcd-content { padding: clamp(16px,2.2vw,28px) clamp(14px,1.8vw,24px); }.retro-lcd-category { font-size: clamp(15px,1.5vw,18px); }.retro-lcd h1 { margin-top: clamp(16px,2vw,26px); }.retro-lcd h1.retro-pixel-title { font-size: clamp(38px,5vw,64px); }.retro-lcd p { font-size: clamp(12px,1.2vw,15px); }
+  .retro-handy { margin-top: 24px; }.retro-handy > div { max-width: 660px; }.retro-handy a { min-height: 68px; }.retro-handy strong { font-size: 17px; }
+  .retro-library-grid { grid-template-columns: repeat(6,minmax(0,1fr)); gap: 26px; }.retro-library-game { font-size: 15px; }
+  .retro-toolbox { display: grid; grid-template-columns: 1fr 1fr; column-gap: 36px; }.retro-toolbox .retro-section-heading { grid-column: 1 / -1; }
+}
+@media (max-width: 359px) {
+  html[data-theme='theme-retro'] { --retro-gutter: 12px; }
+  .retro-brand { gap: 7px; }.retro-brand strong { font-size: 21px; }.retro-brand > span { width: 32px; height: 34px; }.retro-header-controls { gap: 4px; }
+  .retro-lcd-content { padding: 15px 12px; }.retro-lcd-motto { right: 10px; top: 12px; font-size: 5px; }.retro-lcd h1 { margin-block: 12px 7px; }.retro-lcd p { font-size: 11px; }.retro-lcd-indicator { bottom: 6px; left: 12px; font-size: 16px; }
+  .retro-rack { gap: 2px; padding-inline: 17px; }.retro-rack-arrow:first-child { left: -10px; }.retro-rack-arrow:last-child { right: -10px; }.retro-cartridge-label strong { font-size: 10px; }.retro-handy a { gap: 6px; }.retro-handy a + a { padding-left: 10px; }.retro-handy strong { font-size: 12px; }
+}
+@media (hover: hover) { .retro-start:hover { filter: brightness(1.06); }.retro-library-game:hover .retro-cartridge { transform: translateY(-3px); }.retro-tool-entry:hover h2 { color: #9b431f; } }
+@media (prefers-reduced-motion: no-preference) { .retro-cartridge { transition: transform .16s ease; }.retro-start { transition: transform .12s ease; }.retro-start:active { transform: translateY(3px); } }
