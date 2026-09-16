@@ -22,6 +22,7 @@ describe("Theme Four secondary page layout contracts", () => {
     expect(entry).toContain("@import './utilities.css'")
     expect(entry).toContain("@import './settings.css'")
     expect(entry).toContain("@import './pwa.css'")
+    expect(entry).toContain("@import './immersive.css'")
   })
 
   it("gives tools a real workbench and usable editor", () => {
@@ -41,21 +42,27 @@ describe("Theme Four secondary page layout contracts", () => {
     expect(declarations("utilities.css", ".offline-tool-code-result")["white-space"]).toContain("pre")
   })
 
-  it("lays out settings rows and reserves navigation space", () => {
+  it("lays out settings rows without reserving a removed navigation bar", () => {
     expect(declarations("settings.css", ".settings-row").display).toContain("grid")
     expect(declarations("settings.css", ".settings-row").padding).toContain("1rem")
     expect(declarations("settings.css", ".settings-shell")["padding-bottom"])
-      .toContain("calc(5.5rem + env(safe-area-inset-bottom))")
+      .toContain("calc(1.5rem + env(safe-area-inset-bottom))")
     expect(declarations("settings.css", ".settings-shell .theme-current-label").display)
       .toContain("inline")
   })
 
   it("keeps new presentation rules isolated to Theme Four", () => {
-    for (const file of ["utilities.css", "settings.css", "pwa.css"]) {
+    for (const file of ["utilities.css", "settings.css", "pwa.css", "immersive.css"]) {
       parse(read(root + file)).walkRules((rule) => {
         for (const selector of rule.selectors) expect(selector).toMatch(/^html\[data-theme='theme-four'\]/)
       })
     }
+  })
+
+  it("removes the old corridor backdrop and permanent Theme Four navigation", () => {
+    expect(declarations("index.css", ".game-page::before")["background-image"]).toEqual(["none"])
+    expect(new Set(declarations("index.css", ".game-page")["padding-left"])).toEqual(new Set(["0"]))
+    expect(read("features/themes/shared/theme-navigation.tsx")).not.toContain("ThemeFourNavigation")
   })
 
   it("reserves natural control width in the compact header", () => {
@@ -73,7 +80,7 @@ describe("Theme Four secondary page layout contracts", () => {
     expect(prompt.position).toContain("fixed")
     expect(prompt.display).toContain("grid")
     expect(prompt["overflow-y"]).toContain("auto")
-    expect(prompt.bottom).toContain("calc(5.25rem + env(safe-area-inset-bottom))")
+    expect(prompt.bottom).toContain("calc(1rem + env(safe-area-inset-bottom))")
     expect(declarations("pwa.css", ".pwa-install-prompt__close").position).toContain("absolute")
   })
 })

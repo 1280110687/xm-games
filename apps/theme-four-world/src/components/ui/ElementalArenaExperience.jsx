@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useScene } from '../../context/SceneContext';
 import '../../styles/ElementalArenaExperience.scss';
 
-const ElementalArenaExperience = () => {
+const ElementalArenaExperience = ({ locale = 'en' }) => {
     const { currentRoom, exitRequested } = useScene();
     const [loaded, setLoaded] = useState(false);
     const active = currentRoom === 'elemental' && !exitRequested;
@@ -24,7 +24,7 @@ const ElementalArenaExperience = () => {
             {!loaded && (
                 <div className="elemental-arena__handoff" role="status">
                     <span aria-hidden="true" />
-                    <strong>OPENING ELEMENTAL ARENA</strong>
+                    <strong>{({ zh: '正在打开元素训练室…', en: 'Opening elemental studio…', th: 'กำลังเปิดห้องฝึกธาตุ…' })[locale]}</strong>
                 </div>
             )}
         </section>

@@ -169,6 +169,14 @@ describe("service worker shell", () => {
 
     expect(manifest.version).toBe(1)
     expect(manifest.assets).toEqual(expectedAssets)
+    expect(manifest.assets).toContain("/theme-four-experience/textures/clubhouse/pale-oak.webp")
+    expect(manifest.assets).toContain("/theme-four-experience/textures/clubhouse/ivory-plaster.webp")
+  })
+
+  it("does not fragment the clubhouse offline document cache by initial locale", () => {
+    const home = readFileSync(join(PROJECT_ROOT, "features/themes/theme-four/home.tsx"), "utf8")
+    expect(home).toContain("/theme-four-experience/index.html#locale=")
+    expect(home).not.toContain("/theme-four-experience/index.html?locale=")
   })
 
   it("serves cached navigations immediately while refreshing in the background", () => {

@@ -156,7 +156,7 @@ html[data-theme='theme-four'] [data-slot='dialog-content'].pwa-install-guide {
 @media (max-width: 767px) {
   html[data-theme='theme-four'] .pwa-install-prompt {
     right: max(0.75rem, env(safe-area-inset-right));
-    bottom: calc(5.25rem + env(safe-area-inset-bottom));
+    bottom: calc(1rem + env(safe-area-inset-bottom));
     width: calc(100vw - 1.5rem - env(safe-area-inset-left) - env(safe-area-inset-right));
     max-height: calc(100dvh - 6.25rem - var(--xm-safe-area-top) - env(safe-area-inset-bottom));
   }

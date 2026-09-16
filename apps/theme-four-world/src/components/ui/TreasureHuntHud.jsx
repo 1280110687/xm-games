@@ -240,7 +240,7 @@ const LookPad = ({ addLookInput }) => {
     );
 };
 
-const TreasureHuntHud = () => {
+const TreasureHuntHud = ({ hostLocale } = {}) => {
     const { currentRoom } = useScene();
     const {
         addLookInput,
@@ -265,7 +265,9 @@ const TreasureHuntHud = () => {
         toggleFlashlight,
         totalClues,
     } = useTreasureHunt();
-    const [locale, setLocale] = useState('zh');
+    const [locale, setLocale] = useState(hostLocale || 'zh');
+
+    useEffect(() => { if (COPY[hostLocale]) setLocale(hostLocale); }, [hostLocale]);
 
     useEffect(() => {
         const handleMessage = (event) => {

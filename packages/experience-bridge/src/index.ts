@@ -5,7 +5,11 @@ export const EXPERIENCE_MESSAGES = {
   ready: "xm-games:theme-four-ready",
   context: "xm-games:theme-four-context",
   navigate: "xm-games:theme-four-navigate",
+  sceneState: "xm-games:theme-four-scene-state",
+  sceneCommand: "xm-games:theme-four-scene-command",
 } as const
+
+export * from "./clubhouse"
 
 export type ExperienceContext = {
   locale: "zh" | "en" | "th"

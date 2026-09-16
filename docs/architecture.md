@@ -16,6 +16,14 @@ Next.js 主站仍位于仓库根目录，不为目录整齐额外迁移应用入
 
 主站拥有主题、语言、游戏目录和路由；世界只向父窗口请求允许的游戏路由。世界与竞技场继续通过 iframe 隔离生命周期及不同版本的 Three.js，不合并渲染器或强制统一依赖。收到消息必须检查来源窗口及同源条件。不要在主站直接导入 3D 应用源码。
 
+### 主题四沉浸会馆
+
+当前入口为 `apps/theme-four-world/src/clubhouse/Clubhouse.jsx`，`App.jsx` 只组装场景/性能/博物馆状态 Provider。`clubhouse/model.js` 管位置与持久化契约，`controller.jsx` 管逐帧镜头和手势，`architecture.jsx`、`furniture.jsx`、`materials.jsx` 分别管建筑、可交互物件和共享材质。原博物馆与元素训练室懒加载复用，不再从旧 `Experience` 预加载整套展示素材。
+
+四个实体房间的 ID、名称、消息和会话快照校验由 `packages/experience-bridge/src/clubhouse.ts` 共享。主站 `features/themes/theme-four/menu.tsx` 与实体门牌使用同一份房间定义；游戏分类目录是故障/无障碍退路，不等同于实体房间。主题四不渲染公共底栏，业务页 `header.tsx` 保留返回与必要操作。
+
+仅房间与镜头位置存入同标签页 `sessionStorage`，不保存工具输入；存储不可用时仍能使用。入口语言通过 URL hash 提供以避免英文首闪且不改变离线文档缓存键，后续语言通过同源桥消息实时同步。新材质源在世界应用 `public/textures/clubhouse/`，缓存版本更新为 v24；已安装用户须联网更新并重新准备离线包。
+
 ## 素材只有一个维护位置
 
 每个 3D 应用的 `public/` 保存该应用的原始素材和需要随包发布的许可证。Vite 构建各自产生 `dist/`，根脚本组装到 `public/theme-four-experience/`。主站自有的 `public/theme-four/` 仍由主站维护，不能把它与生成目录混淆。

@@ -1,6 +1,6 @@
 html[data-theme='theme-four'] .settings-shell {
   padding-right: 1rem;
-  padding-left: 6rem;
+  padding-left: 0;
   padding-bottom: 2rem;
 }
 
@@ -87,7 +87,7 @@ html[data-theme='theme-four'] .settings-storage-note svg {
 @media (max-width: 767px) {
   html[data-theme='theme-four'] .settings-shell {
     padding-inline: 0.75rem;
-    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
   }
 }
 

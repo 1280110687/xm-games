@@ -1,0 +1,28 @@
+html, body, #root { margin: 0; width: 100%; height: 100%; overflow: hidden; overscroll-behavior: none; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans Thai', sans-serif; background: #e8e1d3; }
+* { box-sizing: border-box; }
+.clubhouse { position: fixed; inset: 0; width: 100%; height: 100dvh; overflow: hidden; user-select: none; touch-action: none; }
+.clubhouse canvas { display: block; touch-action: none; }
+.clubhouse .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.clubhouse .sr-only:focus-within { clip: auto; width: min(290px, calc(100vw - 80px)); height: auto; margin: 0; padding: 10px; display: grid; top: max(16px, env(safe-area-inset-top)); left: 16px; white-space: normal; background: #fffaf0; pointer-events: auto; }
+.clubhouse-hint { position: absolute; z-index: 4; bottom: max(32px, calc(env(safe-area-inset-bottom) + 18px)); left: 50%; width: max-content; max-width: calc(100% - 40px); margin: 0; transform: translateX(-50%); color: #273b39; background: #fffaf0d9; border-radius: 6px; padding: 8px 12px; font-size: 13px; line-height: 1.6; text-align: center; pointer-events: none; animation: clubhouse-hint-in 500ms ease both; }
+.clubhouse-hint[data-visible='false'] { opacity: 0; animation: none; transition: opacity 400ms ease; }
+.clubhouse-accessible { position: absolute; z-index: 110; left: 16px; top: max(16px, env(safe-area-inset-top)); clip-path: inset(50%); width: 1px; height: 1px; overflow: hidden; }
+.clubhouse-accessible:focus-within { clip-path: none; width: min(290px, calc(100% - 76px)); height: auto; max-height: 70dvh; overflow: auto; display: grid; background: #fffaf0; border-radius: 12px; padding: 10px; gap: 4px; }
+.clubhouse-accessible button, .clubhouse-game-selection button { min-height: 44px; cursor: pointer; color: #214f4e; background: transparent; border: 0; font: inherit; text-align: left; padding: 10px; }
+.clubhouse-accessible button:focus-visible, .clubhouse-game-selection button:focus-visible { outline: 2px solid #286f72; outline-offset: 1px; }
+.clubhouse-room-loading { position: fixed; z-index: 90; inset: 0; display: grid; place-content: center; margin: 0; color: #fff4dc; background: #163330; }
+.clubhouse-game-selection { width: min(430px, calc(100% - 32px)); max-height: 76dvh; margin: auto; padding: 20px; border: 1px solid #c9bda6; border-radius: 14px; color: #283c38; background: #fbf7ed; box-shadow: 0 24px 100px #152c3966; user-select: text; touch-action: auto; }
+.clubhouse-game-selection::backdrop { background: #12312a66; backdrop-filter: blur(4px); }
+.clubhouse-game-selection header { display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #d6cbb8; }
+.clubhouse-game-selection h2 { margin: 0; font-size: 21px; }
+.clubhouse-game-selection > div { display: grid; padding-top: 10px; }
+.clubhouse-game-selection > div > button { display: grid; gap: 5px; padding: 14px 4px; border-bottom: 1px solid #e3dbcd; }
+.clubhouse-game-selection span { color: #66726c; font-size: 13px; line-height: 1.55; }
+@keyframes clubhouse-hint-in { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .clubhouse-hint, .clubhouse-hint[data-visible='false'] { animation: none; transition: none; } }
+@media (max-width: 760px) {
+    .clubhouse .treasure-mission { top: max(76px, calc(env(safe-area-inset-top) + 64px)); }
+    .clubhouse .treasure-battery { top: max(128px, calc(env(safe-area-inset-top) + 116px)); }
+    .clubhouse .treasure-message { top: max(180px, calc(env(safe-area-inset-top) + 168px)); }
+}

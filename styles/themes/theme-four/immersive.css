@@ -1,0 +1,37 @@
+/* The clubhouse uses a single safe-area menu, never a persistent app toolbar. */
+html[data-theme='theme-four'] .theme-four-scene-menu { position: absolute; z-index: 20; top: max(16px, calc(env(safe-area-inset-top) + 10px)); right: max(16px, calc(env(safe-area-inset-right) + 10px)); }
+html[data-theme='theme-four'] .theme-four-menu-trigger { width: 44px; height: 44px; display: inline-grid; place-items: center; border: 1px solid rgb(255 255 255 / 0.7); border-radius: 50%; background: rgb(255 253 246 / 0.82); color: #354841; box-shadow: 0 2px 12px rgb(35 49 35 / 0.08); backdrop-filter: blur(10px); cursor: pointer; padding: 0; }
+html[data-theme='theme-four'] .theme-four-menu-trigger svg { width: 22px; height: 22px; stroke-width: 2; }
+html[data-theme='theme-four'] .theme-four-menu-trigger:focus-visible { outline: 2px solid #286f72; outline-offset: 3px; }
+html[data-theme='theme-four'] [data-slot='dialog-content'].theme-four-menu-dialog { width: min(380px, calc(100vw - 32px)); max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 48px); overflow: auto; border-radius: 18px; background: #fbf8ef; border: 1px solid #d7d4c5; color: #253e39; padding: 24px; box-shadow: 0 24px 90px #193a363d; }
+html[data-theme='theme-four'] .theme-four-menu-preferences { display: grid; gap: 12px; padding-block: 14px; border-block: 1px solid #dfdbcd; }
+html[data-theme='theme-four'] .theme-four-menu-preferences > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+html[data-theme='theme-four'] .theme-four-menu-preferences > div > span { display: flex; gap: 9px; align-items: center; font-size: 14px; }
+html[data-theme='theme-four'] .theme-four-menu-preferences svg { width: 18px; height: 18px; color: inherit; }
+html[data-theme='theme-four'] .theme-four-menu-preferences .theme-switcher-trigger,
+html[data-theme='theme-four'] .theme-four-menu-preferences .language-switcher-trigger { min-height: 44px; border-radius: 9px; background: #eeede4; color: #254e47; border: 1px solid #dbd7c9; box-shadow: none; }
+html[data-theme='theme-four'] .theme-four-menu-actions { display: grid; gap: 3px; }
+html[data-theme='theme-four'] .theme-four-menu-actions h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; margin: 9px 9px 3px; color: #737c6f; }
+html[data-theme='theme-four'] .theme-four-menu-actions button { display: flex; align-items: center; gap: 11px; min-height: 44px; padding: 10px; border: 0; border-radius: 8px; background: transparent; color: #354f45; text-align: left; font: inherit; font-size: 14px; cursor: pointer; }
+html[data-theme='theme-four'] .theme-four-menu-actions button:hover,
+html[data-theme='theme-four'] .theme-four-menu-actions button:focus-visible,
+html[data-theme='theme-four'] .theme-four-menu-actions button[aria-current] { background: #e6ece3; color: #205a50; }
+html[data-theme='theme-four'] .theme-four-menu-actions svg { width: 18px; height: 18px; }
+html[data-theme='theme-four'] .theme-four-page-header { position: relative; display: flex; align-items: center; gap: 12px; width: min(calc(100% - 24px), 74rem); margin: max(12px, calc(env(safe-area-inset-top) + 8px)) auto 20px; padding: 10px 12px; border-radius: 12px; background: #fbf8efed; border: 1px solid #d9d3c1; }
+html[data-theme='theme-four'] .theme-four-page-back { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px; border-radius: 50%; color: #365b50; background: #e9ece3; }
+html[data-theme='theme-four'] .theme-four-page-back svg { width: 20px; height: 20px; }
+html[data-theme='theme-four'] .theme-four-page-heading { flex: 1; min-width: 0; }
+html[data-theme='theme-four'] .theme-four-page-heading h1 { font: 650 clamp(16px, 2.5vw, 23px)/1.35 var(--font-geist-sans), sans-serif; margin: 0; }
+html[data-theme='theme-four'] .theme-four-page-heading p { margin: 4px 0 0; color: #687267; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html[data-theme='theme-four'] .theme-four-page-actions { display: flex; align-items: center; gap: 6px; }
+html[data-theme='theme-four'] .game-page { padding-left: 0; padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+html[data-theme='theme-four'] .app-shell[data-page='anime-tracker'],
+html[data-theme='theme-four'] .settings-shell { padding-left: 0; padding-bottom: max(24px, env(safe-area-inset-bottom)); }
+html[data-theme='theme-four'] .pwa-install-prompt { bottom: max(16px, calc(env(safe-area-inset-bottom) + 8px)); }
+html[data-theme='theme-four'] .game-page::before,
+html[data-theme='theme-four'] .app-shell[data-page='anime-tracker']::before { background-image: none; }
+html[data-theme='theme-four'] .game-page,
+html[data-theme='theme-four'] .app-shell[data-page='anime-tracker'] { background: #edece2; }
+html[data-theme='theme-four'] .surface-panel,
+html[data-theme='theme-four'] .surface-card { border-radius: 12px; box-shadow: 0 4px 18px rgb(48 66 47 / 0.035); border-color: #d9d7c7; background: #fbf9f0; }
+@media (max-width: 380px) { html[data-theme='theme-four'] .theme-four-page-header { gap: 8px; padding-inline: 8px; } }

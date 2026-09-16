@@ -1,3 +1,47 @@
+# Theme Four — Immersive clubhouse, first interactive loop
+
+Date: 2026-09-16. Scope: entrance → finite corridor → tool workshop → real utility page → restored room, plus preserved game/elemental/museum access. This is a real-time Three.js scene, not a raster mockup used as a background. Earlier theme records below are preserved.
+
+## Source, state and comparison evidence
+
+- Source truth: `output/theme-four-concepts-2026-09-16/immersive-v2-plan.md`, `entrance-immersive-v2.png` (853 × 1844), `corridor-immersive-v2.png` and `tool-workshop.png` (977 × 1610). The v2 instruction explicitly supersedes the workshop image's header, return strip and bottom navigation.
+- Runtime: `http://localhost:4412/`, Theme Four, Chinese, no menu open. Evidence: `output/theme-four-immersive-qa-2026-09-16/entrance-mobile.png`, `corridor-mobile.png`, `workshop-mobile.png`, `workshop-desktop.png`, `museum-mobile.png`, `json-desktop.png`.
+- Mobile viewport/capture: 390 × 844, effective capture density 1. Desktop: 1365 × 900. Also inspected 768 × 1024 and 844 × 390. No device bezel or fake system bars. Browser captures may be JPEG bytes despite the `.png` filename.
+- Source and runtime images were emitted together in the same comparison inputs, repeated after workshop camera/furniture fixes. Entrance proportions are comparable after uniform scaling; corridor/workshop sources have a different aspect ratio, so architectural/content regions were compared without stretching them. Perspective and sunlight are real-time and do not claim pixel-equivalence to the generated renders.
+- Focused review: door panels/handles, small localized plaques, corner menu, workshop labels and editor controls inspected in the full-size captures and browser. These details were readable in those views; additional crops were not needed.
+
+## Findings and iterations
+
+1. Fixed P1: fresh entrance mistakenly initialized its door progress to open. Added `initialDoors()` and a regression test; final entrance capture shows closed, pushable leaves. Short upward drag stays outside; a completed push crosses the threshold continuously.
+2. Fixed P2: oversized front chair and narrow portrait camera obscured the workbench. Moved the chair to the right, widened the room lens on portrait screens, adjusted eye position, increased desk depth and raised rear stations. Final workshop capture shows the front text tray, QR stand and elevated rear monitors; side stations remain discoverable by looking around. Desktop shows all six stations together.
+3. Fixed P2: long full catalog labels crowded the 3D plaques. Short localized physical labels now accompany full accessible catalog names. All six tools resolve against the host's route allowlist.
+4. Fixed P2: paper-era background and navigation spacing remained on business pages. Removed the corridor bitmap, left/bottom navigation reservations and rendered Theme Four navigation; kept essential tool/game controls and a compact return header. Text tool, JSON and Gomoku inspected.
+5. Fixed P2: lazily mounted museum lost its old global `sr-only` rule, exposing assistive buttons at the top. Added scoped hiding/focus behavior and repositioned its mission HUD below the single corner menu. `museum-mobile.png` is post-fix evidence.
+6. Fixed interaction risks: room objects cannot activate from outside their room; dragging suppresses navigation; pausing clears pending pointer/key input; unready host menus do not offer ineffective room commands. Session snapshots are validated and clamped; storage failure is nonfatal.
+7. Fixed offline regression before delivery: locale initialization originally used a query parameter, creating a different HTTP cache key from the offline manifest. Changed it to `#locale=…`, added a contract test, and bumped service-worker cache v23 → v24 for the new materials and chunks.
+
+## Required fidelity surfaces and intentional scope
+
+- Typography/content: local system CJK/Thai/sans text rendered onto small architectural canvases; no remote font request at the entrance. Chinese/English live switch checked without leaving the room. Physical labels are intentionally shorter than full catalog names. UI controls use localized accessible names; existing museum/elemental gameplay presentation remains its own style.
+- Layout/rhythm: one 44 px corner menu, no persistent top/bottom app bars, no visible entrance CTA. Door/sign/desk objects are the primary navigation. The finite corridor and room camera framing prioritize touch exploration; not every wall object must fit the initial portrait view. Menu and business workspaces remain scrollable on short screens.
+- Colors/materials: warm plaster, pale oak, deep teal, restrained brass and warm lighting. The shared material set is lighter and less yellow after comparison. Two original generated local surface maps total 209690 bytes; no screen-size reference image is used as UI.
+- Image quality: real geometric doors, tables, screens, chessboard and props, with adaptive render quality. This first real-time implementation is visibly simpler than the concept's photographic lighting, carved details, foliage and fabric. It is **not** a claim of photo-level art completion or equal visual realism; higher-detail art remains follow-up work. Using true meshes rather than image cutouts is an explicit product constraint.
+- Accessibility: physical actions have keyboard equivalents, visible focus controls, minimum 44 px menu/actions, native modal game selection and reduced-motion camera transitions. Existing tool inputs remain editable. Not a full screen-reader or WCAG certification.
+
+## Verification
+
+- Browser: partial/completed door push; physical game/workshop door entry; horizontal look; physical workshop exit back to its prior corridor orientation; text tray → text tool → restored workshop; JSON object → formatter → restored workshop; chess table → category dialog → Gomoku. Elemental and museum still load; language switching updates room labels without reloading the scene.
+- Text test: synthetic `  hello  / hello / blank line / world ` cleaned to `hello`, blank line, `world`. JSON test formatted a synthetic object. No saved watchlist, account, LAN room or transfer records changed.
+- During a development rebuild, an already-open old frame requested a removed hashed lazy chunk. Failure UI appeared and its reload action recovered. No errors observed in the final hash-locale session after 08:10 UTC; no blanket claim that the entire development session had no errors.
+- Final `pnpm verify`: ESLint for host and both experiences, TypeScript, both Vite builds, Next production build, **602 tests passed, two existing tests skipped**. Chunk-size warnings remain (world core ~316 kB gzip); no new dependency or remote artwork package.
+- Offline manifest includes both materials and lazy room chunks (311 files); cache v24 forces refreshed manifest preparation. Real installed iOS/Android, physical touch cancellation, device GPU performance and a fresh production offline-package cold start were **not** tested this turn. Previously installed users must update online and prepare the new offline package before relying on it offline.
+
+Implementation checklist: first loop, physical doors, shared room IDs, corner menu, business-page return, safe-area controls, preserved special rooms, offline cache identity, tests/build and browser checks complete. This verdict applies to that first interactive phase, not final photographic art quality or real-device release certification.
+
+final result: passed
+
+---
+
 # Theme Five — Retro Handheld implementation QA
 
 Date: 2026-09-16. New theme ID: `theme-retro`. Existing four themes and the default `theme-three` remain available. Implemented in the existing application, not a separate prototype.

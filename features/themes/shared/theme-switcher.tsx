@@ -52,8 +52,8 @@ const THEME_COPY: Record<
         description: "月光湖景、清透玻璃与悬浮导航",
       },
       "theme-four": {
-        name: "主题四",
-        description: "手绘沉浸游戏走廊",
+        name: "主题四 · 游戏会馆",
+        description: "推门进入，自由探索 3D 房间",
       },
     },
   },
@@ -69,8 +69,8 @@ const THEME_COPY: Record<
         description: "Moonlit scenery, crystal glass and a floating dock",
       },
       "theme-four": {
-        name: "Theme Four",
-        description: "Hand-drawn immersive corridor",
+        name: "Theme Four · Clubhouse",
+        description: "Push the door and explore 3D rooms",
       },
     },
   },
@@ -86,8 +86,8 @@ const THEME_COPY: Record<
         description: "วิวทะเลสาบใต้แสงจันทร์ กระจกใส และแถบนำทางลอย",
       },
       "theme-four": {
-        name: "ธีม 4",
-        description: "โถงเกมวาดมือแบบเต็มอารมณ์",
+        name: "ธีม 4 · คลับเกม",
+        description: "ผลักประตูและสำรวจห้องสามมิติ",
       },
     },
   },

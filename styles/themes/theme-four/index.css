@@ -1,9 +1,10 @@
 @import './utilities.css';
 @import './settings.css';
 @import './pwa.css';
+@import './immersive.css';
 
 /*
- * Theme Four: a pencil-and-paper game club.
+ * Theme Four: a real-time 3D clubhouse with a quiet utility workspace.
  *
  * The immersive entrance and corridor are isolated in ThemeFourHome. Existing
  * game routes keep their stateful React trees and receive this paper workspace
@@ -281,7 +282,7 @@ html[data-theme='theme-four'] [data-slot='dialog-content'].theme-four-map-dialog
 html[data-theme='theme-four'] .game-page,
 html[data-theme='theme-four'] .app-shell[data-page='anime-tracker'] {
   color: var(--theme-four-ink);
-  background: #e9e1d2;
+  background: #edece2;
 }
 
 html[data-theme='theme-four'] .game-page::before,
@@ -291,14 +292,14 @@ html[data-theme='theme-four'] .app-shell[data-page='anime-tracker']::before {
   inset: 0;
   pointer-events: none;
   content: '';
-  background-image: url('/theme-four/club-corridor.webp');
+  background-image: none;
   background-position: center;
   background-size: cover;
   filter: grayscale(0.82) opacity(0.1);
 }
 
 html[data-theme='theme-four'] .game-page {
-  padding-left: 5.4rem;
+  padding-left: 0;
 }
 
 html[data-theme='theme-four'] .game-page main,
@@ -347,11 +348,11 @@ html[data-theme='theme-four'] .game-header .language-switcher-trigger svg {
 html[data-theme='theme-four'] .surface-panel,
 html[data-theme='theme-four'] .surface-card,
 html[data-theme='theme-four'] [data-slot='card'] {
-  border: 1px solid rgb(54 49 41 / 0.28);
-  border-radius: 0.22rem;
+  border: 1px solid #d9d7c7;
+  border-radius: 12px;
   color: var(--theme-four-ink);
-  background: rgb(249 243 232 / 0.9);
-  box-shadow: 4px 5px 0 rgb(68 57 43 / 0.12);
+  background: #fbf9f0;
+  box-shadow: 0 4px 18px rgb(48 66 47 / 0.035);
 }
 
 html[data-theme='theme-four'] [data-slot='button'] {
@@ -566,12 +567,12 @@ html[data-theme='theme-four'] [data-slot='dialog-content'].pwa-install-guide {
 
   html[data-theme='theme-four'] .game-page {
     padding-right: 0;
-    padding-bottom: calc(4.9rem + env(safe-area-inset-bottom));
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
     padding-left: 0;
   }
 
   html[data-theme='theme-four'] .app-shell[data-page='anime-tracker'] {
-    padding-bottom: calc(4.9rem + env(safe-area-inset-bottom));
+    padding-bottom: calc(1.5rem + env(safe-area-inset-bottom));
   }
 
   html[data-theme='theme-four'] .game-header {

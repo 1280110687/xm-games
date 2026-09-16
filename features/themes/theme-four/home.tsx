@@ -2,18 +2,13 @@
 
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
-import { EXPERIENCE_MESSAGES, type ExperienceContext } from "@xm-games/experience-bridge"
+import { EXPERIENCE_MESSAGES, isClubhousePlace, type ClubhouseCommand, type ClubhousePlace, type ExperienceContext } from "@xm-games/experience-bridge"
 import {
-  Gamepad2,
   LoaderCircle,
-  Map,
   MapPinned,
-  Settings2,
 } from "lucide-react"
 
-import { LanguageSwitcher } from "@/components/language-switcher"
 import { PrefetchLink as Link } from "@/components/prefetch-link"
-import { ThemeSwitcher } from "@/features/themes/shared/theme-switcher"
 import { useTheme } from "@/features/themes/shared/theme-provider"
 import {
   Dialog,
@@ -28,6 +23,7 @@ import type { Locale } from "@/lib/i18n"
 import type { CatalogCategory, CatalogEntry } from "@/features/catalog/types"
 import { themeLoadsWebglExperience } from "@/lib/theme"
 import { INITIAL_SCENE_LOAD, SCENE_START_TIMEOUT_MS, sceneLoadReducer } from "./scene-loading"
+import { ThemeFourMenu } from "./menu"
 
 export type ThemeFourGame = CatalogEntry
 export type ThemeFourRoom = CatalogCategory
@@ -48,31 +44,31 @@ const COPY: Record<
   }
 > = {
   zh: {
-    experience: "3D 手绘游戏世界",
+    experience: "3D 游戏会馆",
     loading: "正在装配 3D 走廊…",
-    failed: "3D 走廊暂时未能启动。可以重新加载，或通过游戏地图继续使用。",
+    failed: "3D 会馆暂时未能启动。可以重新加载，或通过游戏与工具目录继续使用。",
     retry: "重新加载 3D",
-    map: "游戏地图",
+    map: "游戏与工具目录",
     mapDescription: "从 3D 世界直接进入 XM-Games 的全部游戏与离线工具。",
-    mapClose: "关闭游戏地图",
-    room: "房间",
+    mapClose: "关闭目录",
+    room: "分类",
     open: "进入",
     settings: "设置",
   },
   en: {
-    experience: "Hand-drawn 3D game world",
+    experience: "3D game clubhouse",
     loading: "Building the 3D corridor…",
     failed: "The 3D corridor could not start. Retry, or use the game map to continue.",
     retry: "Reload 3D",
-    map: "Game map",
+    map: "Games and tools",
     mapDescription: "Open every XM-Games experience and offline tool from the 3D world.",
     mapClose: "Close game map",
-    room: "Room",
+    room: "Category",
     open: "Open",
     settings: "Settings",
   },
   th: {
-    experience: "โลกเกม 3D วาดมือ",
+    experience: "คลับเกม 3D",
     loading: "กำลังสร้างโถงทางเดิน 3D…",
     failed: "ยังเปิดโถงทางเดิน 3D ไม่สำเร็จ ลองโหลดใหม่หรือใช้แผนที่เกมเพื่อเล่นต่อ",
     retry: "โหลด 3D ใหม่",
@@ -120,6 +116,13 @@ export function ThemeFourHome({ rooms }: { rooms: ThemeFourRoom[] }) {
   const frameRef = useRef<HTMLIFrameElement>(null)
   const [scene, dispatchScene] = useReducer(sceneLoadReducer, INITIAL_SCENE_LOAD)
   const [mapOpen, setMapOpen] = useState(false)
+  const [menuOpen, setMenuOpen] = useState(false)
+  const [place, setPlace] = useState<ClubhousePlace>("entrance")
+  const [frameLocale] = useState(locale)
+
+  const sendCommand = useCallback((payload: ClubhouseCommand) => {
+    frameRef.current?.contentWindow?.postMessage({ type: EXPERIENCE_MESSAGES.sceneCommand, payload }, window.location.origin)
+  }, [])
 
   const sceneManifest = useMemo<ExperienceContext>(
     () => ({
@@ -170,6 +173,12 @@ export function ThemeFourHome({ rooms }: { rooms: ThemeFourRoom[] }) {
 
       if (event.data?.type === EXPERIENCE_MESSAGES.booted) {
         dispatchScene("booted")
+        sendSceneManifest()
+        return
+      }
+
+      if (event.data?.type === EXPERIENCE_MESSAGES.sceneState && isClubhousePlace(event.data.place)) {
+        setPlace(event.data.place)
         return
       }
 
@@ -196,6 +205,10 @@ export function ThemeFourHome({ rooms }: { rooms: ThemeFourRoom[] }) {
   }, [scene.phase, sendSceneManifest])
 
   useEffect(() => {
+    sendCommand({ action: "pause", paused: menuOpen || mapOpen })
+  }, [menuOpen, mapOpen, scene.phase, sendCommand])
+
+  useEffect(() => {
     if (!themeLoadsWebglExperience(theme)) return
     const timeout = window.setTimeout(() => dispatchScene("timeout"), SCENE_START_TIMEOUT_MS)
     return () => window.clearTimeout(timeout)
@@ -216,14 +229,14 @@ export function ThemeFourHome({ rooms }: { rooms: ThemeFourRoom[] }) {
         key={scene.attempt}
         ref={frameRef}
         className="theme-four-webgl-frame"
-        src="/theme-four-experience/index.html"
+        src={`/theme-four-experience/index.html#locale=${frameLocale}`}
         title={copy.experience}
         allow="autoplay; fullscreen"
         allowFullScreen
         onLoad={sendSceneManifest}
       />
 
-      {scene.phase === "starting" && (
+      {(scene.phase === "starting" || scene.phase === "booted") && (
         <div className="theme-four-webgl-loading" role="status">
           <LoaderCircle aria-hidden="true" />
           <span>{copy.loading}</span>
@@ -238,31 +251,16 @@ export function ThemeFourHome({ rooms }: { rooms: ThemeFourRoom[] }) {
         </div>
       )}
 
-      <header className="theme-four-webgl-toolbar">
-        <span className="theme-four-webgl-brand">
-          <Gamepad2 aria-hidden="true" />
-          <span>
-            <strong>XM-GAMES</strong>
-            <small>{copy.experience}</small>
-          </span>
-        </span>
-
-        <span className="theme-four-webgl-controls">
-          <button
-            type="button"
-            className="theme-four-webgl-map-trigger"
-            onClick={() => setMapOpen(true)}
-          >
-            <Map aria-hidden="true" />
-            <span>{copy.map}</span>
-          </button>
-          <ThemeSwitcher compact />
-          <LanguageSwitcher compact />
-          <Link href="/settings" aria-label={copy.settings}>
-            <Settings2 aria-hidden="true" />
-          </Link>
-        </span>
-      </header>
+      <div className="theme-four-scene-menu">
+        <ThemeFourMenu
+          place={scene.phase === "ready" ? place : "entrance"}
+          onOpenChange={setMenuOpen}
+          onRoom={scene.phase === "ready" ? (room) => sendCommand({ action: "visit", room }) : undefined}
+          onBack={() => sendCommand({ action: "back" })}
+          onEntrance={scene.phase === "ready" ? () => sendCommand({ action: "entrance" }) : undefined}
+          onDirectory={() => setMapOpen(true)}
+        />
+      </div>
 
       <Dialog open={mapOpen} onOpenChange={setMapOpen}>
         <DialogContent
