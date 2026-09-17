@@ -1,5 +1,7 @@
 "use client"
 
+import "@/styles/games/board-workspace.css"
+
 import { useCallback, useEffect, useReducer, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -18,6 +20,7 @@ export function SnakeGame() {
   const { locale, t } = useLocale()
   const [game, dispatch] = useReducer(snakeReducer, undefined, createInitialSnakeState)
   const persistedHighScoreRef = useRef<number | null>(null)
+  const boardRef = useRef<HTMLDivElement>(null)
   const { food, highScore, phase, score, snake, speed } = game
   const isPlaying = phase === "playing"
   const isPaused = phase === "paused"
@@ -60,6 +63,7 @@ export function SnakeGame() {
 
   const changeDirection = useCallback((newDir: Position) => {
     dispatch({ type: "changeDirection", direction: newDir })
+    boardRef.current?.focus({ preventScroll: true })
   }, [])
 
   // Keyboard controls
@@ -101,10 +105,12 @@ export function SnakeGame() {
 
   const startGame = () => {
     dispatch({ type: "start", foodRoll: Math.random() })
+    boardRef.current?.focus({ preventScroll: true })
   }
 
   const togglePause = () => {
     dispatch({ type: "togglePause" })
+    boardRef.current?.focus({ preventScroll: true })
   }
 
   const boardLabels = {
@@ -128,36 +134,40 @@ export function SnakeGame() {
       <main
         className="game-content flex flex-1 flex-col items-center justify-center gap-5 py-5 sm:gap-6"
         data-slot="game-content"
+        data-game-workspace="ready"
       >
-        {/* Score Display */}
-        <div
-          className="game-summary flex gap-8 text-center"
-          data-slot="game-summary"
-          role="status"
-          aria-live="polite"
-        >
-          <div>
-            <div className="text-sm text-muted-foreground">{t("score")}</div>
-            <div
-              className="game-stat-value text-2xl font-bold text-green-400"
-              data-tone="success"
-            >
-              {score}
+        <div className="game-workspace-before">
+          {/* Score Display */}
+          <div
+            className="game-summary flex gap-8 text-center"
+            data-slot="game-summary"
+            role="status"
+            aria-live="polite"
+          >
+            <div>
+              <div className="text-sm text-muted-foreground">{t("score")}</div>
+              <div
+                className="game-stat-value text-2xl font-bold text-green-400"
+                data-tone="success"
+              >
+                {score}
+              </div>
+            </div>
+            <div>
+              <div className="text-sm text-muted-foreground">{t("highScore")}</div>
+              <div
+                className="game-stat-value text-2xl font-bold text-yellow-400"
+                data-tone="achievement"
+              >
+                {highScore}
+              </div>
             </div>
           </div>
-          <div>
-            <div className="text-sm text-muted-foreground">{t("highScore")}</div>
-            <div
-              className="game-stat-value text-2xl font-bold text-yellow-400"
-              data-tone="achievement"
-            >
-              {highScore}
-            </div>
-          </div>
-        </div>
 
-        {/* Game Board */}
-        <Card className="game-stage border-white/10 bg-card/70">
+          {/* Game Board */}
+
+        </div>
+        <Card className="game-stage border-white/10 bg-card/70" ref={boardRef} tabIndex={0} aria-label={t("snake")}>
           <CardContent className="p-2">
             <div
               className="grid gap-[1px] rounded bg-slate-900 p-1"
@@ -194,110 +204,114 @@ export function SnakeGame() {
             </div>
           </CardContent>
         </Card>
+        <div className="game-workspace-after">
 
-        {/* Game Over */}
-        {(isGameOver || isWon) && (
-          <div className="text-center" role="status" aria-live="assertive">
-            <div
-              data-tone={isWon ? "success" : "danger"}
-              className={`game-status-copy text-2xl font-bold ${isWon ? "text-green-400" : "text-red-500"}`}
-            >
-              {isWon ? t("youWin") : t("gameOver")}
+
+          {/* Game Over */}
+          {(isGameOver || isWon) && (
+            <div className="text-center" role="status" aria-live="assertive">
+              <div
+                data-tone={isWon ? "success" : "danger"}
+                className={`game-status-copy text-2xl font-bold ${isWon ? "text-green-400" : "text-red-500"}`}
+              >
+                {isWon ? t("youWin") : t("gameOver")}
+              </div>
+              <div className="text-muted-foreground">
+                {t("finalScore")}: {score}
+              </div>
             </div>
-            <div className="text-muted-foreground">
-              {t("finalScore")}: {score}
-            </div>
-          </div>
-        )}
+          )}
 
-        {/* Controls */}
-        <div
-          className="game-actions flex gap-2"
-          data-slot="game-actions"
-        >
-          {phase === "idle" && (
-            <Button onClick={startGame} className="gap-2">
-              <Play className="h-4 w-4" aria-hidden="true" />
-              {t("start")}
-            </Button>
-          )}
-          {isPlaying && (
-            <Button onClick={togglePause} variant="secondary" className="gap-2">
-              <Pause className="h-4 w-4" aria-hidden="true" />
-              {t("pause")}
-            </Button>
-          )}
-          {isPaused && (
-            <Button onClick={togglePause} className="gap-2">
-              <Play className="h-4 w-4" aria-hidden="true" />
-              {t("resume")}
-            </Button>
-          )}
-          {(isGameOver || isWon || (isPaused && score > 0)) && (
-            <Button onClick={startGame} variant="outline" className="gap-2">
-              <RotateCcw className="h-4 w-4" aria-hidden="true" />
-              {t("restart")}
-            </Button>
-          )}
-        </div>
-
-        {/* Mobile Controls */}
-        <div
-          className="mobile-controls flex flex-col items-center gap-2 md:hidden"
-          data-slot="mobile-controls"
-        >
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-12 w-12"
-            aria-label={`${t("snakeControlsMobile")} ↑`}
-            disabled={!isPlaying}
-            onClick={() => changeDirection({ x: 0, y: -1 })}
+          {/* Controls */}
+          <div
+            className="game-actions flex gap-2"
+            data-slot="game-actions"
           >
-            <ChevronUp className="h-6 w-6" aria-hidden="true" />
-          </Button>
-          <div className="flex gap-2">
+            {phase === "idle" && (
+              <Button onClick={startGame} className="gap-2">
+                <Play className="h-4 w-4" aria-hidden="true" />
+                {t("start")}
+              </Button>
+            )}
+            {isPlaying && (
+              <Button onClick={togglePause} variant="secondary" className="gap-2">
+                <Pause className="h-4 w-4" aria-hidden="true" />
+                {t("pause")}
+              </Button>
+            )}
+            {isPaused && (
+              <Button onClick={togglePause} className="gap-2">
+                <Play className="h-4 w-4" aria-hidden="true" />
+                {t("resume")}
+              </Button>
+            )}
+            {(isGameOver || isWon || (isPaused && score > 0)) && (
+              <Button onClick={startGame} variant="outline" className="gap-2">
+                <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                {t("restart")}
+              </Button>
+            )}
+          </div>
+
+          {/* Mobile Controls */}
+          <div
+            className="mobile-controls flex flex-col items-center gap-2 md:hidden"
+            data-slot="mobile-controls"
+          >
             <Button
               variant="outline"
               size="icon"
               className="h-12 w-12"
-              aria-label={`${t("snakeControlsMobile")} ←`}
+              aria-label={`${t("snakeControlsMobile")} ↑`}
               disabled={!isPlaying}
-              onClick={() => changeDirection({ x: -1, y: 0 })}
+              onClick={() => changeDirection({ x: 0, y: -1 })}
             >
-              <ChevronLeft className="h-6 w-6" aria-hidden="true" />
+              <ChevronUp className="h-6 w-6" aria-hidden="true" />
             </Button>
-            <div className="h-12 w-12" />
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-12 w-12"
+                aria-label={`${t("snakeControlsMobile")} ←`}
+                disabled={!isPlaying}
+                onClick={() => changeDirection({ x: -1, y: 0 })}
+              >
+                <ChevronLeft className="h-6 w-6" aria-hidden="true" />
+              </Button>
+              <div className="h-12 w-12" />
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-12 w-12"
+                aria-label={`${t("snakeControlsMobile")} →`}
+                disabled={!isPlaying}
+                onClick={() => changeDirection({ x: 1, y: 0 })}
+              >
+                <ChevronRight className="h-6 w-6" aria-hidden="true" />
+              </Button>
+            </div>
             <Button
               variant="outline"
               size="icon"
               className="h-12 w-12"
-              aria-label={`${t("snakeControlsMobile")} →`}
+              aria-label={`${t("snakeControlsMobile")} ↓`}
               disabled={!isPlaying}
-              onClick={() => changeDirection({ x: 1, y: 0 })}
+              onClick={() => changeDirection({ x: 0, y: 1 })}
             >
-              <ChevronRight className="h-6 w-6" aria-hidden="true" />
+              <ChevronDown className="h-6 w-6" aria-hidden="true" />
             </Button>
           </div>
-          <Button
-            variant="outline"
-            size="icon"
-            className="h-12 w-12"
-            aria-label={`${t("snakeControlsMobile")} ↓`}
-            disabled={!isPlaying}
-            onClick={() => changeDirection({ x: 0, y: 1 })}
-          >
-            <ChevronDown className="h-6 w-6" aria-hidden="true" />
-          </Button>
-        </div>
 
-        {/* Instructions */}
-        <div
-          className="game-help text-center text-sm text-muted-foreground"
-          data-slot="game-help"
-        >
-          <span className="hidden md:inline">{t("snakeControls")}</span>
-          <span className="md:hidden">{t("snakeControlsMobile")}</span>
+          {/* Instructions */}
+          <div
+            className="game-help text-center text-sm text-muted-foreground"
+            data-slot="game-help"
+          >
+            <span className="hidden md:inline">{t("snakeControls")}</span>
+            <span className="md:hidden">{t("snakeControlsMobile")}</span>
+          </div>
+
         </div>
       </main>
     </div>

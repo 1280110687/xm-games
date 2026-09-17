@@ -1,5 +1,7 @@
 "use client"
 
+import "@/styles/games/board-workspace.css"
+
 import { useCallback, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -298,242 +300,254 @@ export function ChessGame() {
       <main
         className="game-content flex flex-1 flex-col items-center gap-4 py-2 sm:py-4"
         data-slot="game-content"
+        data-game-workspace={showBoard ? "ready" : undefined}
       >
-        <div className="gomoku-mode-switch" role="tablist" aria-label={t("chess")}>
-          <Button
-            type="button"
-            role="tab"
-            variant="ghost"
-            aria-selected={mode === "local"}
-            onClick={() => changeMode("local")}
-          >
-            <Gamepad2 aria-hidden="true" />
-            {lanCopy.localMode}
-          </Button>
-          <Button
-            type="button"
-            role="tab"
-            variant="ghost"
-            aria-selected={mode === "lan"}
-            onClick={() => changeMode("lan")}
-          >
-            <Wifi aria-hidden="true" />
-            {lanCopy.lanMode}
-          </Button>
-        </div>
-
-        {mode === "lan" && (
-          <LanGamePanel<Color>
-            idPrefix="chess"
-            gameTitle={CHESS_LAN_GAME_TITLES[locale]}
-            phase={lan.phase}
-            roomId={lan.roomId}
-            role={lan.role}
-            connected={lan.connected}
-            localReady={lan.localReady}
-            remoteReady={lan.remoteReady}
-            localSide={lan.localSide}
-            currentSide={lan.currentSide}
-            sides={[
-              { value: "white", label: lanCopy.white, color: "#f8fafc" },
-              { value: "black", label: lanCopy.black, color: "#111827" },
-            ]}
-            dice={lan.dice}
-            series={lan.series}
-            error={getChessLanError(locale, lan.errorCode, lanCopy.errors)}
-            copy={lanCopy}
-            onCreateRoom={() => void lan.createRoom()}
-            onJoinRoom={(roomId) => void lan.joinRoom(roomId)}
-            onReady={lan.markReady}
-            onLeave={lan.leaveRoom}
-            onRetry={lan.retryConnection}
-            onRematch={() => void lan.requestRematch()}
-          />
-        )}
-
-        {showBoard && (
-          <>
-        {/* Game Status */}
-        <Card
-          className="game-summary surface-panel w-full max-w-lg border-white/10 bg-card/70 p-3"
-          role="status"
-          aria-live="polite"
-        >
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-center gap-4">
-              <div className="flex items-center gap-2">
-                <span className={`text-2xl ${currentTurn === "white" ? "opacity-100" : "opacity-35"}`}>♔</span>
-                <span className={`text-sm ${currentTurn === "white" ? "text-foreground" : "text-muted-foreground"}`}>
-                  {t("whiteTurn")}
-                </span>
-              </div>
-              <div className="h-4 w-px bg-border" />
-              <div className="flex items-center gap-2">
-                <span className={`text-2xl ${currentTurn === "black" ? "opacity-100" : "opacity-35"}`}>♚</span>
-                <span className={`text-sm ${currentTurn === "black" ? "text-foreground" : "text-muted-foreground"}`}>
-                  {t("blackTurnChess")}
-                </span>
-              </div>
-            </div>
-
-          {gameStatus === "check" && (
-            <div className="game-message flex justify-center" data-slot="game-message">
-              <span
-                className="game-status-banner animate-pulse rounded-full bg-yellow-500/20 px-3 py-1 text-sm font-bold text-yellow-400"
-                data-tone="warning"
-              >
-                {t("checkChess")}
-              </span>
-            </div>
-          )}
-          {gameStatus === "checkmate" && (
-            <div className="game-message flex justify-center" data-slot="game-message">
-              <span
-                className="game-status-banner rounded-full bg-red-500/20 px-3 py-1 text-sm font-bold text-red-400"
-                data-tone="danger"
-              >
-                {winner === "white" ? t("whiteWinsChess") : t("blackWinsChess")}
-              </span>
-            </div>
-          )}
-          {gameStatus === "stalemate" && (
-            <div className="game-message flex justify-center" data-slot="game-message">
-              <span
-                className="game-status-banner rounded-full bg-slate-500/20 px-3 py-1 text-sm font-bold text-slate-400"
-                data-tone="neutral"
-              >
-                {t("stalemate")}
-              </span>
-            </div>
-          )}
-
-            {mode === "local" && (
-              <div
-                className="game-undo-status flex items-center justify-center gap-4 text-xs text-muted-foreground"
-                data-slot="undo-status"
-              >
-                <span>{whiteUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
-                <div className="h-3 w-px bg-border" />
-                <span>{blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
-              </div>
-            )}
+        <div className="game-workspace-before">
+          <div className="gomoku-mode-switch" role="tablist" aria-label={t("chess")}>
+            <Button
+              type="button"
+              role="tab"
+              variant="ghost"
+              aria-selected={mode === "local"}
+              onClick={() => changeMode("local")}
+            >
+              <Gamepad2 aria-hidden="true" />
+              {lanCopy.localMode}
+            </Button>
+            <Button
+              type="button"
+              role="tab"
+              variant="ghost"
+              aria-selected={mode === "lan"}
+              onClick={() => changeMode("lan")}
+            >
+              <Wifi aria-hidden="true" />
+              {lanCopy.lanMode}
+            </Button>
           </div>
-        </Card>
 
-        {/* Board */}
-        <div
-          className="game-stage w-full max-w-[22.5rem] overflow-hidden rounded-xl border-4 border-amber-950 shadow-2xl shadow-black/30"
-          data-slot="game-stage"
-        >
-          <div className="grid w-full grid-cols-8" role="group" aria-label={t("chess")}>
-          {board.map((row, rowIndex) =>
-            row.map((piece, colIndex) => {
-              const isLight = (rowIndex + colIndex) % 2 === 0
-              const isSelected = selectedPos?.row === rowIndex && selectedPos?.col === colIndex
-              const isValid = isValidTarget(rowIndex, colIndex)
-              const isLastFrom = lastMove?.from.row === rowIndex && lastMove?.from.col === colIndex
-              const isLastTo = lastMove?.to.row === rowIndex && lastMove?.to.col === colIndex
-              const square = `${String.fromCharCode(97 + colIndex)}${8 - rowIndex}`
-              const cellContent = piece ? `${piece.color} ${piece.type}` : "empty"
+          {mode === "lan" && (
+            <LanGamePanel<Color>
+              idPrefix="chess"
+              gameTitle={CHESS_LAN_GAME_TITLES[locale]}
+              phase={lan.phase}
+              roomId={lan.roomId}
+              role={lan.role}
+              connected={lan.connected}
+              localReady={lan.localReady}
+              remoteReady={lan.remoteReady}
+              localSide={lan.localSide}
+              currentSide={lan.currentSide}
+              sides={[
+                { value: "white", label: lanCopy.white, color: "#f8fafc" },
+                { value: "black", label: lanCopy.black, color: "#111827" },
+              ]}
+              dice={lan.dice}
+              series={lan.series}
+              error={getChessLanError(locale, lan.errorCode, lanCopy.errors)}
+              copy={lanCopy}
+              onCreateRoom={() => void lan.createRoom()}
+              onJoinRoom={(roomId) => void lan.joinRoom(roomId)}
+              onReady={lan.markReady}
+              onLeave={lan.leaveRoom}
+              onRetry={lan.retryConnection}
+              onRematch={() => void lan.requestRematch()}
+            />
+          )}
 
-              return (
-                <button
-                  key={`${rowIndex}-${colIndex}`}
-                  onClick={() => handleCellClick(rowIndex, colIndex)}
-                  disabled={mode === "lan" && !canPlayLan}
-                  aria-label={`${square}, ${cellContent}${isValid ? ", valid move" : ""}`}
-                  aria-pressed={isSelected}
-                  className={`
+          {showBoard && (
+            <>
+              {/* Game Status */}
+              <Card
+                className="game-summary surface-panel w-full max-w-lg border-white/10 bg-card/70 p-3"
+                role="status"
+                aria-live="polite"
+              >
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center justify-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-2xl ${currentTurn === "white" ? "opacity-100" : "opacity-35"}`}>♔</span>
+                      <span className={`text-sm ${currentTurn === "white" ? "text-foreground" : "text-muted-foreground"}`}>
+                        {t("whiteTurn")}
+                      </span>
+                    </div>
+                    <div className="h-4 w-px bg-border" />
+                    <div className="flex items-center gap-2">
+                      <span className={`text-2xl ${currentTurn === "black" ? "opacity-100" : "opacity-35"}`}>♚</span>
+                      <span className={`text-sm ${currentTurn === "black" ? "text-foreground" : "text-muted-foreground"}`}>
+                        {t("blackTurnChess")}
+                      </span>
+                    </div>
+                  </div>
+
+                  {gameStatus === "check" && (
+                    <div className="game-message flex justify-center" data-slot="game-message">
+                      <span
+                        className="game-status-banner animate-pulse rounded-full bg-yellow-500/20 px-3 py-1 text-sm font-bold text-yellow-400"
+                        data-tone="warning"
+                      >
+                        {t("checkChess")}
+                      </span>
+                    </div>
+                  )}
+                  {gameStatus === "checkmate" && (
+                    <div className="game-message flex justify-center" data-slot="game-message">
+                      <span
+                        className="game-status-banner rounded-full bg-red-500/20 px-3 py-1 text-sm font-bold text-red-400"
+                        data-tone="danger"
+                      >
+                        {winner === "white" ? t("whiteWinsChess") : t("blackWinsChess")}
+                      </span>
+                    </div>
+                  )}
+                  {gameStatus === "stalemate" && (
+                    <div className="game-message flex justify-center" data-slot="game-message">
+                      <span
+                        className="game-status-banner rounded-full bg-slate-500/20 px-3 py-1 text-sm font-bold text-slate-400"
+                        data-tone="neutral"
+                      >
+                        {t("stalemate")}
+                      </span>
+                    </div>
+                  )}
+
+                  {mode === "local" && (
+                    <div
+                      className="game-undo-status flex items-center justify-center gap-4 text-xs text-muted-foreground"
+                      data-slot="undo-status"
+                    >
+                      <span>{whiteUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
+                      <div className="h-3 w-px bg-border" />
+                      <span>{blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
+                    </div>
+                  )}
+                </div>
+              </Card>
+
+              {/* Board */}
+            </>
+          )}
+        </div>
+        {showBoard && (
+          <div
+            className="game-stage w-full max-w-[22.5rem] overflow-hidden rounded-xl border-4 border-amber-950 shadow-2xl shadow-black/30"
+            data-slot="game-stage"
+          >
+            <div className="grid w-full grid-cols-8" role="group" aria-label={t("chess")}>
+              {board.map((row, rowIndex) =>
+                row.map((piece, colIndex) => {
+                  const isLight = (rowIndex + colIndex) % 2 === 0
+                  const isSelected = selectedPos?.row === rowIndex && selectedPos?.col === colIndex
+                  const isValid = isValidTarget(rowIndex, colIndex)
+                  const isLastFrom = lastMove?.from.row === rowIndex && lastMove?.from.col === colIndex
+                  const isLastTo = lastMove?.to.row === rowIndex && lastMove?.to.col === colIndex
+                  const square = `${String.fromCharCode(97 + colIndex)}${8 - rowIndex}`
+                  const cellContent = piece ? `${piece.color} ${piece.type}` : "empty"
+
+                  return (
+                    <button
+                      key={`${rowIndex}-${colIndex}`}
+                      onClick={() => handleCellClick(rowIndex, colIndex)}
+                      disabled={mode === "lan" && !canPlayLan}
+                      aria-label={`${square}, ${cellContent}${isValid ? ", valid move" : ""}`}
+                      aria-pressed={isSelected}
+                      className={`
                     relative flex aspect-square w-full items-center justify-center text-[clamp(1.35rem,8vw,1.875rem)] transition-all
                     ${isLight ? "bg-amber-200" : "bg-amber-700"}
                     ${isSelected ? "ring-2 ring-yellow-400 ring-inset" : ""}
                     ${isLastFrom || isLastTo ? "bg-yellow-400/50" : ""}
                   `}
+                    >
+                      {isValid && !piece && (
+                        <div className="absolute h-3 w-3 rounded-full bg-green-500/50" aria-hidden="true" />
+                      )}
+                      {piece && (
+                        <span aria-hidden="true" className={`${isValid ? "ring-2 ring-green-400 rounded-full" : ""} ${piece.color === "white" ? "text-amber-50 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" : "text-slate-900"}`}>
+                          {pieceSymbols[piece.color][piece.type]}
+                        </span>
+                      )}
+                    </button>
+                  )
+                })
+              )}
+            </div>
+          </div>
+        )}
+        <div className="game-workspace-after">
+          {showBoard && (
+            <>
+
+              {/* Controls */}
+              <div className="game-actions flex flex-wrap justify-center gap-2" data-slot="game-actions">
+                {mode === "local" && (
+                  <>
+                    <Button
+                      onClick={handleUndo}
+                      disabled={localHistory.length === 0 || localGameStatus === "checkmate" || localGameStatus === "stalemate" ||
+                        (localCurrentTurn === "white" && blackUndoUsed) ||
+                        (localCurrentTurn === "black" && whiteUndoUsed)
+                      }
+                      variant="outline"
+                    >
+                      <Undo2 className="mr-1 h-4 w-4" aria-hidden="true" />
+                      {t("undo")}
+                    </Button>
+                    <Button
+                      onClick={resetGame}
+                      variant="outline"
+                    >
+                      <RotateCcw className="mr-1 h-4 w-4" aria-hidden="true" />
+                      {t("restart")}
+                    </Button>
+                  </>
+                )}
+                <GameRulesDialog
+                  triggerLabel={t("howToPlay")}
+                  closeLabel={t("close")}
+                  triggerIconClassName="mr-1"
+                  titleClassName="text-lg font-bold text-foreground"
                 >
-                  {isValid && !piece && (
-                    <div className="absolute h-3 w-3 rounded-full bg-green-500/50" aria-hidden="true" />
-                  )}
-                  {piece && (
-                    <span aria-hidden="true" className={`${isValid ? "ring-2 ring-green-400 rounded-full" : ""} ${piece.color === "white" ? "text-amber-50 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" : "text-slate-900"}`}>
-                      {pieceSymbols[piece.color][piece.type]}
-                    </span>
-                  )}
-                </button>
-              )
-            })
+                  <div className="space-y-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">♔</span>
+                      <span>{t("kingRuleInt")}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">♕</span>
+                      <span>{t("queenRule")}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">♖</span>
+                      <span>{t("rookRule")}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">♗</span>
+                      <span>{t("bishopRule")}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">♘</span>
+                      <span>{t("knightRule")}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xl">♙</span>
+                      <span>{t("pawnRuleInt")}</span>
+                    </div>
+                    <div className="mt-4 border-t border-border pt-4">
+                      <p>{t("chessSpecialRules")}</p>
+                      {mode === "lan" && <p className="mt-2">{lanRule}</p>}
+                    </div>
+                  </div>
+                </GameRulesDialog>
+              </div>
+
+              {/* Instructions */}
+              <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
+                {mode === "lan" ? lanInstructions : t("chessInstructionsInt")}
+              </p>
+            </>
           )}
-          </div>
-        </div>
 
-        {/* Controls */}
-        <div className="game-actions flex flex-wrap justify-center gap-2" data-slot="game-actions">
-        {mode === "local" && (
-          <>
-            <Button
-              onClick={handleUndo}
-              disabled={localHistory.length === 0 || localGameStatus === "checkmate" || localGameStatus === "stalemate" ||
-                (localCurrentTurn === "white" && blackUndoUsed) ||
-                (localCurrentTurn === "black" && whiteUndoUsed)
-              }
-              variant="outline"
-            >
-              <Undo2 className="mr-1 h-4 w-4" aria-hidden="true" />
-              {t("undo")}
-            </Button>
-            <Button
-              onClick={resetGame}
-              variant="outline"
-            >
-              <RotateCcw className="mr-1 h-4 w-4" aria-hidden="true" />
-              {t("restart")}
-            </Button>
-          </>
-        )}
-        <GameRulesDialog
-          triggerLabel={t("howToPlay")}
-          closeLabel={t("close")}
-          triggerIconClassName="mr-1"
-          titleClassName="text-lg font-bold text-foreground"
-        >
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">♔</span>
-              <span>{t("kingRuleInt")}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xl">♕</span>
-              <span>{t("queenRule")}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xl">♖</span>
-              <span>{t("rookRule")}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xl">♗</span>
-              <span>{t("bishopRule")}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xl">♘</span>
-              <span>{t("knightRule")}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="text-xl">♙</span>
-              <span>{t("pawnRuleInt")}</span>
-            </div>
-            <div className="mt-4 border-t border-border pt-4">
-              <p>{t("chessSpecialRules")}</p>
-              {mode === "lan" && <p className="mt-2">{lanRule}</p>}
-            </div>
-          </div>
-        </GameRulesDialog>
         </div>
-
-        {/* Instructions */}
-        <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
-          {mode === "lan" ? lanInstructions : t("chessInstructionsInt")}
-        </p>
-          </>
-        )}
       </main>
 
     </div>

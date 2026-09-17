@@ -1,5 +1,7 @@
 "use client"
 
+import "@/styles/games/board-workspace.css"
+
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Gamepad2, RotateCcw, Wifi } from "lucide-react"
 
@@ -118,169 +120,179 @@ export function ReversiGame() {
       <main
         className="game-content flex flex-1 flex-col items-center gap-4 py-2 sm:py-4"
         data-slot="game-content"
+        data-game-workspace={showBoard ? "ready" : undefined}
       >
-        <div className="gomoku-mode-switch" role="tablist" aria-label={t("reversi")}>
-          <Button
-            type="button"
-            role="tab"
-            variant="ghost"
-            aria-selected={mode === "local"}
-            onClick={() => changeMode("local")}
-          >
-            <Gamepad2 aria-hidden="true" />
-            {lanCopy.localMode}
-          </Button>
-          <Button
-            type="button"
-            role="tab"
-            variant="ghost"
-            aria-selected={mode === "lan"}
-            onClick={() => changeMode("lan")}
-          >
-            <Wifi aria-hidden="true" />
-            {lanCopy.lanMode}
-          </Button>
-        </div>
-
-        {mode === "lan" && (
-          <LanGamePanel
-            idPrefix="reversi"
-            gameTitle={t("reversi")}
-            phase={lan.phase}
-            roomId={lan.roomId}
-            role={lan.role}
-            connected={lan.connected}
-            localReady={lan.localReady}
-            remoteReady={lan.remoteReady}
-            localSide={lan.localSide}
-            currentSide={lan.currentSide}
-            sides={[
-              { value: "black", label: lanCopy.black, color: "#111827" },
-              { value: "white", label: lanCopy.white, color: "#f8fafc" },
-            ]}
-            dice={lan.dice}
-            series={lan.series}
-            error={getReversiLanError(locale, lan.errorCode, lanCopy.errors)}
-            copy={lanCopy}
-            onCreateRoom={() => void lan.createRoom()}
-            onJoinRoom={(roomId) => void lan.joinRoom(roomId)}
-            onReady={lan.markReady}
-            onLeave={lan.leaveRoom}
-            onRetry={lan.retryConnection}
-            onRematch={() => void lan.requestRematch()}
-          />
-        )}
-
-        {showBoard && (
-          <>
-            <Card
-              className="game-summary surface-panel border-white/10 bg-card/70 px-4 py-2"
-              role="status"
-              aria-live="polite"
+        <div className="game-workspace-before">
+          <div className="gomoku-mode-switch" role="tablist" aria-label={t("reversi")}>
+            <Button
+              type="button"
+              role="tab"
+              variant="ghost"
+              aria-selected={mode === "local"}
+              onClick={() => changeMode("local")}
             >
-              <div className="flex items-center gap-6">
-                <div className="flex items-center gap-2">
-                  <div className={`flex h-6 w-6 items-center justify-center rounded-full bg-slate-950 ${!gameOver && currentPlayer === "black" ? "ring-2 ring-primary" : ""}`}>
-                    <span className="text-xs font-bold text-white">{blackCount}</span>
-                  </div>
-                  <span className={`text-sm ${!gameOver && currentPlayer === "black" ? "text-foreground" : "text-muted-foreground"}`}>
-                    {t("blackStone")}
-                  </span>
-                </div>
-                <div className="h-4 w-px bg-border" />
-                <div className="flex items-center gap-2">
-                  <div className={`flex h-6 w-6 items-center justify-center rounded-full bg-white ${!gameOver && currentPlayer === "white" ? "ring-2 ring-primary" : ""}`}>
-                    <span className="text-xs font-bold text-slate-900">{whiteCount}</span>
-                  </div>
-                  <span className={`text-sm ${!gameOver && currentPlayer === "white" ? "text-foreground" : "text-muted-foreground"}`}>
-                    {t("whiteStone")}
-                  </span>
-                </div>
-              </div>
-            </Card>
+              <Gamepad2 aria-hidden="true" />
+              {lanCopy.localMode}
+            </Button>
+            <Button
+              type="button"
+              role="tab"
+              variant="ghost"
+              aria-selected={mode === "lan"}
+              onClick={() => changeMode("lan")}
+            >
+              <Wifi aria-hidden="true" />
+              {lanCopy.lanMode}
+            </Button>
+          </div>
 
-            {gameOver && (
-              <div
-                className="game-message game-status-banner rounded-lg bg-yellow-500/20 px-4 py-2 text-lg font-bold text-yellow-300"
-                data-tone="success"
-                data-slot="game-message"
+          {mode === "lan" && (
+            <LanGamePanel
+              idPrefix="reversi"
+              gameTitle={t("reversi")}
+              phase={lan.phase}
+              roomId={lan.roomId}
+              role={lan.role}
+              connected={lan.connected}
+              localReady={lan.localReady}
+              remoteReady={lan.remoteReady}
+              localSide={lan.localSide}
+              currentSide={lan.currentSide}
+              sides={[
+                { value: "black", label: lanCopy.black, color: "#111827" },
+                { value: "white", label: lanCopy.white, color: "#f8fafc" },
+              ]}
+              dice={lan.dice}
+              series={lan.series}
+              error={getReversiLanError(locale, lan.errorCode, lanCopy.errors)}
+              copy={lanCopy}
+              onCreateRoom={() => void lan.createRoom()}
+              onJoinRoom={(roomId) => void lan.joinRoom(roomId)}
+              onReady={lan.markReady}
+              onLeave={lan.leaveRoom}
+              onRetry={lan.retryConnection}
+              onRematch={() => void lan.requestRematch()}
+            />
+          )}
+
+          {showBoard && (
+            <>
+              <Card
+                className="game-summary surface-panel border-white/10 bg-card/70 px-4 py-2"
                 role="status"
-                aria-live="assertive"
+                aria-live="polite"
               >
-                {winner === "tie"
-                  ? t("tie")
-                  : winner === "black"
-                    ? t("blackWinsGo")
-                    : t("whiteWinsGo")}
-              </div>
-            )}
+                <div className="flex items-center gap-6">
+                  <div className="flex items-center gap-2">
+                    <div className={`flex h-6 w-6 items-center justify-center rounded-full bg-slate-950 ${!gameOver && currentPlayer === "black" ? "ring-2 ring-primary" : ""}`}>
+                      <span className="text-xs font-bold text-white">{blackCount}</span>
+                    </div>
+                    <span className={`text-sm ${!gameOver && currentPlayer === "black" ? "text-foreground" : "text-muted-foreground"}`}>
+                      {t("blackStone")}
+                    </span>
+                  </div>
+                  <div className="h-4 w-px bg-border" />
+                  <div className="flex items-center gap-2">
+                    <div className={`flex h-6 w-6 items-center justify-center rounded-full bg-white ${!gameOver && currentPlayer === "white" ? "ring-2 ring-primary" : ""}`}>
+                      <span className="text-xs font-bold text-slate-900">{whiteCount}</span>
+                    </div>
+                    <span className={`text-sm ${!gameOver && currentPlayer === "white" ? "text-foreground" : "text-muted-foreground"}`}>
+                      {t("whiteStone")}
+                    </span>
+                  </div>
+                </div>
+              </Card>
 
-            <div
-              className={`game-stage rounded-xl border-4 border-green-800 bg-green-600 p-1 shadow-2xl shadow-black/30 ${
-                mode === "lan"
-                  ? "w-[min(calc(100vw-1rem),calc(100svh-19rem),22.875rem)]"
-                  : "w-full max-w-[22.875rem]"
-              }`}
-              data-slot="game-stage"
-            >
-              <div className="grid w-full grid-cols-8 gap-px bg-green-800" role="group" aria-label={t("reversi")}>
-                {board.map((row, rowIndex) =>
-                  row.map((cell, colIndex) => {
-                    const isValid = isValidMove(rowIndex, colIndex)
-                    const isEnabled = isValid && !gameOver && (mode === "local" || canPlayLan)
-                    return (
-                      <button
-                        key={`${rowIndex}-${colIndex}`}
-                        onClick={() => handleCellClick(rowIndex, colIndex)}
-                        disabled={!isEnabled}
-                        aria-label={`${rowIndex + 1}, ${colIndex + 1}, ${cell === "black" ? t("blackStone") : cell === "white" ? t("whiteStone") : emptyLabel}${isValid ? `, ${validLabel}` : ""}`}
-                        className={`flex aspect-square w-full touch-manipulation items-center justify-center bg-green-600 ${isEnabled ? "cursor-pointer" : "cursor-default"}`}
-                      >
-                        {cell ? (
-                          <div
-                            aria-hidden="true"
-                            className={`h-[78%] w-[78%] rounded-full shadow-md transition-all ${
-                              cell === "black"
-                                ? "bg-gradient-to-br from-slate-700 to-slate-900"
-                                : "bg-gradient-to-br from-white to-slate-200"
-                            }`}
-                          />
-                        ) : isValid ? (
-                          <div className="h-3 w-3 rounded-full bg-green-400/50" aria-hidden="true" />
-                        ) : null}
-                      </button>
-                    )
-                  }),
-                )}
-              </div>
-            </div>
-
-            <div className="game-actions flex gap-2" data-slot="game-actions">
-              {mode === "local" && (
-                <Button onClick={resetGame} variant="outline">
-                  <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
-                  {t("restart")}
-                </Button>
+              {gameOver && (
+                <div
+                  className="game-message game-status-banner rounded-lg bg-yellow-500/20 px-4 py-2 text-lg font-bold text-yellow-300"
+                  data-tone="success"
+                  data-slot="game-message"
+                  role="status"
+                  aria-live="assertive"
+                >
+                  {winner === "tie"
+                    ? t("tie")
+                    : winner === "black"
+                      ? t("blackWinsGo")
+                      : t("whiteWinsGo")}
+                </div>
               )}
-              <GameRulesDialog
-                triggerLabel={t("howToPlay")}
-                closeLabel={t("close")}
-                titleClassName="text-lg font-bold text-foreground"
-              >
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>{t("reversiRule1")}</li>
-                  <li>{t("reversiRule2")}</li>
-                  <li>{t("reversiRule3")}</li>
-                  <li>{mode === "lan" ? LAN_RULE[locale] : t("reversiRule4")}</li>
-                </ul>
-              </GameRulesDialog>
-            </div>
 
-            <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
-              {mode === "lan" ? LAN_INSTRUCTIONS[locale] : t("reversiInstructions")}
-            </p>
-          </>
+            </>
+          )}
+        </div>
+        {showBoard && (
+          <div
+            className={`game-stage rounded-xl border-4 border-green-800 bg-green-600 p-1 shadow-2xl shadow-black/30 ${mode === "lan"
+                ? "w-[min(calc(100vw-1rem),calc(100svh-19rem),22.875rem)]"
+                : "w-full max-w-[22.875rem]"
+              }`}
+            data-slot="game-stage"
+          >
+            <div className="grid w-full grid-cols-8 gap-px bg-green-800" role="group" aria-label={t("reversi")}>
+              {board.map((row, rowIndex) =>
+                row.map((cell, colIndex) => {
+                  const isValid = isValidMove(rowIndex, colIndex)
+                  const isEnabled = isValid && !gameOver && (mode === "local" || canPlayLan)
+                  return (
+                    <button
+                      key={`${rowIndex}-${colIndex}`}
+                      onClick={() => handleCellClick(rowIndex, colIndex)}
+                      disabled={!isEnabled}
+                      aria-label={`${rowIndex + 1}, ${colIndex + 1}, ${cell === "black" ? t("blackStone") : cell === "white" ? t("whiteStone") : emptyLabel}${isValid ? `, ${validLabel}` : ""}`}
+                      className={`flex aspect-square w-full touch-manipulation items-center justify-center bg-green-600 ${isEnabled ? "cursor-pointer" : "cursor-default"}`}
+                    >
+                      {cell ? (
+                        <div
+                          aria-hidden="true"
+                          className={`h-[78%] w-[78%] rounded-full shadow-md transition-all ${cell === "black"
+                              ? "bg-gradient-to-br from-slate-700 to-slate-900"
+                              : "bg-gradient-to-br from-white to-slate-200"
+                            }`}
+                        />
+                      ) : isValid ? (
+                        <div className="h-3 w-3 rounded-full bg-green-400/50" aria-hidden="true" />
+                      ) : null}
+                    </button>
+                  )
+                }),
+              )}
+            </div>
+          </div>
         )}
+        <div className="game-workspace-after">
+          {showBoard && (
+            <>
+
+              <div className="game-actions flex gap-2" data-slot="game-actions">
+                {mode === "local" && (
+                  <Button onClick={resetGame} variant="outline">
+                    <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
+                    {t("restart")}
+                  </Button>
+                )}
+                <GameRulesDialog
+                  triggerLabel={t("howToPlay")}
+                  closeLabel={t("close")}
+                  titleClassName="text-lg font-bold text-foreground"
+                >
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li>{t("reversiRule1")}</li>
+                    <li>{t("reversiRule2")}</li>
+                    <li>{t("reversiRule3")}</li>
+                    <li>{mode === "lan" ? LAN_RULE[locale] : t("reversiRule4")}</li>
+                  </ul>
+                </GameRulesDialog>
+              </div>
+
+              <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
+                {mode === "lan" ? LAN_INSTRUCTIONS[locale] : t("reversiInstructions")}
+              </p>
+            </>
+          )}
+
+        </div>
       </main>
     </div>
   )

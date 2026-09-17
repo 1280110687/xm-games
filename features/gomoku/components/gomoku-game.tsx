@@ -1,5 +1,7 @@
 "use client"
 
+import "@/styles/games/board-workspace.css"
+
 import { useCallback, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -112,103 +114,109 @@ export function GomokuGame() {
       <main
         className="game-content flex flex-1 flex-col items-center gap-4 py-2 sm:py-4"
         data-slot="game-content"
+        data-game-workspace={showBoard ? "ready" : undefined}
       >
-        <div className="gomoku-mode-switch" role="tablist" aria-label={t("gomoku")}>
-          <Button
-            type="button"
-            role="tab"
-            variant="ghost"
-            aria-selected={mode === "local"}
-            onClick={() => changeMode("local")}
-          >
-            <Gamepad2 aria-hidden="true" />
-            {lanCopy.localMode}
-          </Button>
-          <Button
-            type="button"
-            role="tab"
-            variant="ghost"
-            aria-selected={mode === "lan"}
-            onClick={() => changeMode("lan")}
-          >
-            <Wifi aria-hidden="true" />
-            {lanCopy.lanMode}
-          </Button>
-        </div>
-
-        {mode === "lan" && (
-          <GomokuLanPanel
-            locale={locale}
-            phase={lan.phase}
-            roomId={lan.roomId}
-            role={lan.role}
-            connected={lan.connected}
-            localReady={lan.localReady}
-            remoteReady={lan.remoteReady}
-            localStone={lan.localStone}
-            currentPlayer={lan.game.winner || lan.game.isDraw ? null : lan.game.currentPlayer}
-            dice={lan.dice}
-            series={lan.series}
-            error={getGomokuLanError(locale, lan.errorCode)}
-            onCreateRoom={() => void lan.createRoom()}
-            onJoinRoom={(roomId) => void lan.joinRoom(roomId)}
-            onReady={lan.markReady}
-            onLeave={lan.leaveRoom}
-            onRetry={lan.retryConnection}
-            onRematch={() => void lan.requestRematch()}
-          />
-        )}
-
-        {showBoard && (
-          <>
-            {/* Game status */}
-            <Card className="game-summary surface-panel border-white/10 bg-card/70 px-4 py-2" role="status" aria-live="polite">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-2">
-                  <div className={`h-5 w-5 rounded-full bg-slate-950 ${currentPlayer === "black" ? "ring-2 ring-primary" : ""}`} />
-                  <span className={`text-sm ${currentPlayer === "black" ? "text-foreground" : "text-muted-foreground"}`}>
-                    {t("blackStone")}
-                  </span>
-                </div>
-                <div className="h-4 w-px bg-border" />
-                <div className="flex items-center gap-2">
-                  <div className={`h-5 w-5 rounded-full bg-white ${currentPlayer === "white" ? "ring-2 ring-primary" : ""}`} />
-                  <span className={`text-sm ${currentPlayer === "white" ? "text-foreground" : "text-muted-foreground"}`}>
-                    {t("whiteStone")}
-                  </span>
-                </div>
-              </div>
-            </Card>
-
-            {(winner || game.isDraw) && (
-              <div
-                className="game-message game-status-banner rounded-lg bg-yellow-500/20 px-4 py-2 text-lg font-bold text-yellow-300"
-                data-tone="success"
-                data-slot="game-message"
-                role="status"
-                aria-live="assertive"
-              >
-                {game.isDraw ? drawLabel : winner === "black" ? t("blackWinsGo") : t("whiteWinsGo")}
-              </div>
-            )}
-
-            {/* Undo status */}
-            {mode === "local" && (
-              <div
-                className="gomoku-undo-status flex items-center gap-4 text-xs text-muted-foreground"
-                data-slot="gomoku-undo-status"
-              >
-                <span>{t("blackStone")}: {blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
-                <span>{t("whiteStone")}: {whiteUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
-              </div>
-            )}
-
-            {/* Game board */}
-            <div
-              className="game-stage relative aspect-square w-full max-w-[23.5rem] rounded-xl border-4 border-amber-800 bg-amber-600 p-2 shadow-2xl shadow-black/30"
-              data-slot="game-stage"
+        <div className="game-workspace-before">
+          <div className="gomoku-mode-switch" role="tablist" aria-label={t("gomoku")}>
+            <Button
+              type="button"
+              role="tab"
+              variant="ghost"
+              aria-selected={mode === "local"}
+              onClick={() => changeMode("local")}
             >
-              <div className="relative h-full w-full">
+              <Gamepad2 aria-hidden="true" />
+              {lanCopy.localMode}
+            </Button>
+            <Button
+              type="button"
+              role="tab"
+              variant="ghost"
+              aria-selected={mode === "lan"}
+              onClick={() => changeMode("lan")}
+            >
+              <Wifi aria-hidden="true" />
+              {lanCopy.lanMode}
+            </Button>
+          </div>
+
+          {mode === "lan" && (
+            <GomokuLanPanel
+              locale={locale}
+              phase={lan.phase}
+              roomId={lan.roomId}
+              role={lan.role}
+              connected={lan.connected}
+              localReady={lan.localReady}
+              remoteReady={lan.remoteReady}
+              localStone={lan.localStone}
+              currentPlayer={lan.game.winner || lan.game.isDraw ? null : lan.game.currentPlayer}
+              dice={lan.dice}
+              series={lan.series}
+              error={getGomokuLanError(locale, lan.errorCode)}
+              onCreateRoom={() => void lan.createRoom()}
+              onJoinRoom={(roomId) => void lan.joinRoom(roomId)}
+              onReady={lan.markReady}
+              onLeave={lan.leaveRoom}
+              onRetry={lan.retryConnection}
+              onRematch={() => void lan.requestRematch()}
+            />
+          )}
+
+          {showBoard && (
+            <>
+              {/* Game status */}
+              <Card className="game-summary surface-panel border-white/10 bg-card/70 px-4 py-2" role="status" aria-live="polite">
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <div className={`h-5 w-5 rounded-full bg-slate-950 ${currentPlayer === "black" ? "ring-2 ring-primary" : ""}`} />
+                    <span className={`text-sm ${currentPlayer === "black" ? "text-foreground" : "text-muted-foreground"}`}>
+                      {t("blackStone")}
+                    </span>
+                  </div>
+                  <div className="h-4 w-px bg-border" />
+                  <div className="flex items-center gap-2">
+                    <div className={`h-5 w-5 rounded-full bg-white ${currentPlayer === "white" ? "ring-2 ring-primary" : ""}`} />
+                    <span className={`text-sm ${currentPlayer === "white" ? "text-foreground" : "text-muted-foreground"}`}>
+                      {t("whiteStone")}
+                    </span>
+                  </div>
+                </div>
+              </Card>
+
+              {(winner || game.isDraw) && (
+                <div
+                  className="game-message game-status-banner rounded-lg bg-yellow-500/20 px-4 py-2 text-lg font-bold text-yellow-300"
+                  data-tone="success"
+                  data-slot="game-message"
+                  role="status"
+                  aria-live="assertive"
+                >
+                  {game.isDraw ? drawLabel : winner === "black" ? t("blackWinsGo") : t("whiteWinsGo")}
+                </div>
+              )}
+
+              {/* Undo status */}
+              {mode === "local" && (
+                <div
+                  className="gomoku-undo-status flex items-center gap-4 text-xs text-muted-foreground"
+                  data-slot="gomoku-undo-status"
+                >
+                  <span>{t("blackStone")}: {blackUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
+                  <span>{t("whiteStone")}: {whiteUndoUsed ? t("undoUsed") : `${t("undoRemaining")}: 1`}</span>
+                </div>
+              )}
+
+              {/* Game board */}
+            </>
+          )}
+        </div>
+        {showBoard && (
+          <div
+            className="game-stage relative aspect-square w-full max-w-[23.5rem] rounded-xl border-4 border-amber-800 bg-amber-600 p-2 shadow-2xl shadow-black/30"
+            data-slot="game-stage"
+          >
+            <div className="relative h-full w-full">
               {/* Grid lines */}
               <svg
                 className="pointer-events-none absolute left-[3.333%] top-[3.333%] h-[93.333%] w-[93.333%]"
@@ -267,62 +275,67 @@ export function GomokuGame() {
                       {cell && (
                         <div
                           aria-hidden="true"
-                          className={`aspect-square w-[82%] rounded-full shadow-md ${
-                            cell === "black"
+                          className={`aspect-square w-[82%] rounded-full shadow-md ${cell === "black"
                               ? "bg-gradient-to-br from-slate-700 to-slate-900"
                               : "bg-gradient-to-br from-white to-slate-200"
-                          }`}
+                            }`}
                         />
                       )}
                     </button>
                   ))
                 )}
               </div>
-              </div>
             </div>
-
-            {/* Controls */}
-            <div className="game-actions flex flex-wrap justify-center gap-2" data-slot="game-actions">
-              {mode === "local" && (
-                <>
-                  <Button
-                    onClick={handleUndo}
-                    variant="outline"
-                    disabled={
-                      moveHistory.length === 0 ||
-                      !!winner ||
-                      (moveHistory.length > 0 && moveHistory[moveHistory.length - 1].stone === "black" && blackUndoUsed) ||
-                      (moveHistory.length > 0 && moveHistory[moveHistory.length - 1].stone === "white" && whiteUndoUsed)
-                    }
-                  >
-                    <Undo2 className="mr-2 h-4 w-4" aria-hidden="true" />
-                    {t("undo")}
-                  </Button>
-                  <Button onClick={resetGame} variant="outline">
-                    <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
-                    {t("restart")}
-                  </Button>
-                </>
-              )}
-              <GameRulesDialog
-                triggerLabel={t("howToPlay")}
-                closeLabel={t("close")}
-                titleClassName="text-lg font-bold text-foreground"
-              >
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  <li>{t("gomokuRule1")}</li>
-                  <li>{t("gomokuRule2")}</li>
-                  <li>{mode === "lan" ? lanRule : t("gomokuRule3")}</li>
-                </ul>
-              </GameRulesDialog>
-            </div>
-
-            <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
-              {mode === "lan" ? lanInstructions : t("gomokuInstructions")}
-            </p>
-          </>
+          </div>
         )}
+        <div className="game-workspace-after">
+          {showBoard && (
+            <>
 
+              {/* Controls */}
+              <div className="game-actions flex flex-wrap justify-center gap-2" data-slot="game-actions">
+                {mode === "local" && (
+                  <>
+                    <Button
+                      onClick={handleUndo}
+                      variant="outline"
+                      disabled={
+                        moveHistory.length === 0 ||
+                        !!winner ||
+                        (moveHistory.length > 0 && moveHistory[moveHistory.length - 1].stone === "black" && blackUndoUsed) ||
+                        (moveHistory.length > 0 && moveHistory[moveHistory.length - 1].stone === "white" && whiteUndoUsed)
+                      }
+                    >
+                      <Undo2 className="mr-2 h-4 w-4" aria-hidden="true" />
+                      {t("undo")}
+                    </Button>
+                    <Button onClick={resetGame} variant="outline">
+                      <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
+                      {t("restart")}
+                    </Button>
+                  </>
+                )}
+                <GameRulesDialog
+                  triggerLabel={t("howToPlay")}
+                  closeLabel={t("close")}
+                  titleClassName="text-lg font-bold text-foreground"
+                >
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    <li>{t("gomokuRule1")}</li>
+                    <li>{t("gomokuRule2")}</li>
+                    <li>{mode === "lan" ? lanRule : t("gomokuRule3")}</li>
+                  </ul>
+                </GameRulesDialog>
+              </div>
+
+              <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
+                {mode === "lan" ? lanInstructions : t("gomokuInstructions")}
+              </p>
+            </>
+          )}
+
+
+        </div>
       </main>
     </div>
   )

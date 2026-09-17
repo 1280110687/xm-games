@@ -133,6 +133,7 @@ export function Game2048() {
   const [keepPlaying, setKeepPlaying] = useState(false)
   const [newTile, setNewTile] = useState<[number, number] | null>(null)
   const pointerOrigin = useRef<PointerOrigin | null>(null)
+  const boardRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setBestScore(readBestScore())
@@ -148,6 +149,7 @@ export function Game2048() {
 
   const handleMove = useCallback(
     (direction: MoveDirection) => {
+      boardRef.current?.focus({ preventScroll: true })
       if (status !== "playing") return
 
       const move = moveBoard(board, direction)
@@ -199,6 +201,7 @@ export function Game2048() {
   }, [handleMove])
 
   const resetGame = useCallback(() => {
+    boardRef.current?.focus({ preventScroll: true })
     setBoard(createRandomBoard())
     setScore(0)
     setStatus("playing")
@@ -207,6 +210,7 @@ export function Game2048() {
   }, [])
 
   const continueGame = () => {
+    boardRef.current?.focus({ preventScroll: true })
     setKeepPlaying(true)
     setStatus("playing")
   }
@@ -290,6 +294,7 @@ export function Game2048() {
 
           <div
             className="classic-2048-board"
+            ref={boardRef}
             role="group"
             aria-label={`${copy.board}. ${t("score")}: ${score}.`}
             tabIndex={0}

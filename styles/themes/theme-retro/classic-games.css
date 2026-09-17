@@ -1,5 +1,5 @@
 /* Route-only retro game console, independent of the other theme presentations. */
-html[data-theme='theme-retro'] :is(.classic-2048-content,.classic-tetris-content) { width: min(100%,470px); margin-inline: auto; }
+html[data-theme='theme-retro'] :is(.classic-2048-content,.classic-tetris-content) { width: 100%; max-width: 470px; margin-inline: auto; }
 html[data-theme='theme-retro'] .classic-2048-shell { padding: 18px; border-radius: 6px; background: #f5f2e9; }
 html[data-theme='theme-retro'] .classic-2048-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 html[data-theme='theme-retro'] .classic-2048-logo { font-size: clamp(42px,13vw,68px); font-weight: 850; color: #9b431f; letter-spacing: -3px; line-height: 1.2; }
@@ -30,9 +30,9 @@ html[data-theme='theme-retro'] .tetris-handheld { --tetris-cell: clamp(10px,calc
 html[data-theme='theme-retro'] .tetris-brand { display: flex; gap: 8px; align-items: center; font-size: 20px; font-weight: 800; color: #9b431f; margin-bottom: 14px; }
 html[data-theme='theme-retro'] .tetris-brand svg { width: 24px; height: 24px; }
 html[data-theme='theme-retro'] .tetris-screen-frame { padding: 10px; border-radius: 6px; background: #dfdfce; }
-html[data-theme='theme-retro'] .tetris-lcd { display: flex; gap: 12px; justify-content: center; padding: 10px; border-radius: 6px; background: #bcc895; color: #354321; }
+html[data-theme='theme-retro'] .tetris-lcd { display: flex; gap: var(--tetris-lcd-gap); justify-content: center; padding: 10px; border-radius: 6px; background: #bcc895; color: #354321; }
 html[data-theme='theme-retro'] .tetris-board { background: #a3b27e; border: 1px solid #687b47; }
-html[data-theme='theme-retro'] .tetris-cell { width: var(--tetris-cell); height: var(--tetris-cell); border: 1px solid rgb(121 155 210 / 10%); }
+html[data-theme='theme-retro'] .tetris-cell { width: 100%; height: 100%; border: 1px solid rgb(121 155 210 / 10%); }
 html[data-theme='theme-retro'] .tetris-preview-cell { width: var(--tetris-preview-cell); height: var(--tetris-preview-cell); }
 html[data-theme='theme-retro'] :is(.tetris-cell,.tetris-preview-cell).is-filled { background: #5ed5e8; border: 1px solid rgb(255 255 255 / 25%); border-radius: 2px; }
 html[data-theme='theme-retro'] :is(.tetris-cell,.tetris-preview-cell)[data-piece='O'] { background: #ffcc59; }
@@ -42,7 +42,7 @@ html[data-theme='theme-retro'] :is(.tetris-cell,.tetris-preview-cell)[data-piece
 html[data-theme='theme-retro'] :is(.tetris-cell,.tetris-preview-cell)[data-piece='S'] { background: #6dbf73; }
 html[data-theme='theme-retro'] :is(.tetris-cell,.tetris-preview-cell)[data-piece='Z'] { background: #f27179; }
 html[data-theme='theme-retro'] :is(.tetris-cell,.tetris-preview-cell).is-filled::after { border: 1px solid rgb(255 255 255 / 20%); }
-html[data-theme='theme-retro'] .tetris-lcd-panel { display: flex; flex-direction: column; min-width: 48px; width: 100px; gap: 14px; }
+html[data-theme='theme-retro'] .tetris-lcd-panel { display: flex; flex-direction: column; min-width: 48px; width: var(--tetris-panel-width); gap: 14px; }
 html[data-theme='theme-retro'] .tetris-lcd-stat { display: grid; gap: 3px; }
 html[data-theme='theme-retro'] .tetris-lcd-stat span, html[data-theme='theme-retro'] .tetris-next > span { font-size: 10px; color: #344321; }
 html[data-theme='theme-retro'] .tetris-lcd-stat strong { font: 700 21px var(--font-geist-mono),monospace; }
@@ -72,7 +72,19 @@ html[data-theme='theme-retro'] .classic-tetris-help { text-align: center; font-s
   html[data-theme='theme-retro'] :is(.classic-2048-shell,.tetris-handheld) { padding: 10px; }
   html[data-theme='theme-retro'] .tetris-screen-frame, html[data-theme='theme-retro'] .tetris-lcd { padding: 6px; }
   html[data-theme='theme-retro'] .tetris-control-deck { gap: 6px; }
-  html[data-theme='theme-retro'] .tetris-lcd { gap: 8px; }
+  html[data-theme='theme-retro'] .tetris-lcd { gap: var(--tetris-lcd-gap); }
   html[data-theme='theme-retro'] .tetris-lcd-panel { gap: 8px; }
   html[data-theme='theme-retro'] .tetris-lcd-stat strong { font-size: 17px; }
+}
+
+
+@media (min-width: 1024px) {
+  html[data-theme='theme-retro'] .classic-2048-content { max-width: min(470px, calc(100svh - 430px)); }
+  html[data-theme='theme-retro'] .classic-2048-shell { padding: 14px; }
+  html[data-theme='theme-retro'] .classic-2048-logo { font-size: 48px; }
+  html[data-theme='theme-retro'] .classic-2048-intro { margin-block: 10px; }
+  html[data-theme='theme-retro'] .classic-2048-controls { margin-top: 10px; }
+  html[data-theme='theme-retro'] .classic-2048-help { margin-top: 10px; }
+  html[data-theme='theme-retro'] .classic-tetris-content { max-width: 520px; }
+  html[data-theme='theme-retro'] .tetris-handheld { --tetris-cell: clamp(16px, calc((100svh - 350px) / 20), 26px); width: 100%; }
 }

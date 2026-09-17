@@ -221,7 +221,8 @@ html[data-theme='theme-four'] .classic-tetris-page .game-header [data-slot='butt
 
 html[data-theme='theme-four'] .classic-tetris-content {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
   padding: 0.75rem 0 0.5rem;
 }
@@ -258,7 +259,7 @@ html[data-theme='theme-four'] .tetris-brand-blocks {
 }
 
 html[data-theme='theme-four'] .tetris-screen-frame {
-  width: fit-content;
+  width: 100%;
   margin-inline: auto;
   padding: 0.6rem;
   border: 0.28rem solid #15140d;
@@ -268,7 +269,8 @@ html[data-theme='theme-four'] .tetris-screen-frame {
 
 html[data-theme='theme-four'] .tetris-lcd {
   display: flex;
-  gap: 0.5rem;
+  justify-content: center;
+  gap: var(--tetris-lcd-gap);
   padding: 0.42rem;
   border: 0.18rem solid #5a6350;
   color: #1d2b1d;
@@ -284,8 +286,8 @@ html[data-theme='theme-four'] .tetris-board {
 }
 
 html[data-theme='theme-four'] .tetris-cell {
-  width: var(--tetris-cell);
-  height: var(--tetris-cell);
+  width: 100%;
+  height: 100%;
   border: 1px solid rgb(40 57 38 / 0.16);
   background: rgb(42 59 40 / 0.04);
   box-shadow: inset 0 0 0 1px rgb(216 226 198 / 0.09);
@@ -320,7 +322,7 @@ html[data-theme='theme-four'] .tetris-screen-message small {
 
 html[data-theme='theme-four'] .tetris-lcd-panel {
   display: flex;
-  width: calc(var(--tetris-cell) * 5.2);
+  width: var(--tetris-panel-width);
   flex-direction: column;
   gap: 0.46rem;
   font-family: var(--font-geist-mono), monospace;
@@ -668,13 +670,13 @@ html[data-theme='theme-four'] .classic-tetris-help {
   }
 
   html[data-theme='theme-four'] .tetris-lcd {
-    gap: 0.32rem;
+    gap: var(--tetris-lcd-gap);
     padding: 0.25rem;
     border-width: 0.12rem;
   }
 
   html[data-theme='theme-four'] .tetris-lcd-panel {
-    width: 4.55rem;
+    width: var(--tetris-panel-width);
     gap: 0.24rem;
   }
 
@@ -756,6 +758,12 @@ html[data-theme='theme-four'] .classic-tetris-help {
   html[data-theme='theme-four'] .classic-tetris-help {
     display: none;
   }
+}
+
+
+@media (min-width: 1024px) {
+  html[data-theme='theme-four'] .classic-tetris-content { max-width: 520px; }
+  html[data-theme='theme-four'] .tetris-handheld { --tetris-cell: clamp(10px, calc((100svh - 450px) / 20), 26px); width: 100%; }
 }
 
 @media (max-width: 767px) and (min-height: 701px) {

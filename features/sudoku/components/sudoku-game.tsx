@@ -1,5 +1,7 @@
 "use client"
 
+import "@/styles/games/board-workspace.css"
+
 import { useState, useCallback, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { useLocale } from "@/lib/locale-context"
@@ -80,7 +82,7 @@ export function SudokuGame() {
     setErrors(newErrors)
 
     // Check completion
-    const isComplete = newBoard.every((row, r) => 
+    const isComplete = newBoard.every((row, r) =>
       row.every((cell, c) => cell === solution[r][c])
     )
     if (isComplete) {
@@ -127,19 +129,19 @@ export function SudokuGame() {
     if (hints <= 0 || !selectedCell || completed) return
     const [row, col] = selectedCell
     if (initialCells[row][col]) return
-    
+
     const newBoard = board.map(r => [...r])
     newBoard[row][col] = solution[row][col]
     setBoard(newBoard)
     setHints(h => h - 1)
-    
+
     // Clear error for this cell
     const newErrors = errors.map(r => [...r])
     newErrors[row][col] = false
     setErrors(newErrors)
 
     // Check completion
-    const isComplete = newBoard.every((row, r) => 
+    const isComplete = newBoard.every((row, r) =>
       row.every((cell, c) => cell === solution[r][c])
     )
     if (isComplete) setCompleted(true)
@@ -151,19 +153,19 @@ export function SudokuGame() {
     const hasError = errors[row]?.[col]
     const isSameRow = selectedCell?.[0] === row
     const isSameCol = selectedCell?.[1] === col
-    const isSameBox = selectedCell && 
+    const isSameBox = selectedCell &&
       Math.floor(selectedCell[0] / 3) === Math.floor(row / 3) &&
       Math.floor(selectedCell[1] / 3) === Math.floor(col / 3)
-    
+
     let bg = "bg-white"
     if (isSelected) bg = "bg-blue-200"
     else if (isSameRow || isSameCol || isSameBox) bg = "bg-blue-50"
     if (hasError) bg = "bg-red-100"
-    
+
     let text = "text-blue-600"
     if (isInitial) text = "text-slate-900"
     if (hasError) text = "text-red-600"
-    
+
     return `${bg} ${text}`
   }
 
@@ -188,36 +190,40 @@ export function SudokuGame() {
       <main
         className="game-content flex flex-1 flex-col items-center gap-4 py-2 sm:py-4"
         data-slot="game-content"
+        data-game-workspace="ready"
       >
-        {/* Difficulty selector */}
-        <div className="game-settings flex gap-2" data-slot="game-settings">
-          {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
-            <Button
-              key={d}
-              variant={difficulty === d ? "default" : "outline"}
-              size="sm"
-              onClick={() => setDifficulty(d)}
-              aria-pressed={difficulty === d}
-            >
-              {t(d === "easy" ? "easy" : d === "medium" ? "medium" : "hard")}
-            </Button>
-          ))}
-        </div>
-
-        {/* Game status */}
-        {completed && (
-          <div
-            className="game-message game-status-banner rounded-lg bg-green-500/20 px-4 py-2 text-lg font-bold text-green-300"
-            data-tone="success"
-            data-slot="game-message"
-            role="status"
-            aria-live="assertive"
-          >
-            {t("youWin")}
+        <div className="game-workspace-before">
+          {/* Difficulty selector */}
+          <div className="game-settings flex gap-2" data-slot="game-settings">
+            {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
+              <Button
+                key={d}
+                variant={difficulty === d ? "default" : "outline"}
+                size="sm"
+                onClick={() => setDifficulty(d)}
+                aria-pressed={difficulty === d}
+              >
+                {t(d === "easy" ? "easy" : d === "medium" ? "medium" : "hard")}
+              </Button>
+            ))}
           </div>
-        )}
 
-        {/* Game board */}
+          {/* Game status */}
+          {completed && (
+            <div
+              className="game-message game-status-banner rounded-lg bg-green-500/20 px-4 py-2 text-lg font-bold text-green-300"
+              data-tone="success"
+              data-slot="game-message"
+              role="status"
+              aria-live="assertive"
+            >
+              {t("youWin")}
+            </div>
+          )}
+
+          {/* Game board */}
+
+        </div>
         <div
           className="game-stage w-full max-w-[22.75rem] rounded-xl border-2 border-blue-300 bg-white p-1 shadow-2xl shadow-black/25"
           data-slot="game-stage"
@@ -251,70 +257,74 @@ export function SudokuGame() {
             )}
           </div>
         </div>
+        <div className="game-workspace-after">
 
-        {/* Number input buttons */}
-        <div
-          className="sudoku-keypad flex flex-wrap justify-center gap-2"
-          data-slot="sudoku-keypad"
-          role="toolbar"
-          aria-label={t("sudoku")}
-        >
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+
+          {/* Number input buttons */}
+          <div
+            className="sudoku-keypad flex flex-wrap justify-center gap-2"
+            data-slot="sudoku-keypad"
+            role="toolbar"
+            aria-label={t("sudoku")}
+          >
+            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+              <Button
+                key={num}
+                onClick={() => handleNumberInput(num)}
+                disabled={!canEditSelected}
+                variant="outline"
+                className="h-10 w-10 text-lg font-bold"
+              >
+                {num}
+              </Button>
+            ))}
             <Button
-              key={num}
-              onClick={() => handleNumberInput(num)}
+              onClick={() => handleNumberInput(null)}
               disabled={!canEditSelected}
+              aria-label={cellText.empty}
               variant="outline"
-              className="h-10 w-10 text-lg font-bold"
+              className="h-10 w-10"
             >
-              {num}
+              <Eraser className="h-5 w-5" aria-hidden="true" />
             </Button>
-          ))}
-          <Button
-            onClick={() => handleNumberInput(null)}
-            disabled={!canEditSelected}
-            aria-label={cellText.empty}
-            variant="outline"
-            className="h-10 w-10"
-          >
-            <Eraser className="h-5 w-5" aria-hidden="true" />
-          </Button>
+          </div>
+
+          {/* Controls */}
+          <div className="game-actions flex flex-wrap justify-center gap-2" data-slot="game-actions">
+            <Button
+              onClick={initGame}
+              variant="outline"
+            >
+              <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
+              {t("restart")}
+            </Button>
+            <Button
+              onClick={useHint}
+              variant="outline"
+              disabled={hints <= 0 || !canEditSelected}
+            >
+              <Lightbulb className="mr-2 h-4 w-4" aria-hidden="true" />
+              {t("hint")} ({hints})
+            </Button>
+            <GameRulesDialog
+              triggerLabel={t("howToPlay")}
+              closeLabel={t("close")}
+              titleClassName="text-lg font-bold text-foreground"
+            >
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>{t("sudokuRule1")}</li>
+                <li>{t("sudokuRule2")}</li>
+                <li>{t("sudokuRule3")}</li>
+              </ul>
+            </GameRulesDialog>
+          </div>
+
+          <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
+            {t("sudokuInstructions")}
+          </p>
+
+
         </div>
-
-        {/* Controls */}
-        <div className="game-actions flex flex-wrap justify-center gap-2" data-slot="game-actions">
-          <Button
-            onClick={initGame}
-            variant="outline"
-          >
-            <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
-            {t("restart")}
-          </Button>
-          <Button
-            onClick={useHint}
-            variant="outline"
-            disabled={hints <= 0 || !canEditSelected}
-          >
-            <Lightbulb className="mr-2 h-4 w-4" aria-hidden="true" />
-            {t("hint")} ({hints})
-          </Button>
-          <GameRulesDialog
-            triggerLabel={t("howToPlay")}
-            closeLabel={t("close")}
-            titleClassName="text-lg font-bold text-foreground"
-          >
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>{t("sudokuRule1")}</li>
-              <li>{t("sudokuRule2")}</li>
-              <li>{t("sudokuRule3")}</li>
-            </ul>
-          </GameRulesDialog>
-        </div>
-
-        <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
-          {t("sudokuInstructions")}
-        </p>
-
       </main>
     </div>
   )

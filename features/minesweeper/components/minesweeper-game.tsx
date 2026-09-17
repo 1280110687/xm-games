@@ -1,5 +1,7 @@
 "use client"
 
+import "@/styles/games/board-workspace.css"
+
 import { useState, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -195,104 +197,107 @@ export function MinesweeperGame() {
       <main
         className="game-content flex flex-1 flex-col items-center gap-4 py-2 sm:py-4"
         data-slot="game-content"
+        data-game-workspace="ready"
       >
-        {/* Difficulty selector */}
-        <div className="game-settings flex gap-2" data-slot="game-settings">
-          {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
-            <Button
-              key={d}
-              variant={difficulty === d ? "default" : "outline"}
-              size="sm"
-              onClick={() => { setDifficulty(d) }}
-              aria-pressed={difficulty === d}
-            >
-              {t(d === "easy" ? "easy" : d === "medium" ? "medium" : "hard")}
-            </Button>
-          ))}
-        </div>
+        <div className="game-workspace-before">
+          {/* Difficulty selector */}
+          <div className="game-settings flex gap-2" data-slot="game-settings">
+            {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
+              <Button
+                key={d}
+                variant={difficulty === d ? "default" : "outline"}
+                size="sm"
+                onClick={() => { setDifficulty(d) }}
+                aria-pressed={difficulty === d}
+              >
+                {t(d === "easy" ? "easy" : d === "medium" ? "medium" : "hard")}
+              </Button>
+            ))}
+          </div>
 
-        {/* Game stats */}
-        <Card
-          className="game-summary surface-panel flex flex-row items-center gap-6 border-white/10 bg-card/70 px-4 py-2"
-          aria-label={`${t("minesweeper")}: ${mines - flagCount}; ${formatTime(timer)}; ${flagCount}`}
-        >
-          <div className="flex items-center gap-2">
-            <Bomb
-              className="game-stat-icon h-4 w-4 text-red-400"
-              data-tone="danger"
-              aria-hidden="true"
-            />
-            <span className="font-mono text-lg text-foreground">{mines - flagCount}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="font-mono text-lg text-foreground">{formatTime(timer)}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Flag
-              className="game-stat-icon h-4 w-4 text-yellow-400"
-              data-tone="achievement"
-              aria-hidden="true"
-            />
-            <span className="font-mono text-lg text-foreground">{flagCount}</span>
-          </div>
-        </Card>
-
-        {/* Game status */}
-        {gameStatus !== "playing" && (
-          <div
-            role="status"
-            aria-live="polite"
-            data-tone={gameStatus === "won" ? "success" : "danger"}
-            data-slot="game-message"
-            className={`game-message game-status-banner rounded-lg px-4 py-2 text-lg font-bold ${
-            gameStatus === "won" ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
-          }`}
+          {/* Game stats */}
+          <Card
+            className="game-summary surface-panel flex flex-row items-center gap-6 border-white/10 bg-card/70 px-4 py-2"
+            aria-label={`${t("minesweeper")}: ${mines - flagCount}; ${formatTime(timer)}; ${flagCount}`}
           >
-            {gameStatus === "won" ? t("youWin") : t("gameOver")}
-          </div>
-        )}
+            <div className="flex items-center gap-2">
+              <Bomb
+                className="game-stat-icon h-4 w-4 text-red-400"
+                data-tone="danger"
+                aria-hidden="true"
+              />
+              <span className="font-mono text-lg text-foreground">{mines - flagCount}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="font-mono text-lg text-foreground">{formatTime(timer)}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Flag
+                className="game-stat-icon h-4 w-4 text-yellow-400"
+                data-tone="achievement"
+                aria-hidden="true"
+              />
+              <span className="font-mono text-lg text-foreground">{flagCount}</span>
+            </div>
+          </Card>
 
-        <div className="game-settings flex flex-col items-center gap-2" data-slot="game-settings">
-          <div className="flex gap-2" role="group" aria-label={a11y.modeHelp}>
-            <Button
-              type="button"
-              size="sm"
-              variant={inputMode === "reveal" ? "default" : "outline"}
-              aria-pressed={inputMode === "reveal"}
-              onClick={() => setInputMode("reveal")}
+          {/* Game status */}
+          {gameStatus !== "playing" && (
+            <div
+              role="status"
+              aria-live="polite"
+              data-tone={gameStatus === "won" ? "success" : "danger"}
+              data-slot="game-message"
+              className={`game-message game-status-banner rounded-lg px-4 py-2 text-lg font-bold ${gameStatus === "won" ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
+                }`}
             >
-              <Eye className="mr-2 h-4 w-4" aria-hidden="true" />
-              {a11y.revealMode}
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant={inputMode === "flag" ? "default" : "outline"}
-              aria-pressed={inputMode === "flag"}
-              onClick={() => setInputMode("flag")}
-            >
-              <Flag className="mr-2 h-4 w-4" aria-hidden="true" />
-              {a11y.flagMode}
-            </Button>
+              {gameStatus === "won" ? t("youWin") : t("gameOver")}
+            </div>
+          )}
+
+          <div className="game-settings flex flex-col items-center gap-2" data-slot="game-settings">
+            <div className="flex gap-2" role="group" aria-label={a11y.modeHelp}>
+              <Button
+                type="button"
+                size="sm"
+                variant={inputMode === "reveal" ? "default" : "outline"}
+                aria-pressed={inputMode === "reveal"}
+                onClick={() => setInputMode("reveal")}
+              >
+                <Eye className="mr-2 h-4 w-4" aria-hidden="true" />
+                {a11y.revealMode}
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={inputMode === "flag" ? "default" : "outline"}
+                aria-pressed={inputMode === "flag"}
+                onClick={() => setInputMode("flag")}
+              >
+                <Flag className="mr-2 h-4 w-4" aria-hidden="true" />
+                {a11y.flagMode}
+              </Button>
+            </div>
+            <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
+              {a11y.modeHelp}
+            </p>
           </div>
-          <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
-            {a11y.modeHelp}
-          </p>
+
+          {/* Game board */}
+
         </div>
-
-        {/* Game board */}
-        <div 
+        <div
           className="game-stage overflow-auto rounded-lg border-2 border-slate-600 bg-slate-300 p-1"
           data-slot="game-stage"
           data-difficulty={difficulty}
           style={{ maxWidth: "100%", maxHeight: "60vh" }}
         >
-          <div 
-            className="grid gap-px"
+          <div
+            className="minesweeper-grid grid w-max gap-px"
             role="group"
             aria-label={`${t("minesweeper")}, ${rows} × ${cols}`}
-            style={{ 
-              gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+            style={{
+              gridTemplateColumns: `repeat(${cols}, var(--mine-cell-size))`,
             }}
           >
             {board.map((row, rowIndex) =>
@@ -305,8 +310,8 @@ export function MinesweeperGame() {
                   aria-label={getCellLabel(rowIndex, colIndex)}
                   aria-pressed={cell.isFlagged}
                   className={`
-                    minesweeper-cell flex items-center justify-center font-bold transition-all
-                    ${difficulty === "hard" ? "h-5 w-5 text-xs sm:h-6 sm:w-6" : "h-7 w-7 text-sm sm:h-8 sm:w-8"}
+                    minesweeper-cell flex items-center justify-center font-bold transition-colors
+                    h-[var(--mine-cell-size)] w-[var(--mine-cell-size)] text-sm
                     ${cell.isRevealed
                       ? cell.isMine
                         ? "bg-red-500"
@@ -329,34 +334,38 @@ export function MinesweeperGame() {
             )}
           </div>
         </div>
+        <div className="game-workspace-after">
 
-        {/* Controls */}
-        <div className="game-actions flex gap-2" data-slot="game-actions">
-          <Button
-            onClick={initGame}
-            variant="outline"
-          >
-            <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
-            {t("restart")}
-          </Button>
-          <GameRulesDialog
-            triggerLabel={t("howToPlay")}
-            closeLabel={t("close")}
-            titleClassName="text-lg font-bold text-foreground"
-          >
-            <ul className="space-y-2 text-sm text-muted-foreground">
-              <li>{t("minesweeperRule1")}</li>
-              <li>{t("minesweeperRule2")}</li>
-              <li>{t("minesweeperRule3")}</li>
-              <li>{t("minesweeperRule4")}</li>
-            </ul>
-          </GameRulesDialog>
+
+          {/* Controls */}
+          <div className="game-actions flex gap-2" data-slot="game-actions">
+            <Button
+              onClick={initGame}
+              variant="outline"
+            >
+              <RotateCcw className="mr-2 h-4 w-4" aria-hidden="true" />
+              {t("restart")}
+            </Button>
+            <GameRulesDialog
+              triggerLabel={t("howToPlay")}
+              closeLabel={t("close")}
+              titleClassName="text-lg font-bold text-foreground"
+            >
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>{t("minesweeperRule1")}</li>
+                <li>{t("minesweeperRule2")}</li>
+                <li>{t("minesweeperRule3")}</li>
+                <li>{t("minesweeperRule4")}</li>
+              </ul>
+            </GameRulesDialog>
+          </div>
+
+          <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
+            {t("minesweeperInstructions")}
+          </p>
+
+
         </div>
-
-        <p className="game-help max-w-md text-center text-xs text-muted-foreground" data-slot="game-help">
-          {t("minesweeperInstructions")}
-        </p>
-
       </main>
     </div>
   )

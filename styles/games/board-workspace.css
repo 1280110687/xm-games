@@ -1,0 +1,137 @@
+/* Route-loaded geometry only. Themes continue to own colors and materials.
+   Mobile keeps the existing setup -> board -> controls reading order. */
+.game-workspace-before,
+.game-workspace-after {
+  display: contents;
+}
+
+.game-page[data-page='minesweeper'] .game-stage {
+  --mine-cell-size: 28px;
+  overscroll-behavior: contain;
+}
+
+.game-page[data-page='minesweeper'] .game-stage:not([data-difficulty='easy']) {
+  --mine-cell-size: 32px;
+}
+
+.minesweeper-grid { flex: none; }
+
+.game-page[data-page='go'] .game-stage {
+  --go-board-inset: 12px;
+  padding: var(--go-board-inset);
+}
+
+/* Glyph line boxes must not stretch occupied ranks beyond the empty ranks. */
+html[data-theme] .game-page[data-page='chess'] .game-stage > [role='group'] {
+  aspect-ratio: 1;
+  grid-template-rows: repeat(8, minmax(0, 1fr));
+}
+
+html[data-theme] .game-page[data-page='chess'] .game-stage button {
+  min-height: 0;
+  line-height: 1;
+}
+
+/* Let the snake grid, not fixed pixel cells, own its square geometry. */
+html[data-theme] .game-page[data-page='snake'] .game-stage {
+  width: min(100%, 365px);
+}
+
+html[data-theme] .game-page[data-page='snake'] .game-stage [role='img'] {
+  width: 100%;
+  aspect-ratio: 1;
+  grid-template-rows: repeat(20, minmax(0, 1fr));
+}
+
+html[data-theme] .game-page[data-page='snake'] .game-stage [role='img'] > div {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+
+.game-stage:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 4px;
+}
+
+@media (min-width: 1024px) {
+  html[data-theme] .game-page > .game-content[data-game-workspace='ready'] {
+    --workspace-board-size: min(560px, calc(100svh - 250px));
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
+    grid-template-rows: max-content 1fr;
+    align-items: start;
+    align-content: start;
+    column-gap: clamp(24px, 3vw, 48px);
+    row-gap: 20px;
+    width: min(100%, 960px);
+    max-width: 960px;
+    margin-inline: auto;
+    flex: none;
+    padding-block: 12px 28px;
+  }
+
+  html[data-theme] .game-content[data-game-workspace='ready'] > .game-workspace-before,
+  html[data-theme] .game-content[data-game-workspace='ready'] > .game-workspace-after {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    min-width: 0;
+    grid-column: 2;
+  }
+
+  .game-content[data-game-workspace='ready'] > .game-workspace-before { grid-row: 1; }
+  .game-content[data-game-workspace='ready'] > .game-workspace-after { grid-row: 2; }
+
+  html[data-theme] .game-content[data-game-workspace='ready'] > .game-stage {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    justify-self: center;
+    align-self: start;
+    width: min(100%, var(--workspace-board-size));
+    max-width: none;
+    margin: 0;
+  }
+
+  html[data-theme] .game-page[data-page='chinese-chess'] > .game-content {
+    --workspace-board-size: min(540px, calc((100svh - 250px) * 80 / 89));
+  }
+
+  html[data-theme] .game-page[data-page='chinese-chess'] .game-stage button > span.aspect-square {
+    font-size: clamp(18px, 1.8vw, 25px);
+  }
+
+  html[data-theme] .game-page[data-page='chinese-chess'] .game-stage {
+    padding: 32px;
+  }
+
+  html[data-theme] .game-page[data-page='go'] .game-stage {
+    --go-board-inset: 32px;
+  }
+
+  html[data-theme] .game-page[data-page='chess'] .game-stage button { font-size: clamp(32px, 3.2vw, 48px); }
+  html[data-theme] .game-page[data-page='sudoku'] .game-stage button { font-size: 24px; }
+
+  .game-content[data-game-workspace='ready'] :is(.game-settings, .game-actions) {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .game-content[data-game-workspace='ready'] .game-actions > button { flex: 1 1 120px; }
+  .game-content[data-game-workspace='ready'] .game-help { text-align: left; font-size: 14px; line-height: 1.7; }
+  .game-content[data-game-workspace='ready'] .game-summary { width: 100%; justify-content: center; }
+  .game-content[data-game-workspace='ready'] .sudoku-keypad { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); }
+  .game-content[data-game-workspace='ready'] .sudoku-keypad button { width: 100%; min-height: 48px; }
+
+  html[data-theme] .game-page[data-page='minesweeper'] .game-stage {
+    --mine-cell-size: 32px;
+    width: max-content;
+    max-width: 100%;
+  }
+
+  html[data-theme] .game-page[data-page='snake'] .game-stage {
+    width: min(100%, var(--workspace-board-size));
+  }
+}

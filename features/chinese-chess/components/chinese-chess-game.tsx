@@ -1,5 +1,7 @@
 "use client"
 
+import "@/styles/games/board-workspace.css"
+
 import { useEffect, useMemo, useState } from "react"
 import { Bot, Flag, RotateCcw, SlidersHorizontal, Undo2, Users, Wifi } from "lucide-react"
 
@@ -167,8 +169,8 @@ export function ChineseChessGame() {
   const canInteractWithBoard = !gameResult.over && (
     isLanMode
       ? lan.phase === "playing"
-        && lan.connected
-        && lan.localSide === state.currentTurn
+      && lan.connected
+      && lan.localSide === state.currentTurn
       : game.aiStatus !== "thinking" && game.isHumanTurn
   )
 
@@ -353,144 +355,148 @@ export function ChineseChessGame() {
       <main
         className="game-content flex flex-1 flex-col items-center gap-4 py-1 sm:py-3"
         data-slot="game-content"
+        data-game-workspace={showBoard ? "ready" : undefined}
       >
-        <div
-          className="chinese-chess-mode-bar"
-          data-slot="game-mode"
-          data-has-summary={game.mode === "ai" ? "true" : "false"}
-          role="group"
-          aria-label={t("chineseChess")}
-        >
-          <Button
-            type="button"
-            variant="ghost"
-            className="chinese-chess-mode-option"
-            aria-pressed={game.mode === "local"}
-            data-active={game.mode === "local" ? "true" : "false"}
-            onClick={handleLocalMode}
+        <div className="game-workspace-before">
+          <div
+            className="chinese-chess-mode-bar"
+            data-slot="game-mode"
+            data-has-summary={game.mode === "ai" ? "true" : "false"}
+            role="group"
+            aria-label={t("chineseChess")}
           >
-            <Users aria-hidden="true" />
-            {t("chineseChessLocalMode")}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            className="chinese-chess-mode-option"
-            aria-pressed={game.mode === "ai"}
-            data-active={game.mode === "ai" ? "true" : "false"}
-            onClick={openAiSetup}
-          >
-            <Bot aria-hidden="true" />
-            {t("chineseChessAiMode")}
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            className="chinese-chess-mode-option"
-            aria-pressed={isLanMode}
-            data-active={isLanMode ? "true" : "false"}
-            onClick={handleLanMode}
-          >
-            <Wifi aria-hidden="true" />
-            {baseLanCopy.lanMode}
-          </Button>
-          {game.mode === "ai" && (
             <Button
               type="button"
               variant="ghost"
-              className="chinese-chess-ai-summary"
-              aria-label={`${t("chineseChessAiSettingsSummary")}: ${getSideLabel(game.playerColor)}, ${t(difficultyKeys[game.difficulty])}`}
+              className="chinese-chess-mode-option"
+              aria-pressed={game.mode === "local"}
+              data-active={game.mode === "local" ? "true" : "false"}
+              onClick={handleLocalMode}
+            >
+              <Users aria-hidden="true" />
+              {t("chineseChessLocalMode")}
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              className="chinese-chess-mode-option"
+              aria-pressed={game.mode === "ai"}
+              data-active={game.mode === "ai" ? "true" : "false"}
               onClick={openAiSetup}
             >
-              <SlidersHorizontal aria-hidden="true" />
-              <span>{getSideLabel(game.playerColor)} · {t(difficultyKeys[game.difficulty])}</span>
+              <Bot aria-hidden="true" />
+              {t("chineseChessAiMode")}
             </Button>
-          )}
-        </div>
-
-        {isLanMode && (
-          <LanGamePanel<PieceColor>
-            idPrefix="chinese-chess"
-            gameTitle={t("chineseChess")}
-            phase={lan.phase}
-            roomId={lan.roomId}
-            role={lan.role}
-            connected={lan.connected}
-            localReady={lan.localReady}
-            remoteReady={lan.remoteReady}
-            localSide={lan.localSide}
-            currentSide={lan.currentSide}
-            sides={[
-              { value: "red", label: t("chineseChessRedSide"), color: "#ef4444" },
-              { value: "black", label: t("chineseChessBlackSide"), color: "#1f2937" },
-            ]}
-            dice={lan.dice}
-            series={lan.series}
-            error={getChineseChessLanError(locale, lan.errorCode)}
-            copy={lanPanelCopy}
-            onCreateRoom={() => void lan.createRoom()}
-            onJoinRoom={(roomId) => void lan.joinRoom(roomId)}
-            onReady={lan.markReady}
-            onLeave={lan.leaveRoom}
-            onRetry={lan.retryConnection}
-            onRematch={() => void lan.requestRematch()}
-          />
-        )}
-
-        {showBoard && <Card className="game-summary surface-panel border-white/10 bg-card/70 p-3 sm:p-4" role="status" aria-live="polite">
-          <span className="sr-only">
-            {game.mode === "ai"
-              ? game.isHumanTurn ? t("chineseChessYourTurn") : t("chineseChessAiTurn")
-              : isLanMode
-                ? lan.localSide === state.currentTurn ? baseLanCopy.yourTurn : baseLanCopy.opponentTurn
-                : state.currentTurn === "red" ? t("redTurn") : t("blackTurn")}
-          </span>
-          <div className="flex flex-col gap-3">
-            <div className="flex items-center justify-center gap-4">
-              {(["red", "black"] as const).map((color, index) => {
-                const active = state.currentTurn === color
-                const owner = getSideOwner(color)
-
-                return (
-                  <div key={color} className="contents">
-                    {index > 0 && <div className="h-4 w-px bg-border" aria-hidden="true" />}
-                    <div className="flex items-center gap-2" aria-current={active ? "true" : undefined}>
-                      <div
-                        className={`h-4 w-4 rounded-full ${color === "red"
-                          ? active ? "bg-red-500 ring-2 ring-red-300" : "bg-red-950/70"
-                          : active ? "bg-slate-800 ring-2 ring-slate-400" : "bg-slate-600"
-                        }`}
-                        aria-hidden="true"
-                      />
-                      <span className={`text-sm font-medium sm:text-base ${active ? "text-foreground" : "text-muted-foreground"}`}>
-                        {getSideLabel(color)}{owner ? ` · ${owner}` : ""}
-                      </span>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-
-            {renderStatusMessage()}
-
-            {game.mode === "local" ? (
-              <div className="game-undo-status flex items-center justify-center gap-4 text-xs" data-slot="undo-status">
-                <span className="game-status-copy text-red-400" data-tone="danger">
-                  {game.localUndoUsage.red ? t("undoUsed") : `${t("undoRemaining")}: 1`}
-                </span>
-                <div className="h-3 w-px bg-border" aria-hidden="true" />
-                <span className="game-status-copy text-slate-400" data-tone="neutral">
-                  {game.localUndoUsage.black ? t("undoUsed") : `${t("undoRemaining")}: 1`}
-                </span>
-              </div>
-            ) : game.mode === "ai" ? (
-              <div className="game-undo-status text-center text-xs text-muted-foreground" data-slot="undo-status">
-                {t("chineseChessAiUndoRound")}: {game.aiUndoUsed ? t("undoUsed") : "1"}
-              </div>
-            ) : null}
+            <Button
+              type="button"
+              variant="ghost"
+              className="chinese-chess-mode-option"
+              aria-pressed={isLanMode}
+              data-active={isLanMode ? "true" : "false"}
+              onClick={handleLanMode}
+            >
+              <Wifi aria-hidden="true" />
+              {baseLanCopy.lanMode}
+            </Button>
+            {game.mode === "ai" && (
+              <Button
+                type="button"
+                variant="ghost"
+                className="chinese-chess-ai-summary"
+                aria-label={`${t("chineseChessAiSettingsSummary")}: ${getSideLabel(game.playerColor)}, ${t(difficultyKeys[game.difficulty])}`}
+                onClick={openAiSetup}
+              >
+                <SlidersHorizontal aria-hidden="true" />
+                <span>{getSideLabel(game.playerColor)} · {t(difficultyKeys[game.difficulty])}</span>
+              </Button>
+            )}
           </div>
-        </Card>}
 
+          {isLanMode && (
+            <LanGamePanel<PieceColor>
+              idPrefix="chinese-chess"
+              gameTitle={t("chineseChess")}
+              phase={lan.phase}
+              roomId={lan.roomId}
+              role={lan.role}
+              connected={lan.connected}
+              localReady={lan.localReady}
+              remoteReady={lan.remoteReady}
+              localSide={lan.localSide}
+              currentSide={lan.currentSide}
+              sides={[
+                { value: "red", label: t("chineseChessRedSide"), color: "#ef4444" },
+                { value: "black", label: t("chineseChessBlackSide"), color: "#1f2937" },
+              ]}
+              dice={lan.dice}
+              series={lan.series}
+              error={getChineseChessLanError(locale, lan.errorCode)}
+              copy={lanPanelCopy}
+              onCreateRoom={() => void lan.createRoom()}
+              onJoinRoom={(roomId) => void lan.joinRoom(roomId)}
+              onReady={lan.markReady}
+              onLeave={lan.leaveRoom}
+              onRetry={lan.retryConnection}
+              onRematch={() => void lan.requestRematch()}
+            />
+          )}
+
+          {showBoard && <Card className="game-summary surface-panel border-white/10 bg-card/70 p-3 sm:p-4" role="status" aria-live="polite">
+            <span className="sr-only">
+              {game.mode === "ai"
+                ? game.isHumanTurn ? t("chineseChessYourTurn") : t("chineseChessAiTurn")
+                : isLanMode
+                  ? lan.localSide === state.currentTurn ? baseLanCopy.yourTurn : baseLanCopy.opponentTurn
+                  : state.currentTurn === "red" ? t("redTurn") : t("blackTurn")}
+            </span>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center justify-center gap-4">
+                {(["red", "black"] as const).map((color, index) => {
+                  const active = state.currentTurn === color
+                  const owner = getSideOwner(color)
+
+                  return (
+                    <div key={color} className="contents">
+                      {index > 0 && <div className="h-4 w-px bg-border" aria-hidden="true" />}
+                      <div className="flex items-center gap-2" aria-current={active ? "true" : undefined}>
+                        <div
+                          className={`h-4 w-4 rounded-full ${color === "red"
+                            ? active ? "bg-red-500 ring-2 ring-red-300" : "bg-red-950/70"
+                            : active ? "bg-slate-800 ring-2 ring-slate-400" : "bg-slate-600"
+                            }`}
+                          aria-hidden="true"
+                        />
+                        <span className={`text-sm font-medium sm:text-base ${active ? "text-foreground" : "text-muted-foreground"}`}>
+                          {getSideLabel(color)}{owner ? ` · ${owner}` : ""}
+                        </span>
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
+
+              {renderStatusMessage()}
+
+              {game.mode === "local" ? (
+                <div className="game-undo-status flex items-center justify-center gap-4 text-xs" data-slot="undo-status">
+                  <span className="game-status-copy text-red-400" data-tone="danger">
+                    {game.localUndoUsage.red ? t("undoUsed") : `${t("undoRemaining")}: 1`}
+                  </span>
+                  <div className="h-3 w-px bg-border" aria-hidden="true" />
+                  <span className="game-status-copy text-slate-400" data-tone="neutral">
+                    {game.localUndoUsage.black ? t("undoUsed") : `${t("undoRemaining")}: 1`}
+                  </span>
+                </div>
+              ) : game.mode === "ai" ? (
+                <div className="game-undo-status text-center text-xs text-muted-foreground" data-slot="undo-status">
+                  {t("chineseChessAiUndoRound")}: {game.aiUndoUsed ? t("undoUsed") : "1"}
+                </div>
+              ) : null}
+            </div>
+          </Card>}
+
+
+        </div>
         {showBoard && <div
           className="game-stage relative aspect-[80/89] w-full max-w-80 rounded-xl border-4 border-amber-800 bg-[#d4a574] p-4 shadow-2xl shadow-black/30"
           data-slot="game-stage"
@@ -571,7 +577,7 @@ export function ChineseChessGame() {
                           className={`flex aspect-square w-[88%] items-center justify-center rounded-full border-2 text-[clamp(0.65rem,3.5vw,0.875rem)] font-bold shadow-lg transition-transform ${piece.color === "red"
                             ? "border-red-700 bg-gradient-to-br from-amber-50 to-amber-100 text-red-600"
                             : "border-slate-600 bg-gradient-to-br from-slate-50 to-slate-200 text-slate-800"
-                          } ${isSelected ? "scale-110 ring-2 ring-yellow-400" : ""} ${isValidTarget ? "ring-2 ring-green-400" : ""}`}
+                            } ${isSelected ? "scale-110 ring-2 ring-yellow-400" : ""} ${isValidTarget ? "ring-2 ring-green-400" : ""}`}
                         >
                           {pieceGlyphs[piece.color][piece.type]}
                         </span>
@@ -583,80 +589,84 @@ export function ChineseChessGame() {
             </div>
           </div>
         </div>}
+        <div className="game-workspace-after">
 
-        {showBoard && <div className="game-actions flex flex-wrap justify-center gap-2" data-slot="game-actions">
-          {!isLanMode && (
-            <>
-              <Button onClick={game.undo} variant="outline" disabled={!game.canUndo}>
-                <Undo2 className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
-                {game.mode === "ai" ? t("chineseChessAiUndoRound") : t("undo")}
+
+          {showBoard && <div className="game-actions flex flex-wrap justify-center gap-2" data-slot="game-actions">
+            {!isLanMode && (
+              <>
+                <Button onClick={game.undo} variant="outline" disabled={!game.canUndo}>
+                  <Undo2 className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
+                  {game.mode === "ai" ? t("chineseChessAiUndoRound") : t("undo")}
+                </Button>
+                <Button onClick={game.resetGame} variant="outline">
+                  <RotateCcw className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
+                  {t("restart")}
+                </Button>
+              </>
+            )}
+            {game.mode === "ai" && game.aiStatus === "error" && (
+              <Button onClick={game.retryAi} variant="outline">
+                <Bot className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
+                {t("chineseChessAiRetry")}
               </Button>
-              <Button onClick={game.resetGame} variant="outline">
-                <RotateCcw className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
-                {t("restart")}
-              </Button>
-            </>
-          )}
-          {game.mode === "ai" && game.aiStatus === "error" && (
-            <Button onClick={game.retryAi} variant="outline">
-              <Bot className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
-              {t("chineseChessAiRetry")}
-            </Button>
-          )}
-          <GameRulesDialog
-            triggerLabel={t("howToPlay")}
-            closeLabel={t("close")}
-            triggerIconClassName="mr-1 sm:mr-2"
-            titleClassName="text-lg font-bold text-foreground sm:text-xl"
-          >
-            <div className="space-y-4">
-              <div>
-                <h3 className="mb-2 font-semibold text-foreground">{t("pieceRules")}</h3>
-                <ul className="space-y-2 text-sm text-muted-foreground">
-                  {([
-                    ["帅", "kingRule"],
-                    ["仕", "advisorRule"],
-                    ["相", "elephantRule"],
-                    ["馬", "horseRule"],
-                    ["車", "chariotRule"],
-                    ["炮", "cannonRule"],
-                    ["兵", "pawnRule"],
-                  ] as const).map(([glyph, ruleKey]) => (
-                    <li key={ruleKey} className="flex gap-2">
-                      <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">
-                        {glyph}
-                      </span>
-                      <span>{t(ruleKey)}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-              <div className="border-t border-border pt-4">
-                <h3 className="mb-2 font-semibold text-foreground">{t("winCondition")}</h3>
-                <p className="text-sm text-muted-foreground">{t("chineseChessRepetitionDraw")}</p>
-              </div>
-              {isLanMode && (
-                <div className="border-t border-border pt-4">
-                  <p className="text-sm text-muted-foreground">{chineseChessLanHelpCopy[locale]}</p>
+            )}
+            <GameRulesDialog
+              triggerLabel={t("howToPlay")}
+              closeLabel={t("close")}
+              triggerIconClassName="mr-1 sm:mr-2"
+              titleClassName="text-lg font-bold text-foreground sm:text-xl"
+            >
+              <div className="space-y-4">
+                <div>
+                  <h3 className="mb-2 font-semibold text-foreground">{t("pieceRules")}</h3>
+                  <ul className="space-y-2 text-sm text-muted-foreground">
+                    {([
+                      ["帅", "kingRule"],
+                      ["仕", "advisorRule"],
+                      ["相", "elephantRule"],
+                      ["馬", "horseRule"],
+                      ["車", "chariotRule"],
+                      ["炮", "cannonRule"],
+                      ["兵", "pawnRule"],
+                    ] as const).map(([glyph, ruleKey]) => (
+                      <li key={ruleKey} className="flex gap-2">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">
+                          {glyph}
+                        </span>
+                        <span>{t(ruleKey)}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-              )}
-            </div>
-          </GameRulesDialog>
-          {!isLanMode && gameResult.over && (
-            <Button onClick={game.resetGame}>
-              <Flag className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
-              {t("newGame")}
-            </Button>
-          )}
-        </div>}
+                <div className="border-t border-border pt-4">
+                  <h3 className="mb-2 font-semibold text-foreground">{t("winCondition")}</h3>
+                  <p className="text-sm text-muted-foreground">{t("chineseChessRepetitionDraw")}</p>
+                </div>
+                {isLanMode && (
+                  <div className="border-t border-border pt-4">
+                    <p className="text-sm text-muted-foreground">{chineseChessLanHelpCopy[locale]}</p>
+                  </div>
+                )}
+              </div>
+            </GameRulesDialog>
+            {!isLanMode && gameResult.over && (
+              <Button onClick={game.resetGame}>
+                <Flag className="mr-1 h-4 w-4 sm:mr-2" aria-hidden="true" />
+                {t("newGame")}
+              </Button>
+            )}
+          </div>}
 
-        {showBoard && (
-          <p className="game-help max-w-md text-center text-xs text-muted-foreground sm:text-sm" data-slot="game-help">
-            {isLanMode
-              ? chineseChessLanHelpCopy[locale]
-              : game.mode === "ai" ? t("chineseChessAiUndoHint") : t("chessInstructions")}
-          </p>
-        )}
+          {showBoard && (
+            <p className="game-help max-w-md text-center text-xs text-muted-foreground sm:text-sm" data-slot="game-help">
+              {isLanMode
+                ? chineseChessLanHelpCopy[locale]
+                : game.mode === "ai" ? t("chineseChessAiUndoHint") : t("chessInstructions")}
+            </p>
+          )}
+
+        </div>
       </main>
 
       <ChineseChessAiSetup

@@ -1,0 +1,24 @@
+@media (min-width: 1024px) {
+  .bingo-play-layout {
+    display: grid;
+    grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+    align-items: start;
+    gap: 24px;
+  }
+
+  html[data-theme] .bingo-play-layout .bingo-workspace {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    min-width: 0;
+  }
+
+  .bingo-play-layout .bingo-draw { grid-column: auto; }
+  .bingo-play-layout .bingo-board { min-width: 0; margin-top: 0; gap: 12px; padding-block: 16px; }
+  .bingo-play-layout .bingo-board [data-slot='card-header'],
+  .bingo-play-layout .bingo-board [data-slot='card-content'] { padding-inline: 16px; }
+  .bingo-play-layout .bingo-number-grid { gap: 4px; }
+  .bingo-play-layout .bingo-number-grid > [role='img'] { height: clamp(24px, calc((100svh - 300px) / 16), 32px); }
+  .bingo-play-layout .bingo-number-grid > :not([role='img']) { padding-block: 4px; }
+  .bingo-play-layout .bingo-draw [data-slot='card-content'] { padding-block: 16px; }
+  .bingo-play-layout .bingo-draw .rounded-full.h-36 { width: 148px; height: 148px; }
+}

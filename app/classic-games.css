@@ -112,9 +112,37 @@
 .tetris-board {
   position: relative;
   display: grid;
-  width: max-content;
-  height: max-content;
+  box-sizing: content-box;
+  flex: 0 0 auto;
+  align-self: flex-start;
+  /* The theme sets a height budget; the LCD's actual width is the other limit.
+     Size the grid, not just its clipping box, so all 10 x 20 cells stay visible. */
+  width: min(calc(var(--tetris-cell) * 10), calc(100% - var(--tetris-panel-width) - var(--tetris-lcd-gap) - 2px));
+  height: auto;
+  aspect-ratio: 1 / 2;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+  grid-template-rows: repeat(20, minmax(0, 1fr));
   overflow: hidden;
+}
+
+.tetris-lcd {
+  --tetris-panel-width: clamp(80px, 18vw, 100px);
+  --tetris-lcd-gap: 12px;
+  min-width: 0;
+}
+
+.tetris-lcd-panel {
+  flex: 0 0 var(--tetris-panel-width);
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.tetris-lcd-stat-row > * { min-width: 0; }
+
+.tetris-board:focus-visible,
+.classic-2048-board:focus-visible {
+  outline: 3px solid var(--ring);
+  outline-offset: 4px;
 }
 
 .tetris-cell,

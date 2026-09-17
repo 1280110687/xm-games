@@ -355,9 +355,8 @@ export function BingoGame() {
                   <div
                     key={`recent-${num}`}
                     role="listitem"
-                    className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white ${getLetterColor(num)} ${
-                      index === 0 ? "ring-2 ring-white" : "opacity-70"
-                    }`}
+                    className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white ${getLetterColor(num)} ${index === 0 ? "ring-2 ring-white" : "opacity-70"
+                      }`}
                   >
                     {num}
                   </div>
@@ -378,8 +377,7 @@ export function BingoGame() {
       {["B", "I", "N", "G", "O"].map((letter, idx) => (
         <div
           key={letter}
-          className={`py-2 text-center text-xl font-bold text-white ${
-            idx === 0
+          className={`py-2 text-center text-xl font-bold text-white ${idx === 0
               ? "text-red-500"
               : idx === 1
                 ? "text-orange-500"
@@ -388,7 +386,7 @@ export function BingoGame() {
                   : idx === 3
                     ? "text-green-500"
                     : "text-blue-500"
-          }`}
+            }`}
         >
           {letter}
         </div>
@@ -402,11 +400,10 @@ export function BingoGame() {
               key={num}
               role="img"
               aria-label={`${getLetter(num)} ${num}, ${isDrawn ? t("drawn") : t("remaining")}`}
-              className={`flex h-10 items-center justify-center rounded-md text-sm font-medium transition-all duration-300 md:h-12 md:text-base ${
-                isDrawn
+              className={`flex h-10 items-center justify-center rounded-md text-sm font-medium transition-all duration-300 md:h-12 md:text-base ${isDrawn
                   ? `${getLetterColor(num)} text-white shadow-lg`
                   : "bg-muted text-muted-foreground"
-              }`}
+                }`}
             >
               {num}
             </div>
@@ -464,147 +461,148 @@ export function BingoGame() {
           />
         )}
 
-        <div className="bingo-workspace grid gap-4 lg:grid-cols-3 lg:gap-6">
-          {/* 当前抽到的数字 */}
-          <Card className="bingo-draw game-stage gap-0 overflow-hidden border-white/10 bg-card/70 py-0 lg:col-span-2">
-            <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-white/[0.07] px-4 py-4 sm:px-6">
-              <CardTitle className="text-base text-foreground sm:text-lg">
-                {t("currentNumber")}
-              </CardTitle>
-              <div
-                className="game-summary flex items-center gap-1.5 text-[11px] text-muted-foreground sm:gap-2 sm:text-sm"
-                data-slot="game-summary"
-              >
-                <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-1 sm:px-2.5">
-                  {t("drawn")}{" "}
-                  <strong className="font-semibold text-foreground">
-                    {activeDrawnNumbers.length}
-                  </strong>
-                </span>
-                <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-1 sm:px-2.5">
-                  {t("remaining")}{" "}
-                  <strong className="font-semibold text-foreground">
-                    {remainingNumbers.length}
-                  </strong>
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent className="px-4 py-5 sm:px-6 sm:py-6">
-              <div className="flex flex-col items-center justify-center gap-4 sm:gap-5">
-                {activeCurrentNumber ? (
-                  <div className="flex flex-col items-center gap-2.5">
-                    <div
-                      role="status"
-                      aria-live="assertive"
-                      aria-atomic="true"
-                      className={`flex h-36 w-36 items-center justify-center rounded-full ${getLetterColor(activeCurrentNumber)} text-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] ring-4 ring-white/10 transition-all duration-300 sm:h-44 sm:w-44 md:h-52 md:w-52`}
-                    >
-                      <div className="text-center leading-none">
-                        <div className="text-xl font-bold sm:text-2xl md:text-3xl">
-                          {getLetter(activeCurrentNumber)}
-                        </div>
-                        <div className="mt-1 text-5xl font-bold tabular-nums sm:text-6xl md:text-7xl">
-                          {activeCurrentNumber}
+        <div className="bingo-play-layout">
+          <div className="bingo-workspace grid gap-4 lg:grid-cols-3 lg:gap-6">
+            {/* 当前抽到的数字 */}
+            <Card className="bingo-draw game-stage gap-0 overflow-hidden border-white/10 bg-card/70 py-0 lg:col-span-2">
+              <CardHeader className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 border-b border-white/[0.07] px-4 py-4 sm:px-6">
+                <CardTitle className="text-base text-foreground sm:text-lg">
+                  {t("currentNumber")}
+                </CardTitle>
+                <div
+                  className="game-summary flex items-center gap-1.5 text-[11px] text-muted-foreground sm:gap-2 sm:text-sm"
+                  data-slot="game-summary"
+                >
+                  <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-1 sm:px-2.5">
+                    {t("drawn")}{" "}
+                    <strong className="font-semibold text-foreground">
+                      {activeDrawnNumbers.length}
+                    </strong>
+                  </span>
+                  <span className="rounded-full border border-white/[0.08] bg-white/[0.04] px-2 py-1 sm:px-2.5">
+                    {t("remaining")}{" "}
+                    <strong className="font-semibold text-foreground">
+                      {remainingNumbers.length}
+                    </strong>
+                  </span>
+                </div>
+              </CardHeader>
+              <CardContent className="px-4 py-5 sm:px-6 sm:py-6">
+                <div className="flex flex-col items-center justify-center gap-4 sm:gap-5">
+                  {activeCurrentNumber ? (
+                    <div className="flex flex-col items-center gap-2.5">
+                      <div
+                        role="status"
+                        aria-live="assertive"
+                        aria-atomic="true"
+                        className={`flex h-36 w-36 items-center justify-center rounded-full ${getLetterColor(activeCurrentNumber)} text-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] ring-4 ring-white/10 transition-all duration-300 sm:h-44 sm:w-44 md:h-52 md:w-52`}
+                      >
+                        <div className="text-center leading-none">
+                          <div className="text-xl font-bold sm:text-2xl md:text-3xl">
+                            {getLetter(activeCurrentNumber)}
+                          </div>
+                          <div className="mt-1 text-5xl font-bold tabular-nums sm:text-6xl md:text-7xl">
+                            {activeCurrentNumber}
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    {/* {locale !== "en" && (
+                      {/* {locale !== "en" && (
                       <div className="text-base font-medium text-muted-foreground sm:text-lg">
                         {locale === "th"
                           ? thaiNumbers[activeCurrentNumber]
                           : getChineseNumber(activeCurrentNumber)}
                       </div>
                     )} */}
-                  </div>
-                ) : (
-                  <div className="flex h-36 w-36 items-center justify-center rounded-full border border-white/[0.08] bg-gradient-to-br from-slate-700 to-slate-800 text-center text-slate-300 shadow-inner ring-4 ring-white/[0.025] sm:h-44 sm:w-44 md:h-52 md:w-52">
-                    <span className="max-w-24 text-base font-medium sm:text-lg">
-                      {t("clickToDraw")}
-                    </span>
-                  </div>
-                )}
-
-                {/* 操作按钮 */}
-                <div
-                  className={`game-actions grid w-full max-w-sm gap-2.5 sm:gap-3 ${mode === "local" ? "grid-cols-2" : "grid-cols-1"}`}
-                  data-slot="game-actions"
-                >
-                  {!isAutoMode ? (
-                    <Button
-                      size="lg"
-                      onClick={drawNumber}
-                      disabled={!canDraw}
-                      className="w-full px-3 text-base sm:text-lg"
-                    >
-                      {t("drawNumber")}
-                    </Button>
+                    </div>
                   ) : (
-                    <Button
-                      size="lg"
-                      onClick={toggleAutoPlay}
-                      disabled={!canDraw}
-                      className={`w-full px-3 text-base sm:text-lg ${
-                        isPlaying
-                          ? "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800"
-                          : "bg-primary hover:bg-primary/90"
-                      }`}
-                    >
-                      {isPlaying ? (
-                        <>
-                          <Pause className="h-5 w-5" aria-hidden="true" />{" "}
-                          {t("pause")}
-                        </>
-                      ) : (
-                        <>
-                          <Play className="h-5 w-5" aria-hidden="true" />{" "}
-                          {t("start")}
-                        </>
-                      )}
-                    </Button>
+                    <div className="flex h-36 w-36 items-center justify-center rounded-full border border-white/[0.08] bg-gradient-to-br from-slate-700 to-slate-800 text-center text-slate-300 shadow-inner ring-4 ring-white/[0.025] sm:h-44 sm:w-44 md:h-52 md:w-52">
+                      <span className="max-w-24 text-base font-medium sm:text-lg">
+                        {t("clickToDraw")}
+                      </span>
+                    </div>
                   )}
-                  {mode === "local" && (
-                    <Button
-                      size="lg"
-                      variant="outline"
-                      onClick={resetGame}
-                      className="w-full border-white/10 bg-white/[0.035] px-3 text-base text-foreground sm:text-lg"
-                    >
-                      <RotateCcw className="h-5 w-5" aria-hidden="true" />{" "}
-                      {t("reset")}
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
 
-          {/* 设置面板 */}
-          <Card className="bingo-settings game-settings gap-0 overflow-hidden border-white/10 bg-card/70 py-0">
-            <CardHeader className="border-b border-white/[0.07] px-4 py-4 sm:px-6">
-              <CardTitle className="text-base text-foreground sm:text-lg">
-                {t("settings")}
+                  {/* 操作按钮 */}
+                  <div
+                    className={`game-actions grid w-full max-w-sm gap-2.5 sm:gap-3 ${mode === "local" ? "grid-cols-2" : "grid-cols-1"}`}
+                    data-slot="game-actions"
+                  >
+                    {!isAutoMode ? (
+                      <Button
+                        size="lg"
+                        onClick={drawNumber}
+                        disabled={!canDraw}
+                        className="w-full px-3 text-base sm:text-lg"
+                      >
+                        {t("drawNumber")}
+                      </Button>
+                    ) : (
+                      <Button
+                        size="lg"
+                        onClick={toggleAutoPlay}
+                        disabled={!canDraw}
+                        className={`w-full px-3 text-base sm:text-lg ${isPlaying
+                            ? "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800"
+                            : "bg-primary hover:bg-primary/90"
+                          }`}
+                      >
+                        {isPlaying ? (
+                          <>
+                            <Pause className="h-5 w-5" aria-hidden="true" />{" "}
+                            {t("pause")}
+                          </>
+                        ) : (
+                          <>
+                            <Play className="h-5 w-5" aria-hidden="true" />{" "}
+                            {t("start")}
+                          </>
+                        )}
+                      </Button>
+                    )}
+                    {mode === "local" && (
+                      <Button
+                        size="lg"
+                        variant="outline"
+                        onClick={resetGame}
+                        className="w-full border-white/10 bg-white/[0.035] px-3 text-base text-foreground sm:text-lg"
+                      >
+                        <RotateCcw className="h-5 w-5" aria-hidden="true" />{" "}
+                        {t("reset")}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* 设置面板 */}
+            <Card className="bingo-settings game-settings gap-0 overflow-hidden border-white/10 bg-card/70 py-0">
+              <CardHeader className="border-b border-white/[0.07] px-4 py-4 sm:px-6">
+                <CardTitle className="text-base text-foreground sm:text-lg">
+                  {t("settings")}
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4 px-4 py-4 sm:px-6 sm:py-5">
+                {renderSettingsControls()}
+              </CardContent>
+            </Card>
+          </div>
+
+          <div className="sr-only" role="status" aria-live="polite">
+            {t("drawn")}: {activeDrawnNumbers.length} / 75. {t("remaining")}:{" "}
+            {remainingNumbers.length}
+          </div>
+
+          {/* 所有数字网格 */}
+          <Card className="bingo-board game-stage mt-4 border-white/10 bg-card/70 sm:mt-6">
+            <CardHeader>
+              <CardTitle className="text-foreground">
+                {t("numberBoard")}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 px-4 py-4 sm:px-6 sm:py-5">
-              {renderSettingsControls()}
-            </CardContent>
+            <CardContent>{renderNumberGrid()}</CardContent>
           </Card>
         </div>
-
-        <div className="sr-only" role="status" aria-live="polite">
-          {t("drawn")}: {activeDrawnNumbers.length} / 75. {t("remaining")}:{" "}
-          {remainingNumbers.length}
-        </div>
-
-        {/* 所有数字网格 */}
-        <Card className="bingo-board game-stage mt-4 border-white/10 bg-card/70 sm:mt-6">
-          <CardHeader>
-            <CardTitle className="text-foreground">
-              {t("numberBoard")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>{renderNumberGrid()}</CardContent>
-        </Card>
       </div>
     </div>
   );

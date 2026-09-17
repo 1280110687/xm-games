@@ -2,15 +2,39 @@ import { describe, expect, it } from "vitest"
 import {
   BOARD_HEIGHT,
   BOARD_WIDTH,
+  TETROMINO_SHAPES,
   clearCompletedLines,
   createEmptyBoard,
   createInitialState,
   spawnPiece,
   tetrisReducer,
+  type TetrominoType,
   type TetrisState,
 } from "./engine"
 
 describe("tetrisReducer", () => {
+  it.each(Object.keys(TETROMINO_SHAPES) as TetrominoType[])(
+    "keeps every occupied %s cell inside both walls through repeated moves and rotations",
+    (firstPiece) => {
+      let state = tetrisReducer(createInitialState(), { type: "start", firstPiece, nextPiece: "O" })
+      for (const dx of [-1, 1]) {
+        for (let rotation = 0; rotation < 4; rotation++) {
+          for (let move = 0; move < BOARD_WIDTH + 4; move++) {
+            state = tetrisReducer(state, { type: "move", dx, dy: 0 })
+            const piece = state.currentPiece!
+            piece.shape.forEach((row, y) => row.forEach((cell, x) => {
+              if (!cell) return
+              expect(piece.x + x).toBeGreaterThanOrEqual(0)
+              expect(piece.x + x).toBeLessThan(BOARD_WIDTH)
+              expect(piece.y + y).toBeLessThan(BOARD_HEIGHT)
+            }))
+          }
+          state = tetrisReducer(state, { type: "rotate" })
+        }
+      }
+    },
+  )
+
   it("locks and scores a landed piece exactly once in one tick", () => {
     const board = createEmptyBoard()
     board[BOARD_HEIGHT - 1] = Array(BOARD_WIDTH).fill(1)

@@ -24,7 +24,6 @@ import {
 
 import { GameHeader } from "@/components/game-header"
 import {
-  BOARD_WIDTH,
   TETROMINO_SHAPES,
   createInitialState,
   getDisplayBoard,
@@ -143,6 +142,7 @@ export function TetrisGame() {
   const previousLinesRef = useRef(0)
   const previousPhaseRef = useRef(state.phase)
   const audioContextRef = useRef<AudioContext | null>(null)
+  const boardRef = useRef<HTMLDivElement>(null)
   const { nextPiece, score, lines, level, phase } = state
 
   const drawPiece = useCallback((): TetrominoType => {
@@ -388,11 +388,10 @@ export function TetrisGame() {
             <div className="tetris-lcd">
               <div
                 className="tetris-board"
+                ref={boardRef}
                 role="img"
                 aria-label={`${t("tetris")}. ${t("score")}: ${score}. ${t("lines")}: ${lines}. ${t("level")}: ${level}.`}
-                style={{
-                  gridTemplateColumns: `repeat(${BOARD_WIDTH}, var(--tetris-cell))`,
-                }}
+                tabIndex={0}
               >
                 {displayBoard.map((row, rowIndex) =>
                   row.map((cell, columnIndex) => (
@@ -473,7 +472,7 @@ export function TetrisGame() {
             </div>
           </div>
 
-          <div className="tetris-control-deck">
+          <div className="tetris-control-deck" onClick={() => boardRef.current?.focus({ preventScroll: true })}>
             <div className="tetris-left-controls">
               <div className="tetris-function-row">
                 <button
