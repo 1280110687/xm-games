@@ -374,7 +374,7 @@ export function ChineseChessGame() {
               onClick={handleLocalMode}
             >
               <Users aria-hidden="true" />
-              {t("chineseChessLocalMode")}
+              <span className="min-w-0">{t("chineseChessLocalMode")}</span>
             </Button>
             <Button
               type="button"
@@ -385,7 +385,7 @@ export function ChineseChessGame() {
               onClick={openAiSetup}
             >
               <Bot aria-hidden="true" />
-              {t("chineseChessAiMode")}
+              <span className="min-w-0">{t("chineseChessAiMode")}</span>
             </Button>
             <Button
               type="button"
@@ -396,7 +396,7 @@ export function ChineseChessGame() {
               onClick={handleLanMode}
             >
               <Wifi aria-hidden="true" />
-              {baseLanCopy.lanMode}
+              <span className="min-w-0">{baseLanCopy.lanMode}</span>
             </Button>
             {game.mode === "ai" && (
               <Button

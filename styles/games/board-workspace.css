@@ -5,6 +5,35 @@
   display: contents;
 }
 
+@media (max-width: 767px) {
+  html[data-theme] .chinese-chess-mode-option {
+    height: auto;
+    min-height: 44px;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.35;
+  }
+
+  html[data-theme] .sudoku-keypad {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    width: min(100%, 24rem);
+    margin-inline: auto;
+  }
+
+  html[data-theme] .sudoku-keypad button {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 359px) {
+  html[data-theme] .chinese-chess-mode-option {
+    flex-direction: column;
+    gap: 4px;
+  }
+}
+
 .game-page[data-page='minesweeper'] .game-stage {
   --mine-cell-size: 28px;
   overscroll-behavior: contain;

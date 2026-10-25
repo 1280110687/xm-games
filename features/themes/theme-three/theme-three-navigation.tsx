@@ -12,7 +12,7 @@ export function ThemeThreeNavigation() {
   const pathname = usePathname()
   const section = useThemeThreeSection()
   const copy = THEME_THREE_HOME_COPY[locale]
-  return <nav className="theme-three-bottom-bar" data-t3-glass="dock" aria-label={copy.navigation}>
+  return <nav className="theme-three-bottom-bar" data-t3-glass="dock" data-secondary={pathname !== "/"} aria-label={copy.navigation}>
     {THEME_THREE_NAV_ITEMS.map(({ key, href, hash }) => {
       const Icon = ICONS[key]
       return <Link key={key} href={href} scroll={false} className="theme-three-bottom-item"

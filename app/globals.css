@@ -153,17 +153,14 @@
 
 @media (max-width: 420px) {
   html[data-theme] .chinese-chess-mode-bar[data-has-summary='true'] {
-    flex-wrap: wrap;
-  }
-
-  html[data-theme] .chinese-chess-mode-bar[data-has-summary='true'] .chinese-chess-mode-option {
-    flex: 1 1 calc((100% - 0.6rem) / 3);
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   html[data-theme] .chinese-chess-mode-bar[data-has-summary='true'] .chinese-chess-ai-summary {
     width: 100%;
     max-width: none;
-    flex: 1 0 100%;
+    grid-column: 1 / -1;
   }
 }
 
@@ -571,5 +568,15 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Landscape phones can reach desktop text breakpoints; focused fields must
+   retain Safari's non-zooming text size in either orientation. */
+@media (pointer: coarse) {
+  input,
+  textarea,
+  select {
+    font-size: max(1rem, 16px) !important;
   }
 }

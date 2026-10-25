@@ -42,3 +42,10 @@ html[data-theme='theme-pocket'] .settings-storage-note svg { width: 20px; flex-s
   html[data-theme='theme-pocket'] .settings-row { grid-template-columns: 28px minmax(0,1fr); }
   html[data-theme='theme-pocket'] .settings-control { grid-column: 2; justify-self: start; }
 }
+
+/* A short landscape viewport needs its full height for the board and controls. */
+@media (orientation: landscape) and (max-height: 500px) {
+  html[data-theme='theme-pocket'] .pocket-page-header { position: relative; top: auto; }
+  html[data-theme='theme-pocket'] :is(.game-page,.app-shell[data-page='anime-tracker'],.settings-shell) { padding-bottom: calc(24px + env(safe-area-inset-bottom)); }
+  html[data-theme='theme-pocket']:has(.game-page,.app-shell[data-page='anime-tracker'],.settings-shell) .pocket-navigation { position: static; }
+}

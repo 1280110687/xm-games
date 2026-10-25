@@ -377,15 +377,15 @@ export function BingoGame() {
       {["B", "I", "N", "G", "O"].map((letter, idx) => (
         <div
           key={letter}
-          className={`py-2 text-center text-xl font-bold text-white ${idx === 0
-              ? "text-red-500"
+          className={`py-2 text-center text-xl font-bold ${idx === 0
+              ? "text-red-700 dark:text-red-400"
               : idx === 1
-                ? "text-orange-500"
+                ? "text-orange-700 dark:text-orange-400"
                 : idx === 2
-                  ? "text-yellow-500"
+                  ? "text-yellow-700 dark:text-yellow-400"
                   : idx === 3
-                    ? "text-green-500"
-                    : "text-blue-500"
+                    ? "text-green-700 dark:text-green-400"
+                    : "text-blue-700 dark:text-blue-400"
             }`}
         >
           {letter}

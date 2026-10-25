@@ -465,9 +465,10 @@ export function BingoCards() {
             <div className="bingo-cards-toolbar-main flex flex-wrap items-center gap-4">
               {/* Number Input */}
               {mode === "local" && (
-                <div className="bingo-cards-number-entry flex min-w-0 items-center gap-2">
+                <div className="bingo-cards-number-entry flex w-full min-w-0 items-center gap-2 sm:w-64">
                   <Input
                     type="number"
+                    inputMode="numeric"
                     min={1}
                     max={75}
                     value={inputNumber}

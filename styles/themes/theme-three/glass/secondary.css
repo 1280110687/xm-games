@@ -93,4 +93,17 @@ html[data-theme='theme-three'] .bingo-settings-controls label { white-space: nor
   html[data-theme='theme-three'] .neon-dashboard .game-actions { order: -1; }
   html[data-theme='theme-three'] .settings-row { grid-template-columns: 28px minmax(0,1fr); }
   html[data-theme='theme-three'] .settings-control { grid-column: 2; justify-self: start; }
+  html[data-theme='theme-three'] .settings-control.theme-switcher-trigger { min-width: 0; max-width: 100%; min-height: 44px; height: auto; white-space: normal; text-align: left; }
+  html[data-theme='theme-three'] .settings-control .theme-current-label { min-width: 0; overflow-wrap: anywhere; }
+}
+@media (max-width: 359px) {
+  /* Five timer characters must fit within one of the four narrow stat columns. */
+  html[data-theme='theme-three'] .memory-stats p.font-mono { font-size: 14px; white-space: nowrap; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  /* A short viewport needs its full height for boards; keep page navigation in flow. */
+  html[data-theme='theme-three'] .theme-three-bottom-bar[data-secondary='true'] { position: relative; left: auto; bottom: auto; transform: none; margin: 16px auto calc(16px + env(safe-area-inset-bottom)); }
+  html[data-theme='theme-three'] .t3-page-header { position: static; }
+  html[data-theme='theme-three'] body :is(.game-page,.app-shell[data-page='anime-tracker'],.settings-shell) { padding-bottom: 0; }
+  html[data-theme='theme-three'] body .schulte-page { padding-bottom: 0; }
 }
