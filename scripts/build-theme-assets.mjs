@@ -6,7 +6,7 @@ import { bundle, transform } from "lightningcss"
 import sharp from "sharp"
 
 const root = fileURLToPath(new URL("../", import.meta.url))
-const themes = ["theme-arcade", "theme-pocket", "theme-three", "theme-four", "theme-retro"]
+const themes = ["theme-pocket", "theme-three", "theme-four", "theme-retro"]
 const targets = { safari: (15 << 16) | (4 << 8), chrome: 111 << 16, firefox: 128 << 16 }
 
 async function writeChanged(path, data) {

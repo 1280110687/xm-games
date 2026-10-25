@@ -21,7 +21,6 @@ import {
 
 import { GameHeader } from "@/components/game-header"
 import { SchulteThemeFourView } from "@/features/themes/theme-four/schulte-view"
-import { ArcadeSchulteView } from "@/features/themes/theme-arcade/schulte-view"
 import { PocketSchulteView } from "@/features/themes/theme-pocket/schulte-view"
 import { RetroSchulteView } from "@/features/themes/theme-retro/schulte-view"
 import { useTheme } from "@/features/themes/shared/theme-provider"
@@ -552,9 +551,9 @@ function SchulteTargetValue({
   return game.completionReason === "solved" ? "✓" : "—"
 }
 
-function SchulteThemedView({ presentation, ...props }: SchulteViewProps & { presentation: "paper" | "arcade" | "pocket" | "retro" }) {
+function SchulteThemedView({ presentation, ...props }: SchulteViewProps & { presentation: "paper" | "pocket" | "retro" }) {
   const best = props.records.best[props.selectedLevel]
-  const View = presentation === "retro" ? RetroSchulteView : presentation === "pocket" ? PocketSchulteView : presentation === "arcade" ? ArcadeSchulteView : SchulteThemeFourView
+  const View = presentation === "retro" ? RetroSchulteView : presentation === "pocket" ? PocketSchulteView : SchulteThemeFourView
   return (
     <View
       targetLabel={props.t(props.config.nextTargetKey)}
@@ -870,8 +869,8 @@ function FocusSequenceGame({
         titleClassName="schulte-header-title"
         descriptionClassName="schulte-header-description"
       />
-      {theme === "theme-four" || theme === "theme-arcade" || theme === "theme-pocket" || theme === "theme-retro" ? (
-        <SchulteThemedView {...viewProps} presentation={theme === "theme-retro" ? "retro" : theme === "theme-pocket" ? "pocket" : theme === "theme-arcade" ? "arcade" : "paper"} />
+      {theme === "theme-four" || theme === "theme-pocket" || theme === "theme-retro" ? (
+        <SchulteThemedView {...viewProps} presentation={theme === "theme-retro" ? "retro" : theme === "theme-pocket" ? "pocket" : "paper"} />
       ) : (
         <SchulteThemeThreeView {...viewProps} />
       )}

@@ -31,7 +31,6 @@ import {
 } from "lucide-react"
 
 import { GameHeader } from "@/components/game-header"
-import { useTheme } from "@/features/themes/shared/theme-provider"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -388,8 +387,6 @@ function SearchResultItem({
 
 export function AnimeTracker() {
   const { t, locale } = useLocale()
-  const { theme } = useTheme()
-  const isArcade = theme === "theme-arcade"
   const isOnline = useOnlineStatus()
   const [animeList, setAnimeList] = useState<AnimeRecord[]>([])
   const [imageCache, setImageCache] = useState<Record<string, string>>({})
@@ -759,12 +756,12 @@ export function AnimeTracker() {
           homeLabel={t("appName")}
           homeLabelMode="sr-only"
           title={t("animeTracker")}
-          description={isArcade ? undefined : t("animeTrackerDescription")}
+          description={t("animeTrackerDescription")}
           className="mb-5"
           homeButtonClassName="border border-border/70 bg-card/70 shadow-sm"
           titleClassName="text-xl font-semibold tracking-tight sm:text-2xl"
           descriptionClassName="hidden text-sm text-muted-foreground sm:block"
-          actions={!isArcade &&
+          actions={
             <Button
               onClick={openAddDialog}
               className="game-actions rounded-full px-3 sm:px-4"
@@ -777,9 +774,6 @@ export function AnimeTracker() {
         />
 
         <div className="anime-page-toolbar mb-4 flex justify-end">
-          {isArcade && <Button onClick={openAddDialog}>
-            <Plus aria-hidden="true" />{t("addAnime")}
-          </Button>}
           <AnimeTransfer
             records={animeList}
             ready={storageReady}

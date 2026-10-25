@@ -1,7 +1,6 @@
 import { TetrisGame } from "@/features/tetris/components/tetris-game"
 import { getPageMetadata } from "@/lib/page-metadata"
 import "../classic-games.css"
-import "@/styles/themes/theme-arcade/classic-games.css"
 import "@/styles/themes/theme-pocket/classic-games.css"
 import "@/styles/themes/theme-retro/classic-games.css"
 

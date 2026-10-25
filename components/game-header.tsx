@@ -9,7 +9,6 @@ import { ThemeSwitcher } from "@/features/themes/shared/theme-switcher"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { useTheme } from "@/features/themes/shared/theme-provider"
-import { ArcadePageHeader } from "@/features/themes/theme-arcade/header"
 import { PocketPageHeader } from "@/features/themes/theme-pocket/header"
 import { ThemeThreeHeader } from "@/features/themes/theme-three/header"
 import { RetroPageHeader } from "@/features/themes/theme-retro/header"
@@ -85,9 +84,6 @@ export function GameHeader({
   if (theme === "theme-retro") return <RetroPageHeader title={title} description={description} actions={actions} homeLabel={homeLabel} />
   if (theme === "theme-three") return <ThemeThreeHeader title={title} description={description} actions={actions} homeLabel={homeLabel} />
   if (theme === "theme-pocket") return <PocketPageHeader title={title} description={description} actions={actions} homeLabel={homeLabel} />
-  if (theme === "theme-arcade") {
-    return <ArcadePageHeader title={title} description={description} actions={actions} homeLabel={homeLabel} />
-  }
   const home = (
     <HomeLink
       label={homeLabel}

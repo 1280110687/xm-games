@@ -68,7 +68,8 @@ describe("theme configuration", () => {
   })
 
   it("accepts only active themes", () => {
-    expect(isThemeId("theme-arcade")).toBe(true)
+    expect(isThemeId("theme-arcade")).toBe(false)
+    expect(isThemeId("theme-pocket")).toBe(true)
     expect(isThemeId("theme-one")).toBe(false)
     expect(isThemeId("theme-two")).toBe(false)
     expect(isThemeId("theme-three")).toBe(true)
@@ -91,26 +92,19 @@ describe("theme configuration", () => {
   })
 
   it("loads the isolated WebGL experience only for Theme Four", () => {
-    expect(themeLoadsWebglExperience("theme-arcade")).toBe(false)
+    expect(themeLoadsWebglExperience("theme-pocket")).toBe(false)
     expect(themeLoadsWebglExperience("theme-three")).toBe(false)
     expect(themeLoadsWebglExperience("theme-four")).toBe(true)
   })
 
-  it.each(["/", "/text-tool", "/text-tool/"])("renders arcade on %s before first paint", pathname => {
+  it.each(["/", "/text-tool", "/text-tool/", "/snake", "/settings", "/anime-tracker", "/2048", "/qr-code", "/schulte-grid", "/alternating-trail"])("migrates arcade to Pocket on %s before first paint", pathname => {
     const { root, classes, writes } = runBootstrap("theme-arcade", false, false, pathname)
-    expect(root.dataset.theme).toBe("theme-arcade")
+    expect(root.dataset.theme).toBe("theme-pocket")
     expect(classes.has("dark")).toBe(false)
-    expect(writes).toEqual([])
+    expect(writes).toEqual([["xm-games-theme:v1", "theme-pocket"]])
   })
 
-  it.each(["/snake", "/settings", "/anime-tracker", "/2048", "/qr-code", "/schulte-grid"])("keeps arcade on %s before first paint", pathname => {
-    const { root, classes, writes } = runBootstrap("theme-arcade", false, false, pathname)
-    expect(root.dataset.theme).toBe("theme-arcade")
-    expect(classes.has("dark")).toBe(false)
-    expect(writes).toEqual([])
-  })
-
-  it.each(["theme-one", "theme-two"])("migrates retired %s before first paint", (retired) => {
+  it.each(["theme-one", "theme-two", "theme-arcade"])("migrates retired %s before first paint", (retired) => {
     const { root, classes, themeColor, writes } = runBootstrap(retired)
     expect(root.dataset.theme).toBe("theme-pocket")
     expect(root.style.colorScheme).toBe("light")
@@ -128,8 +122,8 @@ describe("theme configuration", () => {
     expect(writes).toEqual([])
   })
 
-  it("still renders the fallback when migration cannot be persisted", () => {
-    const { root, writes } = runBootstrap("theme-two", false, true)
+  it.each(["theme-one", "theme-two", "theme-arcade"])("still renders the fallback when %s migration cannot be persisted", retired => {
+    const { root, writes } = runBootstrap(retired, false, true)
     expect(root.dataset.theme).toBe(DEFAULT_THEME)
     expect(writes).toEqual([])
   })

@@ -3,7 +3,6 @@
 import {
   Layers3,
   LayoutGrid,
-  Gamepad2,
   Joystick,
   Palette,
   PanelsTopLeft,
@@ -45,7 +44,6 @@ const THEME_COPY: Record<
     trigger: "切换主题风格",
     themes: {
       "theme-retro": { name: "主题五 · 复古掌机", description: "LCD 屏幕、游戏卡带与实体感按键" },
-      "theme-arcade": { name: "主题一 · 街机编辑部", description: "珊瑚色块、硬朗线条与编辑式排版" },
       "theme-pocket": { name: "主题二 · 口袋启动器", description: "蓝白轻界面与立体游戏图标" },
       "theme-three": {
         name: "主题三 · 夜色游廊",
@@ -62,7 +60,6 @@ const THEME_COPY: Record<
     trigger: "Switch appearance",
     themes: {
       "theme-retro": { name: "Theme Five · Retro", description: "LCD screens, cartridges and tactile controls" },
-      "theme-arcade": { name: "Theme One · Arcade", description: "Coral accents and bold editorial layouts" },
       "theme-pocket": { name: "Theme Two · Pocket", description: "A blue-and-white launcher with playful game icons" },
       "theme-three": {
         name: "Theme Three · Night Gallery",
@@ -79,7 +76,6 @@ const THEME_COPY: Record<
     trigger: "เปลี่ยนธีม",
     themes: {
       "theme-retro": { name: "ธีม 5 · เรโทร", description: "จอ LCD ตลับเกม และปุ่มสไตล์เครื่องเกมพกพา" },
-      "theme-arcade": { name: "ธีม 1 · อาร์เคด", description: "สีคอรัล เส้นคมชัด และเลย์เอาต์แบบนิตยสาร" },
       "theme-pocket": { name: "ธีม 2 · พ็อกเก็ต", description: "หน้าจอขาวฟ้า พร้อมไอคอนเกมสามมิติ" },
       "theme-three": {
         name: "ธีม 3 · ไนต์แกลเลอรี",
@@ -96,7 +92,6 @@ const THEME_COPY: Record<
 const THEME_ICONS: Record<ThemeId, LucideIcon> = {
   "theme-retro": Joystick,
   "theme-pocket": LayoutGrid,
-  "theme-arcade": Gamepad2,
   "theme-three": PanelsTopLeft,
   "theme-four": PencilRuler,
 }

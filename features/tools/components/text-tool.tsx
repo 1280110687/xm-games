@@ -17,15 +17,10 @@ import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 
 import { useTextTool } from "../hooks/use-text-tool"
-import { useTheme } from "@/features/themes/shared/theme-provider"
-import { ArcadeTextTool } from "@/features/themes/theme-arcade/text-tool"
 
 export function TextTool() {
   const controller = useTextTool()
-  const { theme } = useTheme()
   const { locale, copy, input, setInput, output, outputStats, error, status, copied, stats, invalidateResult, processText, copyOutput, useOutputAsInput, clearAll } = controller
-
-  if (theme === "theme-arcade") return <ArcadeTextTool controller={controller} />
 
   return (
     <div data-page="text-tool" className="utility-page offline-data-page game-page">

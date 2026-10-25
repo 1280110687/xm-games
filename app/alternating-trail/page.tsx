@@ -1,7 +1,6 @@
 import { AlternatingTrailGame } from "@/features/alternating-trail/components/alternating-trail-game"
 import { getPageMetadata } from "@/lib/page-metadata"
 import "../schulte-grid.css"
-import "@/styles/themes/theme-arcade/schulte-grid.css"
 import "@/styles/themes/theme-pocket/schulte-grid.css"
 import "@/styles/themes/theme-retro/schulte-grid.css"
 

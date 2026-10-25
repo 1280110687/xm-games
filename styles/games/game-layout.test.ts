@@ -24,7 +24,7 @@ describe("responsive game layout contracts", () => {
     expect(read("features/tetris/components/tetris-game.tsx")).not.toContain("repeat(${BOARD_WIDTH}")
   })
 
-  it.each(["arcade", "pocket", "three", "four", "retro"])(
+  it.each(["pocket", "three", "four", "retro"])(
     "lets theme %s cells follow the board tracks",
     (theme) => {
       expect(declarations(

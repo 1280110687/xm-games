@@ -2,7 +2,6 @@
 
 import { ThemeThreeNavigation } from "@/features/themes/theme-three/theme-three-navigation"
 import { useTheme } from "@/features/themes/shared/theme-provider"
-import { ArcadeNavigation } from "@/features/themes/theme-arcade/navigation"
 import { PocketNavigation } from "@/features/themes/theme-pocket/navigation"
 
 export function ThemeNavigation() {
@@ -10,7 +9,6 @@ export function ThemeNavigation() {
 
   if (!isResolved) return null
   if (theme === "theme-pocket") return <PocketNavigation />
-  if (theme === "theme-arcade") return <ArcadeNavigation />
   if (theme === "theme-three") return <ThemeThreeNavigation />
   return null
 }

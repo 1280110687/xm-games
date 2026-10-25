@@ -1,7 +1,6 @@
 import { SchulteGridGame } from "@/features/schulte-grid/components/schulte-grid-game"
 import { getPageMetadata } from "@/lib/page-metadata"
 import "../schulte-grid.css"
-import "@/styles/themes/theme-arcade/schulte-grid.css"
 import "@/styles/themes/theme-pocket/schulte-grid.css"
 import "@/styles/themes/theme-retro/schulte-grid.css"
 
