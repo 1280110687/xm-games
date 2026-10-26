@@ -25,6 +25,7 @@ interface GameRulesDialogProps {
   titleClassName?: string
   closeButtonClassName?: string
   onOpenChange?: (open: boolean) => void
+  onCloseAutoFocus?: (event: Event) => void
 }
 
 export function GameRulesDialog({
@@ -38,6 +39,7 @@ export function GameRulesDialog({
   titleClassName,
   closeButtonClassName,
   onOpenChange,
+  onCloseAutoFocus,
 }: GameRulesDialogProps) {
   return (
     <Dialog onOpenChange={onOpenChange}>
@@ -52,6 +54,7 @@ export function GameRulesDialog({
       </DialogTrigger>
       <DialogContent
         showCloseButton={false}
+        onCloseAutoFocus={onCloseAutoFocus}
         className={cn(
           "max-h-[82vh] overflow-y-auto border-white/10 bg-popover p-5 text-foreground sm:max-w-md sm:p-6",
           contentClassName,

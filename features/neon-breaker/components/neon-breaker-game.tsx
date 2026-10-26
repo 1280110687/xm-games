@@ -1,6 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState, type FocusEvent } from "react"
 import {
   BrickWall,
   ChevronRight,
@@ -158,11 +158,26 @@ export function NeonBreakerGame() {
     if (open) {
       resumeAfterRulesRef.current = snapshotRef.current?.phase === "playing"
       if (resumeAfterRulesRef.current) controllerRef.current?.pause()
-      return
     }
+  }, [])
 
-    if (resumeAfterRulesRef.current) controllerRef.current?.resume()
+  const handleRulesCloseAutoFocus = useCallback((event: Event) => {
+    if (!resumeAfterRulesRef.current) return
     resumeAfterRulesRef.current = false
+    const controller = controllerRef.current
+    if (!controller) return
+    // Resume after Radix releases the dialog focus trap, so keyboard play can continue.
+    event.preventDefault()
+    controller.resume()
+  }, [])
+
+  const handleOverlayFocus = useCallback((event: FocusEvent<HTMLDivElement>) => {
+    if (snapshotRef.current?.phase !== "playing") return
+    const overlay = event.target.closest('[role="menu"], [role="dialog"], [role="listbox"]')
+    // Rules own their pause/resume intent, including focus during the closing animation.
+    if (overlay && !overlay.classList.contains("neon-rules-dialog") && overlay.getAttribute("data-state") !== "closed") {
+      controllerRef.current?.pause()
+    }
   }, [])
 
   const phase = snapshot?.phase
@@ -201,7 +216,7 @@ export function NeonBreakerGame() {
   ]
 
   return (
-    <div className="game-page" data-page="neon-breaker">
+    <div className="game-page" data-page="neon-breaker" onFocusCapture={handleOverlayFocus}>
       <GameHeader
         layout="centered"
         homeLabel={t("appName")}
@@ -210,6 +225,20 @@ export function NeonBreakerGame() {
         className="mb-4"
         homeButtonClassName="text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
         titleClassName="text-base font-bold text-foreground sm:text-xl"
+        actions={
+          <Button
+            type="button"
+            size="icon-lg"
+            className={`neon-quick-pause min-h-11 min-w-11${phase === "playing" ? "" : " invisible"}`}
+            disabled={!sceneReady || phase !== "playing"}
+            aria-hidden={phase !== "playing"}
+            aria-label={t("pause")}
+            title={t("pause")}
+            onClick={() => controllerRef.current?.pause()}
+          >
+            <Pause className="size-5" aria-hidden="true" />
+          </Button>
+        }
       />
 
       <main
@@ -239,7 +268,7 @@ export function NeonBreakerGame() {
 
             {statusText && (
               <div className="neon-status-backdrop pointer-events-none absolute inset-0 flex items-center justify-center p-5">
-                <div className="neon-status-panel pointer-events-auto max-w-[17rem] px-5 py-4 text-center">
+                <div className="neon-status-panel pointer-events-auto max-w-[17rem] px-3 py-4 text-center sm:px-5">
                   {phase === "won" ? (
                     <Trophy className="neon-status-icon mx-auto mb-2 size-8" aria-hidden="true" />
                   ) : phase === "level-cleared" ? (
@@ -253,9 +282,29 @@ export function NeonBreakerGame() {
                     {statusText}
                   </p>
                   {loadError && (
-                    <Button type="button" size="sm" className="mt-3" onClick={retryLoading}>
+                    <Button type="button" size="sm" className="mt-3 min-h-11" onClick={retryLoading}>
                       <RotateCcw className="size-4" aria-hidden="true" />
                       {t("restart")}
+                    </Button>
+                  )}
+                  {sceneReady && phase === "ready" && (
+                    <Button type="button" className="mt-3 min-h-11" onClick={() => controllerRef.current?.launch()}>
+                      <Play className="size-4" aria-hidden="true" />{t("neonBreakerLaunch")}
+                    </Button>
+                  )}
+                  {phase === "paused" && (
+                    <Button type="button" className="mt-3 min-h-11" onClick={() => controllerRef.current?.resume()}>
+                      <Play className="size-4" aria-hidden="true" />{t("resume")}
+                    </Button>
+                  )}
+                  {phase === "level-cleared" && (
+                    <Button type="button" className="mt-3 min-h-11" onClick={() => controllerRef.current?.nextLevel()}>
+                      <ChevronRight className="size-4" aria-hidden="true" />{t("neonBreakerNextLevel")}
+                    </Button>
+                  )}
+                  {(phase === "won" || phase === "game-over") && (
+                    <Button type="button" className="mt-3 min-h-11" onClick={() => controllerRef.current?.restart()}>
+                      <RotateCcw className="size-4" aria-hidden="true" />{t("restart")}
                     </Button>
                   )}
                 </div>
@@ -359,7 +408,9 @@ export function NeonBreakerGame() {
               triggerLabel={t("howToPlay")}
               closeLabel={t("close")}
               title={t("neonBreaker")}
+              contentClassName="neon-rules-dialog"
               onOpenChange={handleRulesOpenChange}
+              onCloseAutoFocus={handleRulesCloseAutoFocus}
               triggerClassName="ml-auto"
             >
               <ol className="mt-4 space-y-3 text-sm leading-6 text-muted-foreground">

@@ -502,7 +502,8 @@ export function ChineseChessGame() {
           data-slot="game-stage"
           aria-busy={game.mode === "ai" && game.aiStatus === "thinking"}
         >
-          <div className="relative h-full w-full">
+          {/* Explicit insets keep the board inside its padding in WebKit. */}
+          <div className="absolute inset-4 lg:inset-8">
             <svg
               className="board-lines absolute inset-0 h-full w-full"
               aria-hidden="true"

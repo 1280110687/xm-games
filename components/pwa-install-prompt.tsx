@@ -1,6 +1,7 @@
 "use client"
 
 import Image from "next/image"
+import { usePathname } from "next/navigation"
 import { useEffect, useRef, useState } from "react"
 import {
   Check,
@@ -107,6 +108,7 @@ function removeMediaQueryChangeListener(
 }
 
 export function PwaInstallPrompt() {
+  const pathname = usePathname()
   const { t } = useLocale()
   const [open, setOpen] = useState(false)
   const [platform, setPlatform] = useState<PwaInstallPlatform>("other")
@@ -283,6 +285,9 @@ export function PwaInstallPrompt() {
       </li>
     </ol>
   )
+
+  // Keep the install offer pending until the player leaves the real-time game.
+  if (pathname === "/neon-breaker") return null
 
   return (
     <>

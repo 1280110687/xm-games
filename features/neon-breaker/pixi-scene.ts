@@ -507,6 +507,10 @@ export async function createNeonBreakerScene({
   }
 
   const syncStateGraphics = () => {
+    const touchAction = state.phase === "playing" ? "none" : "pan-y"
+    if (app.canvas.style.touchAction !== touchAction) {
+      app.canvas.style.touchAction = touchAction
+    }
     syncBricks()
     syncPowerUps()
 
@@ -657,8 +661,9 @@ export async function createNeonBreakerScene({
       rightPressed = true
       return
     }
-    if ((key === " " || key === "enter") && !event.repeat) {
+    if (key === " " || key === "enter") {
       event.preventDefault()
+      if (event.repeat) return
       if (state.phase === "ready") {
         state = launchBall(state)
       } else if (state.phase === "playing" || state.phase === "paused") {
@@ -768,6 +773,7 @@ export async function createNeonBreakerScene({
 
   const applyCommand = (
     update: (current: NeonBreakerState) => NeonBreakerState,
+    focus = false,
   ) => {
     if (destroyed) return
     const next = update(state)
@@ -777,10 +783,11 @@ export async function createNeonBreakerScene({
     syncStateGraphics()
     publishSnapshot(true)
     syncTickerWithPhase()
+    if (focus) host.focus({ preventScroll: true })
   }
 
   return {
-    launch: () => applyCommand((current) => launchBall(current)),
+    launch: () => applyCommand((current) => launchBall(current), true),
     pause: () => {
       if (state.phase === "playing") {
         applyCommand((current) => togglePause(current))
@@ -788,11 +795,11 @@ export async function createNeonBreakerScene({
     },
     resume: () => {
       if (state.phase === "paused") {
-        applyCommand((current) => togglePause(current))
+        applyCommand((current) => togglePause(current), true)
       }
     },
-    restart: () => applyCommand((current) => restartNeonBreaker(current)),
-    nextLevel: () => applyCommand((current) => startNextLevel(current)),
+    restart: () => applyCommand((current) => restartNeonBreaker(current), true),
+    nextLevel: () => applyCommand((current) => startNextLevel(current), true),
     setReducedMotion: (reduced) => {
       currentReducedMotion = reduced
       if (reduced) {

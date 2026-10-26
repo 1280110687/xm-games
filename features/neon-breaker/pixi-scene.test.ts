@@ -5,7 +5,7 @@ import { DEFAULT_GAME_RENDER_PALETTE } from "../../lib/game-render-palette"
 const pixi = vi.hoisted(() => ({ applications: [] as MockApplication[] }))
 
 interface MockApplication {
-  canvas: object
+  canvas: { style: { touchAction?: string } }
   renderer: { background: { color: number } }
   ticker: { started: boolean; advance: () => void }
   start: ReturnType<typeof vi.fn>
@@ -63,7 +63,10 @@ beforeEach(() => {
   vi.stubGlobal("document", { visibilityState: "visible", addEventListener: vi.fn(), removeEventListener: vi.fn() })
   vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} })
 })
-afterEach(() => vi.unstubAllGlobals())
+afterEach(() => {
+  vi.unstubAllGlobals()
+  vi.restoreAllMocks()
+})
 
 describe("live Pixi theme changes", () => {
   it("recolors the existing canvas and keeps an earned score, bricks, phase and ticker intact", async () => {
@@ -73,6 +76,7 @@ describe("live Pixi theme changes", () => {
       replaceChildren: vi.fn(),
       addEventListener: vi.fn(),
       removeEventListener: vi.fn(),
+      focus: vi.fn(),
     }
     const snapshots: NeonBreakerSnapshot[] = []
     const onSnapshot = vi.fn((snapshot: NeonBreakerSnapshot) => snapshots.push(snapshot))
@@ -107,5 +111,60 @@ describe("live Pixi theme changes", () => {
     expect(snapshots.at(-1)?.phase).toBe("playing")
     scene.destroy()
     expect(app.destroy).toHaveBeenCalledOnce()
+  })
+
+  it("restores gameplay focus and releases gestures whenever play stops", async () => {
+    vi.spyOn(Math, "random").mockReturnValue(0.5)
+    const host = {
+      clientWidth: 390,
+      clientHeight: 640,
+      replaceChildren: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      focus: vi.fn(),
+    }
+    const snapshots: NeonBreakerSnapshot[] = []
+    const scene = await createNeonBreakerScene({
+      host: host as unknown as HTMLDivElement,
+      onSnapshot: snapshot => snapshots.push(snapshot),
+    })
+    const app = pixi.applications[0]
+    expect(app.canvas.style.touchAction).toBe("pan-y")
+    expect(host.focus).not.toHaveBeenCalled()
+
+    scene.launch()
+    expect(app.canvas.style.touchAction).toBe("none")
+    expect(host.focus).toHaveBeenCalledExactlyOnceWith({ preventScroll: true })
+    for (let frame = 0; frame < 180 && snapshots.at(-1)?.score === 0; frame += 1) app.ticker.advance()
+    scene.pause()
+    const earned = snapshots.at(-1)!
+    expect(earned.score).toBeGreaterThan(0)
+    expect(app.canvas.style.touchAction).toBe("pan-y")
+    expect(host.focus).toHaveBeenCalledTimes(1)
+
+    scene.resume()
+    expect(app.canvas.style.touchAction).toBe("none")
+    expect(host.focus).toHaveBeenCalledTimes(2)
+    expect(snapshots.at(-1)).toMatchObject({ phase: "playing", score: earned.score, lives: earned.lives, bricksLeft: earned.bricksLeft })
+
+    scene.restart()
+    expect(app.canvas.style.touchAction).toBe("pan-y")
+    expect(host.focus).toHaveBeenCalledTimes(3)
+    expect(snapshots.at(-1)?.phase).toBe("ready")
+    scene.nextLevel()
+    expect(host.focus).toHaveBeenCalledTimes(3)
+
+    const keyDown = host.addEventListener.mock.calls.find(([name]) => name === "keydown")![1] as (event: KeyboardEvent) => void
+    const preventDefault = vi.fn()
+    keyDown({ key: " ", repeat: true, preventDefault } as unknown as KeyboardEvent)
+    expect(preventDefault).toHaveBeenCalledOnce()
+    expect(snapshots.at(-1)?.phase).toBe("ready")
+
+    scene.launch()
+    keyDown({ key: "ArrowLeft", repeat: false, preventDefault } as unknown as KeyboardEvent)
+    for (let frame = 0; frame < 1_800 && snapshots.at(-1)?.phase !== "ready"; frame += 1) app.ticker.advance()
+    expect(snapshots.at(-1)).toMatchObject({ phase: "ready", lives: 2 })
+    expect(app.canvas.style.touchAction).toBe("pan-y")
+    scene.destroy()
   })
 })
