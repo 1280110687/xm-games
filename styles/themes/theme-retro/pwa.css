@@ -1,0 +1,54 @@
+/* The cream install card sits above the console, below the shared guide dialog. */
+html[data-theme='theme-retro'] .pwa-install-prompt {
+  position: fixed;
+  z-index: 49;
+  right: max(12px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  width: min(380px, calc(100% - max(12px, env(safe-area-inset-left)) - max(12px, env(safe-area-inset-right))));
+  max-height: calc(100dvh - 12px - var(--xm-safe-area-top, 0px) - max(16px, env(safe-area-inset-bottom)));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px;
+  border: 2px solid #a7aa98;
+  border-radius: 8px;
+  color: var(--foreground);
+  background: #f5f2e9;
+  box-shadow: inset 0 1px #fff9, 0 4px 0 #b7b7a8, 0 12px 32px rgb(51 51 40 / 22%);
+}
+
+html[data-theme='theme-retro'] .pwa-install-prompt__close {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #b5b5a7;
+  border-radius: 5px;
+  color: #62645b;
+  background: #eeece3;
+  cursor: pointer;
+}
+
+html[data-theme='theme-retro'] .pwa-install-prompt__close svg { width: 19px; height: 19px; }
+html[data-theme='theme-retro'] .pwa-install-prompt__brand { display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: center; gap: 12px; padding-right: 32px; }
+html[data-theme='theme-retro'] .pwa-install-prompt__icon { width: 52px; height: 52px; }
+html[data-theme='theme-retro'] .pwa-install-prompt__icon img { width: 100%; height: 100%; object-fit: contain; }
+html[data-theme='theme-retro'] .pwa-install-prompt__eyebrow { display: flex; align-items: center; gap: 5px; color: #79502e; font-size: 11px; line-height: 1.5; font-weight: 700; }
+html[data-theme='theme-retro'] .pwa-install-prompt__eyebrow svg { width: 14px; height: 14px; flex-shrink: 0; }
+html[data-theme='theme-retro'] .pwa-install-prompt__brand h2 { margin-top: 3px; font-size: 18px; line-height: 1.4; font-weight: 750; overflow-wrap: anywhere; }
+html[data-theme='theme-retro'] .pwa-install-prompt__description { margin-top: 14px; color: var(--muted-foreground); font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
+html[data-theme='theme-retro'] .pwa-install-prompt__benefits { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+html[data-theme='theme-retro'] .pwa-install-prompt__benefits span { display: flex; align-items: center; gap: 5px; padding: 6px 8px; border: 1px solid #b5bca1; border-radius: 4px; background: #e0e5d0; color: #3f482d; font-size: 11px; line-height: 1.5; }
+html[data-theme='theme-retro'] .pwa-install-prompt__benefits svg { width: 15px; height: 15px; flex-shrink: 0; }
+html[data-theme='theme-retro'] .pwa-install-prompt__error { margin-top: 12px; color: var(--destructive); font-size: 13px; line-height: 1.6; }
+html[data-theme='theme-retro'] .pwa-install-prompt__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+html[data-theme='theme-retro'] .pwa-install-prompt__actions [data-slot='button'] { flex: 1 1 128px; min-width: 44px; min-height: 44px; height: auto; padding: 10px 12px; white-space: normal; line-height: 1.4; }
+html[data-theme='theme-retro'] .pwa-install-prompt__steps { display: grid; gap: 12px; padding: 0; list-style: none; }
+html[data-theme='theme-retro'] .pwa-install-prompt__steps li { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 12px; padding: 10px; border: 1px solid #c3c7b0; border-radius: 5px; background: #e8ebdc; }
+html[data-theme='theme-retro'] .pwa-install-prompt__steps li > span { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #89916e; border-radius: 4px; background: #c5cfa8; color: var(--retro-ink); box-shadow: inset 0 1px 2px #0001; }
+html[data-theme='theme-retro'] .pwa-install-prompt__steps svg { width: 22px; height: 22px; }
+html[data-theme='theme-retro'] .pwa-install-prompt__steps strong { color: #79502e; font-size: 11px; }
+html[data-theme='theme-retro'] .pwa-install-prompt__steps p { margin-top: 2px; color: var(--foreground); font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+html[data-theme='theme-retro'] .pwa-install-guide__action { min-width: 44px; min-height: 44px; white-space: normal; }

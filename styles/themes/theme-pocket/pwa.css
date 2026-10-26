@@ -1,0 +1,53 @@
+/* Stay above the 69px pocket dock and below the shared install-guide dialog. */
+html[data-theme='theme-pocket'] .pwa-install-prompt {
+  position: fixed;
+  z-index: 49;
+  right: max(12px, env(safe-area-inset-right));
+  bottom: calc(81px + env(safe-area-inset-bottom));
+  width: min(380px, calc(100% - max(12px, env(safe-area-inset-left)) - max(12px, env(safe-area-inset-right))));
+  max-height: calc(100dvh - 93px - var(--xm-safe-area-top, 0px) - env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px;
+  border: 1px solid #dce4ef;
+  border-radius: 24px;
+  color: var(--foreground);
+  background: var(--card);
+  box-shadow: 0 12px 40px rgb(28 54 100 / 18%);
+}
+
+html[data-theme='theme-pocket'] .pwa-install-prompt__close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  color: var(--muted-foreground);
+  background: #edf2fa;
+  cursor: pointer;
+}
+
+html[data-theme='theme-pocket'] .pwa-install-prompt__close svg { width: 19px; height: 19px; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__brand { display: grid; grid-template-columns: 52px minmax(0, 1fr); align-items: center; gap: 12px; padding-right: 32px; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__icon { width: 52px; height: 52px; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__icon img { width: 100%; height: 100%; object-fit: contain; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__eyebrow { display: flex; align-items: center; gap: 5px; color: #2458d6; font-size: 11px; line-height: 1.5; font-weight: 700; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__eyebrow svg { width: 14px; height: 14px; flex-shrink: 0; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__brand h2 { margin-top: 3px; font-size: 18px; line-height: 1.4; font-weight: 750; overflow-wrap: anywhere; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__description { margin-top: 14px; color: var(--muted-foreground); font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__benefits { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__benefits span { display: flex; align-items: center; gap: 5px; padding: 6px 8px; border-radius: 10px; background: #e7efff; color: #244c98; font-size: 11px; line-height: 1.5; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__benefits svg { width: 15px; height: 15px; flex-shrink: 0; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__error { margin-top: 12px; color: var(--destructive); font-size: 13px; line-height: 1.6; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__actions [data-slot='button'] { flex: 1 1 128px; min-width: 44px; min-height: 44px; height: auto; padding: 10px 12px; white-space: normal; line-height: 1.4; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__steps { display: grid; gap: 12px; padding: 0; list-style: none; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__steps li { display: grid; grid-template-columns: 44px minmax(0, 1fr); align-items: center; gap: 12px; padding: 10px; border-radius: 14px; background: #f3f6fa; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__steps li > span { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 12px; background: #e7efff; color: #2458d6; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__steps svg { width: 22px; height: 22px; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__steps strong { color: #2458d6; font-size: 11px; }
+html[data-theme='theme-pocket'] .pwa-install-prompt__steps p { margin-top: 2px; color: var(--foreground); font-size: 14px; line-height: 1.6; overflow-wrap: anywhere; }
+html[data-theme='theme-pocket'] .pwa-install-guide__action { min-width: 44px; min-height: 44px; white-space: normal; }

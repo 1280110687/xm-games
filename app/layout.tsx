@@ -42,12 +42,13 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/pwa-icon-192.png', sizes: '192x192', type: 'image/png' },
-      { url: '/pwa-icon-512.png', sizes: '512x512', type: 'image/png' },
+      { url: '/favicon.ico', sizes: '16x16 32x32 48x48', type: 'image/x-icon' },
+      { url: '/favicon-32.png', sizes: '32x32', type: 'image/png' },
+      { url: '/icons/xm-192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/xm-512.png', sizes: '512x512', type: 'image/png' },
     ],
     apple: {
-      url: '/apple-touch-icon.png',
+      url: '/icons/xm-apple-180.png',
       sizes: '180x180',
       type: 'image/png',
     },

@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v30"
+const CACHE_VERSION = "v31"
 const SHELL_CACHE = `xm-games-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `xm-games-runtime-${CACHE_VERSION}`
 const OWNED_CACHE_PREFIX = "xm-games-"
@@ -36,11 +36,12 @@ const APP_ROUTES = [
 const STATIC_SHELL = [
   "/manifest.webmanifest",
   OFFLINE_ASSET_MANIFEST,
-  "/icon.svg",
-  "/apple-touch-icon.png",
-  "/pwa-icon-192.png",
-  "/pwa-icon-512.png",
-  "/pwa-icon-maskable-512.png",
+  "/favicon.ico",
+  "/favicon-32.png",
+  "/icons/xm-apple-180.png",
+  "/icons/xm-192.png",
+  "/icons/xm-512.png",
+  "/icons/xm-maskable-512.png",
 ]
 
 const SENSITIVE_SEARCH_PATTERN =

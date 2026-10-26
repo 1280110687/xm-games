@@ -316,7 +316,7 @@ export function PwaInstallPrompt() {
           <div className="pwa-install-prompt__brand">
             <span className="pwa-install-prompt__icon" aria-hidden="true">
               <Image
-                src="/pwa-icon-192.png"
+                src="/icons/xm-192.png"
                 alt=""
                 width={64}
                 height={64}
