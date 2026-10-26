@@ -1,2 +1,3 @@
+@import './game-palette.css';
 /* Night Gallery owns its layout; game geometry remains route-loaded. */
 @import './glass/index.css';

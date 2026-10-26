@@ -7,7 +7,7 @@
  */
 
 html[data-theme='theme-four'] .schulte-page {
-  --schulte-four-blue: #007aff;
+  --schulte-four-blue: var(--game-accent);
   --schulte-four-board-size: min(36rem, 100%);
 }
 
@@ -35,7 +35,7 @@ html[data-theme='theme-four'] .schulte-four-stage-card {
   padding: 1rem;
   border: 1px solid var(--surface-border);
   border-radius: 1.75rem;
-  background: color-mix(in oklab, white 96%, var(--background));
+  background: var(--game-surface);
   box-shadow:
     0 1px 2px oklch(0.25 0.03 255 / 0.05),
     0 20px 52px oklch(0.25 0.03 255 / 0.1);
@@ -106,21 +106,21 @@ html[data-theme='theme-four'] .schulte-four-stage-card .schulte-board {
 }
 
 html[data-theme='theme-four'] .schulte-board-backdrop {
-  fill: #f4f6e9;
-  stroke: #d6dcc3;
+  fill: var(--game-surface-raised);
+  stroke: var(--game-border);
   stroke-width: 10;
 }
 
 html[data-theme='theme-four'] .schulte-cell-shape {
-  fill: rgb(255 255 252 / 0.96);
-  stroke: #aeb99a;
+  fill: var(--game-surface);
+  stroke: var(--game-grid);
   stroke-width: 5;
   vector-effect: non-scaling-stroke;
   filter: drop-shadow(0 2px 2px rgb(55 67 44 / 0.08));
 }
 
 html[data-theme='theme-four'] .schulte-cell-number {
-  fill: #657653;
+  fill: var(--game-ink);
   font-family: Georgia, 'Times New Roman', 'Songti SC', serif;
   font-weight: 700;
   pointer-events: none;
@@ -154,7 +154,7 @@ html[data-theme='theme-four'] .schulte-four-stage-card .schulte-progress-block >
 }
 
 html[data-theme='theme-four'] .schulte-four-stage-card .schulte-progress-track {
-  background: #e7ebf0;
+  background: var(--game-border);
 }
 
 html[data-theme='theme-four'] .schulte-four-stage-card .schulte-progress-track > i {

@@ -1,5 +1,7 @@
 "use client"
 
+import "@/styles/games/puzzle-skin.css"
+
 import {
   useCallback,
   useEffect,
@@ -64,19 +66,18 @@ type MemoryAccentTone =
 
 const SYMBOLS: Array<{
   icon: LucideIcon
-  className: string
   tone: MemoryAccentTone
 }> = [
-  { icon: Star, className: "border-amber-300/25 bg-amber-400/15 text-amber-200", tone: "amber" },
-  { icon: Heart, className: "border-rose-300/25 bg-rose-400/15 text-rose-200", tone: "rose" },
-  { icon: Rocket, className: "border-cyan-300/25 bg-cyan-400/15 text-cyan-200", tone: "cyan" },
-  { icon: Crown, className: "border-violet-300/25 bg-violet-400/15 text-violet-200", tone: "violet" },
-  { icon: Gem, className: "border-blue-300/25 bg-blue-400/15 text-blue-200", tone: "blue" },
-  { icon: Leaf, className: "border-emerald-300/25 bg-emerald-400/15 text-emerald-200", tone: "emerald" },
-  { icon: Moon, className: "border-indigo-300/25 bg-indigo-400/15 text-indigo-200", tone: "indigo" },
-  { icon: Music2, className: "border-fuchsia-300/25 bg-fuchsia-400/15 text-fuchsia-200", tone: "fuchsia" },
-  { icon: Palette, className: "border-orange-300/25 bg-orange-400/15 text-orange-200", tone: "orange" },
-  { icon: Zap, className: "border-yellow-300/25 bg-yellow-400/15 text-yellow-200", tone: "yellow" },
+  { icon: Star, tone: "amber" },
+  { icon: Heart, tone: "rose" },
+  { icon: Rocket, tone: "cyan" },
+  { icon: Crown, tone: "violet" },
+  { icon: Gem, tone: "blue" },
+  { icon: Leaf, tone: "emerald" },
+  { icon: Moon, tone: "indigo" },
+  { icon: Music2, tone: "fuchsia" },
+  { icon: Palette, tone: "orange" },
+  { icon: Zap, tone: "yellow" },
 ]
 
 const A11Y_COPY = {
@@ -277,7 +278,7 @@ export function MemoryMatchGame() {
         homeLabelMode="desktop"
         title={t("memoryMatch")}
         className="mb-4"
-        homeButtonClassName="text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+        homeButtonClassName="text-muted-foreground hover:text-foreground"
         titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
@@ -289,12 +290,12 @@ export function MemoryMatchGame() {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="memory-intro">
-                <p className="memory-kicker text-xs font-bold uppercase tracking-[0.16em] text-cyan-200/75">
+                <p className="memory-kicker text-xs font-bold uppercase tracking-[0.16em]">
                   {t("memoryMatchDescription")}
                 </p>
                 <div className="mt-2 flex items-center gap-2">
                   <BrainCircuit
-                    className="memory-accent size-5 text-violet-200"
+                    className="memory-accent size-5"
                     data-tone="violet"
                     aria-hidden="true"
                   />
@@ -305,7 +306,7 @@ export function MemoryMatchGame() {
               </div>
 
               <div
-                className="game-settings memory-difficulty-control grid grid-cols-3 gap-1 rounded-xl border border-white/10 bg-black/10 p-1"
+                className="game-settings memory-difficulty-control grid grid-cols-3 gap-1 rounded-xl border p-1"
                 data-slot="game-settings"
                 role="group"
                 aria-label={t("level")}
@@ -329,7 +330,7 @@ export function MemoryMatchGame() {
             <div className="memory-stats grid grid-cols-2 gap-2 sm:grid-cols-4">
               <div className="surface-card flex min-h-16 items-center gap-3 px-3 py-2.5">
                 <span
-                  className="memory-accent flex size-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-200"
+                  className="memory-accent flex size-9 shrink-0 items-center justify-center rounded-xl"
                   data-tone="cyan"
                 >
                   <Medal className="size-4" aria-hidden="true" />
@@ -346,7 +347,7 @@ export function MemoryMatchGame() {
 
               <div className="surface-card flex min-h-16 items-center gap-3 px-3 py-2.5">
                 <span
-                  className="memory-accent flex size-9 shrink-0 items-center justify-center rounded-xl bg-violet-400/10 text-violet-200"
+                  className="memory-accent flex size-9 shrink-0 items-center justify-center rounded-xl"
                   data-tone="violet"
                 >
                   <MousePointerClick className="size-4" aria-hidden="true" />
@@ -363,7 +364,7 @@ export function MemoryMatchGame() {
 
               <div className="surface-card flex min-h-16 items-center gap-3 px-3 py-2.5">
                 <span
-                  className="memory-accent flex size-9 shrink-0 items-center justify-center rounded-xl bg-emerald-400/10 text-emerald-200"
+                  className="memory-accent flex size-9 shrink-0 items-center justify-center rounded-xl"
                   data-tone="emerald"
                 >
                   <Clock3 className="size-4" aria-hidden="true" />
@@ -380,7 +381,7 @@ export function MemoryMatchGame() {
 
               <div className="surface-card flex min-h-16 items-center gap-3 px-3 py-2.5">
                 <span
-                  className="memory-accent flex size-9 shrink-0 items-center justify-center rounded-xl bg-amber-400/10 text-amber-200"
+                  className="memory-accent flex size-9 shrink-0 items-center justify-center rounded-xl"
                   data-tone="amber"
                 >
                   <Trophy className="size-4" aria-hidden="true" />
@@ -401,7 +402,7 @@ export function MemoryMatchGame() {
                 <span>{boardStatus}</span>
                 {game.streak >= 2 && game.phase === "playing" && (
                   <span
-                    className="memory-accent-pill rounded-full border border-amber-300/20 bg-amber-400/10 px-2.5 py-1 text-amber-200"
+                    className="memory-accent-pill rounded-full border px-2.5 py-1"
                     data-tone="amber"
                   >
                     {t("memoryStreak")} × {game.streak}
@@ -409,7 +410,7 @@ export function MemoryMatchGame() {
                 )}
               </div>
               <div
-                className="memory-progress-track h-1.5 overflow-hidden rounded-full bg-white/[0.06]"
+                className="memory-progress-track h-1.5 overflow-hidden rounded-full"
                 role="progressbar"
                 aria-label={t("memoryPairs")}
                 aria-valuemin={0}
@@ -417,7 +418,7 @@ export function MemoryMatchGame() {
                 aria-valuenow={game.matchedPairs}
               >
                 <div
-                  className="h-full rounded-full bg-gradient-to-r from-violet-400 via-primary to-cyan-300 transition-[width] duration-500"
+                  className="memory-progress-fill h-full rounded-full transition-[width] duration-500"
                   style={{ width: `${progress}%` }}
                 />
               </div>
@@ -429,10 +430,10 @@ export function MemoryMatchGame() {
           <div
             role="status"
             aria-live="assertive"
-            className="memory-complete-panel surface-card flex w-full max-w-xl items-center gap-3 border-emerald-300/20 bg-emerald-400/[0.08] px-4 py-3"
+            className="memory-complete-panel surface-card flex w-full max-w-xl items-center gap-3 px-4 py-3"
           >
             <span
-              className="memory-accent flex size-10 shrink-0 items-center justify-center rounded-xl bg-emerald-400/15 text-emerald-200"
+              className="memory-accent flex size-10 shrink-0 items-center justify-center rounded-xl"
               data-tone="emerald"
             >
               <Sparkles className="size-5" aria-hidden="true" />
@@ -448,7 +449,7 @@ export function MemoryMatchGame() {
         )}
 
         <section
-          className="game-stage memory-board surface-panel w-full max-w-xl p-2.5 sm:p-3"
+          className="game-stage puzzle-skin memory-board surface-panel w-full max-w-xl p-2.5 sm:p-3"
           data-slot="game-stage"
           aria-label={a11y.board}
           aria-busy={game.isLocked}
@@ -483,8 +484,9 @@ export function MemoryMatchGame() {
                   aria-disabled={isUnavailable}
                   aria-label={`${a11y.card} ${index + 1}, ${stateLabel}`}
                   aria-pressed={isFaceUp}
+                  data-state={card.status}
                   className={cn(
-                    "group relative aspect-square min-h-11 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:rounded-2xl",
+                    "memory-card group relative aspect-square min-h-11 rounded-xl outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background sm:rounded-2xl",
                     isUnavailable && "cursor-default",
                   )}
                 >
@@ -495,22 +497,15 @@ export function MemoryMatchGame() {
                     )}
                   >
                     <span
-                      className={cn(
-                        "absolute inset-0 flex items-center justify-center rounded-xl border border-violet-300/18 bg-[linear-gradient(145deg,oklch(0.3_0.09_278_/_0.96),oklch(0.19_0.045_267_/_0.98))] text-violet-100 shadow-[inset_0_1px_0_oklch(1_0_0_/_0.1),0_10px_24px_oklch(0.08_0.04_275_/_0.3)] transition-[border-color,filter,transform] [backface-visibility:hidden] sm:rounded-2xl",
-                        !isUnavailable && "group-hover:-translate-y-0.5 group-hover:border-violet-200/35 group-hover:brightness-110",
-                      )}
+                      className="memory-card-back absolute inset-0 flex items-center justify-center rounded-xl border transition-[border-color,filter,transform] [backface-visibility:hidden] sm:rounded-2xl"
                     >
                       <BrainCircuit className="size-[36%] opacity-65" aria-hidden="true" />
-                      <span className="absolute inset-1 rounded-lg border border-white/[0.045] sm:rounded-xl" />
+                      <span className="memory-card-inlay absolute inset-1 rounded-lg border sm:rounded-xl" />
                     </span>
 
                     <span
                       data-tone={symbol.tone}
-                      className={cn(
-                        "memory-symbol absolute inset-0 flex items-center justify-center rounded-xl border shadow-[inset_0_1px_0_oklch(1_0_0_/_0.12),0_10px_24px_oklch(0.08_0.04_275_/_0.24)] [backface-visibility:hidden] [transform:rotateY(180deg)] sm:rounded-2xl",
-                        symbol.className,
-                        card.status === "matched" && "ring-1 ring-emerald-300/35",
-                      )}
+                      className="memory-symbol absolute inset-0 flex items-center justify-center rounded-xl border [backface-visibility:hidden] [transform:rotateY(180deg)] sm:rounded-2xl"
                     >
                       <Icon className="size-[46%]" strokeWidth={1.8} aria-hidden="true" />
                     </span>

@@ -1,0 +1,180 @@
+/* Keep puzzle geometry and controls shared while the active theme supplies ink and material. */
+html[data-theme] .puzzle-skin.game-stage {
+  color: var(--game-ink);
+  background: var(--game-board);
+  border-color: var(--game-frame);
+  border-radius: var(--game-radius);
+  box-shadow: var(--game-shadow);
+}
+
+html[data-theme] .puzzle-summary {
+  color: var(--game-ink);
+  background: var(--game-surface);
+  border-color: var(--game-border);
+}
+html[data-theme] .puzzle-status[data-tone='success'] {
+  color: var(--game-success);
+  background: color-mix(in srgb, var(--game-success) 12%, var(--game-surface));
+  border-color: color-mix(in srgb, var(--game-success) 35%, var(--game-border));
+}
+html[data-theme] .puzzle-status[data-tone='danger'] {
+  color: var(--game-danger);
+  background: color-mix(in srgb, var(--game-danger) 12%, var(--game-surface));
+  border-color: color-mix(in srgb, var(--game-danger) 35%, var(--game-border));
+}
+
+html[data-theme] .minesweeper-grid { background: var(--game-grid); }
+html[data-theme] .minesweeper-cell {
+  color: var(--game-ink);
+  background: var(--game-board);
+  box-shadow: inset 1px 1px 0 color-mix(in srgb, var(--game-light) 45%, transparent), inset -1px -1px 0 var(--game-frame);
+  touch-action: manipulation;
+  user-select: none;
+}
+html[data-theme] .minesweeper-cell[data-state='revealed'] {
+  background: var(--game-board-alt);
+  box-shadow: none;
+}
+html[data-theme] .minesweeper-cell[data-state='mine'] {
+  color: var(--game-on-danger);
+  background: var(--game-danger);
+  box-shadow: none;
+}
+html[data-theme] .mine-flag { color: var(--game-danger); }
+html[data-theme] .mine-number[data-count='1'] { color: var(--game-accent); }
+html[data-theme] .mine-number[data-count='2'] { color: var(--game-success); }
+html[data-theme] .mine-number[data-count='3'] { color: var(--game-danger); }
+html[data-theme] .mine-number[data-count='4'] { color: var(--game-ink); }
+html[data-theme] .mine-number[data-count='5'] { color: color-mix(in srgb, var(--game-danger) 75%, var(--game-ink)); }
+html[data-theme] .mine-number[data-count='6'] { color: color-mix(in srgb, var(--game-accent) 55%, var(--game-success)); }
+html[data-theme] .mine-number[data-count='7'] { color: var(--game-ink); }
+html[data-theme] .mine-number[data-count='8'] { color: var(--game-ink); }
+html[data-theme] .minesweeper-cell:is([data-state='hidden'], [data-state='flagged']):enabled:active {
+  background: var(--game-selected);
+  box-shadow: none;
+}
+
+html[data-theme] .sudoku-cell {
+  color: var(--game-accent);
+  background: var(--game-board-alt);
+  border-right: 1px solid var(--game-border);
+  border-bottom: 1px solid var(--game-border);
+  touch-action: manipulation;
+  user-select: none;
+}
+html[data-theme] .sudoku-cell[data-given='true'] { color: var(--game-ink); }
+html[data-theme] .sudoku-cell[data-box-right='true'] { border-right: 2px solid var(--game-grid); }
+html[data-theme] .sudoku-cell[data-box-bottom='true'] { border-bottom: 2px solid var(--game-grid); }
+html[data-theme] .sudoku-cell[data-state='related'] {
+  color: var(--game-ink);
+  background: var(--game-accent-soft);
+}
+html[data-theme] .sudoku-cell[data-state='selected'] {
+  color: var(--game-ink);
+  background: var(--game-selected);
+  box-shadow: inset 0 0 0 2px var(--game-accent);
+}
+html[data-theme] .sudoku-cell[data-error='true'] {
+  color: var(--game-danger);
+  background: color-mix(in srgb, var(--game-danger) 12%, var(--game-surface));
+  text-decoration: underline;
+  text-underline-offset: .15em;
+}
+
+html[data-theme] .snake-board { background: var(--game-canvas-grid); }
+html[data-theme] .snake-cell { background: var(--game-canvas); }
+html[data-theme] .snake-cell[data-state='head'] {
+  background: var(--game-snake);
+  border-radius: 3px;
+  box-shadow: inset 0 0 0 1px var(--game-ink);
+}
+html[data-theme] .snake-cell[data-state='body'] {
+  background: color-mix(in srgb, var(--game-snake) 76%, var(--game-canvas));
+  border-radius: 3px;
+}
+html[data-theme] .snake-cell[data-state='food'] {
+  background: var(--game-food);
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--game-food) 55%, var(--game-ink));
+}
+
+html[data-theme] [data-page='memory-match'] .memory-dashboard {
+  background: var(--game-surface-raised);
+  border-color: var(--game-border);
+}
+html[data-theme] [data-page='memory-match'] .memory-stats > div {
+  background: var(--game-surface);
+  border-color: var(--game-border);
+}
+html[data-theme] .memory-kicker,
+html[data-theme] .memory-accent { color: var(--game-accent); }
+html[data-theme] .memory-accent:not(svg) { background: var(--game-accent-soft); }
+html[data-theme] .memory-difficulty-control {
+  background: var(--game-surface);
+  border-color: var(--game-border);
+}
+html[data-theme] .memory-accent-pill {
+  color: var(--game-success);
+  border-color: color-mix(in srgb, var(--game-success) 35%, var(--game-border));
+  background: color-mix(in srgb, var(--game-success) 12%, var(--game-surface));
+}
+html[data-theme] .memory-progress-track { background: var(--game-board); }
+html[data-theme] .memory-progress-fill { background: var(--game-accent); }
+html[data-theme] .memory-complete-panel {
+  border-color: var(--game-success);
+  background: color-mix(in srgb, var(--game-success) 10%, var(--game-surface));
+}
+html[data-theme] .memory-card {
+  border-radius: calc(var(--game-radius) * .75);
+  touch-action: manipulation;
+  user-select: none;
+}
+html[data-theme] .memory-card-back,
+html[data-theme] .memory-symbol { border-radius: calc(var(--game-radius) * .75); }
+html[data-theme] .memory-card-back {
+  color: var(--game-accent);
+  background: linear-gradient(145deg, var(--game-surface-raised), var(--game-accent-soft));
+  border-color: var(--game-frame);
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--game-light) 35%, transparent), 0 3px 7px color-mix(in srgb, var(--game-ink) 8%, transparent);
+}
+html[data-theme] .memory-card-inlay {
+  border-color: color-mix(in srgb, var(--game-accent) 12%, transparent);
+  border-radius: calc(var(--game-radius) * .5);
+}
+html[data-theme] .memory-symbol {
+  --memory-symbol-ink: var(--game-accent);
+  color: var(--memory-symbol-ink);
+  background: color-mix(in srgb, var(--memory-symbol-ink) 12%, var(--game-surface));
+  border-color: color-mix(in srgb, var(--memory-symbol-ink) 35%, var(--game-border));
+  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--game-light) 25%, transparent);
+}
+html[data-theme] .memory-symbol:is([data-tone='rose'], [data-tone='orange']) { --memory-symbol-ink: var(--game-danger); }
+html[data-theme] .memory-symbol:is([data-tone='emerald'], [data-tone='cyan'], [data-tone='yellow']) { --memory-symbol-ink: var(--game-success); }
+html[data-theme] .memory-symbol:is([data-tone='amber'], [data-tone='indigo']) { --memory-symbol-ink: var(--game-ink); }
+html[data-theme] .memory-card[data-state='matched'] .memory-symbol {
+  color: var(--game-success);
+  background: color-mix(in srgb, var(--game-success) 15%, var(--game-surface));
+  border-color: var(--game-success);
+  box-shadow: inset 0 0 0 1px var(--game-success);
+}
+html[data-theme] .memory-card[data-state='matched'] .memory-symbol::after {
+  content: '✓';
+  position: absolute;
+  right: 8%;
+  bottom: 4%;
+  font-size: clamp(.65rem, 2.5vw, 1rem);
+  font-weight: 800;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  html[data-theme] .minesweeper-cell:is([data-state='hidden'], [data-state='flagged']):enabled:hover {
+    background: var(--game-selected);
+  }
+  html[data-theme] .sudoku-cell[data-given='false'][data-state='idle'][data-error='false']:hover {
+    background: var(--game-accent-soft);
+  }
+  html[data-theme] .memory-card[aria-disabled='false']:hover .memory-card-back {
+    border-color: var(--game-accent);
+    transform: translateY(-2px);
+  }
+}

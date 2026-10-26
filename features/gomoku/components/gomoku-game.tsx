@@ -1,6 +1,7 @@
 "use client"
 
 import "@/styles/games/board-workspace.css"
+import "@/styles/games/board-skin.css"
 
 import { useCallback, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -33,6 +34,7 @@ export function GomokuGame() {
   const lanCopy = GOMOKU_LAN_COPY[locale]
   const game = mode === "local" ? localGame : lan.game
   const { board, currentPlayer, winner, moveHistory } = game
+  const lastMove = moveHistory.at(-1)
   const blackUndoUsed = game.undoUsed.black
   const whiteUndoUsed = game.undoUsed.white
   const showBoard = mode === "local" || lan.phase === "playing"
@@ -169,14 +171,14 @@ export function GomokuGame() {
               <Card className="game-summary surface-panel border-white/10 bg-card/70 px-4 py-2" role="status" aria-live="polite">
                 <div className="flex items-center gap-4">
                   <div className="flex items-center gap-2">
-                    <div className={`h-5 w-5 rounded-full bg-slate-950 ${currentPlayer === "black" ? "ring-2 ring-primary" : ""}`} />
+                    <div className="board-player-token h-5 w-5 rounded-full" data-side="black" data-active={currentPlayer === "black" || undefined} />
                     <span className={`text-sm ${currentPlayer === "black" ? "text-foreground" : "text-muted-foreground"}`}>
                       {t("blackStone")}
                     </span>
                   </div>
                   <div className="h-4 w-px bg-border" />
                   <div className="flex items-center gap-2">
-                    <div className={`h-5 w-5 rounded-full bg-white ${currentPlayer === "white" ? "ring-2 ring-primary" : ""}`} />
+                    <div className="board-player-token h-5 w-5 rounded-full" data-side="white" data-active={currentPlayer === "white" || undefined} />
                     <span className={`text-sm ${currentPlayer === "white" ? "text-foreground" : "text-muted-foreground"}`}>
                       {t("whiteStone")}
                     </span>
@@ -213,13 +215,13 @@ export function GomokuGame() {
         </div>
         {showBoard && (
           <div
-            className="game-stage relative aspect-square w-full max-w-[23.5rem] rounded-xl border-4 border-amber-800 bg-amber-600 p-2 shadow-2xl shadow-black/30"
+            className="game-stage board-skin board-skin--gomoku relative aspect-square w-full max-w-[23.5rem] rounded-xl border-4 p-2"
             data-slot="game-stage"
           >
             <div className="relative h-full w-full">
               {/* Grid lines */}
               <svg
-                className="pointer-events-none absolute left-[3.333%] top-[3.333%] h-[93.333%] w-[93.333%]"
+                className="board-lines pointer-events-none absolute left-[3.333%] top-[3.333%] h-[93.333%] w-[93.333%]"
                 aria-hidden="true"
                 focusable="false"
                 viewBox={`0 0 ${(GOMOKU_BOARD_SIZE - 1) * 24} ${(GOMOKU_BOARD_SIZE - 1) * 24}`}
@@ -232,7 +234,7 @@ export function GomokuGame() {
                       y1={i * 24}
                       x2={(GOMOKU_BOARD_SIZE - 1) * 24}
                       y2={i * 24}
-                      stroke="#8B4513"
+                      stroke="currentColor"
                       strokeWidth="1"
                     />
                     <line
@@ -240,14 +242,14 @@ export function GomokuGame() {
                       y1={0}
                       x2={i * 24}
                       y2={(GOMOKU_BOARD_SIZE - 1) * 24}
-                      stroke="#8B4513"
+                      stroke="currentColor"
                       strokeWidth="1"
                     />
                   </g>
                 ))}
                 {/* Star points */}
                 {[[3, 3], [3, 11], [7, 7], [11, 3], [11, 11]].map(([r, c]) => (
-                  <circle key={`${r}-${c}`} cx={c * 24} cy={r * 24} r={3} fill="#8B4513" />
+                  <circle key={`${r}-${c}`} cx={c * 24} cy={r * 24} r={3} fill="currentColor" />
                 ))}
               </svg>
 
@@ -263,7 +265,8 @@ export function GomokuGame() {
                     <button
                       key={`${rowIndex}-${colIndex}`}
                       onClick={() => handleCellClick(rowIndex, colIndex)}
-                      className="flex aspect-square w-full touch-manipulation items-center justify-center"
+                      className="board-intersection flex aspect-square w-full touch-manipulation items-center justify-center"
+                      data-last-move={lastMove?.row === rowIndex && lastMove?.col === colIndex || undefined}
                       disabled={
                         !!winner ||
                         game.isDraw ||
@@ -275,10 +278,8 @@ export function GomokuGame() {
                       {cell && (
                         <div
                           aria-hidden="true"
-                          className={`aspect-square w-[82%] rounded-full shadow-md ${cell === "black"
-                              ? "bg-gradient-to-br from-slate-700 to-slate-900"
-                              : "bg-gradient-to-br from-white to-slate-200"
-                            }`}
+                          className="board-stone aspect-square w-[82%] rounded-full"
+                          data-side={cell}
                         />
                       )}
                     </button>

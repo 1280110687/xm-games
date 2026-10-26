@@ -1,4 +1,4 @@
-/* Only game chrome is themed; boards retain rule-significant colors and geometry. */
+/* Layout remains theme-owned; shared game skins read this theme's material tokens. */
 html[data-theme='theme-retro'] .game-stage { border-radius: 6px; border-color: #dfdfce; box-shadow: 0 8px 24px rgb(51 51 40 / 6%); }
 html[data-theme='theme-retro'] .game-stat-value[data-tone='success'], html[data-theme='theme-retro'] .game-status-copy[data-tone='success'] { color: #287059; }
 html[data-theme='theme-retro'] .game-stat-value[data-tone='achievement'] { color: #956012; }
@@ -27,13 +27,6 @@ html[data-theme='theme-retro'] .chinese-chess-ai-choice[aria-pressed='true'] { b
 html[data-theme='theme-retro'] .chinese-chess-ai-choice__piece { margin-right: 5px; }
 html[data-theme='theme-retro'] .chinese-chess-ai-setup__warning { font-size: 13px; line-height: 1.6; color: #956012; }
 html[data-theme='theme-retro'] .chinese-chess-ai-setup__footer { margin-top: 20px; }
-html[data-theme='theme-retro'] [data-page='chess'] .game-stage button.bg-amber-200:not([class~='bg-yellow-400/50']) { background: #dfdfce; }
-html[data-theme='theme-retro'] [data-page='chess'] .game-stage button.bg-amber-700:not([class~='bg-yellow-400/50']) { background: #839367; }
-html[data-theme='theme-retro'] [data-page='chess'] .game-stage button .text-amber-50 { color: #f5f2e9; -webkit-text-stroke: .7px #303c21; }
-html[data-theme='theme-retro'] [data-page='sudoku'] .game-stage { background: #f5f2e9; border-color: #576744; }
-html[data-theme='theme-retro'] [data-page='sudoku'] .game-stage button[aria-pressed='true']:not(.bg-red-100) { background: #bdc6a5; }
-html[data-theme='theme-retro'] .minesweeper-cell.bg-slate-400 { background: #bdc6a5; box-shadow: inset 1px 1px #f5f2e9, inset -1px -1px #7a8861; }
-html[data-theme='theme-retro'] .minesweeper-cell.bg-slate-200 { background: #dfdfce; }
 html[data-theme='theme-retro'] [data-page='snake'] .game-stage { padding: 0; overflow: hidden; }
 html[data-theme='theme-retro'] [data-page='snake'] .mobile-controls { display: grid; grid-template-columns: repeat(3,44px); gap: 5px; }
 html[data-theme='theme-retro'] [data-page='snake'] .mobile-controls > button:first-child { grid-area: 1 / 2; }
@@ -43,31 +36,22 @@ html[data-theme='theme-retro'] [data-page='snake'] .mobile-controls > div > butt
 html[data-theme='theme-retro'] [data-page='snake'] .mobile-controls > div > div { display: none; }
 html[data-theme='theme-retro'] [data-page='snake'] .mobile-controls > button:last-child { grid-area: 2 / 2; }
 html[data-theme='theme-retro'] [data-page='snake'] .mobile-controls button { width: 44px; height: 44px; }
-html[data-theme='theme-retro'] .memory-dashboard { border: 0; background: #dfdfce; border-radius: 6px; }
+html[data-theme='theme-retro'] .memory-dashboard { border: 0; border-radius: 6px; }
 html[data-theme='theme-retro'] :is(.memory-kicker,.memory-accent,.neon-breaker-accent) { color: #9b431f; }
 html[data-theme='theme-retro'] .memory-stats { grid-template-columns: repeat(4,minmax(0,1fr)); }
-html[data-theme='theme-retro'] .memory-stats > div { display: block; min-height: 0; padding: 8px 4px; text-align: center; background: #f5f2e9; border: 0; border-radius: 6px; }
+html[data-theme='theme-retro'] .memory-stats > div { display: block; min-height: 0; padding: 8px 4px; text-align: center; border: 0; border-radius: 6px; }
 html[data-theme='theme-retro'] .memory-stats .memory-accent { display: none; }
 html[data-theme='theme-retro'] .memory-stats p { white-space: normal; overflow-wrap: anywhere; }
-html[data-theme='theme-retro'] .memory-board button > span > span { border: 1px solid #dfdfce; box-shadow: none; }
-html[data-theme='theme-retro'] .memory-board button > span > span:first-child { color: white; background: #596c38; }
-html[data-theme='theme-retro'] .memory-symbol { background: #dfdfce; color: #46552e; }
-html[data-theme='theme-retro'] .memory-progress-track { background: #dfdfce; }
-html[data-theme='theme-retro'] .memory-progress-track > div { background: #9b431f; }
 html[data-theme='theme-retro'] .neon-stage { padding: 8px; }
 html[data-theme='theme-retro'] .neon-canvas-shell { border-radius: 6px; box-shadow: none; }
 html[data-theme='theme-retro'] .neon-stage > .pointer-events-none { display: none; }
 html[data-theme='theme-retro'] .neon-breaker-power-up { color: #286a57; background: #dfdfce; border-color: #b3dccc; }
-html[data-theme='theme-retro'] .bingo-draw { background: #dfdfce; }
 html[data-theme='theme-retro'] .bingo-number-grid > div:not([role='img']) { color: #465438; }
 html[data-theme='theme-retro'] .bingo-workspace { gap: 18px; }
 html[data-theme='theme-retro'] .bingo-cards-toolbar { background: #f5f2e9; }
 html[data-theme='theme-retro'] :is(.bingo-card-item,.bingo-cards-library) { min-width: 0; }
 html[data-theme='theme-retro'] :is(.bingo-card-content,.bingo-card-header) { padding-inline: 12px; }
 html[data-theme='theme-retro'] .bingo-card-cell { min-height: 40px; border-radius: 6px; }
-html[data-theme='theme-retro'] .bingo-card-cell:not(.bingo-card-cell--marked):not([aria-pressed='true']) { background: #dfdfce; }
-html[data-theme='theme-retro'] .bingo-card-cell--marked, html[data-theme='theme-retro'] .bingo-card-cell[aria-pressed='true'] { background: #9b431f; color: white; }
-html[data-theme='theme-retro'] .bingo-card-grid .bingo-card-cell[class~='text-amber-400'] { background: #fff1cc; color: #825919; }
 html[data-theme='theme-retro'] .bingo-lan-eyebrow { color: #9b431f; }
 html[data-theme='theme-retro'] .bingo-lan-current { color: #46552e; background: #dfdfce; border-color: #bdc6a5; border-radius: 6px; }
 /* Watchlist and cross-device transfer continue to use the shared data controller. */

@@ -1,6 +1,7 @@
 "use client"
 
 import "@/styles/games/board-workspace.css"
+import "@/styles/games/board-skin.css"
 
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { Gamepad2, RotateCcw, Wifi } from "lucide-react"
@@ -51,6 +52,7 @@ export function ReversiGame() {
   const lanCopy = GOMOKU_LAN_COPY[locale]
   const game = mode === "local" ? localGame : lan.game
   const { board, currentPlayer, gameOver, winner } = game
+  const lastMove = game.moveHistory.at(-1)
   const validMoves = useMemo(
     () => gameOver ? [] : getReversiValidMoves(board, currentPlayer),
     [board, currentPlayer, gameOver],
@@ -184,8 +186,8 @@ export function ReversiGame() {
               >
                 <div className="flex items-center gap-6">
                   <div className="flex items-center gap-2">
-                    <div className={`flex h-6 w-6 items-center justify-center rounded-full bg-slate-950 ${!gameOver && currentPlayer === "black" ? "ring-2 ring-primary" : ""}`}>
-                      <span className="text-xs font-bold text-white">{blackCount}</span>
+                    <div className="board-player-token flex h-6 w-6 items-center justify-center rounded-full" data-side="black" data-active={!gameOver && currentPlayer === "black" || undefined}>
+                      <span className="text-xs font-bold">{blackCount}</span>
                     </div>
                     <span className={`text-sm ${!gameOver && currentPlayer === "black" ? "text-foreground" : "text-muted-foreground"}`}>
                       {t("blackStone")}
@@ -193,8 +195,8 @@ export function ReversiGame() {
                   </div>
                   <div className="h-4 w-px bg-border" />
                   <div className="flex items-center gap-2">
-                    <div className={`flex h-6 w-6 items-center justify-center rounded-full bg-white ${!gameOver && currentPlayer === "white" ? "ring-2 ring-primary" : ""}`}>
-                      <span className="text-xs font-bold text-slate-900">{whiteCount}</span>
+                    <div className="board-player-token flex h-6 w-6 items-center justify-center rounded-full" data-side="white" data-active={!gameOver && currentPlayer === "white" || undefined}>
+                      <span className="text-xs font-bold">{whiteCount}</span>
                     </div>
                     <span className={`text-sm ${!gameOver && currentPlayer === "white" ? "text-foreground" : "text-muted-foreground"}`}>
                       {t("whiteStone")}
@@ -224,13 +226,13 @@ export function ReversiGame() {
         </div>
         {showBoard && (
           <div
-            className={`game-stage rounded-xl border-4 border-green-800 bg-green-600 p-1 shadow-2xl shadow-black/30 ${mode === "lan"
+            className={`game-stage board-skin board-skin--reversi rounded-xl border-4 p-1 ${mode === "lan"
                 ? "w-[min(calc(100vw-1rem),calc(100svh-19rem),22.875rem)]"
                 : "w-full max-w-[22.875rem]"
               }`}
             data-slot="game-stage"
           >
-            <div className="grid w-full grid-cols-8 gap-px bg-green-800" role="group" aria-label={t("reversi")}>
+            <div className="board-cell-grid grid w-full grid-cols-8 gap-px" role="group" aria-label={t("reversi")}>
               {board.map((row, rowIndex) =>
                 row.map((cell, colIndex) => {
                   const isValid = isValidMove(rowIndex, colIndex)
@@ -241,18 +243,18 @@ export function ReversiGame() {
                       onClick={() => handleCellClick(rowIndex, colIndex)}
                       disabled={!isEnabled}
                       aria-label={`${rowIndex + 1}, ${colIndex + 1}, ${cell === "black" ? t("blackStone") : cell === "white" ? t("whiteStone") : emptyLabel}${isValid ? `, ${validLabel}` : ""}`}
-                      className={`flex aspect-square w-full touch-manipulation items-center justify-center bg-green-600 ${isEnabled ? "cursor-pointer" : "cursor-default"}`}
+                      data-last-move={lastMove?.row === rowIndex && lastMove?.col === colIndex || undefined}
+                      data-target={isValid || undefined}
+                      className={`board-square relative flex aspect-square w-full touch-manipulation items-center justify-center ${isEnabled ? "cursor-pointer" : "cursor-default"}`}
                     >
                       {cell ? (
                         <div
                           aria-hidden="true"
-                          className={`h-[78%] w-[78%] rounded-full shadow-md transition-all ${cell === "black"
-                              ? "bg-gradient-to-br from-slate-700 to-slate-900"
-                              : "bg-gradient-to-br from-white to-slate-200"
-                            }`}
+                          className="board-stone h-[78%] w-[78%] rounded-full transition-all"
+                          data-side={cell}
                         />
                       ) : isValid ? (
-                        <div className="h-3 w-3 rounded-full bg-green-400/50" aria-hidden="true" />
+                        <div className="board-hint h-3 w-3 rounded-full" aria-hidden="true" />
                       ) : null}
                     </button>
                   )

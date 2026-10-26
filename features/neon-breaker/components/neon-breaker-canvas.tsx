@@ -2,6 +2,9 @@
 
 import { useEffect, useRef } from "react"
 
+import { useTheme } from "@/features/themes/shared/theme-provider"
+import { readGameRenderPalette } from "@/lib/game-render-palette"
+
 import type {
   NeonBreakerController,
   NeonBreakerSnapshot,
@@ -24,13 +27,20 @@ export function NeonBreakerCanvas({
   onSnapshot,
   onError,
 }: NeonBreakerCanvasProps) {
+  const { theme } = useTheme()
   const hostRef = useRef<HTMLDivElement>(null)
+  const controllerRef = useRef<NeonBreakerController | null>(null)
   const initialHighScoreRef = useRef(initialHighScore)
   const callbacksRef = useRef({ onReady, onSnapshot, onError })
 
   useEffect(() => {
     callbacksRef.current = { onReady, onSnapshot, onError }
   }, [onError, onReady, onSnapshot])
+
+  useEffect(() => {
+    const host = hostRef.current
+    if (host) controllerRef.current?.setPalette(readGameRenderPalette(host))
+  }, [theme])
 
   useEffect(() => {
     const host = hostRef.current
@@ -51,6 +61,7 @@ export function NeonBreakerCanvas({
           host,
           highScore: initialHighScoreRef.current,
           reducedMotion: reducedMotionQuery.matches,
+          palette: readGameRenderPalette(host),
           signal: abortController.signal,
           onSnapshot: (snapshot) => callbacksRef.current.onSnapshot(snapshot),
         })
@@ -58,6 +69,9 @@ export function NeonBreakerCanvas({
           controller.destroy()
           return
         }
+        controllerRef.current = controller
+        // The theme may have changed while Pixi was loading/initializing.
+        controller.setPalette(readGameRenderPalette(host))
         callbacksRef.current.onReady(controller)
       } catch (cause) {
         if (abortController.signal.aborted) return
@@ -79,6 +93,7 @@ export function NeonBreakerCanvas({
       abortController.abort()
       reducedMotionQuery.removeEventListener("change", handleReducedMotionChange)
       controller?.destroy()
+      if (controllerRef.current === controller) controllerRef.current = null
       callbacksRef.current.onReady(null)
     }
   }, [retryKey])
@@ -89,7 +104,7 @@ export function NeonBreakerCanvas({
       role="application"
       tabIndex={0}
       aria-label={ariaLabel}
-      className="size-full touch-pan-y overflow-hidden rounded-[1.35rem] outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/70 focus-visible:ring-offset-2 focus-visible:ring-offset-slate-950"
+      className="neon-canvas-host size-full touch-pan-y overflow-hidden outline-none"
     />
   )
 }

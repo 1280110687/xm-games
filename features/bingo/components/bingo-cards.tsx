@@ -1,5 +1,6 @@
 "use client"
 
+import "@/styles/games/bingo-skin.css"
 import { useState, useCallback, useEffect, useMemo, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -364,13 +365,6 @@ export function BingoCards() {
   }, [activeDrawnNumbers.size])
 
   const bingoLetters = ["B", "I", "N", "G", "O"]
-  const letterColors = [
-    "text-red-500",
-    "text-orange-500",
-    "text-yellow-500",
-    "text-green-500",
-    "text-blue-500",
-  ]
 
   const updateMode = (nextMode: BingoPlayMode) => {
     if (lan.profile) return
@@ -409,11 +403,11 @@ export function BingoCards() {
           titleClassName="text-2xl font-bold text-foreground md:text-3xl"
           title={
             <>
-              <span className="text-red-500">B</span>
-              <span className="text-orange-500">I</span>
-              <span className="text-yellow-500">N</span>
-              <span className="text-green-500">G</span>
-              <span className="text-blue-500">O</span>
+              <span className="bingo-letter" data-letter="B">B</span>
+              <span className="bingo-letter" data-letter="I">I</span>
+              <span className="bingo-letter" data-letter="N">N</span>
+              <span className="bingo-letter" data-letter="G">G</span>
+              <span className="bingo-letter" data-letter="O">O</span>
               <span className="ml-2 text-muted-foreground">{t("bingoCards")}</span>
             </>
           }
@@ -447,12 +441,12 @@ export function BingoCards() {
               </div>
             )}
             {mode === "lan" && bingoCards.size > 0 && !localPlayerWon && (
-              <p className="mb-4 rounded-xl border border-amber-400/30 bg-amber-400/10 p-4 text-sm text-amber-300" role="status">
+              <p className="bingo-lan-warning mb-4 rounded-xl border p-4 text-sm" role="status">
                 {t("bingoLanWinnerNotice")}
               </p>
             )}
             {localPlayerWon && (
-              <p className="mb-4 rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-4 font-semibold text-emerald-300" role="status">
+              <p className="bingo-lan-success mb-4 rounded-xl border p-4 font-semibold" role="status">
                 {t("bingoLanWinners")}: {lan.profile?.nickname}
               </p>
             )}
@@ -688,10 +682,11 @@ export function BingoCards() {
                   <CardContent className="bingo-card-content">
                     {/* Bingo Header */}
                     <div className="bingo-card-letters mb-1 grid grid-cols-5 gap-1">
-                      {bingoLetters.map((letter, index) => (
+                      {bingoLetters.map((letter) => (
                         <div
                           key={letter}
-                          className={`flex h-8 items-center justify-center text-lg font-bold ${letterColors[index]}`}
+                          className="bingo-letter flex h-8 items-center justify-center text-lg font-bold"
+                          data-letter={letter}
                         >
                           {letter}
                         </div>
@@ -723,7 +718,7 @@ export function BingoCards() {
                               aria-label={`${t("removeMarkedNumber")} ${num}`}
                               title={`${t("removeMarkedNumber")} ${num}`}
                               onClick={() => undoMarkedNumber(num)}
-                              className="bingo-card-cell bingo-card-cell--marked flex h-10 items-center justify-center rounded bg-muted text-sm font-medium text-white transition-all"
+                              className="bingo-card-cell bingo-card-cell--marked flex h-10 items-center justify-center rounded text-sm font-medium transition-colors"
                             >
                               {cellContent}
                             </button>
@@ -736,13 +731,7 @@ export function BingoCards() {
                             data-state={isMarked ? "marked" : isFree ? "free" : "idle"}
                             role="img"
                             aria-label={`${isFree ? "FREE" : num}${isFree || isMarked ? `, ${t("drawn")}` : ""}`}
-                            className={`bingo-card-cell flex h-10 items-center justify-center rounded text-sm font-medium transition-all ${mode === "lan" ? "cursor-default" : ""} ${
-                              isMarked
-                                ? "bingo-card-cell--marked bg-primary text-white"
-                                : isFree
-                                ? "bg-amber-500/30 text-amber-400"
-                                : "bg-muted text-muted-foreground"
-                            }`}
+                            className={`bingo-card-cell flex h-10 items-center justify-center rounded text-sm font-medium transition-colors ${mode === "lan" ? "cursor-default" : ""} ${isMarked ? "bingo-card-cell--marked" : ""}`}
                           >
                             {cellContent}
                           </div>

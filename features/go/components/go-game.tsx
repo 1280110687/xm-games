@@ -1,6 +1,7 @@
 "use client"
 
 import "@/styles/games/board-workspace.css"
+import "@/styles/games/board-skin.css"
 
 import { useCallback, useEffect, useState } from "react"
 import { Flag, Gamepad2, RotateCcw, Undo2, Wifi } from "lucide-react"
@@ -220,14 +221,14 @@ export function GoGame() {
                 <div className="flex flex-col gap-2">
                   <div className="flex items-center justify-center gap-4">
                     <div className="flex items-center gap-2">
-                      <div className={`h-5 w-5 rounded-full border-2 ${currentPlayer === "black" && status === "playing" ? "border-primary bg-slate-950" : "border-transparent bg-slate-800"}`} />
+                      <div className="board-player-token h-5 w-5 rounded-full border-2" data-side="black" data-active={currentPlayer === "black" && status === "playing" || undefined} />
                       <span className={`text-sm ${currentPlayer === "black" && status === "playing" ? "text-foreground" : "text-muted-foreground"}`}>
                         {t("blackStone")} ({captures.black})
                       </span>
                     </div>
                     <div className="h-4 w-px bg-border" />
                     <div className="flex items-center gap-2">
-                      <div className={`h-5 w-5 rounded-full border-2 ${currentPlayer === "white" && status === "playing" ? "border-primary bg-stone-50" : "border-transparent bg-stone-300"}`} />
+                      <div className="board-player-token h-5 w-5 rounded-full border-2" data-side="white" data-active={currentPlayer === "white" && status === "playing" || undefined} />
                       <span className={`text-sm ${currentPlayer === "white" && status === "playing" ? "text-foreground" : "text-muted-foreground"}`}>
                         {t("whiteStone")} ({captures.white})
                       </span>
@@ -263,11 +264,11 @@ export function GoGame() {
         </div>
         {showBoard && (
           <div
-            className={`game-stage relative aspect-square rounded-xl border-4 border-amber-800 bg-[#dcb35c] p-3 shadow-2xl shadow-black/30 ${mode === "lan" ? "w-[min(calc(100vw-1rem),calc(100svh-19rem),19.5rem)]" : "w-full max-w-[19.5rem]"}`}
+            className={`game-stage board-skin board-skin--go relative aspect-square rounded-xl border-4 p-3 ${mode === "lan" ? "w-[min(calc(100vw-1rem),calc(100svh-19rem),19.5rem)]" : "w-full max-w-[19.5rem]"}`}
             data-slot="game-stage"
           >
             <svg
-              className="absolute"
+              className="board-lines absolute"
               aria-hidden="true"
               focusable="false"
               style={{
@@ -285,7 +286,7 @@ export function GoGame() {
                   y1={index * 32}
                   x2={(GO_BOARD_SIZE - 1) * 32}
                   y2={index * 32}
-                  stroke="#5a4a2a"
+                  stroke="currentColor"
                   strokeWidth="1"
                 />
               ))}
@@ -296,7 +297,7 @@ export function GoGame() {
                   y1={0}
                   x2={index * 32}
                   y2={(GO_BOARD_SIZE - 1) * 32}
-                  stroke="#5a4a2a"
+                  stroke="currentColor"
                   strokeWidth="1"
                 />
               ))}
@@ -306,7 +307,7 @@ export function GoGame() {
                   cx={point.col * 32}
                   cy={point.row * 32}
                   r={4}
-                  fill="#5a4a2a"
+                  fill="currentColor"
                 />
               ))}
             </svg>
@@ -325,19 +326,20 @@ export function GoGame() {
                       disabled={!enabled}
                       aria-label={`${rowIndex + 1}, ${colIndex + 1}, ${stone === "black" ? t("blackStone") : stone === "white" ? t("whiteStone") : "empty"}`}
                       aria-current={lastMove?.row === rowIndex && lastMove?.col === colIndex ? "true" : undefined}
-                      className="absolute flex aspect-square w-[11.111%] -translate-x-1/2 -translate-y-1/2 items-center justify-center touch-manipulation disabled:cursor-default"
+                      className="board-intersection absolute flex aspect-square w-[11.111%] -translate-x-1/2 -translate-y-1/2 items-center justify-center touch-manipulation disabled:cursor-default"
                       style={{
                         left: `${(colIndex / (GO_BOARD_SIZE - 1)) * 100}%`,
                         top: `${(rowIndex / (GO_BOARD_SIZE - 1)) * 100}%`,
                       }}
                     >
                       {lastMove?.row === rowIndex && lastMove?.col === colIndex && (
-                        <div className="absolute z-10 h-3 w-3 rounded-full bg-red-500/70" aria-hidden="true" />
+                        <div className="board-last-dot absolute z-10 h-3 w-3 rounded-full" aria-hidden="true" />
                       )}
                       {stone && (
                         <div
                           aria-hidden="true"
-                          className={`h-[87.5%] w-[87.5%] rounded-full shadow-lg ${stone === "black" ? "bg-gradient-to-br from-slate-700 to-slate-900" : "border border-amber-300 bg-gradient-to-br from-amber-50 to-amber-200"}`}
+                          className="board-stone h-[87.5%] w-[87.5%] rounded-full"
+                          data-side={stone}
                         />
                       )}
                     </button>

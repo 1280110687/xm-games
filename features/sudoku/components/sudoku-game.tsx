@@ -1,6 +1,7 @@
 "use client"
 
 import "@/styles/games/board-workspace.css"
+import "@/styles/games/puzzle-skin.css"
 
 import { useState, useCallback, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
@@ -147,26 +148,17 @@ export function SudokuGame() {
     if (isComplete) setCompleted(true)
   }
 
-  const getCellStyle = (row: number, col: number) => {
+  const getCellState = (row: number, col: number) => {
     const isSelected = selectedCell?.[0] === row && selectedCell?.[1] === col
-    const isInitial = initialCells[row]?.[col]
-    const hasError = errors[row]?.[col]
     const isSameRow = selectedCell?.[0] === row
     const isSameCol = selectedCell?.[1] === col
     const isSameBox = selectedCell &&
       Math.floor(selectedCell[0] / 3) === Math.floor(row / 3) &&
       Math.floor(selectedCell[1] / 3) === Math.floor(col / 3)
 
-    let bg = "bg-white"
-    if (isSelected) bg = "bg-blue-200"
-    else if (isSameRow || isSameCol || isSameBox) bg = "bg-blue-50"
-    if (hasError) bg = "bg-red-100"
-
-    let text = "text-blue-600"
-    if (isInitial) text = "text-slate-900"
-    if (hasError) text = "text-red-600"
-
-    return `${bg} ${text}`
+    if (isSelected) return "selected"
+    if (isSameRow || isSameCol || isSameBox) return "related"
+    return "idle"
   }
 
   const canEditSelected = Boolean(
@@ -183,7 +175,7 @@ export function SudokuGame() {
         homeLabelMode="desktop"
         title={t("sudoku")}
         className="mb-4"
-        homeButtonClassName="text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+        homeButtonClassName="text-muted-foreground hover:text-foreground"
         titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
@@ -211,7 +203,7 @@ export function SudokuGame() {
           {/* Game status */}
           {completed && (
             <div
-              className="game-message game-status-banner rounded-lg bg-green-500/20 px-4 py-2 text-lg font-bold text-green-300"
+              className="game-message game-status-banner puzzle-status rounded-lg px-4 py-2 text-lg font-bold"
               data-tone="success"
               data-slot="game-message"
               role="status"
@@ -225,7 +217,7 @@ export function SudokuGame() {
 
         </div>
         <div
-          className="game-stage w-full max-w-[22.75rem] rounded-xl border-2 border-blue-300 bg-white p-1 shadow-2xl shadow-black/25"
+          className="game-stage puzzle-skin w-full max-w-[22.75rem] rounded-xl border-2 p-1"
           data-slot="game-stage"
         >
           <div className="grid w-full grid-cols-9" role="group" aria-label={t("sudoku")}>
@@ -243,12 +235,14 @@ export function SudokuGame() {
                   aria-pressed={selectedCell?.[0] === rowIndex && selectedCell?.[1] === colIndex}
                   aria-disabled={completed}
                   aria-label={`${cellText.row} ${rowIndex + 1}, ${cellText.column} ${colIndex + 1}, ${cell ?? cellText.empty}${cell !== null ? `, ${initialCells[rowIndex]?.[colIndex] ? cellText.given : cellText.entered}` : ""}${errors[rowIndex]?.[colIndex] ? `, ${cellText.error}` : ""}`}
+                  data-state={getCellState(rowIndex, colIndex)}
+                  data-given={Boolean(initialCells[rowIndex]?.[colIndex])}
+                  data-error={Boolean(errors[rowIndex]?.[colIndex])}
+                  data-box-right={colIndex % 3 === 2 && colIndex !== 8}
+                  data-box-bottom={rowIndex % 3 === 2 && rowIndex !== 8}
                   className={`
-                    flex aspect-square w-full min-w-0 items-center justify-center text-[clamp(1rem,5vw,1.25rem)] font-semibold transition-colors
-                    ${getCellStyle(rowIndex, colIndex)}
-                    ${colIndex % 3 === 2 && colIndex !== 8 ? "border-r-2 border-blue-400" : "border-r border-blue-200"}
-                    ${rowIndex % 3 === 2 && rowIndex !== 8 ? "border-b-2 border-blue-400" : "border-b border-blue-200"}
-                    ${initialCells[rowIndex]?.[colIndex] ? "cursor-default" : "cursor-pointer hover:bg-blue-100"}
+                    sudoku-cell flex aspect-square w-full min-w-0 items-center justify-center text-[clamp(1rem,5vw,1.25rem)] font-semibold transition-colors
+                    ${initialCells[rowIndex]?.[colIndex] ? "cursor-default" : "cursor-pointer"}
                   `}
                 >
                   {cell}

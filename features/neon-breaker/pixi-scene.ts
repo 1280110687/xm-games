@@ -8,6 +8,8 @@ import {
   type Ticker,
 } from "pixi.js"
 
+import { DEFAULT_GAME_RENDER_PALETTE, type GameRenderPalette } from "../../lib/game-render-palette"
+
 import {
   FIXED_TIME_STEP,
   LEVEL_LAYOUTS,
@@ -29,14 +31,6 @@ const MAX_FIXED_STEPS = 12
 const POWER_UP_POOL_SIZE = 16
 const PARTICLE_POOL_SIZE = 96
 const BALL_TRAIL_SIZE = 7
-
-const LEVEL_COLORS = [
-  0x22d3ee,
-  0xa78bfa,
-  0xf472b6,
-  0x34d399,
-  0xfbbf24,
-] as const
 
 const STOPPED_PHASES: NeonBreakerPhase[] = [
   "paused",
@@ -65,6 +59,7 @@ export interface NeonBreakerController {
   restart: () => void
   nextLevel: () => void
   setReducedMotion: (reduced: boolean) => void
+  setPalette: (palette: GameRenderPalette) => void
   destroy: () => void
 }
 
@@ -72,6 +67,7 @@ interface CreateNeonBreakerSceneOptions {
   host: HTMLDivElement
   highScore?: number
   reducedMotion?: boolean
+  palette?: GameRenderPalette
   signal?: AbortSignal
   onSnapshot: (snapshot: NeonBreakerSnapshot) => void
 }
@@ -89,7 +85,12 @@ interface ParticleView {
   velocityY: number
   life: number
   maxLife: number
+  radius: number
+  tone: ParticleTone
+  levelIndex: number
 }
+
+type ParticleTone = "accent" | "ink" | "success" | "danger" | "muted" | "brick"
 
 function snapshotFromState(state: NeonBreakerState): NeonBreakerSnapshot {
   return {
@@ -120,24 +121,24 @@ function snapshotSignature(snapshot: NeonBreakerSnapshot) {
   ].join(":")
 }
 
-function drawBackground(graphic: Graphics) {
+function drawBackground(graphic: Graphics, palette: GameRenderPalette) {
+  graphic.clear()
   graphic
-    .roundRect(0, 0, WORLD_WIDTH, WORLD_HEIGHT, 28)
-    .fill({ color: 0x050816 })
-    .stroke({ color: 0x6366f1, alpha: 0.34, width: 2 })
+    .rect(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
+    .fill({ color: palette.canvas })
 
   for (let x = 30; x < WORLD_WIDTH; x += 42) {
     graphic
       .moveTo(x, 16)
       .lineTo(x, WORLD_HEIGHT - 16)
-      .stroke({ color: 0x818cf8, alpha: 0.035, width: 1 })
+      .stroke({ color: palette.canvasGrid, alpha: 0.45, width: 1 })
   }
 
   for (let y = 28; y < WORLD_HEIGHT; y += 42) {
     graphic
       .moveTo(16, y)
       .lineTo(WORLD_WIDTH - 16, y)
-      .stroke({ color: 0x22d3ee, alpha: 0.035, width: 1 })
+      .stroke({ color: palette.canvasGrid, alpha: 0.45, width: 1 })
   }
 
   for (let index = 0; index < 34; index += 1) {
@@ -145,8 +146,8 @@ function drawBackground(graphic: Graphics) {
     const y = 22 + ((index * 137) % (WORLD_HEIGHT - 44))
     const radius = index % 4 === 0 ? 1.5 : 0.8
     graphic.circle(x, y, radius).fill({
-      color: index % 3 === 0 ? 0x22d3ee : 0xa78bfa,
-      alpha: index % 5 === 0 ? 0.42 : 0.22,
+      color: palette.accent,
+      alpha: index % 5 === 0 ? 0.24 : 0.12,
     })
   }
 }
@@ -158,65 +159,82 @@ function drawBrick(
   color: number,
   durable: boolean,
   damaged: boolean,
+  palette: GameRenderPalette,
 ) {
   graphic.clear()
   graphic
     .roundRect(-2, -2, width + 4, height + 4, 7)
     .fill({ color, alpha: 0.16 })
     .roundRect(0, 0, width, height, 5)
-    .fill({ color, alpha: damaged ? 0.5 : durable ? 0.82 : 0.72 })
-    .stroke({ color: 0xffffff, alpha: durable ? 0.66 : 0.38, width: durable ? 1.7 : 1 })
+    .fill({ color, alpha: damaged ? 0.5 : durable ? 0.96 : 0.88 })
+    .stroke({ color: palette.ink, alpha: durable ? 0.5 : 0.24, width: durable ? 1.7 : 1 })
 
   if (durable && !damaged) {
     graphic
       .roundRect(5, 4, width - 10, 4, 2)
-      .fill({ color: 0xffffff, alpha: 0.34 })
+      .fill({ color: palette.light, alpha: 0.34 })
   }
 }
 
-function drawPaddle(graphic: Graphics, width: number) {
+function drawPaddle(graphic: Graphics, width: number, palette: GameRenderPalette) {
   graphic.clear()
   graphic
     .roundRect(-4, -4, width + 8, 22, 11)
-    .fill({ color: 0x22d3ee, alpha: 0.12 })
+    .fill({ color: palette.accent, alpha: 0.12 })
     .roundRect(0, 0, width, 14, 7)
-    .fill({ color: 0x67e8f9, alpha: 0.94 })
-    .stroke({ color: 0xffffff, alpha: 0.82, width: 1.2 })
+    .fill({ color: palette.accent, alpha: 0.94 })
+    .stroke({ color: palette.light, alpha: 0.82, width: 1.2 })
     .roundRect(8, 3, Math.max(8, width - 16), 3, 2)
-    .fill({ color: 0xffffff, alpha: 0.4 })
+    .fill({ color: palette.light, alpha: 0.4 })
 }
 
-function drawBall(graphic: Graphics) {
+function drawBall(graphic: Graphics, palette: GameRenderPalette) {
+  graphic.clear()
   graphic
     .circle(0, 0, 13)
-    .fill({ color: 0x22d3ee, alpha: 0.08 })
+    .fill({ color: palette.accent, alpha: 0.12 })
     .circle(0, 0, 9.5)
-    .fill({ color: 0xa5f3fc, alpha: 0.2 })
+    .fill({ color: palette.accent, alpha: 0.25 })
     .circle(0, 0, 7)
-    .fill({ color: 0xffffff })
+    .fill({ color: palette.ink })
     .circle(-2, -2, 2.4)
-    .fill({ color: 0xc4b5fd, alpha: 0.9 })
+    .fill({ color: palette.light, alpha: 0.9 })
 }
 
-function drawPowerUp(graphic: Graphics) {
+function drawPowerUp(graphic: Graphics, palette: GameRenderPalette) {
+  graphic.clear()
   graphic
     .circle(9, 9, 12)
-    .fill({ color: 0x34d399, alpha: 0.14 })
+    .fill({ color: palette.success, alpha: 0.14 })
     .roundRect(0, 0, 18, 18, 5)
-    .fill({ color: 0x34d399, alpha: 0.9 })
-    .stroke({ color: 0xffffff, alpha: 0.72, width: 1 })
+    .fill({ color: palette.success, alpha: 0.9 })
+    .stroke({ color: palette.light, alpha: 0.72, width: 1 })
     .roundRect(3, 7, 12, 4, 2)
-    .fill({ color: 0xffffff, alpha: 0.9 })
+    .fill({ color: palette.light, alpha: 0.9 })
 }
 
-function particleColorForLevel(levelIndex: number) {
-  return LEVEL_COLORS[levelIndex % LEVEL_COLORS.length]
+function particleColorForLevel(levelIndex: number, palette: GameRenderPalette) {
+  return palette.bricks[levelIndex % palette.bricks.length]
+}
+
+function drawTrail(graphic: Graphics, index: number, palette: GameRenderPalette) {
+  graphic.clear()
+    .circle(0, 0, Math.max(1.4, 5.4 - index * 0.55))
+    .fill({ color: palette.accent, alpha: Math.max(0.04, 0.24 - index * 0.025) })
+}
+
+function drawParticle(particle: ParticleView, palette: GameRenderPalette) {
+  const color = particle.tone === "brick"
+    ? particleColorForLevel(particle.levelIndex, palette)
+    : palette[particle.tone]
+  particle.graphic.clear().circle(0, 0, particle.radius).fill({ color, alpha: 0.92 })
 }
 
 export async function createNeonBreakerScene({
   host,
   highScore = 0,
   reducedMotion = false,
+  palette = DEFAULT_GAME_RENDER_PALETTE,
   signal,
   onSnapshot,
 }: CreateNeonBreakerSceneOptions): Promise<NeonBreakerController> {
@@ -231,7 +249,7 @@ export async function createNeonBreakerScene({
   await app.init({
     width: initialWidth,
     height: initialHeight,
-    background: 0x050816,
+    background: palette.canvas,
     backgroundAlpha: 1,
     antialias: true,
     resolution: initialResolution,
@@ -255,6 +273,7 @@ export async function createNeonBreakerScene({
   let leftPressed = false
   let rightPressed = false
   let currentReducedMotion = reducedMotion
+  let currentPalette = palette
   let lastSnapshotSignature = ""
   let lastPaddleWidth = -1
   let particleCursor = 0
@@ -281,11 +300,11 @@ export async function createNeonBreakerScene({
   const ballView = new Graphics()
   const inputSurface = new Graphics()
 
-  drawBackground(background)
-  drawBall(ballView)
+  drawBackground(background, currentPalette)
+  drawBall(ballView, currentPalette)
   inputSurface
     .rect(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
-    .fill({ color: 0xffffff, alpha: 0.001 })
+    .fill({ color: currentPalette.ink, alpha: 0.001 })
   inputSurface.eventMode = "static"
   inputSurface.hitArea = new Rectangle(0, 0, WORLD_WIDTH, WORLD_HEIGHT)
   inputSurface.cursor = "crosshair"
@@ -314,7 +333,7 @@ export async function createNeonBreakerScene({
   )
   const powerUpViews = Array.from({ length: POWER_UP_POOL_SIZE }, () => {
     const graphic = new Graphics()
-    drawPowerUp(graphic)
+    drawPowerUp(graphic, currentPalette)
     graphic.visible = false
     powerUpLayer.addChild(graphic)
     return graphic
@@ -332,13 +351,15 @@ export async function createNeonBreakerScene({
         velocityY: 0,
         life: 0,
         maxLife: 0,
+        radius: 0,
+        tone: "accent",
+        levelIndex: 0,
       }
     },
   )
   const trailViews = Array.from({ length: BALL_TRAIL_SIZE }, (_, index) => {
     const graphic = new Graphics()
-      .circle(0, 0, Math.max(1.4, 5.4 - index * 0.55))
-      .fill({ color: 0x67e8f9, alpha: Math.max(0.04, 0.18 - index * 0.02) })
+    drawTrail(graphic, index, currentPalette)
     graphic.visible = false
     trailLayer.addChild(graphic)
     return graphic
@@ -355,7 +376,7 @@ export async function createNeonBreakerScene({
 
   const spawnParticles = (
     position: Vector2,
-    color: number,
+    tone: ParticleTone,
     count: number,
     speed = 120,
   ) => {
@@ -373,10 +394,10 @@ export async function createNeonBreakerScene({
       particle.maxLife = life
       particle.velocityX = Math.cos(angle) * velocity
       particle.velocityY = Math.sin(angle) * velocity
-      particle.graphic
-        .clear()
-        .circle(0, 0, 1.6 + Math.random() * 2.2)
-        .fill({ color, alpha: 0.92 })
+      particle.radius = 1.6 + Math.random() * 2.2
+      particle.tone = tone
+      particle.levelIndex = state.levelIndex
+      drawParticle(particle, currentPalette)
       particle.graphic.position.set(position.x, position.y)
       particle.graphic.scale.set(1)
       particle.graphic.alpha = 1
@@ -385,40 +406,38 @@ export async function createNeonBreakerScene({
   }
 
   const processEvents = (events: NeonBreakerEvent[]) => {
-    const levelColor = particleColorForLevel(state.levelIndex)
-
     for (const event of events) {
       switch (event.type) {
         case "launched":
-          spawnParticles(event.position, 0xffffff, 6, 80)
+          spawnParticles(event.position, "ink", 6, 80)
           break
         case "wall-hit":
-          spawnParticles(event.position, 0x67e8f9, 3, 70)
+          spawnParticles(event.position, "accent", 3, 70)
           break
         case "paddle-hit":
-          spawnParticles(event.position, 0xa5f3fc, 5, 90)
+          spawnParticles(event.position, "accent", 5, 90)
           break
         case "brick-hit":
-          spawnParticles(event.position, levelColor, 5, 105)
+          spawnParticles(event.position, "brick", 5, 105)
           break
         case "brick-destroyed":
-          spawnParticles(event.position, levelColor, 11, 145)
+          spawnParticles(event.position, "brick", 11, 145)
           shakeRemaining = currentReducedMotion ? 0 : 0.07
           break
         case "power-up-dropped":
-          spawnParticles(event.position, 0x34d399, 6, 85)
+          spawnParticles(event.position, "success", 6, 85)
           break
         case "power-up-collected":
-          spawnParticles(event.position, 0x6ee7b7, 14, 145)
+          spawnParticles(event.position, "success", 14, 145)
           shakeRemaining = currentReducedMotion ? 0 : 0.1
           break
         case "life-lost":
-          spawnParticles({ x: state.ball.x, y: WORLD_HEIGHT - 24 }, 0xfb7185, 18, 165)
+          spawnParticles({ x: state.ball.x, y: WORLD_HEIGHT - 24 }, "danger", 18, 165)
           shakeRemaining = currentReducedMotion ? 0 : 0.22
           break
         case "level-cleared":
         case "game-won":
-          spawnParticles({ x: WORLD_WIDTH / 2, y: WORLD_HEIGHT / 2 }, 0xfbbf24, 30, 210)
+          spawnParticles({ x: WORLD_WIDTH / 2, y: WORLD_HEIGHT / 2 }, "success", 30, 210)
           shakeRemaining = currentReducedMotion ? 0 : 0.18
           break
         case "game-over":
@@ -427,7 +446,7 @@ export async function createNeonBreakerScene({
         case "power-up-expired":
           spawnParticles(
             { x: state.paddle.x + state.paddle.width / 2, y: state.paddle.y },
-            0x94a3b8,
+            "muted",
             5,
             70,
           )
@@ -437,7 +456,7 @@ export async function createNeonBreakerScene({
   }
 
   const syncBricks = () => {
-    const levelColor = particleColorForLevel(state.levelIndex)
+    const levelColor = particleColorForLevel(state.levelIndex, currentPalette)
 
     for (let index = 0; index < brickViews.length; index += 1) {
       const pooled = brickViews[index]
@@ -461,6 +480,7 @@ export async function createNeonBreakerScene({
           levelColor,
           brick.kind === "durable",
           brick.hitPoints < brick.maxHitPoints,
+          currentPalette,
         )
         pooled.brickId = brick.id
         pooled.hitPoints = brick.hitPoints
@@ -491,7 +511,7 @@ export async function createNeonBreakerScene({
     syncPowerUps()
 
     if (lastPaddleWidth !== state.paddle.width) {
-      drawPaddle(paddleView, state.paddle.width)
+      drawPaddle(paddleView, state.paddle.width, currentPalette)
       lastPaddleWidth = state.paddle.width
     }
     paddleView.position.set(state.paddle.x, state.paddle.y)
@@ -779,6 +799,23 @@ export async function createNeonBreakerScene({
         shakeRemaining = 0
         camera.position.set(0, 0)
       }
+    },
+    setPalette: (nextPalette) => {
+      if (destroyed) return
+      currentPalette = nextPalette
+      app.renderer.background.color = nextPalette.canvas
+      drawBackground(background, nextPalette)
+      drawBall(ballView, nextPalette)
+      drawPaddle(paddleView, state.paddle.width, nextPalette)
+      for (const pooled of brickViews) pooled.brickId = null
+      syncBricks()
+      for (const view of powerUpViews) drawPowerUp(view, nextPalette)
+      trailViews.forEach((view, index) => drawTrail(view, index, nextPalette))
+      for (const particle of particleViews) {
+        if (particle.active) drawParticle(particle, nextPalette)
+      }
+      // Only redraw materials. Simulation, ticker, input and current phase stay intact.
+      app.render()
     },
     destroy: destroyScene,
   }

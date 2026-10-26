@@ -26,6 +26,7 @@ import type {
   NeonBreakerSnapshot,
 } from "@/features/neon-breaker/pixi-scene"
 import { useLocale } from "@/lib/locale-context"
+import "@/styles/games/arcade-skin.css"
 
 const STORAGE_KEY = "xm-games-neon-breaker-best:v1"
 const MAX_LEVEL_COUNT = 5
@@ -191,12 +192,12 @@ export function NeonBreakerGame() {
   const statusAnnouncement = `${statusText || t("neonBreakerInstructions")} ${t("neonBreakerLives")}: ${lives}. ${t("level")}: ${level}/${levelCount}.`
 
   const stats = [
-    { label: t("score"), value: score, icon: CircleGauge, color: "text-cyan-200", tone: "cyan" },
-    { label: t("highScore"), value: highScore, icon: Trophy, color: "text-amber-200", tone: "amber" },
-    { label: t("neonBreakerLives"), value: lives, icon: Heart, color: "text-rose-200", tone: "rose" },
-    { label: t("level"), value: `${level}/${levelCount}`, icon: Layers3, color: "text-violet-200", tone: "violet" },
-    { label: t("neonBreakerCombo"), value: `×${combo}`, icon: Zap, color: "text-emerald-200", tone: "emerald" },
-    { label: t("neonBreakerBricksLeft"), value: bricksLeft, icon: BrickWall, color: "text-fuchsia-200", tone: "fuchsia" },
+    { label: t("score"), value: score, icon: CircleGauge, tone: "cyan" },
+    { label: t("highScore"), value: highScore, icon: Trophy, tone: "amber" },
+    { label: t("neonBreakerLives"), value: lives, icon: Heart, tone: "rose" },
+    { label: t("level"), value: `${level}/${levelCount}`, icon: Layers3, tone: "violet" },
+    { label: t("neonBreakerCombo"), value: `×${combo}`, icon: Zap, tone: "emerald" },
+    { label: t("neonBreakerBricksLeft"), value: bricksLeft, icon: BrickWall, tone: "fuchsia" },
   ]
 
   return (
@@ -222,8 +223,8 @@ export function NeonBreakerGame() {
           className="game-stage neon-stage surface-panel relative mx-auto w-full max-w-[25rem] overflow-hidden p-2.5 sm:p-3 lg:mx-0"
           data-slot="game-stage"
         >
-          <div className="pointer-events-none absolute inset-x-12 top-0 h-28 rounded-full bg-cyan-400/10 blur-3xl" />
-          <div className="neon-canvas-shell relative aspect-[39/64] w-full overflow-hidden rounded-[1.35rem] border border-cyan-200/15 bg-[#050816] shadow-[0_22px_70px_rgba(3,7,24,0.58)]">
+          <div className="neon-ambient pointer-events-none absolute inset-x-12 top-0 h-28 rounded-full blur-3xl" />
+          <div className="neon-canvas-shell relative aspect-[39/64] w-full overflow-hidden">
             {storageReady && (
               <NeonBreakerCanvas
                 key={retryKey}
@@ -237,18 +238,18 @@ export function NeonBreakerGame() {
             )}
 
             {statusText && (
-              <div className="pointer-events-none absolute inset-0 flex items-center justify-center bg-slate-950/20 p-5">
-                <div className="pointer-events-auto max-w-[17rem] rounded-2xl border border-white/10 bg-slate-950/78 px-5 py-4 text-center shadow-2xl backdrop-blur-md">
+              <div className="neon-status-backdrop pointer-events-none absolute inset-0 flex items-center justify-center p-5">
+                <div className="neon-status-panel pointer-events-auto max-w-[17rem] px-5 py-4 text-center">
                   {phase === "won" ? (
-                    <Trophy className="mx-auto mb-2 size-8 text-amber-300" aria-hidden="true" />
+                    <Trophy className="neon-status-icon mx-auto mb-2 size-8" aria-hidden="true" />
                   ) : phase === "level-cleared" ? (
-                    <Sparkles className="mx-auto mb-2 size-8 text-cyan-200" aria-hidden="true" />
+                    <Sparkles className="neon-status-icon mx-auto mb-2 size-8" aria-hidden="true" />
                   ) : loadError ? (
-                    <ShieldCheck className="mx-auto mb-2 size-8 text-rose-300" aria-hidden="true" />
+                    <ShieldCheck className="neon-status-icon mx-auto mb-2 size-8" aria-hidden="true" />
                   ) : (
-                    <Gamepad2 className="mx-auto mb-2 size-8 text-violet-200" aria-hidden="true" />
+                    <Gamepad2 className="neon-status-icon mx-auto mb-2 size-8" aria-hidden="true" />
                   )}
-                  <p className="text-sm font-semibold leading-6 text-slate-100">
+                  <p className="text-sm font-semibold leading-6">
                     {statusText}
                   </p>
                   {loadError && (
@@ -270,7 +271,7 @@ export function NeonBreakerGame() {
           >
             <div className="flex items-start gap-3">
               <span
-                className="neon-breaker-accent flex size-10 shrink-0 items-center justify-center rounded-2xl border border-cyan-300/15 bg-cyan-400/10 text-cyan-200"
+                className="neon-breaker-accent neon-accent-surface flex size-10 shrink-0 items-center justify-center rounded-2xl border"
                 data-tone="cyan"
               >
                 <BrickWall className="size-5" aria-hidden="true" />
@@ -290,11 +291,11 @@ export function NeonBreakerGame() {
             className="game-summary grid grid-cols-3 gap-2"
             data-slot="game-summary"
           >
-            {stats.map(({ label, value, icon: Icon, color, tone }) => (
+            {stats.map(({ label, value, icon: Icon, tone }) => (
               <div key={label} className="surface-card min-w-0 px-2.5 py-3 sm:px-3">
                 <div className="flex items-center gap-1.5">
                   <Icon
-                    className={`neon-breaker-accent size-3.5 shrink-0 ${color}`}
+                    className="neon-breaker-accent size-3.5 shrink-0"
                     data-tone={tone}
                     aria-hidden="true"
                   />
@@ -310,7 +311,7 @@ export function NeonBreakerGame() {
           </div>
 
           {Boolean(snapshot?.widePaddleSeconds) && (
-            <div className="neon-breaker-power-up flex items-center justify-between rounded-xl border border-emerald-300/15 bg-emerald-400/[0.08] px-3 py-2.5 text-sm text-emerald-100">
+            <div className="neon-breaker-power-up flex items-center justify-between rounded-xl border px-3 py-2.5 text-sm">
               <span className="flex items-center gap-2 font-semibold">
                 <Zap className="size-4" aria-hidden="true" />
                 {t("neonBreakerWidePaddle")}
@@ -370,7 +371,7 @@ export function NeonBreakerGame() {
                 ].map((rule, index) => (
                   <li key={rule} className="flex gap-3">
                     <span
-                      className="neon-breaker-accent flex size-6 shrink-0 items-center justify-center rounded-full bg-cyan-400/10 font-mono text-xs font-bold text-cyan-200"
+                      className="neon-breaker-accent neon-accent-surface flex size-6 shrink-0 items-center justify-center rounded-full font-mono text-xs font-bold"
                       data-tone="cyan"
                     >
                       {index + 1}

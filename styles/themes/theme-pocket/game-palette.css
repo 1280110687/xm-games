@@ -1,0 +1,36 @@
+/* Gameplay surfaces share this theme's material and state colors. */
+html[data-theme='theme-pocket'] {
+  --game-surface: #ffffff;
+  --game-surface-raised: #eef4ff;
+  --game-ink: #20324e;
+  --game-muted: #66758c;
+  --game-border: #cad8ec;
+  --game-accent: #2860ed;
+  --game-on-accent: #ffffff;
+  --game-accent-soft: #dce8ff;
+  --game-success: #287059;
+  --game-danger: #bf2940;
+  --game-on-danger: #ffffff;
+  --game-radius: 16px;
+  --game-shadow: 0 8px 24px rgb(40 70 130 / 8%);
+  --game-board: #dbe7f4;
+  --game-board-alt: #f8fbff;
+  --game-square-light: #f8fbff;
+  --game-square-dark: #7894bd;
+  --game-grid: #8ba1bf;
+  --game-dark: #25334a;
+  --game-light: #ffffff;
+  --game-selected: #b9d2ff;
+  --game-hint: #2860ed;
+  --game-last: #d8e5bb;
+  --game-frame: #b9cce7;
+  --game-canvas: #edf4ff;
+  --game-canvas-grid: #ceddf2;
+  --game-snake: #2860ed;
+  --game-food: #c94c64;
+  --game-brick-1: #467eea;
+  --game-brick-2: #79a4ef;
+  --game-brick-3: #66a8c5;
+  --game-brick-4: #8eb8e9;
+  --game-brick-5: #3d64a9;
+}

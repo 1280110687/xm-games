@@ -1,6 +1,7 @@
 "use client"
 
 import "@/styles/games/board-workspace.css"
+import "@/styles/games/puzzle-skin.css"
 
 import { useState, useCallback, useEffect } from "react"
 import { Button } from "@/components/ui/button"
@@ -167,15 +168,6 @@ export function MinesweeperGame() {
     return `${position}, ${a11y.adjacent}: ${cell.adjacentMines}`
   }
 
-  const getNumberColor = (num: number) => {
-    const colors = [
-      "", "text-blue-600", "text-green-600", "text-red-600",
-      "text-purple-800", "text-red-800", "text-cyan-600",
-      "text-black", "text-gray-600"
-    ]
-    return colors[num] || ""
-  }
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
     const secs = seconds % 60
@@ -190,7 +182,7 @@ export function MinesweeperGame() {
         homeLabelMode="desktop"
         title={t("minesweeper")}
         className="mb-4"
-        homeButtonClassName="text-muted-foreground hover:bg-white/[0.06] hover:text-foreground"
+        homeButtonClassName="text-muted-foreground hover:text-foreground"
         titleClassName="text-base font-bold text-foreground sm:text-2xl"
       />
 
@@ -217,12 +209,12 @@ export function MinesweeperGame() {
 
           {/* Game stats */}
           <Card
-            className="game-summary surface-panel flex flex-row items-center gap-6 border-white/10 bg-card/70 px-4 py-2"
+            className="game-summary puzzle-summary surface-panel flex flex-row items-center gap-6 px-4 py-2"
             aria-label={`${t("minesweeper")}: ${mines - flagCount}; ${formatTime(timer)}; ${flagCount}`}
           >
             <div className="flex items-center gap-2">
               <Bomb
-                className="game-stat-icon h-4 w-4 text-red-400"
+                className="game-stat-icon h-4 w-4"
                 data-tone="danger"
                 aria-hidden="true"
               />
@@ -233,7 +225,7 @@ export function MinesweeperGame() {
             </div>
             <div className="flex items-center gap-2">
               <Flag
-                className="game-stat-icon h-4 w-4 text-yellow-400"
+                className="game-stat-icon h-4 w-4"
                 data-tone="achievement"
                 aria-hidden="true"
               />
@@ -248,8 +240,7 @@ export function MinesweeperGame() {
               aria-live="polite"
               data-tone={gameStatus === "won" ? "success" : "danger"}
               data-slot="game-message"
-              className={`game-message game-status-banner rounded-lg px-4 py-2 text-lg font-bold ${gameStatus === "won" ? "bg-green-500/20 text-green-400" : "bg-red-500/20 text-red-400"
-                }`}
+              className="game-message game-status-banner puzzle-status rounded-lg px-4 py-2 text-lg font-bold"
             >
               {gameStatus === "won" ? t("youWin") : t("gameOver")}
             </div>
@@ -287,7 +278,7 @@ export function MinesweeperGame() {
 
         </div>
         <div
-          className="game-stage overflow-auto rounded-lg border-2 border-slate-600 bg-slate-300 p-1"
+          className="game-stage overflow-auto puzzle-skin rounded-lg border-2 p-1"
           data-slot="game-stage"
           data-difficulty={difficulty}
           style={{ maxWidth: "100%", maxHeight: "60vh" }}
@@ -309,25 +300,17 @@ export function MinesweeperGame() {
                   disabled={gameStatus !== "playing"}
                   aria-label={getCellLabel(rowIndex, colIndex)}
                   aria-pressed={cell.isFlagged}
-                  className={`
-                    minesweeper-cell flex items-center justify-center font-bold transition-colors
-                    h-[var(--mine-cell-size)] w-[var(--mine-cell-size)] text-sm
-                    ${cell.isRevealed
-                      ? cell.isMine
-                        ? "bg-red-500"
-                        : "bg-slate-200"
-                      : "bg-slate-400 hover:bg-slate-350 active:bg-slate-300 shadow-[inset_2px_2px_0_#94a3b8,inset_-2px_-2px_0_#475569]"
-                    }
-                  `}
+                  data-state={cell.isRevealed ? cell.isMine ? "mine" : "revealed" : cell.isFlagged ? "flagged" : "hidden"}
+                  className="minesweeper-cell flex h-[var(--mine-cell-size)] w-[var(--mine-cell-size)] items-center justify-center text-sm font-bold transition-colors"
                 >
                   {cell.isRevealed ? (
                     cell.isMine ? (
-                      <Bomb className="h-4 w-4 text-black" aria-hidden="true" />
+                      <Bomb className="mine-symbol h-4 w-4" aria-hidden="true" />
                     ) : cell.adjacentMines > 0 ? (
-                      <span className={getNumberColor(cell.adjacentMines)}>{cell.adjacentMines}</span>
+                      <span className="mine-number" data-count={cell.adjacentMines}>{cell.adjacentMines}</span>
                     ) : null
                   ) : cell.isFlagged ? (
-                    <Flag className="h-4 w-4 text-red-600" aria-hidden="true" />
+                    <Flag className="mine-flag h-4 w-4" aria-hidden="true" />
                   ) : null}
                 </button>
               ))

@@ -98,9 +98,11 @@ const THEME_ICONS: Record<ThemeId, LucideIcon> = {
 
 export function ThemeSwitcher({
   compact = false,
+  modal = true,
   className,
 }: {
   compact?: boolean
+  modal?: boolean
   className?: string
 }) {
   const { locale } = useLocale()
@@ -109,7 +111,7 @@ export function ThemeSwitcher({
   const currentTheme = copy.themes[theme]
 
   return (
-    <DropdownMenu>
+    <DropdownMenu modal={modal}>
       <DropdownMenuTrigger asChild>
         <Button
           type="button"

@@ -1,5 +1,5 @@
 /* Route-only focus workspace. Preserve the irregular board and all exercise controls. */
-html[data-theme='theme-three'] .game-page[data-focus-exercise] { --schulte-board-size: min(100%,350px); --schulte-cell-fill: #1f3853; --schulte-cell-stroke: #708ead; --schulte-cell-text: #eef6ff; --schulte-board-fill: #102035; --schulte-progress: #bcdcff; --schulte-progress-track: #273f59; --alternating-letter-color: #dfc38c; height: auto; overflow: visible; }
+html[data-theme='theme-three'] .game-page[data-focus-exercise] { --schulte-board-size: min(100%,350px); --schulte-cell-fill: var(--game-surface-raised); --schulte-cell-stroke: var(--game-grid); --schulte-cell-text: var(--game-ink); --schulte-board-fill: var(--game-surface); --schulte-progress: var(--game-accent); --schulte-progress-track: var(--game-border); --alternating-letter-color: var(--game-food); height: auto; overflow: visible; }
 html[data-theme='theme-three'] .schulte-three-console { display: grid; grid-template-columns: minmax(0,1fr); gap: 14px; align-items: start; }
 html[data-theme='theme-three'] .schulte-three-stage { display: grid; gap: 14px; padding: 14px; border-radius: 22px; min-width: 0; }
 html[data-theme='theme-three'] .schulte-three-hud { display: flex; gap: 12px; justify-content: space-between; }

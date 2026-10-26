@@ -1,5 +1,5 @@
 /* Route-only theme presentation. The shared exercise engine owns all states. */
-html[data-theme='theme-pocket'] .game-page[data-focus-exercise] { --schulte-board-size: min(100%,370px); --schulte-cell-fill: #edf4ff; --schulte-cell-stroke: #b8cff2; --schulte-cell-text: #173b76; --schulte-board-fill: #fff; --schulte-progress: #2860ed; --schulte-progress-track: #dce7f8; }
+html[data-theme='theme-pocket'] .game-page[data-focus-exercise] { --schulte-board-size: min(100%,370px); --schulte-cell-fill: var(--game-surface-raised); --schulte-cell-stroke: var(--game-grid); --schulte-cell-text: var(--game-ink); --schulte-board-fill: var(--game-surface); --schulte-progress: var(--game-accent); --schulte-progress-track: var(--game-border); }
 .pocket-focus { width: min(100%,880px); margin-inline: auto; display: grid; gap: 16px; }
 .pocket-focus-play { min-width: 0; padding: 18px; border-radius: 24px; background: white; }
 .pocket-focus-score { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }

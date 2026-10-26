@@ -1,0 +1,47 @@
+/* The Pixi scene reads these same theme variables; this file owns its DOM shell. */
+html[data-theme] [data-page='neon-breaker'] .neon-canvas-shell {
+  background: var(--game-canvas);
+  border: 1px solid var(--game-border);
+  border-radius: var(--game-radius);
+  box-shadow: none;
+}
+
+html[data-theme] .neon-canvas-host { border-radius: inherit; }
+html[data-theme] .neon-canvas-host:focus-visible {
+  outline: 2px solid var(--game-accent);
+  outline-offset: -3px;
+}
+
+html[data-theme] [data-page='neon-breaker'] .neon-ambient {
+  background: color-mix(in srgb, var(--game-accent) 12%, transparent);
+}
+
+html[data-theme] [data-page='neon-breaker'] .neon-status-backdrop {
+  background: color-mix(in srgb, var(--game-canvas) 20%, transparent);
+}
+
+html[data-theme] [data-page='neon-breaker'] .neon-status-panel {
+  color: var(--game-ink);
+  background: var(--game-surface);
+  border: 1px solid var(--game-border);
+  border-radius: var(--game-radius);
+  box-shadow: var(--game-shadow);
+}
+
+html[data-theme] [data-page='neon-breaker'] :is(.neon-status-icon,.neon-breaker-accent) {
+  color: var(--game-accent);
+}
+
+html[data-theme] [data-page='neon-breaker'] .neon-breaker-accent[data-tone='rose'] { color: var(--game-danger); }
+html[data-theme] [data-page='neon-breaker'] .neon-breaker-accent[data-tone='emerald'] { color: var(--game-success); }
+html[data-theme] [data-page='neon-breaker'] .neon-accent-surface {
+  background: var(--game-accent-soft);
+  border-color: var(--game-border);
+}
+
+html[data-theme] [data-page='neon-breaker'] .neon-breaker-power-up {
+  color: var(--game-success);
+  background: var(--game-surface-raised);
+  border-color: var(--game-border);
+  border-radius: var(--game-radius);
+}

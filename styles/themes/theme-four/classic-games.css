@@ -1,19 +1,19 @@
 /*
- * Theme Four classic games: faithful warm 2048 and a bright handheld console.
+ * Theme Four classic games: warm tabletop 2048 and a clubhouse handheld console.
  * These layouts do not inherit the Theme One arcade composition.
  */
 
 html[data-theme='theme-four'] .classic-2048-page {
-  color: #776e65;
-  background: #faf8ef;
+  color: var(--game-ink);
+  background: var(--background);
 }
 
 html[data-theme='theme-four'] .classic-2048-page .game-header {
-  color: #776e65;
+  color: var(--game-ink);
 }
 
 html[data-theme='theme-four'] .classic-2048-page .game-header [data-slot='button'] {
-  color: #776e65;
+  color: var(--game-ink);
 }
 
 html[data-theme='theme-four'] .classic-2048-content {
@@ -27,9 +27,8 @@ html[data-theme='theme-four'] .classic-2048-shell {
   display: grid;
   width: min(100%, 31.25rem);
   gap: 1rem;
-  color: #776e65;
-  font-family: 'Clear Sans', 'Helvetica Neue', Arial, -apple-system,
-    BlinkMacSystemFont, 'PingFang SC', sans-serif;
+  color: var(--game-ink);
+  font-family: var(--font-geist-sans), sans-serif;
 }
 
 html[data-theme='theme-four'] .classic-2048-heading {
@@ -40,7 +39,7 @@ html[data-theme='theme-four'] .classic-2048-heading {
 }
 
 html[data-theme='theme-four'] .classic-2048-logo {
-  color: #776e65;
+  color: var(--game-ink);
   font-size: 5rem;
   font-weight: 900;
   line-height: 0.86;
@@ -62,7 +61,7 @@ html[data-theme='theme-four'] .classic-2048-score {
   padding: 1rem 0.45rem 0.38rem;
   border-radius: 0.2rem;
   color: white;
-  background: #bbada0;
+  background: var(--game-accent);
 }
 
 html[data-theme='theme-four'] .classic-2048-score span {
@@ -70,7 +69,7 @@ html[data-theme='theme-four'] .classic-2048-score span {
   top: 0.4rem;
   right: 0;
   left: 0;
-  color: #eee4da;
+  color: var(--game-light);
   font-size: 0.68rem;
   font-weight: 800;
   line-height: 1;
@@ -103,12 +102,12 @@ html[data-theme='theme-four'] .classic-2048-new-game {
   border: 0;
   border-radius: 0.2rem;
   color: #f9f6f2;
-  background: #8f7a66;
+  background: var(--game-accent);
   box-shadow: none;
 }
 
 html[data-theme='theme-four'] .classic-2048-new-game:hover {
-  background: #7c6958;
+  background: color-mix(in srgb, var(--game-accent) 88%, black);
 }
 
 html[data-theme='theme-four'] .classic-2048-board {
@@ -117,7 +116,7 @@ html[data-theme='theme-four'] .classic-2048-board {
   aspect-ratio: 1;
   padding: 0.94rem;
   border-radius: 0.38rem;
-  background: #bbada0;
+  background: var(--game-frame);
 }
 
 html[data-theme='theme-four'] .classic-2048-grid {
@@ -150,7 +149,7 @@ html[data-theme='theme-four'] .classic-2048-cell[data-value='2048'] {
 html[data-theme='theme-four'] .classic-2048-message {
   gap: 1.1rem;
   border-radius: inherit;
-  color: #776e65;
+  color: var(--game-ink);
   background: rgb(238 228 218 / 0.88);
 }
 
@@ -165,7 +164,7 @@ html[data-theme='theme-four'] .classic-2048-message-actions {
 html[data-theme='theme-four'] .classic-2048-message [data-slot='button'] {
   border-radius: 0.2rem;
   color: #f9f6f2;
-  background: #8f7a66;
+  background: var(--game-accent);
 }
 
 html[data-theme='theme-four'] .classic-2048-controls {
@@ -183,7 +182,7 @@ html[data-theme='theme-four'] .classic-2048-controls > [data-slot='button'] {
   padding: 0 !important;
   border-color: #d3c7bb;
   border-radius: 0.35rem;
-  color: #776e65;
+  color: var(--game-ink);
   background: #eee4da;
 }
 
@@ -194,7 +193,7 @@ html[data-theme='theme-four'] .classic-2048-actions {
 html[data-theme='theme-four'] .classic-2048-actions [data-slot='button'] {
   border-color: #d9d0c5;
   border-radius: 0.35rem;
-  color: #776e65;
+  color: var(--game-ink);
   background: transparent;
 }
 
@@ -206,16 +205,16 @@ html[data-theme='theme-four'] .classic-2048-help {
 }
 
 html[data-theme='theme-four'] .classic-tetris-page {
-  color: #102b27;
-  background: #489c91;
+  color: var(--game-ink);
+  background: var(--background);
 }
 
 html[data-theme='theme-four'] .classic-tetris-page .game-header {
-  color: #102b27;
+  color: var(--game-ink);
 }
 
 html[data-theme='theme-four'] .classic-tetris-page .game-header [data-slot='button'] {
-  color: #153d37;
+  color: var(--game-ink);
   background: rgb(255 255 255 / 0.22);
 }
 
@@ -231,10 +230,10 @@ html[data-theme='theme-four'] .tetris-handheld {
   --tetris-cell: clamp(0.85rem, 2.15vw, 1.05rem);
   width: min(100%, 30rem);
   padding: 1rem 1rem 1.15rem;
-  border: 1px solid #fbe67b;
+  border: 1px solid var(--game-frame);
   border-radius: 1.3rem;
-  color: #19170d;
-  background: #efd447;
+  color: var(--game-ink);
+  background: var(--game-board);
   box-shadow:
     0 24px 54px rgb(17 77 70 / 0.35),
     inset 0 1px 0 rgb(255 255 255 / 0.68),
@@ -248,7 +247,7 @@ html[data-theme='theme-four'] .tetris-brand {
   justify-content: center;
   gap: 0.55rem;
   margin-bottom: 0.5rem;
-  color: #19170d;
+  color: var(--game-ink);
   font-size: 0.9rem;
   letter-spacing: 0.04em;
 }
@@ -262,8 +261,8 @@ html[data-theme='theme-four'] .tetris-screen-frame {
   width: 100%;
   margin-inline: auto;
   padding: 0.6rem;
-  border: 0.28rem solid #15140d;
-  background: #e9d34e;
+  border: 0.28rem solid var(--game-frame);
+  background: var(--game-surface-raised);
   box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.38);
 }
 
@@ -273,8 +272,8 @@ html[data-theme='theme-four'] .tetris-lcd {
   gap: var(--tetris-lcd-gap);
   padding: 0.42rem;
   border: 0.18rem solid #5a6350;
-  color: #1d2b1d;
-  background: #9ead86;
+  color: var(--game-ink);
+  background: var(--game-canvas);
   box-shadow:
     inset 0 0 22px rgb(49 67 45 / 0.2),
     0 0 0 1px rgb(255 255 255 / 0.28);
@@ -282,7 +281,7 @@ html[data-theme='theme-four'] .tetris-lcd {
 
 html[data-theme='theme-four'] .tetris-board {
   border: 1px solid rgb(35 51 34 / 0.42);
-  background: #9ead86;
+  background: var(--game-canvas);
 }
 
 html[data-theme='theme-four'] .tetris-cell {
@@ -295,19 +294,19 @@ html[data-theme='theme-four'] .tetris-cell {
 
 html[data-theme='theme-four'] .tetris-cell.is-filled,
 html[data-theme='theme-four'] .tetris-preview-cell.is-filled {
-  border-color: #1f311f;
-  background: #263a25;
+  border-color: var(--game-ink);
+  background: var(--game-accent);
   box-shadow: inset 0 0 0 1px #819174;
 }
 
 html[data-theme='theme-four'] .tetris-cell::after,
 html[data-theme='theme-four'] .tetris-preview-cell::after {
-  background: #172917;
+  background: var(--game-ink);
 }
 
 html[data-theme='theme-four'] .tetris-screen-message {
-  color: #1d2b1d;
-  background: rgb(158 173 134 / 0.74);
+  color: var(--game-ink);
+  background: color-mix(in srgb, var(--game-canvas) 94%, transparent);
 }
 
 html[data-theme='theme-four'] .tetris-screen-message strong {
@@ -412,7 +411,7 @@ html[data-theme='theme-four'] .tetris-function-button {
   justify-items: center;
   align-content: start;
   gap: 0.28rem;
-  color: #2d2915;
+  color: var(--game-ink);
   background: transparent;
 }
 
@@ -424,7 +423,7 @@ html[data-theme='theme-four'] .tetris-function-button > span {
   border: 1px solid #55765d;
   border-radius: 50%;
   color: white;
-  background: #4cbb6c;
+  background: var(--game-accent);
   box-shadow:
     inset 0 -0.28rem 0 rgb(0 0 0 / 0.17),
     0 0.3rem 0.55rem rgb(86 67 11 / 0.24);
@@ -432,7 +431,7 @@ html[data-theme='theme-four'] .tetris-function-button > span {
 
 html[data-theme='theme-four'] .tetris-function-button.is-red > span {
   border-color: #9e3d32;
-  background: #df4537;
+  background: var(--game-danger);
 }
 
 html[data-theme='theme-four'] .tetris-function-button svg {
@@ -452,10 +451,10 @@ html[data-theme='theme-four'] .tetris-drop-button {
   place-items: center;
   align-content: center;
   gap: 0.12rem;
-  border: 1px solid #4652bf;
+  border: 1px solid var(--game-frame);
   border-radius: 50%;
   color: white;
-  background: linear-gradient(145deg, #7379ef, #4f56cb);
+  background: linear-gradient(145deg, var(--game-accent), #214f43);
   box-shadow:
     inset 0 -0.58rem 0 rgb(0 0 0 / 0.16),
     0 0.55rem 1rem rgb(85 67 12 / 0.28);
@@ -491,10 +490,10 @@ html[data-theme='theme-four'] .tetris-dpad-button {
   height: 3.2rem;
   place-items: center;
   align-content: center;
-  border: 1px solid #4652bf;
+  border: 1px solid var(--game-frame);
   border-radius: 50%;
   color: white;
-  background: linear-gradient(145deg, #7379ef, #4f56cb);
+  background: linear-gradient(145deg, var(--game-accent), #214f43);
   box-shadow:
     inset 0 -0.36rem 0 rgb(0 0 0 / 0.16),
     0 0.4rem 0.75rem rgb(85 67 12 / 0.26);
@@ -531,7 +530,7 @@ html[data-theme='theme-four'] .tetris-dpad-button.is-down {
 
 html[data-theme='theme-four'] .classic-tetris-help {
   margin: 0.4rem 0 0;
-  color: #173e38;
+  color: var(--game-muted);
   font-size: 0.75rem;
 }
 

@@ -37,7 +37,7 @@ export function ThemeFourMenu({ place, onRoom, onBack, onEntrance, onDirectory, 
       <DialogHeader><DialogTitle>{copy.title}</DialogTitle><DialogDescription>{copy.note}</DialogDescription></DialogHeader>
       <div className="theme-four-menu-preferences">
         <div><span><Globe aria-hidden="true" />{copy.language}</span><LanguageSwitcher /></div>
-        <div><span><Palette aria-hidden="true" />{copy.theme}</span><ThemeSwitcher /></div>
+        <div><span><Palette aria-hidden="true" />{copy.theme}</span><ThemeSwitcher modal={false} /></div>
       </div>
       <div className="theme-four-menu-actions">
         {place !== "entrance" && <button onClick={() => act(onBack ?? (() => router.push("/")))}><ArrowLeft aria-hidden="true" />{place ? copy.back : copy.room}</button>}

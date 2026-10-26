@@ -1,3 +1,4 @@
+@import './game-palette.css';
 @import './utilities.css';
 @import './settings.css';
 @import './pwa.css';
@@ -446,10 +447,8 @@ html[data-theme='theme-four'] .tetris-handheld {
   box-shadow: 6px 7px 0 rgb(68 57 43 / 0.16), 0 24px 64px rgb(56 46 32 / 0.18);
 }
 
-html[data-theme='theme-four'] .tetris-brand-blocks,
-html[data-theme='theme-four'] .tetris-function-button,
-html[data-theme='theme-four'] .tetris-drop-button {
-  color: var(--theme-four-teal);
+html[data-theme='theme-four'] .tetris-brand-blocks {
+  color: var(--game-accent);
 }
 
 html[data-theme='theme-four'] .schulte-four-stack > section,
@@ -848,6 +847,30 @@ html[data-theme='theme-four'] .theme-four-webgl-home {
 }
 
 @media (max-width: 767px) {
+  html[data-theme='theme-four'] [data-page='neon-breaker'] .neon-stage {
+    max-width: min(100%, max(180px, calc((100svh - 360px) * .61)));
+  }
+
+  html[data-theme='theme-four'] [data-page='neon-breaker'] .neon-dashboard {
+    display: contents;
+  }
+
+  html[data-theme='theme-four'] [data-page='neon-breaker'] .neon-dashboard > .game-summary {
+    order: 1;
+  }
+
+  html[data-theme='theme-four'] [data-page='neon-breaker'] .neon-dashboard > .game-actions {
+    order: 2;
+  }
+
+  html[data-theme='theme-four'] [data-page='neon-breaker'] .neon-dashboard > .game-help {
+    order: 3;
+  }
+
+  html[data-theme='theme-four'] [data-page='neon-breaker'] .neon-footer-copy {
+    order: 4;
+  }
+
   html[data-theme='theme-four'] .theme-four-webgl-home {
     min-height: 0;
   }

@@ -1,6 +1,7 @@
 "use client"
 
 import "@/styles/games/board-workspace.css"
+import "@/styles/games/board-skin.css"
 
 import { useEffect, useMemo, useState } from "react"
 import { Bot, Flag, RotateCcw, SlidersHorizontal, Undo2, Users, Wifi } from "lucide-react"
@@ -460,10 +461,9 @@ export function ChineseChessGame() {
                       {index > 0 && <div className="h-4 w-px bg-border" aria-hidden="true" />}
                       <div className="flex items-center gap-2" aria-current={active ? "true" : undefined}>
                         <div
-                          className={`h-4 w-4 rounded-full ${color === "red"
-                            ? active ? "bg-red-500 ring-2 ring-red-300" : "bg-red-950/70"
-                            : active ? "bg-slate-800 ring-2 ring-slate-400" : "bg-slate-600"
-                            }`}
+                          className="board-player-token h-4 w-4 rounded-full"
+                          data-side={color}
+                          data-active={active || undefined}
                           aria-hidden="true"
                         />
                         <span className={`text-sm font-medium sm:text-base ${active ? "text-foreground" : "text-muted-foreground"}`}>
@@ -498,40 +498,40 @@ export function ChineseChessGame() {
 
         </div>
         {showBoard && <div
-          className="game-stage relative aspect-[80/89] w-full max-w-80 rounded-xl border-4 border-amber-800 bg-[#d4a574] p-4 shadow-2xl shadow-black/30"
+          className="game-stage board-skin board-skin--xiangqi relative aspect-[80/89] w-full max-w-80 rounded-xl border-4 p-4"
           data-slot="game-stage"
           aria-busy={game.mode === "ai" && game.aiStatus === "thinking"}
         >
           <div className="relative h-full w-full">
             <svg
-              className="absolute inset-0 h-full w-full"
+              className="board-lines absolute inset-0 h-full w-full"
               aria-hidden="true"
               focusable="false"
               viewBox="0 0 288 324"
               preserveAspectRatio="none"
             >
               {Array.from({ length: 10 }).map((_, index) => (
-                <line key={`h-${index}`} x1={0} y1={index * 36} x2={288} y2={index * 36} stroke="#8b6914" strokeWidth="1.5" />
+                <line key={`h-${index}`} x1={0} y1={index * 36} x2={288} y2={index * 36} stroke="currentColor" strokeWidth="1.5" />
               ))}
               {Array.from({ length: 9 }).map((_, index) => (
-                <line key={`vt-${index}`} x1={index * 36} y1={0} x2={index * 36} y2={144} stroke="#8b6914" strokeWidth="1.5" />
+                <line key={`vt-${index}`} x1={index * 36} y1={0} x2={index * 36} y2={144} stroke="currentColor" strokeWidth="1.5" />
               ))}
               {Array.from({ length: 9 }).map((_, index) => (
-                <line key={`vb-${index}`} x1={index * 36} y1={180} x2={index * 36} y2={324} stroke="#8b6914" strokeWidth="1.5" />
+                <line key={`vb-${index}`} x1={index * 36} y1={180} x2={index * 36} y2={324} stroke="currentColor" strokeWidth="1.5" />
               ))}
-              <line x1={0} y1={144} x2={0} y2={180} stroke="#8b6914" strokeWidth="1.5" />
-              <line x1={288} y1={144} x2={288} y2={180} stroke="#8b6914" strokeWidth="1.5" />
-              <line x1={108} y1={0} x2={180} y2={72} stroke="#8b6914" strokeWidth="1.5" />
-              <line x1={180} y1={0} x2={108} y2={72} stroke="#8b6914" strokeWidth="1.5" />
-              <line x1={108} y1={252} x2={180} y2={324} stroke="#8b6914" strokeWidth="1.5" />
-              <line x1={180} y1={252} x2={108} y2={324} stroke="#8b6914" strokeWidth="1.5" />
+              <line x1={0} y1={144} x2={0} y2={180} stroke="currentColor" strokeWidth="1.5" />
+              <line x1={288} y1={144} x2={288} y2={180} stroke="currentColor" strokeWidth="1.5" />
+              <line x1={108} y1={0} x2={180} y2={72} stroke="currentColor" strokeWidth="1.5" />
+              <line x1={180} y1={0} x2={108} y2={72} stroke="currentColor" strokeWidth="1.5" />
+              <line x1={108} y1={252} x2={180} y2={324} stroke="currentColor" strokeWidth="1.5" />
+              <line x1={180} y1={252} x2={108} y2={324} stroke="currentColor" strokeWidth="1.5" />
             </svg>
 
             <div
               className="pointer-events-none absolute flex items-center justify-center"
               style={{ left: 0, right: 0, top: "44.444%", height: "11.111%" }}
             >
-              <span className="text-[clamp(0.7rem,3.6vw,1rem)] font-bold tracking-[0.24em] text-amber-900/55 sm:tracking-[0.5em]">
+              <span className="board-river text-[clamp(0.7rem,3.6vw,1rem)] font-bold tracking-[0.24em] sm:tracking-[0.5em]">
                 {locale === "zh" ? "楚河      汉界" : locale === "th" ? "แม่น้ำ" : "RIVER"}
               </span>
             </div>
@@ -558,7 +558,10 @@ export function ChineseChessGame() {
                       onClick={() => handleCellClick(row, col)}
                       aria-label={`${displayRow + 1}, ${displayCol + 1}, ${piece ? `${sideName} ${getPieceName(piece)}` : t("chineseChessEmptyIntersection")}${targetLabel}`}
                       aria-pressed={isSelected}
-                      className="absolute flex h-[11.111%] w-[12.5%] -translate-x-1/2 -translate-y-1/2 items-center justify-center touch-manipulation transition-all disabled:cursor-default"
+                      data-selected={isSelected || undefined}
+                      data-last-move={isLastMoveFrom || isLastMoveTo || undefined}
+                      data-target={isValidTarget || undefined}
+                      className="board-intersection absolute flex h-[11.111%] w-[12.5%] -translate-x-1/2 -translate-y-1/2 items-center justify-center touch-manipulation transition-all disabled:cursor-default"
                       style={{
                         left: `${(displayCol / 8) * 100}%`,
                         top: `${(displayRow / 9) * 100}%`,
@@ -566,18 +569,18 @@ export function ChineseChessGame() {
                       }}
                     >
                       {(isLastMoveFrom || isLastMoveTo) && (
-                        <span className="absolute h-[88%] w-[88%] rounded bg-yellow-400/40" aria-hidden="true" />
+                        <span className="board-last-square absolute h-[88%] w-[88%] rounded" aria-hidden="true" />
                       )}
                       {isValidTarget && !piece && (
-                        <span className="absolute h-[44%] w-[44%] rounded-full bg-green-500/70 shadow" aria-hidden="true" />
+                        <span className="board-hint absolute h-[44%] w-[44%] rounded-full" aria-hidden="true" />
                       )}
                       {piece && (
                         <span
                           aria-hidden="true"
-                          className={`flex aspect-square w-[88%] items-center justify-center rounded-full border-2 text-[clamp(0.65rem,3.5vw,0.875rem)] font-bold shadow-lg transition-transform ${piece.color === "red"
-                            ? "border-red-700 bg-gradient-to-br from-amber-50 to-amber-100 text-red-600"
-                            : "border-slate-600 bg-gradient-to-br from-slate-50 to-slate-200 text-slate-800"
-                            } ${isSelected ? "scale-110 ring-2 ring-yellow-400" : ""} ${isValidTarget ? "ring-2 ring-green-400" : ""}`}
+                          className={`board-xiangqi-piece flex aspect-square w-[88%] items-center justify-center rounded-full border-2 text-[clamp(0.65rem,3.5vw,0.875rem)] font-bold transition-transform ${isSelected ? "scale-110" : ""}`}
+                          data-side={piece.color}
+                          data-selected={isSelected || undefined}
+                          data-target={isValidTarget || undefined}
                         >
                           {pieceGlyphs[piece.color][piece.type]}
                         </span>
@@ -631,7 +634,7 @@ export function ChineseChessGame() {
                       ["兵", "pawnRule"],
                     ] as const).map(([glyph, ruleKey]) => (
                       <li key={ruleKey} className="flex gap-2">
-                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-red-600 bg-amber-50 text-xs font-bold text-red-600">
+                        <span className="board-xiangqi-piece flex h-6 w-6 shrink-0 items-center justify-center rounded-full border text-xs font-bold" data-side="red">
                           {glyph}
                         </span>
                         <span>{t(ruleKey)}</span>

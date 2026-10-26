@@ -1,6 +1,7 @@
 "use client"
 
 import "@/styles/games/board-workspace.css"
+import "@/styles/games/board-skin.css"
 
 import { useCallback, useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -430,7 +431,7 @@ export function ChessGame() {
         </div>
         {showBoard && (
           <div
-            className="game-stage w-full max-w-[22.5rem] overflow-hidden rounded-xl border-4 border-amber-950 shadow-2xl shadow-black/30"
+            className="game-stage board-skin board-skin--chess w-full max-w-[22.5rem] overflow-hidden rounded-xl border-4"
             data-slot="game-stage"
           >
             <div className="grid w-full grid-cols-8" role="group" aria-label={t("chess")}>
@@ -451,18 +452,17 @@ export function ChessGame() {
                       disabled={mode === "lan" && !canPlayLan}
                       aria-label={`${square}, ${cellContent}${isValid ? ", valid move" : ""}`}
                       aria-pressed={isSelected}
-                      className={`
-                    relative flex aspect-square w-full items-center justify-center text-[clamp(1.35rem,8vw,1.875rem)] transition-all
-                    ${isLight ? "bg-amber-200" : "bg-amber-700"}
-                    ${isSelected ? "ring-2 ring-yellow-400 ring-inset" : ""}
-                    ${isLastFrom || isLastTo ? "bg-yellow-400/50" : ""}
-                  `}
+                      data-tone={isLight ? "light" : "dark"}
+                      data-selected={isSelected || undefined}
+                      data-last-move={isLastFrom || isLastTo || undefined}
+                      data-target={isValid || undefined}
+                      className="board-square relative flex aspect-square w-full items-center justify-center text-[clamp(1.35rem,8vw,1.875rem)] transition-all"
                     >
                       {isValid && !piece && (
-                        <div className="absolute h-3 w-3 rounded-full bg-green-500/50" aria-hidden="true" />
+                        <div className="board-hint absolute h-3 w-3 rounded-full" aria-hidden="true" />
                       )}
                       {piece && (
-                        <span aria-hidden="true" className={`${isValid ? "ring-2 ring-green-400 rounded-full" : ""} ${piece.color === "white" ? "text-amber-50 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" : "text-slate-900"}`}>
+                        <span aria-hidden="true" className="board-chess-piece" data-side={piece.color} data-target={isValid || undefined}>
                           {pieceSymbols[piece.color][piece.type]}
                         </span>
                       )}

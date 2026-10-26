@@ -1,0 +1,56 @@
+/* Numbers and card marks stay semantic while materials follow the active theme. */
+html[data-theme] [data-letter='B'] { --bingo-letter-color: var(--game-brick-1); }
+html[data-theme] [data-letter='I'] { --bingo-letter-color: var(--game-brick-2); }
+html[data-theme] [data-letter='N'] { --bingo-letter-color: var(--game-brick-3); }
+html[data-theme] [data-letter='G'] { --bingo-letter-color: var(--game-brick-4); }
+html[data-theme] [data-letter='O'] { --bingo-letter-color: var(--game-brick-5); }
+
+html[data-theme] .bingo-letter {
+  color: color-mix(in srgb, var(--bingo-letter-color) 30%, var(--game-ink));
+}
+html[data-theme] :is(.bingo-draw, .bingo-board, .bingo-card-item) {
+  border-color: var(--game-border);
+  border-radius: var(--game-radius);
+  background: var(--game-surface);
+  box-shadow: var(--game-shadow);
+}
+html[data-theme] .bingo-call-ball {
+  color: var(--game-ink);
+  background: var(--game-surface-raised);
+  border: 1px solid var(--game-border);
+  box-shadow: inset 0 1px 4px color-mix(in srgb, var(--game-dark) 10%, transparent);
+}
+html[data-theme] .bingo-call-ball[data-drawn='true'] {
+  color: var(--game-on-accent);
+  background: var(--game-accent);
+  border-color: var(--game-accent);
+  box-shadow: 0 0 0 5px var(--game-accent-soft), var(--game-shadow);
+}
+html[data-theme] :is(.bingo-board-number, .bingo-card-grid .bingo-card-cell) {
+  border: 1px solid var(--game-border);
+  border-radius: calc(var(--game-radius) / 2);
+  color: var(--game-ink);
+  background: var(--game-surface-raised);
+}
+html[data-theme] .bingo-board-number[data-drawn='true'],
+html[data-theme] .bingo-card-grid .bingo-card-cell[data-state='marked'] {
+  border-color: var(--game-accent);
+  color: var(--game-on-accent);
+  background: var(--game-accent);
+}
+html[data-theme] .bingo-card-grid .bingo-card-cell[data-state='free'] {
+  border-color: var(--game-accent);
+  color: var(--game-ink);
+  background: var(--game-accent-soft);
+}
+html[data-theme] .bingo-recent-ball {
+  border: 1px solid var(--game-border);
+  color: var(--game-ink);
+  background: color-mix(in srgb, var(--bingo-letter-color) 20%, var(--game-surface));
+}
+html[data-theme] .bingo-recent-ball[data-latest='true'] { outline: 2px solid var(--game-accent); outline-offset: 2px; }
+html[data-theme] .bingo-auto-control[data-slot='button'][data-running='true'] { color: var(--game-ink); background: var(--game-accent-soft); }
+html[data-theme] .bingo-card-item[data-bingo='true'] { outline: 2px solid var(--game-success); outline-offset: 2px; }
+html[data-theme] .bingo-card-badge { color: var(--game-success); background: color-mix(in srgb, var(--game-success) 14%, var(--game-surface)); }
+html[data-theme] .bingo-lan-warning { color: var(--game-ink); background: var(--game-accent-soft); border-color: var(--game-border); }
+html[data-theme] .bingo-lan-success { color: var(--game-success); background: color-mix(in srgb, var(--game-success) 12%, var(--game-surface)); border-color: var(--game-success); }

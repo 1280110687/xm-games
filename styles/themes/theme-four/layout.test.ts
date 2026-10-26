@@ -72,7 +72,8 @@ describe("Theme Four secondary page layout contracts", () => {
 
   it("makes only the minesweeper summary explicitly horizontal", () => {
     const source = read("features/minesweeper/components/minesweeper-game.tsx")
-    expect(source).toMatch(/className="game-summary surface-panel flex flex-row /)
+    const summaryClasses = source.match(/<Card\s+className="([^"]*game-summary[^"]*)"/)?.[1].split(/\s+/)
+    expect(summaryClasses).toEqual(expect.arrayContaining(["flex", "flex-row"]))
   })
 
   it("keeps the delayed install prompt out of document flow and above navigation", () => {

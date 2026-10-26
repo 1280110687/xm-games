@@ -1,6 +1,7 @@
 "use client"
 
 import "@/styles/games/board-workspace.css"
+import "@/styles/games/puzzle-skin.css"
 
 import { useCallback, useEffect, useReducer, useRef } from "react"
 import { Button } from "@/components/ui/button"
@@ -147,7 +148,7 @@ export function SnakeGame() {
             <div>
               <div className="text-sm text-muted-foreground">{t("score")}</div>
               <div
-                className="game-stat-value text-2xl font-bold text-green-400"
+                className="game-stat-value text-2xl font-bold"
                 data-tone="success"
               >
                 {score}
@@ -156,7 +157,7 @@ export function SnakeGame() {
             <div>
               <div className="text-sm text-muted-foreground">{t("highScore")}</div>
               <div
-                className="game-stat-value text-2xl font-bold text-yellow-400"
+                className="game-stat-value text-2xl font-bold"
                 data-tone="achievement"
               >
                 {highScore}
@@ -167,10 +168,10 @@ export function SnakeGame() {
           {/* Game Board */}
 
         </div>
-        <Card className="game-stage border-white/10 bg-card/70" ref={boardRef} tabIndex={0} aria-label={t("snake")}>
+        <Card className="game-stage puzzle-skin" ref={boardRef} tabIndex={0} aria-label={t("snake")}>
           <CardContent className="p-2">
             <div
-              className="grid gap-[1px] rounded bg-slate-900 p-1"
+              className="snake-board grid gap-[1px] rounded p-1"
               role="img"
               aria-label={`${t("snake")}. ${t("score")}: ${score}. ${boardLabels.head}: ${snake[0] ? `${snake[0].x + 1}, ${snake[0].y + 1}` : boardLabels.none}. ${boardLabels.food}: ${food ? `${food.x + 1}, ${food.y + 1}` : boardLabels.none}.`}
               style={{
@@ -187,15 +188,13 @@ export function SnakeGame() {
                       const isSnakeBody = snake.slice(1).some((s) => s.x === x && s.y === y)
                       const isFood = food?.x === x && food.y === y
 
-                      let cellClass = "bg-slate-800"
-                      if (isSnakeHead) cellClass = "bg-green-400 rounded-sm"
-                      else if (isSnakeBody) cellClass = "bg-green-600 rounded-sm"
-                      else if (isFood) cellClass = "bg-red-500 rounded-full"
+                      const cellState = isSnakeHead ? "head" : isSnakeBody ? "body" : isFood ? "food" : "empty"
 
                       return (
                         <div
                           key={`${y}-${x}`}
-                          className={`h-[clamp(0.65rem,3.25vw,1rem)] w-[clamp(0.65rem,3.25vw,1rem)] ${cellClass}`}
+                          className="snake-cell h-[clamp(0.65rem,3.25vw,1rem)] w-[clamp(0.65rem,3.25vw,1rem)]"
+                          data-state={cellState}
                           aria-hidden="true"
                         />
                       )
@@ -212,7 +211,7 @@ export function SnakeGame() {
             <div className="text-center" role="status" aria-live="assertive">
               <div
                 data-tone={isWon ? "success" : "danger"}
-                className={`game-status-copy text-2xl font-bold ${isWon ? "text-green-400" : "text-red-500"}`}
+                className="game-status-copy text-2xl font-bold"
               >
                 {isWon ? t("youWin") : t("gameOver")}
               </div>

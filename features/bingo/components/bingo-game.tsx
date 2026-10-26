@@ -1,5 +1,6 @@
 "use client";
 
+import "@/styles/games/bingo-skin.css";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -254,15 +255,6 @@ export function BingoGame() {
     setIsPlaying(!isPlaying);
   };
 
-  // 获取 BINGO 字母对应的颜色
-  const getLetterColor = (num: number) => {
-    if (num <= 15) return "bg-red-500"; // B
-    if (num <= 30) return "bg-orange-500"; // I
-    if (num <= 45) return "bg-yellow-500"; // N
-    if (num <= 60) return "bg-green-500"; // G
-    return "bg-blue-500"; // O
-  };
-
   // 获取 BINGO 字母
   const getLetter = (num: number) => {
     if (num <= 15) return "B";
@@ -355,8 +347,9 @@ export function BingoGame() {
                   <div
                     key={`recent-${num}`}
                     role="listitem"
-                    className={`flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold text-white ${getLetterColor(num)} ${index === 0 ? "ring-2 ring-white" : "opacity-70"
-                      }`}
+                    className={`bingo-recent-ball flex h-9 w-9 items-center justify-center rounded-full text-xs font-bold ${index === 0 ? "" : "opacity-70"}`}
+                    data-letter={getLetter(num)}
+                    data-latest={index === 0 || undefined}
                   >
                     {num}
                   </div>
@@ -374,19 +367,11 @@ export function BingoGame() {
       role="group"
       aria-label={t("numberBoard")}
     >
-      {["B", "I", "N", "G", "O"].map((letter, idx) => (
+      {["B", "I", "N", "G", "O"].map((letter) => (
         <div
           key={letter}
-          className={`py-2 text-center text-xl font-bold ${idx === 0
-              ? "text-red-700 dark:text-red-400"
-              : idx === 1
-                ? "text-orange-700 dark:text-orange-400"
-                : idx === 2
-                  ? "text-yellow-700 dark:text-yellow-400"
-                  : idx === 3
-                    ? "text-green-700 dark:text-green-400"
-                    : "text-blue-700 dark:text-blue-400"
-            }`}
+          className="bingo-letter py-2 text-center text-xl font-bold"
+          data-letter={letter}
         >
           {letter}
         </div>
@@ -400,10 +385,9 @@ export function BingoGame() {
               key={num}
               role="img"
               aria-label={`${getLetter(num)} ${num}, ${isDrawn ? t("drawn") : t("remaining")}`}
-              className={`flex h-10 items-center justify-center rounded-md text-sm font-medium transition-all duration-300 md:h-12 md:text-base ${isDrawn
-                  ? `${getLetterColor(num)} text-white shadow-lg`
-                  : "bg-muted text-muted-foreground"
-                }`}
+              className="bingo-board-number flex h-10 items-center justify-center rounded-md text-sm font-medium transition-colors duration-150 md:h-12 md:text-base"
+              data-letter={getLetter(num)}
+              data-drawn={isDrawn || undefined}
             >
               {num}
             </div>
@@ -433,11 +417,11 @@ export function BingoGame() {
           titleClassName="text-xl font-bold tracking-wide text-foreground sm:text-2xl"
           title={
             <>
-              <span className="text-red-500">B</span>
-              <span className="text-orange-500">I</span>
-              <span className="text-yellow-500">N</span>
-              <span className="text-green-500">G</span>
-              <span className="text-blue-500">O</span>
+              <span className="bingo-letter" data-letter="B">B</span>
+              <span className="bingo-letter" data-letter="I">I</span>
+              <span className="bingo-letter" data-letter="N">N</span>
+              <span className="bingo-letter" data-letter="G">G</span>
+              <span className="bingo-letter" data-letter="O">O</span>
             </>
           }
         />
@@ -495,7 +479,8 @@ export function BingoGame() {
                         role="status"
                         aria-live="assertive"
                         aria-atomic="true"
-                        className={`flex h-36 w-36 items-center justify-center rounded-full ${getLetterColor(activeCurrentNumber)} text-white shadow-[0_20px_50px_rgba(0,0,0,0.3)] ring-4 ring-white/10 transition-all duration-300 sm:h-44 sm:w-44 md:h-52 md:w-52`}
+                        className="bingo-call-ball flex h-36 w-36 items-center justify-center rounded-full transition-colors duration-150 sm:h-44 sm:w-44 md:h-52 md:w-52"
+                        data-drawn="true"
                       >
                         <div className="text-center leading-none">
                           <div className="text-xl font-bold sm:text-2xl md:text-3xl">
@@ -515,7 +500,7 @@ export function BingoGame() {
                     )} */}
                     </div>
                   ) : (
-                    <div className="flex h-36 w-36 items-center justify-center rounded-full border border-white/[0.08] bg-gradient-to-br from-slate-700 to-slate-800 text-center text-slate-300 shadow-inner ring-4 ring-white/[0.025] sm:h-44 sm:w-44 md:h-52 md:w-52">
+                    <div className="bingo-call-ball flex h-36 w-36 items-center justify-center rounded-full text-center sm:h-44 sm:w-44 md:h-52 md:w-52">
                       <span className="max-w-24 text-base font-medium sm:text-lg">
                         {t("clickToDraw")}
                       </span>
@@ -541,10 +526,8 @@ export function BingoGame() {
                         size="lg"
                         onClick={toggleAutoPlay}
                         disabled={!canDraw}
-                        className={`w-full px-3 text-base sm:text-lg ${isPlaying
-                            ? "bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800"
-                            : "bg-primary hover:bg-primary/90"
-                          }`}
+                        className="bingo-auto-control w-full px-3 text-base sm:text-lg"
+                        data-running={isPlaying || undefined}
                       >
                         {isPlaying ? (
                           <>
