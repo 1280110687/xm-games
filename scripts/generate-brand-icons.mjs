@@ -25,34 +25,63 @@ const emblem = await sharp(source)
   .png()
   .toBuffer()
 
-async function render(size, coverage, background = '#00000000') {
+const crop = await sharp(emblem).raw().toBuffer({ resolveWithObject: true })
+let sourceRadius = 0
+for (let y = 0; y < crop.info.height; y++) {
+  for (let x = 0; x < crop.info.width; x++) {
+    if (crop.data[(y * crop.info.width + x) * 4 + 3] <= 10) continue
+    sourceRadius = Math.max(sourceRadius, Math.hypot(
+      x + 0.5 - crop.info.width / 2,
+      y + 0.5 - crop.info.height / 2,
+    ))
+  }
+}
+
+const paper = '#f8fafc'
+const roundedMask = (size) => Buffer.from(
+  `<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg"><rect width="${size}" height="${size}" rx="${size * 0.2}" fill="white"/></svg>`,
+)
+
+async function render(size, coverage, { rounded = false, even = false } = {}) {
+  let width = Math.round(size * coverage)
+  if (even) width = Math.floor(width / 2) * 2
   const { data: tile, info: tileInfo } = await sharp(emblem)
-    .resize(Math.round(size * coverage), Math.round(size * coverage), { fit: 'inside' })
+    .resize({ width })
     .png()
     .toBuffer({ resolveWithObject: true })
-  return sharp({ create: { width: size, height: size, channels: 4, background } })
+  let output = await sharp({ create: { width: size, height: size, channels: 4, background: paper } })
     .composite([{
       input: tile,
-      left: Math.round((size - tileInfo.width) / 2),
-      top: Math.round((size - tileInfo.height) / 2),
+      left: Math.floor((size - tileInfo.width) / 2),
+      top: Math.floor((size - tileInfo.height) / 2),
     }])
     .png()
     .toBuffer()
+  if (rounded) {
+    output = await sharp(output)
+      .composite([{ input: roundedMask(size), blend: 'dest-in' }])
+      .png()
+      .toBuffer()
+  } else {
+    output = await sharp(output).removeAlpha().png().toBuffer()
+  }
+  return output
 }
 
 const publicRoot = resolve(root, 'public')
 await mkdir(resolve(publicRoot, 'icons'), { recursive: true })
 for (const size of [192, 512]) {
-  await writeFile(resolve(publicRoot, `icons/xm-${size}.png`), await render(size, 0.94))
+  await writeFile(resolve(publicRoot, `icons/xm-controller-${size}.png`), await render(size, 0.84))
 }
-// The glyph stays inside the central 80%-diameter circle used by maskable icons.
-await writeFile(resolve(publicRoot, 'icons/xm-maskable-512.png'), await render(512, 0.8, '#2860ed'))
-await writeFile(resolve(publicRoot, 'icons/xm-apple-180.png'), await render(180, 0.94, '#f3f6fa'))
-await writeFile(resolve(publicRoot, 'favicon-32.png'), await render(32, 1))
+// Keep the complete controller inside the maskable safe circle, with extra margin.
+const maskableCoverage = Math.min(0.74, 0.38 * crop.info.width / sourceRadius)
+await writeFile(resolve(publicRoot, 'icons/xm-controller-maskable-512.png'), await render(512, maskableCoverage))
+await writeFile(resolve(publicRoot, 'icons/xm-controller-apple-180.png'), await render(180, 0.84))
 
 // ICO directory entries point to PNG frames, preserving alpha at every size.
 const sizes = [16, 32, 48]
-const frames = await Promise.all(sizes.map((size) => render(size, 1)))
+const frames = await Promise.all(sizes.map((size) => render(size, 0.94, { rounded: true, even: true })))
+await writeFile(resolve(publicRoot, 'icons/xm-controller-32.png'), frames[1])
 const directory = Buffer.alloc(6 + sizes.length * 16)
 directory.writeUInt16LE(1, 2)
 directory.writeUInt16LE(sizes.length, 4)
@@ -67,5 +96,8 @@ for (let i = 0; i < sizes.length; i++) {
   directory.writeUInt32LE(offset, entry + 12)
   offset += frames[i].length
 }
-await writeFile(resolve(publicRoot, 'favicon.ico'), Buffer.concat([directory, ...frames]))
+const ico = Buffer.concat([directory, ...frames])
+await writeFile(resolve(publicRoot, 'icons/xm-controller.ico'), ico)
+// Retain the conventional fallback URL for clients that request it directly.
+await writeFile(resolve(publicRoot, 'favicon.ico'), ico)
 console.log('Generated favicon, PWA, maskable and Apple icons from the XM master.')

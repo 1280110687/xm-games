@@ -23,7 +23,7 @@ export default function manifest(): MetadataRoute.Manifest {
         url: "/bingo",
         icons: [
           {
-            src: "/icons/xm-192.png",
+            src: "/icons/xm-controller-192.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "any",
@@ -37,7 +37,7 @@ export default function manifest(): MetadataRoute.Manifest {
         url: "/bingo-cards",
         icons: [
           {
-            src: "/icons/xm-192.png",
+            src: "/icons/xm-controller-192.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "any",
@@ -51,7 +51,7 @@ export default function manifest(): MetadataRoute.Manifest {
         url: "/chinese-chess",
         icons: [
           {
-            src: "/icons/xm-192.png",
+            src: "/icons/xm-controller-192.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "any",
@@ -65,7 +65,7 @@ export default function manifest(): MetadataRoute.Manifest {
         url: "/qr-code",
         icons: [
           {
-            src: "/icons/xm-192.png",
+            src: "/icons/xm-controller-192.png",
             sizes: "192x192",
             type: "image/png",
             purpose: "any",
@@ -75,19 +75,19 @@ export default function manifest(): MetadataRoute.Manifest {
     ],
     icons: [
       {
-        src: "/icons/xm-192.png",
+        src: "/icons/xm-controller-192.png",
         sizes: "192x192",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icons/xm-512.png",
+        src: "/icons/xm-controller-512.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
       },
       {
-        src: "/icons/xm-maskable-512.png",
+        src: "/icons/xm-controller-maskable-512.png",
         sizes: "512x512",
         type: "image/png",
         purpose: "maskable",

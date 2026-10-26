@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v31"
+const CACHE_VERSION = "v32"
 const SHELL_CACHE = `xm-games-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `xm-games-runtime-${CACHE_VERSION}`
 const OWNED_CACHE_PREFIX = "xm-games-"
@@ -37,11 +37,12 @@ const STATIC_SHELL = [
   "/manifest.webmanifest",
   OFFLINE_ASSET_MANIFEST,
   "/favicon.ico",
-  "/favicon-32.png",
-  "/icons/xm-apple-180.png",
-  "/icons/xm-192.png",
-  "/icons/xm-512.png",
-  "/icons/xm-maskable-512.png",
+  "/icons/xm-controller.ico",
+  "/icons/xm-controller-32.png",
+  "/icons/xm-controller-apple-180.png",
+  "/icons/xm-controller-192.png",
+  "/icons/xm-controller-512.png",
+  "/icons/xm-controller-maskable-512.png",
 ]
 
 const SENSITIVE_SEARCH_PATTERN =
