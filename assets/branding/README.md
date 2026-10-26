@@ -17,6 +17,8 @@ node scripts/generate-brand-icons.mjs
 - `public/icons/xm-controller-maskable-512.png`: opaque maskable icon; the entire
   controller stays inside the central 80% diameter safe circle, with extra margin.
 - `public/icons/xm-controller-apple-180.png`: opaque iOS home-screen icon.
+- `public/images/brand/xm-controller-mark.png`: tightly cropped transparent
+  256 × 119 mark for theme headers and the 3D clubhouse entrance sign.
 
 The wide controller keeps its aspect ratio. Standard PWA and Apple exports use
 84% width coverage; the maskable scale is derived from the actual silhouette.

@@ -4,7 +4,8 @@ html[data-theme='theme-three'] .app-shell[data-page='anime-tracker'] > .app-cont
 html[data-theme='theme-three'] .t3-topbar { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 10px; min-height: 82px; padding: 24px 4px 14px; margin: 0 -4px; border-radius: 0 0 22px 22px; }
 html[data-theme='theme-three'] .t3-topbar[data-scrolled='true'] { background: rgb(15 30 47 / 94%); box-shadow: 0 8px 20px rgb(0 8 22 / 16%); padding-top: max(12px,var(--xm-safe-area-top)); }
 html[data-theme='theme-three'] .t3-wordmark { display: flex; align-items: center; gap: 9px; color: #e6f2ff; min-width: 0; margin-right: auto; font-size: 18px; font-weight: 750; letter-spacing: -.4px; }
-html[data-theme='theme-three'] .t3-wordmark svg { width: 23px; height: 23px; flex-shrink: 0; stroke-width: 1.8; }
+html[data-theme='theme-three'] .t3-wordmark .xm-brand-mark { width: 60px; height: 38px; flex-shrink: 0; border: 1px solid rgb(255 255 255 / 70%); border-radius: 12px; background: #f8fafc; box-shadow: 0 2px 8px rgb(0 8 22 / 16%); }
+html[data-theme='theme-three'] .t3-wordmark-label { white-space: nowrap; }
 html[data-theme='theme-three'] .t3-topbar-controls { display: flex; gap: 10px; margin-left: auto; flex-shrink: 0; }
 html[data-theme='theme-three'] .t3-topbar-controls :is(.language-switcher-trigger,.theme-switcher-trigger) { display: grid; place-items: center; justify-content: center; gap: 0; width: 44px !important; height: 44px !important; min-width: 44px; padding: 0 !important; border-radius: 50%; color: var(--t3-ink); border: 1px solid var(--t3-edge); background: rgb(134 167 207 / 17%); box-shadow: inset 0 1px 1px rgb(255 255 255 / 36%), 0 4px 10px rgb(0 8 22 / 12%); }
 html[data-theme='theme-three'] .t3-topbar-controls :is(.language-switcher-compact-label,.theme-current-label,.theme-chevron) { display: none; }
@@ -31,6 +32,7 @@ html[data-theme='theme-three'] .theme-three-bottom-item[aria-current] svg { filt
 @media (max-width: 359px) {
   html[data-theme='theme-three'] { --t3-gutter: 14px; }
   html[data-theme='theme-three'] .t3-wordmark { font-size: 17px; gap: 6px; }
+  html[data-theme='theme-three'] .t3-wordmark .xm-brand-mark { width: 52px; height: 36px; border-radius: 11px; }
   html[data-theme='theme-three'] .t3-topbar-controls { gap: 6px; }
   html[data-theme='theme-three'] .t3-page-header { gap: 4px; }
   html[data-theme='theme-three'] .t3-page-header h1 { font-size: 16px; }

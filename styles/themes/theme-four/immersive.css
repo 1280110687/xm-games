@@ -4,6 +4,9 @@ html[data-theme='theme-four'] .theme-four-menu-trigger { width: 44px; height: 44
 html[data-theme='theme-four'] .theme-four-menu-trigger svg { width: 22px; height: 22px; stroke-width: 2; }
 html[data-theme='theme-four'] .theme-four-menu-trigger:focus-visible { outline: 2px solid #286f72; outline-offset: 3px; }
 html[data-theme='theme-four'] [data-slot='dialog-content'].theme-four-menu-dialog { width: min(380px, calc(100vw - 32px)); max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 48px); overflow: auto; border-radius: 18px; background: #fbf8ef; border: 1px solid #d7d4c5; color: #253e39; padding: 24px; box-shadow: 0 24px 90px #193a363d; }
+html[data-theme='theme-four'] .theme-four-menu-brand { display: flex; align-items: center; gap: 12px; min-height: 34px; padding-right: 28px; text-align: left; }
+html[data-theme='theme-four'] .theme-four-menu-brand .xm-brand-mark { flex: 0 0 54px; width: 54px; height: 34px; padding: 4px; border-radius: 5px; }
+html[data-theme='theme-four'] .theme-four-menu-brand > span:last-child { min-width: 0; overflow-wrap: anywhere; }
 html[data-theme='theme-four'] .theme-four-menu-preferences { display: grid; gap: 12px; padding-block: 14px; border-block: 1px solid #dfdbcd; }
 html[data-theme='theme-four'] .theme-four-menu-preferences > div { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 html[data-theme='theme-four'] .theme-four-menu-preferences > div > span { display: flex; gap: 9px; align-items: center; font-size: 14px; }

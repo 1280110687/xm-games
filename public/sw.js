@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v32"
+const CACHE_VERSION = "v33"
 const SHELL_CACHE = `xm-games-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `xm-games-runtime-${CACHE_VERSION}`
 const OWNED_CACHE_PREFIX = "xm-games-"
@@ -43,6 +43,7 @@ const STATIC_SHELL = [
   "/icons/xm-controller-192.png",
   "/icons/xm-controller-512.png",
   "/icons/xm-controller-maskable-512.png",
+  "/images/brand/xm-controller-mark.png",
 ]
 
 const SENSITIVE_SEARCH_PATTERN =

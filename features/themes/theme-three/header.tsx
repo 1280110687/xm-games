@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState, type ReactNode } from "react"
-import { ArrowLeft, Gamepad2 } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
+import { BrandMark } from "@/components/brand-mark"
 import { PrefetchLink as Link } from "@/components/prefetch-link"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { ThemeSwitcher } from "@/features/themes/shared/theme-switcher"
@@ -31,7 +32,7 @@ export function ThemeThreeHeader({ title, description, actions, homeLabel }: {
           onNavigate={() => navigateThemeThree(hash)}><ArrowLeft aria-hidden="true" /></Link>
         <h1>{title || homeLabel}</h1>
       </> : <Link href="/" className="t3-wordmark" onNavigate={() => navigateThemeThree("")}>
-        <Gamepad2 aria-hidden="true" /><span>{t("appName")}</span>
+        <BrandMark /><span className="t3-wordmark-label">{t("appName")}</span>
       </Link>}
       <div className="t3-topbar-controls"><LanguageSwitcher compact /><ThemeSwitcher compact /></div>
     </header>

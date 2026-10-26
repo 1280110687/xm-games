@@ -4,6 +4,28 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* The approved dark mark keeps a light backing across every theme. */
+.xm-brand-mark {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 38px;
+  padding: 6px;
+  border-radius: 10px;
+  background: #f8fafc;
+  vertical-align: middle;
+}
+
+.xm-brand-mark > img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+}
+
 /* Language-neutral first paint. CSS motion never delays page readiness. */
 .locale-startup {
   min-height: 100svh;

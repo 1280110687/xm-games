@@ -20,8 +20,7 @@ html[data-theme='theme-pocket'] body { background: var(--background); }
 .pocket-header { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 46px; position: sticky; top: var(--pocket-top); z-index: 40; background: var(--background); isolation: isolate; }
 .pocket-header::before { content: ''; position: absolute; z-index: -1; inset: calc(-1 * var(--pocket-top)) calc(-1 * var(--pocket-gutter)) -10px; background: var(--background); pointer-events: none; }
 .pocket-brand { display: flex; align-items: center; gap: 11px; min-width: 0; }
-.pocket-brand > span { width: 38px; height: 39px; display: grid; place-items: center; flex-shrink: 0; border-radius: 9px; background: linear-gradient(135deg,#3a81ff,#2251dd); color: white; box-shadow: inset 0 1px 1px #75a8ff; }
-.pocket-brand svg { width: 27px; height: 27px; stroke-width: 2; }
+.pocket-brand .xm-brand-mark { width: 60px; height: 38px; flex-shrink: 0; padding: 6px; border: 1px solid #e0e7f1; border-radius: 11px; background: #f8fafc; box-shadow: none; }
 .pocket-brand strong { font-size: 24px; line-height: 1; font-weight: 850; letter-spacing: -1px; white-space: nowrap; }
 .pocket-header-controls { display: flex; gap: 9px; flex-shrink: 0; }
 html[data-theme='theme-pocket'] .pocket-header-controls :is(.language-switcher-trigger,.theme-switcher-trigger) { display: grid; place-items: center; justify-content: center; gap: 0; width: 40px !important; height: 40px; min-height: 40px; min-width: 40px; padding: 0 !important; border: 0; border-radius: 50%; color: var(--foreground); background: #e9eef5; box-shadow: none; }
@@ -79,7 +78,7 @@ html[data-theme='theme-pocket'] .pocket-header-controls .language-switcher-trigg
 }
 @media (max-width: 359px) {
   html[data-theme='theme-pocket'] { --pocket-gutter: 14px; }
-  .pocket-brand { gap: 7px; }.pocket-brand strong { font-size: 21px; }.pocket-header { gap: 6px; }.pocket-header-controls { gap: 5px; }
+  .pocket-brand { gap: 7px; }.pocket-brand .xm-brand-mark { width: 52px; height: 34px; padding: 5px; }.pocket-brand strong { font-size: 21px; }.pocket-header { gap: 6px; }.pocket-header-controls { gap: 5px; }
   .pocket-headline { font-size: 32px; }.pocket-game-grid { gap: 16px 12px; }.pocket-game { font-size: 13px; }
   .pocket-text-entry { grid-template-columns: 86px minmax(0,1fr) 38px; padding-right: 10px; }.pocket-text-entry > img { width: 82px; height: 90px; }
   .pocket-text-entry strong { font-size: 18px; }.pocket-text-entry small { font-size: 12px; }.pocket-entry-arrow { width: 36px; height: 36px; }

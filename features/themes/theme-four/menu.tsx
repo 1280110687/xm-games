@@ -6,6 +6,7 @@ import { CLUBHOUSE_ROOMS, CLUBHOUSE_ROOM_NAMES, type ClubhouseRoom, type Clubhou
 import { useRouter } from "next/navigation"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { BrandMark } from "@/components/brand-mark"
 import { ThemeSwitcher } from "@/features/themes/shared/theme-switcher"
 import { useLocale } from "@/lib/locale-context"
 
@@ -34,7 +35,7 @@ export function ThemeFourMenu({ place, onRoom, onBack, onEntrance, onDirectory, 
       <button type="button" className="theme-four-menu-trigger" aria-label={copy.menu}><Ellipsis aria-hidden="true" /></button>
     </DialogTrigger>
     <DialogContent className="theme-four-menu-dialog" closeLabel={locale === "zh" ? "关闭菜单" : locale === "th" ? "ปิดเมนู" : "Close menu"}>
-      <DialogHeader><DialogTitle>{copy.title}</DialogTitle><DialogDescription>{copy.note}</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle className="theme-four-menu-brand"><BrandMark /><span>{copy.title}</span></DialogTitle><DialogDescription>{copy.note}</DialogDescription></DialogHeader>
       <div className="theme-four-menu-preferences">
         <div><span><Globe aria-hidden="true" />{copy.language}</span><LanguageSwitcher /></div>
         <div><span><Palette aria-hidden="true" />{copy.theme}</span><ThemeSwitcher modal={false} /></div>

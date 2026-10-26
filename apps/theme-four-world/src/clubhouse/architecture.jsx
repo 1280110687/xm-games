@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
+import { useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import { CLUBHOUSE_ROOM_NAMES } from '@xm-games/experience-bridge';
 import { Box, Label, Plant, Plaque, Sconce, useMaterials } from './materials';
@@ -101,6 +102,21 @@ function RoomShell({ x, title }) {
     </group>;
 }
 
+function EntranceBrand() {
+    const texture = useTexture('/images/brand/xm-controller-mark.png');
+    useLayoutEffect(() => {
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.needsUpdate = true;
+    }, [texture]);
+    return <group position={[0, 4.45, 4.205]}>
+        <mesh name="xm-games-entrance-logo" position={[-0.68, 0, 0]} raycast={() => null}>
+            <planeGeometry args={[0.62, 0.62 * 119 / 256]} />
+            <meshBasicMaterial map={texture} transparent toneMapped={false} depthWrite={false} polygonOffset polygonOffsetFactor={-2} />
+        </mesh>
+        <Label text="XM-Games" position={[0.38, 0, 0]} width={1.5} height={0.28} size={146} color="#25231f" />
+    </group>;
+}
+
 export default function Architecture({ apiRef, locale }) {
     const materials = useMaterials();
     const copy = COPY[locale];
@@ -115,7 +131,7 @@ export default function Architecture({ apiRef, locale }) {
         <HingedDoor position={[-0.7, 0, 4.18]} width={1.4} height={3.25} id="entrance" apiRef={apiRef} entrance />
         <HingedDoor position={[0.7, 0, 4.18]} width={1.4} height={3.25} id="entrance" apiRef={apiRef} entrance leftLeaf />
         <Plaque text={copy.clubhouse} position={[0, 3.89, 4.23]} width={2.8} height={0.64} />
-        <Label text="XM · GAMES" position={[0, 4.45, 4.19]} width={1.4} height={0.16} size={75} color="#736c59" />
+        <EntranceBrand />
         {[-1, 1].map((side) => <group key={side}>
             <Sconce position={[side * 1.92, 2.55, 4.2]} />
             <Plant position={[side * 2.08, 0, 4.8]} scale={1.55} />

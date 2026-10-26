@@ -70,6 +70,10 @@ async function render(size, coverage, { rounded = false, even = false } = {}) {
 
 const publicRoot = resolve(root, 'public')
 await mkdir(resolve(publicRoot, 'icons'), { recursive: true })
+await mkdir(resolve(publicRoot, 'images/brand'), { recursive: true })
+// Header and 3D sign share a tightly cropped version of the approved artwork.
+await sharp(emblem).resize({ width: 256 }).png()
+  .toFile(resolve(publicRoot, 'images/brand/xm-controller-mark.png'))
 for (const size of [192, 512]) {
   await writeFile(resolve(publicRoot, `icons/xm-controller-${size}.png`), await render(size, 0.84))
 }

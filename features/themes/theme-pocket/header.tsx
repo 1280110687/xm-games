@@ -1,7 +1,8 @@
 "use client"
 
 import type { ReactNode } from "react"
-import { ArrowLeft, Gamepad2 } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
+import { BrandMark } from "@/components/brand-mark"
 import { PrefetchLink as Link } from "@/components/prefetch-link"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { ThemeSwitcher } from "@/features/themes/shared/theme-switcher"
@@ -16,7 +17,7 @@ function PocketControls() {
 export function PocketHeader() {
   return <header className="pocket-header">
     <Link href="/" className="pocket-brand" onNavigate={() => navigatePocket("")}>
-      <span><Gamepad2 aria-hidden="true" /></span><strong>XM-Games</strong>
+      <BrandMark /><strong>XM-Games</strong>
     </Link>
     <PocketControls />
   </header>
