@@ -34,7 +34,10 @@ export function ThemeFourMenu({ place, onRoom, onBack, onEntrance, onDirectory, 
     <DialogTrigger asChild>
       <button type="button" className="theme-four-menu-trigger" aria-label={copy.menu}><Ellipsis aria-hidden="true" /></button>
     </DialogTrigger>
-    <DialogContent className="theme-four-menu-dialog" closeLabel={locale === "zh" ? "关闭菜单" : locale === "th" ? "ปิดเมนู" : "Close menu"}>
+    <DialogContent className="theme-four-menu-dialog" closeLabel={locale === "zh" ? "关闭菜单" : locale === "th" ? "ปิดเมนู" : "Close menu"}
+      onCloseAutoFocus={(event) => {
+        if (document.documentElement.dataset.theme !== "theme-four") event.preventDefault()
+      }}>
       <DialogHeader><DialogTitle className="theme-four-menu-brand"><BrandMark /><span>{copy.title}</span></DialogTitle><DialogDescription>{copy.note}</DialogDescription></DialogHeader>
       <div className="theme-four-menu-preferences">
         <div><span><Globe aria-hidden="true" />{copy.language}</span><LanguageSwitcher /></div>

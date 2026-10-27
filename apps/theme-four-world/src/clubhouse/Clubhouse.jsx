@@ -4,6 +4,7 @@ import { PerformanceMonitor } from '@react-three/drei';
 import { CLUBHOUSE_ROOM_NAMES, CLUBHOUSE_ROOMS, EXPERIENCE_MESSAGES, isContextMessage, isClubhouseCommand } from '@xm-games/experience-bridge';
 import { usePerformance } from '../context/PerformanceContext';
 import { useScene } from '../context/SceneContext';
+import { useTreasureHunt } from '../context/TreasureHuntContext';
 import { ClubMaterials, Plaque } from './materials';
 import Architecture from './architecture';
 import { GameRoom, ToolWorkshop } from './furniture';
@@ -14,6 +15,12 @@ import './clubhouse.css';
 const TreasureRoom = lazy(() => import('../components/canvas/rooms/Treasure/TreasureRoom'));
 const TreasureHud = lazy(() => import('../components/ui/TreasureHuntHud'));
 const ElementalArena = lazy(() => import('../components/ui/ElementalArenaExperience'));
+
+function MuseumHostPause({ paused }) {
+    const { setHostPaused } = useTreasureHunt();
+    useEffect(() => { setHostPaused(paused); }, [paused, setHostPaused]);
+    return null;
+}
 
 function FramePolicy({ place }) {
     const { setFrameloop, invalidate } = useThree();
@@ -110,6 +117,7 @@ export default function Clubhouse() {
     const categoryData = manifest.categories.find((section) => section.id === category);
 
     return <main className="clubhouse" data-place={place} data-ready={ready}>
+        <MuseumHostPause paused={paused} />
         <SceneSync place={place} apiRef={apiRef} />
         <Canvas camera={{ position: [initial.pose.x, initial.pose.y, initial.pose.z], fov: 62, near: 0.08, far: 70 }} dpr={settings.dpr} shadows={settings.shadows} gl={{ antialias: settings.antialias, alpha: false, powerPreference: settings.powerPreference, failIfMajorPerformanceCaveat: true }}>
             <color attach="background" args={['#d6e4e6']} />

@@ -21,15 +21,15 @@ html[data-theme='theme-retro'] body { background: var(--background) url('/images
 .retro-page { width: min(100%, 1040px); margin-inline: auto; padding: var(--retro-top) max(var(--retro-gutter),env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(var(--retro-gutter),env(safe-area-inset-left)); min-height: 100svh; }
 .retro-header { position: sticky; top: var(--retro-top); z-index: 40; isolation: isolate; min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .retro-header::before { content: ''; position: absolute; z-index: -1; inset: calc(-1 * var(--retro-top)) calc(-1 * var(--retro-gutter)) -8px; background: var(--background) url('/images/theme-retro/shell-texture.webp') repeat; background-size: 220px; pointer-events: none; }
-.retro-brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.retro-brand { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 44px; border-radius: 6px; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
 .retro-brand .xm-brand-mark { width: 60px; height: 38px; flex-shrink: 0; padding: 6px; border: 1px solid #b5b5a7; border-radius: 6px; background: #f8fafc; box-shadow: inset 0 1px 1px #fff9,0 2px 2px #0002; }
 .retro-brand strong { font-size: 25px; font-weight: 850; letter-spacing: -1.1px; white-space: nowrap; }
 .retro-header-controls { display: flex; gap: 7px; flex-shrink: 0; }
-html[data-theme='theme-retro'] .retro-header-controls :is(.language-switcher-trigger,.theme-switcher-trigger) { display: grid; place-items: center; justify-content: center; gap: 0; width: 44px !important; height: 44px; min-height: 44px; min-width: 44px; padding: 0 !important; border: 1px solid #b8b9af; border-radius: 50%; color: var(--foreground); background: #e9e7de; box-shadow: inset 0 1px 1px #fff9,0 2px 3px #0001; }
+html[data-theme='theme-retro'] .retro-header-controls :is(.language-switcher-trigger,.theme-switcher-trigger) { display: grid; place-items: center; justify-content: center; gap: 0; width: 44px !important; height: 44px; min-height: 44px; min-width: 44px; padding: 0 !important; border: 1px solid #b8b9af; border-radius: 50%; color: var(--foreground); background: #e9e7de; box-shadow: inset 0 1px 1px #fff9,0 2px 3px #0001; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
 html[data-theme='theme-retro'] .retro-header-controls svg { width: 24px; height: 24px; color: inherit; stroke-width: 1.8; }
 html[data-theme='theme-retro'] .retro-header-controls .language-switcher-trigger > :not(svg:first-child) { display: none; }
 .retro-mode { display: grid; grid-template-columns: 1fr 1fr; margin: 8px 0 10px; border: 1px solid #b3b3a7; border-radius: 7px; padding: 2px; background: #d1d1c6; box-shadow: inset 0 2px 3px #0001,0 1px 1px #fff8; }
-.retro-mode a { display: grid; place-items: center; min-height: 38px; border-radius: 4px; color: #595c52; font-size: 17px; font-weight: 750; letter-spacing: 2px; }
+.retro-mode a { display: grid; place-items: center; min-height: 44px; border-radius: 4px; color: #595c52; font-size: 17px; font-weight: 750; letter-spacing: 2px; }
 .retro-mode a[aria-current='page'] { background: var(--retro-orange); color: #292a26; box-shadow: inset 0 1px 1px #ffc598,0 2px 3px #0003; }
 .retro-lcd { position: relative; width: 100%; aspect-ratio: 4 / 3; background: url('/images/theme-retro/lcd-frame.webp') center / 100% 100% no-repeat; }
 .retro-lcd-content { position: absolute; inset: 6% 4% 12%; padding: 22px 18px; color: var(--retro-ink); }
@@ -82,7 +82,10 @@ button.retro-cartridge { cursor: pointer; filter: saturate(.8); }
 .retro-tool-symbol { width: 52px; height: 58px; display: grid; place-items: center; border: 3px solid #676c5d; background: #bdc89b; color: #3b4a29; border-radius: 5px; box-shadow: inset 0 1px 3px #0004,0 2px 1px #fff6; }
 .retro-tool-symbol svg { width: 30px; height: 30px; stroke-width: 1.6; }
 .retro-tool-entry small { font: 600 10px var(--font-geist-mono),monospace; color: var(--muted-foreground); }.retro-tool-entry h2 { font-size: 18px; font-weight: 750; }.retro-tool-entry p { font-size: 12px; line-height: 1.6; margin-top: 4px; color: var(--muted-foreground); overflow-wrap: anywhere; }.retro-tool-entry > svg { width: 18px; }
-html[data-theme='theme-retro'] .retro-back { width: 44px; height: 44px; background: #eeece3; border: 1px solid #b5b5a7; box-shadow: 0 2px 2px #0001; }
+html[data-theme='theme-retro'] .retro-back { width: 44px; height: 44px; background: #eeece3; border: 1px solid #b5b5a7; box-shadow: 0 2px 2px #0001; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
+.retro-brand:active { color: #7a351a; background: #d8dbc9; }
+html[data-theme='theme-retro'] .retro-back:active,
+html[data-theme='theme-retro'] .retro-header-controls :is(.language-switcher-trigger,.theme-switcher-trigger):is(:active,[data-state='open']) { color: #7a351a; background: #d5ddbe; border-color: #899473; box-shadow: inset 0 2px 3px rgb(53 67 33 / 22%); }
 html[data-theme='theme-retro'] .surface-panel { box-shadow: inset 0 1px #fff9,0 2px 3px #0001; }
 @media (min-width: 760px) {
   html[data-theme='theme-retro'] { --retro-gutter: 32px; --retro-top: calc(var(--xm-safe-area-top,0px) + 24px); }
@@ -100,4 +103,13 @@ html[data-theme='theme-retro'] .surface-panel { box-shadow: inset 0 1px #fff9,0 
   .retro-rack { gap: 2px; padding-inline: 17px; }.retro-rack-arrow:first-child { left: -10px; }.retro-rack-arrow:last-child { right: -10px; }.retro-cartridge-label strong { font-size: 10px; }.retro-handy a { gap: 6px; }.retro-handy a + a { padding-left: 10px; }.retro-handy strong { font-size: 12px; }
 }
 @media (hover: hover) { .retro-start:hover { filter: brightness(1.06); }.retro-library-game:hover .retro-cartridge { transform: translateY(-3px); }.retro-tool-entry:hover h2 { color: #9b431f; } }
+@media (hover: hover) and (pointer: fine) {
+  .retro-brand:hover { color: #7a351a; background: #d8dbc9; }
+  html[data-theme='theme-retro'] .retro-back:hover,
+  html[data-theme='theme-retro'] .retro-header-controls :is(.language-switcher-trigger,.theme-switcher-trigger):hover { color: #7a351a; background: #d5ddbe; border-color: #899473; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .retro-brand,.retro-back,.retro-header-controls :is(.language-switcher-trigger,.theme-switcher-trigger) { transition: transform .12s ease, background-color .12s ease, color .12s ease, box-shadow .12s ease; }
+  .retro-brand:active,.retro-back:active,.retro-header-controls :is(.language-switcher-trigger,.theme-switcher-trigger):active { transform: translateY(1px); }
+}
 @media (prefers-reduced-motion: no-preference) { .retro-cartridge { transition: transform .16s ease; }.retro-start { transition: transform .12s ease; }.retro-start:active { transform: translateY(3px); } }

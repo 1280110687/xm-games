@@ -3,6 +3,7 @@ html[data-theme='theme-four'] .theme-four-scene-menu { position: absolute; z-ind
 html[data-theme='theme-four'] .theme-four-menu-trigger { width: 44px; height: 44px; display: inline-grid; place-items: center; border: 1px solid rgb(255 255 255 / 0.7); border-radius: 50%; background: rgb(255 253 246 / 0.82); color: #354841; box-shadow: 0 2px 12px rgb(35 49 35 / 0.08); backdrop-filter: blur(10px); cursor: pointer; padding: 0; }
 html[data-theme='theme-four'] .theme-four-menu-trigger svg { width: 22px; height: 22px; stroke-width: 2; }
 html[data-theme='theme-four'] .theme-four-menu-trigger:focus-visible { outline: 2px solid #286f72; outline-offset: 3px; }
+html[data-theme='theme-four'] .theme-four-menu-trigger[data-state='open'] { border-color: #95aaa0; background: #e6ece3; color: #205a50; box-shadow: inset 0 1px 3px rgb(35 49 35 / 0.1); }
 html[data-theme='theme-four'] [data-slot='dialog-content'].theme-four-menu-dialog { width: min(380px, calc(100vw - 32px)); max-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom) - 48px); overflow: auto; border-radius: 18px; background: #fbf8ef; border: 1px solid #d7d4c5; color: #253e39; padding: 24px; box-shadow: 0 24px 90px #193a363d; }
 html[data-theme='theme-four'] .theme-four-menu-brand { display: flex; align-items: center; gap: 12px; min-height: 34px; padding-right: 28px; text-align: left; }
 html[data-theme='theme-four'] .theme-four-menu-brand .xm-brand-mark { flex: 0 0 54px; width: 54px; height: 34px; padding: 4px; border-radius: 5px; }
@@ -16,13 +17,24 @@ html[data-theme='theme-four'] .theme-four-menu-preferences .language-switcher-tr
 html[data-theme='theme-four'] .theme-four-menu-actions { display: grid; gap: 3px; }
 html[data-theme='theme-four'] .theme-four-menu-actions h3 { font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; margin: 9px 9px 3px; color: #737c6f; }
 html[data-theme='theme-four'] .theme-four-menu-actions button { display: flex; align-items: center; gap: 11px; min-height: 44px; padding: 10px; border: 0; border-radius: 8px; background: transparent; color: #354f45; text-align: left; font: inherit; font-size: 14px; cursor: pointer; }
-html[data-theme='theme-four'] .theme-four-menu-actions button:hover,
 html[data-theme='theme-four'] .theme-four-menu-actions button:focus-visible,
 html[data-theme='theme-four'] .theme-four-menu-actions button[aria-current] { background: #e6ece3; color: #205a50; }
 html[data-theme='theme-four'] .theme-four-menu-actions svg { width: 18px; height: 18px; }
 html[data-theme='theme-four'] .theme-four-page-header { position: relative; display: flex; align-items: center; gap: 12px; width: min(calc(100% - 24px), 74rem); margin: max(12px, calc(env(safe-area-inset-top) + 8px)) auto 20px; padding: 10px 12px; border-radius: 12px; background: #fbf8efed; border: 1px solid #d9d3c1; }
 html[data-theme='theme-four'] .theme-four-page-back { display: grid; place-items: center; width: 44px; height: 44px; flex: 0 0 44px; border-radius: 50%; color: #365b50; background: #e9ece3; }
 html[data-theme='theme-four'] .theme-four-page-back svg { width: 20px; height: 20px; }
+html[data-theme='theme-four'] .theme-four-page-back:focus-visible { outline: 2px solid #286f72; outline-offset: 3px; }
+html[data-theme='theme-four'] .theme-four-menu-trigger,
+html[data-theme='theme-four'] .theme-four-page-back,
+html[data-theme='theme-four'] .theme-four-menu-actions button { touch-action: manipulation; -webkit-tap-highlight-color: transparent; user-select: none; -webkit-user-select: none; }
+@media (hover: hover) and (pointer: fine) {
+  html[data-theme='theme-four'] .theme-four-menu-trigger:hover,
+  html[data-theme='theme-four'] .theme-four-page-back:hover,
+  html[data-theme='theme-four'] .theme-four-menu-actions button:hover { background: #e6ece3; color: #205a50; }
+}
+html[data-theme='theme-four'] .theme-four-menu-trigger:active,
+html[data-theme='theme-four'] .theme-four-page-back:active,
+html[data-theme='theme-four'] .theme-four-menu-actions button:active { background: #d7e3d8; color: #194f45; box-shadow: inset 0 1px 3px rgb(35 49 35 / 0.14); }
 html[data-theme='theme-four'] .theme-four-page-heading { flex: 1; min-width: 0; }
 html[data-theme='theme-four'] .theme-four-page-heading h1 { font: 650 clamp(16px, 2.5vw, 23px)/1.35 var(--font-geist-sans), sans-serif; margin: 0; }
 html[data-theme='theme-four'] .theme-four-page-heading p { margin: 4px 0 0; color: #687267; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

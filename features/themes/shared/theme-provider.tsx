@@ -25,7 +25,8 @@ interface ThemeContextValue {
   theme: ThemeId
   isResolved: boolean
   styleError: boolean
-  setTheme: (theme: ThemeId) => void
+  pendingTheme: ThemeId | null
+  setTheme: (theme: ThemeId) => Promise<boolean>
 }
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined)
@@ -60,22 +61,28 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<ThemeId>(DEFAULT_THEME)
   const [isResolved, setIsResolved] = useState(false)
   const [styleError, setStyleError] = useState(false)
+  const [pendingTheme, setPendingTheme] = useState<ThemeId | null>(null)
   const requestRef = useRef(0)
 
   const loadTheme = useCallback(async (nextTheme: ThemeId, persist = false) => {
     const request = ++requestRef.current
     setStyleError(false)
+    setPendingTheme(nextTheme)
     try {
       await loadThemeStyle(nextTheme)
-      if (request !== requestRef.current) return
+      if (request !== requestRef.current) return false
       setThemeState(nextTheme)
       applyTheme(nextTheme)
       setIsResolved(true)
       if (persist) {
         try { localStorage.setItem(THEME_STORAGE_KEY, nextTheme) } catch { /* Optional persistence. */ }
       }
+      return true
     } catch {
       if (request === requestRef.current) setStyleError(true)
+      return false
+    } finally {
+      if (request === requestRef.current) setPendingTheme(null)
     }
   }, [])
 
@@ -100,12 +107,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, [loadTheme])
 
   const setTheme = useCallback((nextTheme: ThemeId) => {
-    void loadTheme(nextTheme, true)
+    return loadTheme(nextTheme, true)
   }, [loadTheme])
 
   const value = useMemo(
-    () => ({ theme, isResolved, styleError, setTheme }),
-    [isResolved, styleError, theme, setTheme],
+    () => ({ theme, isResolved, styleError, pendingTheme, setTheme }),
+    [isResolved, styleError, pendingTheme, theme, setTheme],
   )
 
   return (

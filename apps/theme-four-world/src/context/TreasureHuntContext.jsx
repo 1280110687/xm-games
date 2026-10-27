@@ -1,5 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useScene } from './SceneContext';
+import { createHuntClock } from './hunt-clock';
+import { createPausableTimeout } from './pausable-timeout';
 
 export const MUSEUM_CLUES = [
     { id: 'prism', objective: 'prism', interaction: 'clue', step: 0 },
@@ -36,6 +38,7 @@ export const useTreasureHunt = () => {
 export const TreasureHuntProvider = ({ children }) => {
     const { currentRoom, exitRequested } = useScene();
     const [status, setStatus] = useState('idle');
+    const [hostPaused, setHostPausedState] = useState(false);
     const [clueStep, setClueStep] = useState(0);
     const [discoveredIds, setDiscoveredIds] = useState(() => new Set());
     const [elapsedMs, setElapsedMs] = useState(0);
@@ -53,7 +56,9 @@ export const TreasureHuntProvider = ({ children }) => {
     const statusRef = useRef('idle');
     const clueStepRef = useRef(0);
     const discoveredIdsRef = useRef(new Set());
-    const startedAtRef = useRef(0);
+    const clockRef = useRef(null);
+    if (!clockRef.current) clockRef.current = createHuntClock();
+    const hostPausedRef = useRef(false);
     const bestRunRef = useRef(null);
     const hintsUsedRef = useRef(0);
     const mistakesRef = useRef(0);
@@ -63,6 +68,8 @@ export const TreasureHuntProvider = ({ children }) => {
     const previousRoomRef = useRef(null);
     const hintTimerRef = useRef(null);
     const messageTimerRef = useRef(null);
+    if (!hintTimerRef.current) hintTimerRef.current = createPausableTimeout();
+    if (!messageTimerRef.current) messageTimerRef.current = createPausableTimeout();
     const controlsRef = useRef({ moveX: 0, moveY: 0, lookX: 0, lookY: 0, sprint: false });
 
     const updateStatus = useCallback((nextStatus) => {
@@ -70,35 +77,47 @@ export const TreasureHuntProvider = ({ children }) => {
         setStatus(nextStatus);
     }, []);
 
+    const setHostPaused = useCallback((paused) => {
+        if (hostPausedRef.current === paused) return;
+        hostPausedRef.current = paused;
+        clockRef.current.setPaused(paused);
+        hintTimerRef.current.setPaused(paused);
+        messageTimerRef.current.setPaused(paused);
+        if (paused) {
+            controlsRef.current = { moveX: 0, moveY: 0, lookX: 0, lookY: 0, sprint: false };
+            if (statusRef.current === 'running') {
+                setElapsedMs(clockRef.current.elapsed());
+                if (document.pointerLockElement) document.exitPointerLock?.();
+            }
+        }
+        setHostPausedState(paused);
+    }, []);
+
     const showMessage = useCallback((key, tone = 'info', duration = 3200) => {
-        if (messageTimerRef.current) window.clearTimeout(messageTimerRef.current);
+        messageTimerRef.current.clear();
         setMessage((previous) => ({ key, tone, nonce: previous.nonce + 1 }));
 
         if (duration > 0) {
-            messageTimerRef.current = window.setTimeout(() => {
+            messageTimerRef.current.start(() => {
                 setMessage((previous) => ({ key: null, tone: 'info', nonce: previous.nonce + 1 }));
-                messageTimerRef.current = null;
             }, duration);
         }
     }, []);
 
     const clearHint = useCallback(() => {
-        if (hintTimerRef.current) {
-            window.clearTimeout(hintTimerRef.current);
-            hintTimerRef.current = null;
-        }
+        hintTimerRef.current.clear();
         setHintTargetId(null);
     }, []);
 
     const startNewHunt = useCallback(() => {
         clearHint();
-        if (messageTimerRef.current) window.clearTimeout(messageTimerRef.current);
+        messageTimerRef.current.clear();
 
         const emptyDiscoveredIds = new Set();
         const now = Date.now();
         discoveredIdsRef.current = emptyDiscoveredIds;
         clueStepRef.current = 0;
-        startedAtRef.current = now;
+        clockRef.current.start(hostPausedRef.current);
         hintsUsedRef.current = 0;
         mistakesRef.current = 0;
         focusIdRef.current = null;
@@ -155,16 +174,18 @@ export const TreasureHuntProvider = ({ children }) => {
     }, [currentRoom, exitRequested, updateStatus]);
 
     useEffect(() => {
-        if (status !== 'running') return undefined;
+        if (status !== 'running' || hostPaused) return undefined;
         const timer = window.setInterval(() => {
-            setElapsedMs(Date.now() - startedAtRef.current);
+            if (statusRef.current !== 'running' || hostPausedRef.current) return;
+            setElapsedMs(clockRef.current.elapsed());
         }, 100);
         return () => window.clearInterval(timer);
-    }, [status]);
+    }, [hostPaused, status]);
 
     useEffect(() => {
-        if (status !== 'running') return undefined;
+        if (status !== 'running' || hostPaused) return undefined;
         const batteryTimer = window.setInterval(() => {
+            if (statusRef.current !== 'running' || hostPausedRef.current) return;
             const nextBattery = flashlightOnRef.current
                 ? Math.max(0, batteryRef.current - 0.2)
                 : Math.min(100, batteryRef.current + 0.58);
@@ -177,11 +198,11 @@ export const TreasureHuntProvider = ({ children }) => {
             }
         }, 250);
         return () => window.clearInterval(batteryTimer);
-    }, [showMessage, status]);
+    }, [hostPaused, showMessage, status]);
 
     useEffect(() => () => {
-        if (hintTimerRef.current) window.clearTimeout(hintTimerRef.current);
-        if (messageTimerRef.current) window.clearTimeout(messageTimerRef.current);
+        hintTimerRef.current.clear();
+        messageTimerRef.current.clear();
     }, []);
 
     const setFocusId = useCallback((nextFocusId) => {
@@ -191,7 +212,7 @@ export const TreasureHuntProvider = ({ children }) => {
     }, []);
 
     const finishRun = useCallback(() => {
-        const finalElapsedMs = Date.now() - startedAtRef.current;
+        const finalElapsedMs = clockRef.current.elapsed();
         const finalScore = calculateScore({
             elapsedMs: finalElapsedMs,
             hintsUsed: hintsUsedRef.current,
@@ -217,7 +238,7 @@ export const TreasureHuntProvider = ({ children }) => {
     }, [showMessage, updateStatus]);
 
     const interact = useCallback((interactionId) => {
-        if (statusRef.current !== 'running' || !interactionId) return;
+        if (statusRef.current !== 'running' || hostPausedRef.current || !interactionId) return;
         const interaction = MUSEUM_INTERACTIONS.find((item) => item.id === interactionId);
         if (!interaction) return;
 
@@ -262,7 +283,7 @@ export const TreasureHuntProvider = ({ children }) => {
     }, [interact]);
 
     const toggleFlashlight = useCallback(() => {
-        if (statusRef.current !== 'running') return;
+        if (statusRef.current !== 'running' || hostPausedRef.current) return;
         if (!flashlightOnRef.current && batteryRef.current <= 4) {
             showMessage('batteryCharging', 'warning', 2200);
             return;
@@ -272,30 +293,32 @@ export const TreasureHuntProvider = ({ children }) => {
     }, [showMessage]);
 
     const requestHint = useCallback(() => {
-        if (statusRef.current !== 'running') return;
+        if (statusRef.current !== 'running' || hostPausedRef.current) return;
         const nextTarget = MUSEUM_CLUES[clueStepRef.current]?.id || 'vault';
         hintsUsedRef.current += 1;
         setHintsUsed(hintsUsedRef.current);
         clearHint();
         setHintTargetId(nextTarget);
         showMessage(`hint:${nextTarget}`, 'hint', 5600);
-        hintTimerRef.current = window.setTimeout(() => {
+        hintTimerRef.current.start(() => {
             setHintTargetId(null);
-            hintTimerRef.current = null;
         }, 6000);
     }, [clearHint, showMessage]);
 
     const setMoveInput = useCallback((moveX, moveY) => {
+        if (hostPausedRef.current) return;
         controlsRef.current.moveX = Math.max(-1, Math.min(1, moveX));
         controlsRef.current.moveY = Math.max(-1, Math.min(1, moveY));
     }, []);
 
     const addLookInput = useCallback((lookX, lookY) => {
+        if (hostPausedRef.current) return;
         controlsRef.current.lookX += lookX;
         controlsRef.current.lookY += lookY;
     }, []);
 
     const setSprintInput = useCallback((sprint) => {
+        if (hostPausedRef.current) return;
         controlsRef.current.sprint = Boolean(sprint);
     }, []);
 
@@ -320,9 +343,10 @@ export const TreasureHuntProvider = ({ children }) => {
         runId,
         score,
         setFocusId,
+        setHostPaused,
         setMoveInput,
         setSprintInput,
-        status,
+        status: hostPaused && status === 'running' ? 'paused' : status,
         toggleFlashlight,
         totalClues: NIGHT_MUSEUM_CLUE_COUNT,
     }), [
@@ -336,6 +360,7 @@ export const TreasureHuntProvider = ({ children }) => {
         focusId,
         hintTargetId,
         hintsUsed,
+        hostPaused,
         interact,
         interactFocused,
         message,
@@ -344,6 +369,7 @@ export const TreasureHuntProvider = ({ children }) => {
         runId,
         score,
         setFocusId,
+        setHostPaused,
         setMoveInput,
         setSprintInput,
         startNewHunt,

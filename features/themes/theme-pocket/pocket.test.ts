@@ -97,8 +97,8 @@ describe("pocket launcher", () => {
       "place-items": "center",
       "justify-content": "center",
       gap: "0",
-      width: "40px",
-      height: "40px",
+      width: "44px",
+      height: "44px",
     })
   })
 })

@@ -3,18 +3,21 @@ html[data-theme='theme-three'] body :is(.t3-home,.game-page,.app-shell[data-page
 html[data-theme='theme-three'] .app-shell[data-page='anime-tracker'] > .app-container { padding: 0; }
 html[data-theme='theme-three'] .t3-topbar { position: sticky; top: 0; z-index: 40; display: flex; align-items: center; gap: 10px; min-height: 82px; padding: 24px 4px 14px; margin: 0 -4px; border-radius: 0 0 22px 22px; }
 html[data-theme='theme-three'] .t3-topbar[data-scrolled='true'] { background: rgb(15 30 47 / 94%); box-shadow: 0 8px 20px rgb(0 8 22 / 16%); padding-top: max(12px,var(--xm-safe-area-top)); }
-html[data-theme='theme-three'] .t3-wordmark { display: flex; align-items: center; gap: 9px; color: #e6f2ff; min-width: 0; margin-right: auto; font-size: 18px; font-weight: 750; letter-spacing: -.4px; }
+html[data-theme='theme-three'] .t3-wordmark { display: flex; align-items: center; gap: 9px; color: #e6f2ff; min-width: 0; min-height: 44px; margin-right: auto; border-radius: 12px; font-size: 18px; font-weight: 750; letter-spacing: -.4px; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
 html[data-theme='theme-three'] .t3-wordmark .xm-brand-mark { width: 60px; height: 38px; flex-shrink: 0; border: 1px solid rgb(255 255 255 / 70%); border-radius: 12px; background: #f8fafc; box-shadow: 0 2px 8px rgb(0 8 22 / 16%); }
 html[data-theme='theme-three'] .t3-wordmark-label { white-space: nowrap; }
 html[data-theme='theme-three'] .t3-topbar-controls { display: flex; gap: 10px; margin-left: auto; flex-shrink: 0; }
-html[data-theme='theme-three'] .t3-topbar-controls :is(.language-switcher-trigger,.theme-switcher-trigger) { display: grid; place-items: center; justify-content: center; gap: 0; width: 44px !important; height: 44px !important; min-width: 44px; padding: 0 !important; border-radius: 50%; color: var(--t3-ink); border: 1px solid var(--t3-edge); background: rgb(134 167 207 / 17%); box-shadow: inset 0 1px 1px rgb(255 255 255 / 36%), 0 4px 10px rgb(0 8 22 / 12%); }
+html[data-theme='theme-three'] .t3-topbar-controls :is(.language-switcher-trigger,.theme-switcher-trigger) { display: grid; place-items: center; justify-content: center; gap: 0; width: 44px !important; height: 44px !important; min-width: 44px; padding: 0 !important; border-radius: 50%; color: var(--t3-ink); border: 1px solid var(--t3-edge); background: rgb(134 167 207 / 17%); box-shadow: inset 0 1px 1px rgb(255 255 255 / 36%), 0 4px 10px rgb(0 8 22 / 12%); touch-action: manipulation; -webkit-user-select: none; user-select: none; }
 html[data-theme='theme-three'] .t3-topbar-controls :is(.language-switcher-compact-label,.theme-current-label,.theme-chevron) { display: none; }
 html[data-theme='theme-three'] .t3-topbar-controls .language-switcher-trigger > svg:not(:first-child) { display: none; }
 html[data-theme='theme-three'] .t3-topbar-controls :is(.language-switcher-trigger,.theme-switcher-trigger) svg { width: 23px; height: 23px; color: inherit; stroke-width: 1.8; }
 html[data-theme='theme-three'] .t3-page-header { padding-block: 14px; min-height: 72px; margin-bottom: 14px; }
 html[data-theme='theme-three'] .t3-page-header h1 { flex: 1; min-width: 0; font-size: 18px; line-height: 1.4; font-weight: 700; overflow-wrap: anywhere; }
-html[data-theme='theme-three'] .t3-back { display: grid; place-items: center; width: 40px; height: 44px; flex-shrink: 0; }
+html[data-theme='theme-three'] .t3-back { display: grid; place-items: center; width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; touch-action: manipulation; -webkit-user-select: none; user-select: none; }
 html[data-theme='theme-three'] .t3-back svg { width: 22px; height: 22px; }
+html[data-theme='theme-three'] .t3-wordmark:active { color: #fff; background: rgb(152 196 247 / 18%); }
+html[data-theme='theme-three'] .t3-back:active,
+html[data-theme='theme-three'] .t3-topbar-controls :is(.language-switcher-trigger,.theme-switcher-trigger):is(:active,[data-state='open']) { color: #fff; background: rgb(152 196 247 / 32%); border-color: #a9c9ee; box-shadow: inset 0 1px 4px rgb(0 8 22 / 28%); }
 html[data-theme='theme-three'] .t3-page-context { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: -2px 0 18px; padding: 10px 12px; border-radius: 12px; background: rgb(18 34 54 / 90%); }
 html[data-theme='theme-three'] .t3-page-context > p { color: var(--t3-muted); font-size: 13px; line-height: 1.65; flex: 1; min-width: 200px; }
 html[data-theme='theme-three'] .t3-page-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-left: auto; }
@@ -23,6 +26,17 @@ html[data-theme='theme-three'] .theme-three-bottom-item { display: flex; min-wid
 html[data-theme='theme-three'] .theme-three-bottom-item svg { width: 23px; height: 23px; stroke-width: 1.8; }
 html[data-theme='theme-three'] .theme-three-bottom-item[aria-current] { color: #f7fbff; background: rgb(152 196 247 / 26%); box-shadow: inset 0 1px 2px rgb(235 250 255 / 72%), inset 0 -1px 2px rgb(179 217 255 / 35%); }
 html[data-theme='theme-three'] .theme-three-bottom-item[aria-current] svg { filter: drop-shadow(0 0 6px #75b8ff); }
+@media (hover: hover) and (pointer: fine) {
+  html[data-theme='theme-three'] .t3-wordmark:hover { color: #fff; background: rgb(152 196 247 / 18%); }
+  html[data-theme='theme-three'] .t3-back:hover,
+  html[data-theme='theme-three'] .t3-topbar-controls :is(.language-switcher-trigger,.theme-switcher-trigger):hover { color: #fff; background: rgb(152 196 247 / 32%); border-color: #a9c9ee; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  html[data-theme='theme-three'] :is(.t3-wordmark,.t3-back),
+  html[data-theme='theme-three'] .t3-topbar-controls :is(.language-switcher-trigger,.theme-switcher-trigger) { transition: transform .12s ease, background-color .12s ease, color .12s ease, box-shadow .12s ease; }
+  html[data-theme='theme-three'] :is(.t3-wordmark,.t3-back):active,
+  html[data-theme='theme-three'] .t3-topbar-controls :is(.language-switcher-trigger,.theme-switcher-trigger):active { transform: scale(.96); }
+}
 @media (min-width: 760px) {
   html[data-theme='theme-three'] { --t3-gutter: 32px; }
   html[data-theme='theme-three'] .t3-topbar { min-height: 94px; }

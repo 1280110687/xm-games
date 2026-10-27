@@ -1,7 +1,9 @@
 "use client"
 
+import { useRef, useState } from "react"
 import {
   Layers3,
+  LoaderCircle,
   LayoutGrid,
   Joystick,
   Palette,
@@ -36,12 +38,16 @@ const THEME_COPY: Record<
   {
     appearance: string
     trigger: string
+    loading: string
+    error: string
     themes: Record<ThemeId, ThemeOptionCopy>
   }
 > = {
   zh: {
     appearance: "主题风格",
     trigger: "切换主题风格",
+    loading: "正在切换",
+    error: "主题加载失败，请再次选择主题重试。",
     themes: {
       "theme-retro": { name: "主题五 · 复古掌机", description: "LCD 屏幕、游戏卡带与实体感按键" },
       "theme-pocket": { name: "主题二 · 口袋启动器", description: "蓝白轻界面与立体游戏图标" },
@@ -58,6 +64,8 @@ const THEME_COPY: Record<
   en: {
     appearance: "Appearance",
     trigger: "Switch appearance",
+    loading: "Switching to",
+    error: "Could not load the theme. Select a theme to retry.",
     themes: {
       "theme-retro": { name: "Theme Five · Retro", description: "LCD screens, cartridges and tactile controls" },
       "theme-pocket": { name: "Theme Two · Pocket", description: "A blue-and-white launcher with playful game icons" },
@@ -74,6 +82,8 @@ const THEME_COPY: Record<
   th: {
     appearance: "ธีม",
     trigger: "เปลี่ยนธีม",
+    loading: "กำลังเปลี่ยนเป็น",
+    error: "โหลดธีมไม่สำเร็จ เลือกธีมเพื่อลองอีกครั้ง",
     themes: {
       "theme-retro": { name: "ธีม 5 · เรโทร", description: "จอ LCD ตลับเกม และปุ่มสไตล์เครื่องเกมพกพา" },
       "theme-pocket": { name: "ธีม 2 · พ็อกเก็ต", description: "หน้าจอขาวฟ้า พร้อมไอคอนเกมสามมิติ" },
@@ -106,12 +116,39 @@ export function ThemeSwitcher({
   className?: string
 }) {
   const { locale } = useLocale()
-  const { theme, styleError, setTheme } = useTheme()
+  const { theme, styleError, pendingTheme, setTheme } = useTheme()
+  const [open, setOpen] = useState(false)
+  const openRef = useRef(false)
+  const choosingRef = useRef(false)
   const copy = THEME_COPY[locale]
   const currentTheme = copy.themes[theme]
+  const changeOpen = (next: boolean) => {
+    openRef.current = next
+    setOpen(next)
+  }
+  const chooseTheme = async (nextTheme: ThemeId) => {
+    if (choosingRef.current || pendingTheme) return
+    choosingRef.current = true
+    const applied = await setTheme(nextTheme)
+    choosingRef.current = false
+    const restoreFocus = openRef.current || document.activeElement?.matches(".theme-switcher-trigger")
+    if (!applied || !restoreFocus) return
+    changeOpen(false)
+    // Applying a theme can replace the entire header, including this trigger.
+    // Restore keyboard position to the newly mounted, visible control.
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      const trigger = [...document.querySelectorAll<HTMLElement>(
+        ".theme-switcher-trigger, .theme-four-menu-trigger",
+      )].find((element) => element.getClientRects().length > 0)
+      trigger?.focus({ preventScroll: true })
+    }))
+  }
+  const status = pendingTheme
+    ? `${copy.loading}: ${copy.themes[pendingTheme].name}`
+    : styleError ? copy.error : ""
 
   return (
-    <DropdownMenu modal={modal}>
+    <DropdownMenu modal={modal} open={open} onOpenChange={changeOpen}>
       <DropdownMenuTrigger asChild>
         <Button
           type="button"
@@ -123,9 +160,12 @@ export function ThemeSwitcher({
             className,
           )}
           aria-label={`${copy.trigger}: ${currentTheme.name}`}
-          title={styleError ? (locale === "zh" ? "主题加载失败，请重试" : locale === "th" ? "โหลดธีมไม่สำเร็จ ลองอีกครั้ง" : "Theme failed to load. Please retry.") : undefined}
+          aria-busy={pendingTheme ? true : undefined}
+          title={styleError ? copy.error : undefined}
         >
-          <Palette className="size-4" aria-hidden="true" />
+          {pendingTheme
+            ? <LoaderCircle className="size-4 motion-safe:animate-spin" aria-hidden="true" />
+            : <Palette className="size-4" aria-hidden="true" />}
           {!compact && (
             <span className="theme-current-label hidden sm:inline" aria-hidden="true">
               {currentTheme.name}
@@ -136,7 +176,11 @@ export function ThemeSwitcher({
       <DropdownMenuContent
         align="end"
         sideOffset={8}
-        className="theme-switcher-content w-72 p-2"
+        className="theme-switcher-content w-72 max-w-[calc(100vw-1rem)] p-2"
+        aria-busy={pendingTheme ? true : undefined}
+        onCloseAutoFocus={(event) => {
+          if (document.documentElement.dataset.theme !== theme) event.preventDefault()
+        }}
       >
         <DropdownMenuLabel className="flex items-center gap-2 px-2 py-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
           <Layers3 className="size-4" aria-hidden="true" />
@@ -146,7 +190,7 @@ export function ThemeSwitcher({
         <DropdownMenuRadioGroup
           value={theme}
           onValueChange={(value) => {
-            if (isThemeId(value)) setTheme(value)
+            if (isThemeId(value) && (value !== theme || styleError)) void chooseTheme(value)
           }}
           className="space-y-1"
         >
@@ -159,8 +203,15 @@ export function ThemeSwitcher({
                 key={themeId}
                 value={themeId}
                 className="min-h-14 items-start rounded-xl py-2.5"
+                disabled={pendingTheme !== null}
+                onSelect={(event) => {
+                  // Keep the options and recovery message visible until CSS is ready.
+                  if (themeId !== theme || styleError) event.preventDefault()
+                }}
               >
-                <Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+                {pendingTheme === themeId
+                  ? <LoaderCircle className="mt-0.5 size-4 shrink-0 motion-safe:animate-spin" aria-hidden="true" />
+                  : <Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />}
                 <span>
                   <span className="block font-semibold text-foreground">
                     {option.name}
@@ -173,6 +224,10 @@ export function ThemeSwitcher({
             )
           })}
         </DropdownMenuRadioGroup>
+        <p role="status" aria-atomic="true" className={cn(
+          "theme-switcher-status px-2 text-xs leading-5 text-muted-foreground",
+          status ? "pt-2 pb-1" : "sr-only",
+        )}>{status}</p>
       </DropdownMenuContent>
     </DropdownMenu>
   )
