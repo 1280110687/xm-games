@@ -118,7 +118,6 @@ function EntranceBrand() {
 }
 
 export default function Architecture({ apiRef, locale }) {
-    const materials = useMaterials();
     const copy = COPY[locale];
     const names = CLUBHOUSE_ROOM_NAMES[locale];
     return <group>
@@ -153,18 +152,16 @@ export default function Architecture({ apiRef, locale }) {
         {[-9.2, -6, -2.8, 0.4, 3.4].map((z) => <Box key={z} position={[0, 4.56, z]} size={[2.8, 0.09, 0.12]} material="dark" />)}
         <Box position={[0, 3.9, -11.16]} size={[6.5, 1.2, 0.3]} material="plaster" />
         {[-3, 0, 3].map((x) => <Box key={x} position={[x, 1.7, -11.16]} size={[0.75, 3.4, 0.3]} material="plaster" />)}
+        <Box position={[1.5, 1.7, -11.16]} size={[2.25, 3.4, 0.3]} material="plaster" />
         {Object.entries(ROOM_DOORS).map(([id, door]) => <group key={id}>
             <DoorFrame position={door.position} rotation={door.rotation} />
             <HingedDoor position={door.position} rotation={door.rotation} id={id} label={names[id]} apiRef={apiRef} />
         </group>)}
         <RoomShell x={6.3} title={copy.workshop} />
         <RoomShell x={-6.3} title={names.gallery} />
-        {/* Rear vestibules indicate the existing, separately loaded experiences. */}
+        {/* The rear vestibule leads to the separately loaded elemental studio. */}
         <Box position={[-1.5, 1.5, -13]} size={[2.2, 3, 0.1]} material="dark" />
         <mesh position={[-1.5, 1.2, -12.3]}><octahedronGeometry args={[0.42]} /><meshStandardMaterial color="#89dfe8" emissive="#4caec5" emissiveIntensity={0.5} metalness={0.3} roughness={0.2} /></mesh>
         <Box position={[-1.5, 0.35, -12.3]} size={[0.8, 0.7, 0.8]} material="stone" />
-        <Box position={[1.5, 1.5, -13]} size={[2.2, 3, 0.1]} material="dark" />
-        <Box position={[1.5, 0.6, -12.3]} size={[0.9, 1.2, 0.9]} material="wood" />
-        <mesh position={[1.5, 1.42, -12.3]} material={materials.brass}><sphereGeometry args={[0.32, 20, 12]} /></mesh>
     </group>;
 }

@@ -21,9 +21,3 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Noto Sans
 .clubhouse-game-selection span { color: #66726c; font-size: 13px; line-height: 1.55; }
 @keyframes clubhouse-hint-in { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .clubhouse-hint, .clubhouse-hint[data-visible='false'] { animation: none; transition: none; } }
-@media (max-width: 760px) {
-    .clubhouse .treasure-mission { top: max(76px, calc(env(safe-area-inset-top) + 64px)); }
-    .clubhouse .treasure-battery { top: max(128px, calc(env(safe-area-inset-top) + 116px)); }
-    .clubhouse .treasure-hint { top: max(128px, calc(env(safe-area-inset-top) + 116px)); }
-    .clubhouse .treasure-message { top: max(180px, calc(env(safe-area-inset-top) + 168px)); }
-}

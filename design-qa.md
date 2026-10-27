@@ -1,3 +1,5 @@
+Current status (2026-10-27): Night Museum has been removed from the clubhouse. Museum-specific findings, screenshots and checks below are historical records of earlier builds and do not describe the current version.
+
 # Theme Four — Immersive clubhouse, first interactive loop
 
 Date: 2026-09-16. Scope: entrance → finite corridor → tool workshop → real utility page → restored room, plus preserved game/elemental/museum access. This is a real-time Three.js scene, not a raster mockup used as a background. Earlier theme records below are preserved.

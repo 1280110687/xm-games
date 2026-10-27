@@ -40,4 +40,9 @@ describe('clubhouse movement and persistence', () => {
         expect(readSnapshot()).toMatchObject({ place: 'entrance', pose: ENTRANCE_POSE });
         expect(() => saveSnapshot({ version: 1 })).not.toThrow();
     });
+
+    it('returns to the entrance when a previous session used a retired room', () => {
+        vi.stubGlobal('sessionStorage', { getItem: () => JSON.stringify({ version: 1, place: 'treasure', pose: { x: 1.5, y: 1.7, z: -12, yaw: 0, pitch: 0 }, returnPose: CORRIDOR_POSE }) });
+        expect(readSnapshot()).toMatchObject({ place: 'entrance', pose: ENTRANCE_POSE, returnPose: CORRIDOR_POSE });
+    });
 });

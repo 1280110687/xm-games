@@ -45,7 +45,6 @@ const DOOR_TEXTURES = {
     'THE STUDIO': '/theme-four-experience/textures/corridor/doors/drzwisocial.webp',
     'THE ABOUT': '/theme-four-experience/textures/corridor/doors/drzwiabout.webp',
     "LET'S CONNECT": '/theme-four-experience/textures/corridor/doors/drzwikontakt.webp',
-    'TREASURE HUNT': '/theme-four-experience/textures/corridor/doors/drzwiprojekty.webp',
     'ELEMENTAL ARENA': '/theme-four-experience/textures/corridor/doors/drzwisocial.webp',
 };
 
@@ -55,7 +54,6 @@ const DOOR_PAINTED_TEXTURES = {
     'THE STUDIO': '/theme-four-experience/textures/corridor/doors/drzwisocial_painted.webp',
     'THE ABOUT': '/theme-four-experience/textures/corridor/doors/drzwiabout_painted.webp',
     "LET'S CONNECT": '/theme-four-experience/textures/corridor/doors/drzwikontakt_painted.webp',
-    'TREASURE HUNT': '/theme-four-experience/textures/corridor/doors/drzwiprojekty_painted.webp',
     'ELEMENTAL ARENA': '/theme-four-experience/textures/corridor/doors/drzwisocial_painted.webp',
 };
 
@@ -131,7 +129,6 @@ const DoorSection = ({
         if (label === 'THE STUDIO') return 'studio';
         if (label === 'THE ABOUT') return 'about';
         if (label === "LET'S CONNECT") return 'contact';
-        if (label === 'TREASURE HUNT') return 'treasure';
         if (label === 'ELEMENTAL ARENA') return 'elemental';
         return null;
     }, [label, roomId]);
@@ -260,8 +257,6 @@ const DoorSection = ({
     const doorRatio = label === 'THE STUDIO' ? 0.388 : 0.376;
     const doorHeight = 2.5;
     const doorWidth = doorHeight * doorRatio * 1.12;
-    const clickHitboxWidth = doorId === 'treasure' ? doorWidth * 1.5 : doorWidth;
-    const clickHitboxHeight = doorId === 'treasure' ? doorHeight * 1.12 : doorHeight;
 
     // Frame dimensions - based on legacy ratio 762/1759 (0.433)
     const frameHeight = 2.5;
@@ -742,17 +737,13 @@ const DoorSection = ({
     useEffect(() => {
         const handleKeyDown = (e) => {
             if (e.key === 'Escape' && isInsideRoom && !isAnimating) {
-                if (doorId === 'treasure' && document.pointerLockElement) {
-                    document.exitPointerLock?.();
-                    return;
-                }
                 exitRoom();
             }
         };
 
         window.addEventListener('keydown', handleKeyDown);
         return () => window.removeEventListener('keydown', handleKeyDown);
-    }, [doorId, isInsideRoom, isAnimating, exitRoom]);
+    }, [isInsideRoom, isAnimating, exitRoom]);
 
     // Listen for exit request from UI back button
     useEffect(() => {
@@ -1153,30 +1144,6 @@ const DoorSection = ({
                                 TOOLS
                             </Text>
                         )}
-                        {label === 'TREASURE HUNT' && (
-                            <group position={[0, 0, 0.01]}>
-                                <Text
-                                    font="/theme-four-experience/fonts/CabinSketch-Bold.ttf"
-                                    fontSize={0.21}
-                                    color="#111111"
-                                    anchorX="center"
-                                    anchorY="bottom"
-                                    position={[0, -0.02, 0]}
-                                >
-                                    TREASURE
-                                </Text>
-                                <Text
-                                    font="/theme-four-experience/fonts/CabinSketch-Bold.ttf"
-                                    fontSize={0.21}
-                                    color="#111111"
-                                    anchorX="center"
-                                    anchorY="top"
-                                    position={[0, 0.03, 0]}
-                                >
-                                    HUNT
-                                </Text>
-                            </group>
-                        )}
                         {label === 'ELEMENTAL ARENA' && (
                             <group position={[0, 0, 0.01]}>
                                 <Text
@@ -1234,7 +1201,7 @@ const DoorSection = ({
                             onPointerEnter={handlePointerEnter}
                             onPointerLeave={handlePointerLeave}
                         >
-                            <planeGeometry args={[clickHitboxWidth, clickHitboxHeight]} />
+                            <planeGeometry args={[doorWidth, doorHeight]} />
                             <meshBasicMaterial color="#e0e0e0" transparent={true} opacity={0} depthWrite={false} />
                         </mesh>
 

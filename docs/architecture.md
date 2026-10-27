@@ -18,11 +18,11 @@ Next.js 主站仍位于仓库根目录，不为目录整齐额外迁移应用入
 
 ### 主题四沉浸会馆
 
-当前入口为 `apps/theme-four-world/src/clubhouse/Clubhouse.jsx`，`App.jsx` 只组装场景/性能/博物馆状态 Provider。`clubhouse/model.js` 管位置与持久化契约，`controller.jsx` 管逐帧镜头和手势，`architecture.jsx`、`furniture.jsx`、`materials.jsx` 分别管建筑、可交互物件和共享材质。原博物馆与元素训练室懒加载复用，不再从旧 `Experience` 预加载整套展示素材。
+当前入口为 `apps/theme-four-world/src/clubhouse/Clubhouse.jsx`，`App.jsx` 只组装场景与性能 Provider。`clubhouse/model.js` 管位置与持久化契约，`controller.jsx` 管逐帧镜头和手势，`architecture.jsx`、`furniture.jsx`、`materials.jsx` 分别管建筑、可交互物件和共享材质。元素训练室懒加载复用，不再从旧 `Experience` 预加载整套展示素材。
 
-四个实体房间的 ID、名称、消息和会话快照校验由 `packages/experience-bridge/src/clubhouse.ts` 共享。主站 `features/themes/theme-four/menu.tsx` 与实体门牌使用同一份房间定义；游戏分类目录是故障/无障碍退路，不等同于实体房间。主题四不渲染公共底栏，业务页 `header.tsx` 保留返回与必要操作。
+游戏房、工具工坊和元素训练室三个实体房间的 ID、名称、消息和会话快照校验由 `packages/experience-bridge/src/clubhouse.ts` 共享。主站 `features/themes/theme-four/menu.tsx` 与实体门牌使用同一份房间定义；游戏分类目录是故障/无障碍退路，不等同于实体房间。主题四不渲染公共底栏，业务页 `header.tsx` 保留返回与必要操作。
 
-仅房间与镜头位置存入同标签页 `sessionStorage`，不保存工具输入；存储不可用时仍能使用。入口语言通过 URL hash 提供以避免英文首闪且不改变离线文档缓存键，后续语言通过同源桥消息实时同步。新材质源在世界应用 `public/textures/clubhouse/`，缓存版本更新为 v24；已安装用户须联网更新并重新准备离线包。
+仅房间与镜头位置存入同标签页 `sessionStorage`，不保存工具输入；存储不可用时仍能使用。入口语言通过 URL hash 提供以避免英文首闪且不改变离线文档缓存键，后续语言通过同源桥消息实时同步。新材质源在世界应用 `public/textures/clubhouse/`，缓存版本以 `public/sw.js` 为准；已安装用户须联网更新并重新准备离线包。
 
 ## 素材只有一个维护位置
 

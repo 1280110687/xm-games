@@ -18,7 +18,7 @@ import CorridorDecorations from './CorridorDecorations';
  * Segment length: 112 units
  * Positioned based on segmentIndex * segmentLength
  */
-// Six rooms need enough breathing room to keep the final door clear of the
+// Rooms need enough breathing room to keep the final door clear of the
 // looping segment doors and avoid overlapping interaction zones.
 const SEGMENT_LENGTH = 112;
 
@@ -81,15 +81,6 @@ const CorridorSegment = ({
                 label: "LET'S CONNECT",
                 icon: '✉',
                 color: '#f5e6e6'
-            },
-            {
-                id: `treasure-${segmentIndex}`,
-                roomId: 'treasure',
-                relativeZ: -78,
-                side: 'left',
-                label: 'TREASURE HUNT',
-                icon: '◆',
-                color: '#f5e6cf'
             },
             {
                 id: `elemental-${segmentIndex}`,

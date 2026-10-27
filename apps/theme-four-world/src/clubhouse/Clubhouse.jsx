@@ -4,7 +4,6 @@ import { PerformanceMonitor } from '@react-three/drei';
 import { CLUBHOUSE_ROOM_NAMES, CLUBHOUSE_ROOMS, EXPERIENCE_MESSAGES, isContextMessage, isClubhouseCommand } from '@xm-games/experience-bridge';
 import { usePerformance } from '../context/PerformanceContext';
 import { useScene } from '../context/SceneContext';
-import { useTreasureHunt } from '../context/TreasureHuntContext';
 import { ClubMaterials, Plaque } from './materials';
 import Architecture from './architecture';
 import { GameRoom, ToolWorkshop } from './furniture';
@@ -12,15 +11,7 @@ import Controller from './controller';
 import { COPY, readSnapshot } from './model';
 import './clubhouse.css';
 
-const TreasureRoom = lazy(() => import('../components/canvas/rooms/Treasure/TreasureRoom'));
-const TreasureHud = lazy(() => import('../components/ui/TreasureHuntHud'));
 const ElementalArena = lazy(() => import('../components/ui/ElementalArenaExperience'));
-
-function MuseumHostPause({ paused }) {
-    const { setHostPaused } = useTreasureHunt();
-    useEffect(() => { setHostPaused(paused); }, [paused, setHostPaused]);
-    return null;
-}
 
 function FramePolicy({ place }) {
     const { setFrameloop, invalidate } = useThree();
@@ -113,11 +104,10 @@ export default function Clubhouse() {
     const chooseCategory = useCallback((id) => setCategory(id), []);
     const activity = useCallback(() => setHint(false), []);
     const sceneReady = useCallback(() => setReady(true), []);
-    const special = place === 'treasure' || place === 'elemental';
+    const special = place === 'elemental';
     const categoryData = manifest.categories.find((section) => section.id === category);
 
     return <main className="clubhouse" data-place={place} data-ready={ready}>
-        <MuseumHostPause paused={paused} />
         <SceneSync place={place} apiRef={apiRef} />
         <Canvas camera={{ position: [initial.pose.x, initial.pose.y, initial.pose.z], fov: 62, near: 0.08, far: 70 }} dpr={settings.dpr} shadows={settings.shadows} gl={{ antialias: settings.antialias, alpha: false, powerPreference: settings.powerPreference, failIfMajorPerformanceCaveat: true }}>
             <color attach="background" args={['#d6e4e6']} />
@@ -138,13 +128,11 @@ export default function Clubhouse() {
                         <GameRoom apiRef={apiRef} locale={manifest.locale} onCategory={chooseCategory} />
                         {(place === 'contact' || place === 'gallery') && <ExitPlaque room={place} label={copy.exit} apiRef={apiRef} />}
                     </>}
-                    {place === 'treasure' && <Suspense fallback={null}><TreasureRoom onReady={() => {}} isExiting={false} /></Suspense>}
                 </ClubMaterials>
             </Suspense>
         </Canvas>
         {!special && !category && <p className="clubhouse-hint" data-visible={hint} aria-hidden={!hint} aria-live="polite">{place === 'entrance' ? copy.push : place === 'corridor' ? copy.explore : copy.objects}</p>}
         <Suspense fallback={<p className="clubhouse-room-loading" role="status">{copy.loading}</p>}>
-            {place === 'treasure' && <TreasureHud hostLocale={manifest.locale} />}
             {place === 'elemental' && <ElementalArena locale={manifest.locale} />}
         </Suspense>
         {/* Equivalent keyboard controls, not a visible toolbar. */}

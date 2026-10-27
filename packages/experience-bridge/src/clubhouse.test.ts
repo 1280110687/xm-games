@@ -4,12 +4,16 @@ import { CLUBHOUSE_ROOMS, isClubhouseCommand, isClubhouseSnapshot } from "./club
 const pose = { x: 0, y: 1.7, z: 2, yaw: 0, pitch: 0 }
 const snapshot = { version: 1, place: "contact", pose, returnPose: pose }
 describe("clubhouse protocol", () => {
-  it("exposes precisely four physical rooms", () => {
-    expect(CLUBHOUSE_ROOMS).toEqual(["gallery", "contact", "elemental", "treasure"])
+  it("exposes precisely the three available physical rooms", () => {
+    expect(CLUBHOUSE_ROOMS).toEqual(["gallery", "contact", "elemental"])
     for (const room of CLUBHOUSE_ROOMS) expect(isClubhouseCommand({ action: "visit", room })).toBe(true)
     expect(isClubhouseCommand({ action: "visit", room: "about" })).toBe(false)
     expect(isClubhouseCommand({ action: "navigate", href: "//example.com" })).toBe(false)
     expect(isClubhouseCommand({ action: "pause", paused: "true" })).toBe(false)
+  })
+  it("rejects retired room commands and snapshots from an older client", () => {
+    expect(isClubhouseCommand({ action: "visit", room: "treasure" })).toBe(false)
+    expect(isClubhouseSnapshot({ ...snapshot, place: "treasure" })).toBe(false)
   })
   it("validates saved poses instead of trusting session storage", () => {
     expect(isClubhouseSnapshot(snapshot)).toBe(true)

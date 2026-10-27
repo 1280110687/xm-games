@@ -1,12 +1,12 @@
 /** Physical rooms, shared by the host menu and the WebGL world. */
-export const CLUBHOUSE_ROOMS = ["gallery", "contact", "elemental", "treasure"] as const
+export const CLUBHOUSE_ROOMS = ["gallery", "contact", "elemental"] as const
 export type ClubhouseRoom = typeof CLUBHOUSE_ROOMS[number]
 export type ClubhousePlace = "entrance" | "corridor" | ClubhouseRoom
 export const CLUBHOUSE_SESSION_KEY = "xm-games:clubhouse:v1"
 export const CLUBHOUSE_ROOM_NAMES = {
-  zh: { gallery: "游戏房", contact: "工具工坊", elemental: "元素训练室", treasure: "夜间博物馆" },
-  en: { gallery: "Game room", contact: "Tool workshop", elemental: "Elemental studio", treasure: "Night museum" },
-  th: { gallery: "ห้องเกม", contact: "ห้องเครื่องมือ", elemental: "ห้องฝึกธาตุ", treasure: "พิพิธภัณฑ์กลางคืน" },
+  zh: { gallery: "游戏房", contact: "工具工坊", elemental: "元素训练室" },
+  en: { gallery: "Game room", contact: "Tool workshop", elemental: "Elemental studio" },
+  th: { gallery: "ห้องเกม", contact: "ห้องเครื่องมือ", elemental: "ห้องฝึกธาตุ" },
 } as const
 
 export type ClubhousePose = { x: number; y: number; z: number; yaw: number; pitch: number }

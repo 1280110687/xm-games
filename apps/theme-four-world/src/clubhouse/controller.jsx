@@ -81,7 +81,7 @@ export default function Controller({ initial, apiRef, onPlace, onReady, onActivi
                 return;
             }
             const room = s.place;
-            if (room === 'treasure' || room === 'elemental') {
+            if (room === 'elemental') {
                 s.pose = { ...ROOM_DOORS[room].approach };
                 announce('corridor');
             }
@@ -120,7 +120,7 @@ export default function Controller({ initial, apiRef, onPlace, onReady, onActivi
         element.tabIndex = 0;
         element.setAttribute('aria-label', '3D clubhouse');
         const down = (event) => {
-            if (event.button !== 0 || s.paused || s.tween || s.place === 'elemental' || s.place === 'treasure') return;
+            if (event.button !== 0 || s.paused || s.tween || s.place === 'elemental') return;
             s.pointer = { x: event.clientX, y: event.clientY, startX: event.clientX, startY: event.clientY, id: event.pointerId };
             s.moved = false;
         };
@@ -207,7 +207,7 @@ export default function Controller({ initial, apiRef, onPlace, onReady, onActivi
             callbacks.current.onReady();
             window.parent.postMessage({ type: EXPERIENCE_MESSAGES.sceneState, place: s.place }, window.location.origin);
         }
-        if (s.place === 'treasure' || s.place === 'elemental') return;
+        if (s.place === 'elemental') return;
         const dt = Math.min(delta, 0.05);
         if (!s.tween && s.queue.length) {
             const next = s.queue.shift();

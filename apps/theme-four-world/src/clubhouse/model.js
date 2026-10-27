@@ -6,13 +6,11 @@ export const ROOM_POSES = {
     gallery: { x: -6.2, y: 2.15, z: 1.05, yaw: 0, pitch: -0.2 },
     contact: { x: 5.9, y: 2.3, z: 1.05, yaw: -0.08, pitch: -0.28 },
     elemental: { x: -1.5, y: 1.7, z: -12, yaw: 0, pitch: 0 },
-    treasure: { x: 1.5, y: 1.7, z: -12, yaw: 0, pitch: 0 },
 };
 export const ROOM_DOORS = {
     gallery: { position: [-3, 0, -2], rotation: Math.PI / 2, approach: { ...CORRIDOR_POSE, z: -2, yaw: Math.PI / 2 }, inside: { x: -4.2, y: 1.7, z: -2, yaw: Math.PI / 2, pitch: 0 } },
     contact: { position: [3, 0, -2], rotation: -Math.PI / 2, approach: { ...CORRIDOR_POSE, z: -2, yaw: -Math.PI / 2 }, inside: { x: 4.2, y: 1.7, z: -2, yaw: -Math.PI / 2, pitch: 0 } },
     elemental: { position: [-1.5, 0, -11], rotation: 0, approach: { ...CORRIDOR_POSE, x: -1.5, z: -9 }, inside: ROOM_POSES.elemental },
-    treasure: { position: [1.5, 0, -11], rotation: 0, approach: { ...CORRIDOR_POSE, x: 1.5, z: -9 }, inside: ROOM_POSES.treasure },
 };
 
 export const COPY = {
