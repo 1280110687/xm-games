@@ -1,0 +1,105 @@
+/* Shared geometry with theme-owned materials; two shapes preserve color-independent play. */
+html[data-theme] .oh-hi-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  width: min(100%, 720px);
+  margin-inline: auto;
+  padding: 16px 12px max(32px, env(safe-area-inset-bottom, 0px));
+  color: var(--game-ink);
+}
+
+.oh-hi-panel {
+  width: min(100%, 448px);
+  min-width: 0;
+  padding: clamp(12px, 3vw, 24px);
+  border: 1px solid var(--game-border);
+  border-radius: var(--game-radius);
+  background: var(--game-surface);
+  box-shadow: var(--game-shadow);
+}
+
+.oh-hi-intro { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.oh-hi-eyebrow { margin: 0; color: var(--game-accent); font-size: 20px; font-weight: 800; letter-spacing: -.04em; }
+.oh-hi-subtitle { margin: 4px 0 0; color: var(--game-muted); font-size: 12px; }
+.oh-hi-sizes { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; padding: 3px; flex-shrink: 0; border: 1px solid var(--game-border); border-radius: calc(var(--game-radius) * .65); background: var(--game-surface-raised); }
+.oh-hi-sizes button { min-width: 42px; min-height: 44px; padding: 4px 6px; border: 0; border-radius: calc(var(--game-radius) * .45); color: var(--game-muted); background: transparent; font-size: 12px; font-weight: 750; white-space: nowrap; }
+.oh-hi-sizes button[aria-pressed='true'] { color: var(--game-on-accent); background: var(--game-accent); }
+.oh-hi-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-block: 18px; }
+.oh-hi-stats > div { min-width: 0; padding: 8px 10px; border: 1px solid var(--game-border); border-radius: calc(var(--game-radius) * .5); background: var(--game-surface-raised); }
+.oh-hi-stats span { display: flex; align-items: center; gap: 4px; color: var(--game-muted); font-size: 11px; }
+.oh-hi-stats svg { width: 12px; height: 12px; }
+.oh-hi-stats strong { display: block; margin-top: 3px; color: var(--game-ink); font-size: 19px; font-variant-numeric: tabular-nums; }
+.oh-hi-stats small { font-size: 11px; color: var(--game-muted); font-weight: 500; }
+.oh-hi-board { display: grid; grid-template-columns: repeat(var(--oh-hi-size), minmax(0, 1fr)); gap: clamp(3px, .9vw, 6px); width: 100%; padding: clamp(5px, 1.4vw, 10px); border: 1px solid var(--game-frame); border-radius: calc(var(--game-radius) * .8); background: var(--game-board); }
+.oh-hi-row { display: contents; }
+.oh-hi-cell-slot { min-width: 0; min-height: 0; aspect-ratio: 1; }
+.oh-hi-cell { position: relative; display: grid; width: 100%; height: 100%; min-width: 0; min-height: 0; place-items: center; padding: 0; border: 1px solid var(--game-border); border-radius: calc(var(--game-radius) * .38); background: var(--game-board-alt); color: var(--game-ink); box-shadow: inset 0 -3px 0 color-mix(in srgb, var(--game-ink) 8%, transparent); }
+.oh-hi-cell[data-value='1'] { border-color: var(--game-accent); color: var(--game-on-accent); background: var(--game-accent); }
+.oh-hi-cell[data-value='2'] { border-color: var(--game-danger); color: var(--game-on-danger); background: var(--game-danger); }
+.oh-hi-symbol { display: block; width: 26%; height: 26%; border: 2px solid currentColor; opacity: .85; }
+.oh-hi-cell[data-value='1'] .oh-hi-symbol { border-radius: 50%; }
+.oh-hi-cell[data-value='2'] .oh-hi-symbol { width: 22%; height: 22%; transform: rotate(45deg); }
+.oh-hi-lock { position: absolute; top: 9%; right: 9%; width: 17%; height: 17%; opacity: .7; }
+.oh-hi-cell[data-hint='true'] { outline: 3px solid var(--game-hint); outline-offset: 1px; }
+.oh-hi-cell[data-error='true'] { box-shadow: inset 0 0 0 2px var(--game-ink); }
+.oh-hi-conflict { position: absolute; bottom: 2%; right: 8%; font-size: clamp(10px, 2.5vw, 14px); font-weight: 900; }
+.oh-hi-progress { height: 4px; overflow: hidden; margin-top: 18px; border-radius: 999px; background: var(--game-board); }
+.oh-hi-progress > span { display: block; height: 100%; background: var(--game-accent); }
+.oh-hi-status { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; margin: 8px 0 12px; text-align: center; color: var(--game-muted); font-size: 12px; line-height: 1.55; overflow-wrap: anywhere; }
+.oh-hi-status[data-tone='danger'] { color: var(--game-danger); font-weight: 650; }
+.oh-hi-status[data-tone='success'] { color: var(--game-success); font-weight: 650; }
+.oh-hi-status svg { flex-shrink: 0; width: 18px; height: 18px; }
+.oh-hi-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.oh-hi-actions button, .oh-hi-confirm-actions button { display: flex; align-items: center; justify-content: center; gap: 6px; min-height: 44px; padding: 8px; border: 1px solid var(--game-border); border-radius: calc(var(--game-radius) * .55); color: var(--game-ink); background: var(--game-surface-raised); font-size: 12px; font-weight: 650; }
+.oh-hi-actions svg { width: 16px; height: 16px; flex-shrink: 0; }
+.oh-hi-actions small { color: var(--game-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.oh-hi-guide { display: flex; flex-direction: column; align-items: center; gap: 14px; width: min(100%, 448px); min-width: 0; }
+.oh-hi-legend { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 20px; font-size: 11px; color: var(--game-muted); }
+.oh-hi-legend span { display: flex; align-items: center; gap: 6px; }
+.oh-hi-legend i { display: inline-block; width: 10px; height: 10px; border: 2px solid var(--game-accent); border-radius: 50%; }
+.oh-hi-legend i[data-color='2'] { width: 8px; height: 8px; border-color: var(--game-danger); border-radius: 0; transform: rotate(45deg); }
+html[data-theme] .oh-hi-rules-button { min-height: 44px; color: var(--game-ink); border-color: var(--game-border); border-radius: calc(var(--game-radius) * .55); background: var(--game-surface); }
+.oh-hi-credit { margin: 0; text-align: center; color: var(--game-muted); font-size: 10px; line-height: 1.9; }
+.oh-hi-credit a { color: var(--game-muted); text-decoration: underline; text-underline-offset: 3px; }
+.oh-hi-loading { display: grid; width: 100%; aspect-ratio: 1; place-items: center; color: var(--game-muted); background: var(--game-board); border-radius: calc(var(--game-radius) * .65); font-size: 14px; }
+.oh-hi-rule-list { list-style: decimal; padding-left: 22px; font-size: 14px; line-height: 1.7; }
+.oh-hi-rule-list li + li { margin-top: 10px; }
+.oh-hi-rule-note { font-size: 12px; line-height: 1.7; color: var(--muted-foreground); }
+.oh-hi-confirm-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.oh-hi-confirm-actions button { flex: 1 1 100px; }
+.oh-hi-confirm-actions button[data-primary='true'] { background: var(--game-accent); color: var(--game-on-accent); border-color: var(--game-accent); }
+.oh-hi-panel button, .oh-hi-confirm-actions button { touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; cursor: pointer; }
+.oh-hi-panel button:disabled { opacity: .42; cursor: default; }
+.oh-hi-cell[aria-disabled='true'] { cursor: default; }
+.oh-hi-panel button:focus-visible, .oh-hi-confirm-actions button:focus-visible { outline: 3px solid var(--game-hint); outline-offset: 3px; }
+.oh-hi-panel button:not(:disabled):not([aria-disabled='true']):active, .oh-hi-confirm-actions button:active { transform: scale(.96); }
+@media (hover: hover) and (pointer: fine) {
+  .oh-hi-cell:not([aria-disabled='true']):hover { filter: brightness(1.08); }
+  .oh-hi-actions button:not(:disabled):hover, .oh-hi-sizes button:not([aria-pressed='true']):hover { background: var(--game-accent-soft); }
+}
+@media (max-width: 359px) {
+  .oh-hi-intro { gap: 8px; }
+  .oh-hi-subtitle { max-width: 80px; line-height: 1.5; }
+  .oh-hi-stats { gap: 6px; margin-block: 12px; }
+  .oh-hi-stats > div { padding: 7px 8px; }
+  .oh-hi-actions { gap: 6px; }
+  .oh-hi-actions button { gap: 4px; padding-inline: 4px; }
+}
+
+/* Keep the board and its actions close on short phones without shrinking cells
+   or the 44px controls; long landscape pages remain normally scrollable. */
+@media (max-width: 767px) and (max-height: 650px) {
+  html[data-theme] .game-page[data-page='oh-hi'] > header { margin-bottom: 10px; }
+  html[data-theme] .oh-hi-content { gap: 12px; padding-top: 0; }
+  .oh-hi-subtitle { display: none; }
+  .oh-hi-stats { gap: 6px; margin-block: 10px; }
+  .oh-hi-stats > div { display: flex; align-items: center; justify-content: space-between; gap: 3px; padding: 6px 5px; }
+  .oh-hi-stats strong { margin-top: 0; font-size: 14px; white-space: nowrap; }
+  .oh-hi-stats small { font-size: 9px; }
+  .oh-hi-stats span { font-size: 10px; white-space: nowrap; }
+  .oh-hi-stats span svg { display: none; }
+  .oh-hi-progress { margin-top: 10px; }
+  .oh-hi-status { min-height: 30px; margin-block: 5px 8px; font-size: 11px; }
+}

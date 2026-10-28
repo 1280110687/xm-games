@@ -1,0 +1,15 @@
+{
+  "name": "@xm-games/billiards",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "GPL-3.0",
+  "scripts": { "build": "node build.mjs" },
+  "dependencies": {
+    "fflate": "0.8.3",
+    "interactjs": "1.10.28",
+    "jsoncrush": "1.1.8",
+    "three": "0.186.1"
+  },
+  "devDependencies": { "esbuild": "0.25.12" }
+}

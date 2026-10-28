@@ -7,12 +7,12 @@ import { getTranslation, locales } from "../../lib/i18n"
 import { HOME_CATEGORIES } from "./catalog"
 
 describe("shared experience catalog", () => {
-  it("preserves all six categories and the existing 22 destinations", () => {
+  it("preserves all six categories and all 24 destinations", () => {
     expect(HOME_CATEGORIES.map((category) => category.titleKey)).toEqual(HOME_CATEGORY_ORDER)
     expect(HOME_CATEGORIES.flatMap((category) => category.games.map((game) => game.href)).sort()).toEqual([
       "/2048", "/alternating-trail", "/anime-tracker", "/base64-tool",
-      "/bingo", "/bingo-cards", "/chess", "/chinese-chess", "/go", "/gomoku",
-      "/json-tool", "/memory-match", "/minesweeper", "/neon-breaker", "/qr-code",
+      "/billiards", "/bingo", "/bingo-cards", "/chess", "/chinese-chess", "/go", "/gomoku",
+      "/json-tool", "/memory-match", "/minesweeper", "/neon-breaker", "/oh-hi", "/qr-code",
       "/reversi", "/schulte-grid", "/snake", "/sudoku", "/tetris", "/text-crypto", "/text-tool",
     ])
   })

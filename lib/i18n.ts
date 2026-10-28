@@ -381,6 +381,10 @@ export const translations = {
     sudokuRule3: "蓝色数字是你填入的，红色表示错误",
 
     // Memory Match
+    ohHi: "双色逻辑",
+    ohHiDescription: "按双色规则填满棋盘，挑战独一无二的逻辑谜题",
+    billiards: "台球",
+    billiardsDescription: "瞄准、调整力度并击球，体验真实物理的 3D 台球",
     memoryMatch: "记忆翻牌",
     memoryMatchDescription: "翻开卡片找到相同图案，挑战更少步数和更快时间",
     memoryPairs: "配对",
@@ -824,6 +828,10 @@ export const translations = {
     sudokuRule3: "Blue numbers are your input. Red indicates errors.",
 
     // Memory Match
+    ohHi: "0h h1",
+    ohHiDescription: "Fill the board with two colors and solve a unique logic puzzle",
+    billiards: "Billiards",
+    billiardsDescription: "Aim, set your power, and shoot in a 3D pool game with realistic physics",
     memoryMatch: "Memory Match",
     memoryMatchDescription: "Match every pair of cards with fewer moves and a faster time",
     memoryPairs: "Pairs",
@@ -1267,6 +1275,10 @@ export const translations = {
     sudokuRule3: "ตัวเลขสีน้ำเงินคือที่คุณใส่ สีแดงแสดงข้อผิดพลาด",
 
     // Memory Match
+    ohHi: "ตรรกะสองสี",
+    ohHiDescription: "เติมกระดานด้วยสองสีและไขปริศนาตรรกะที่มีคำตอบเดียว",
+    billiards: "พูล",
+    billiardsDescription: "เล็ง ปรับแรง และแทงลูกในเกมพูล 3D พร้อมฟิสิกส์สมจริง",
     memoryMatch: "เกมจับคู่ความจำ",
     memoryMatchDescription: "เปิดการ์ดจับคู่ลวดลายให้ครบด้วยจำนวนครั้งและเวลาที่น้อยลง",
     memoryPairs: "คู่",

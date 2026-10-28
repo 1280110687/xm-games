@@ -111,6 +111,16 @@ export const PAGE_METADATA_KEYS = {
     descriptionKey: "memoryMatchDescription",
     includeAppName: true,
   },
+  "/oh-hi": {
+    titleKey: "ohHi",
+    descriptionKey: "ohHiDescription",
+    includeAppName: true,
+  },
+  "/billiards": {
+    titleKey: "billiards",
+    descriptionKey: "billiardsDescription",
+    includeAppName: true,
+  },
   "/schulte-grid": {
     titleKey: "schulteGrid",
     descriptionKey: "schulteGridDescription",

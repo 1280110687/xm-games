@@ -19,6 +19,8 @@ const OFFLINE_ASSET_DIRECTORIES = [
   join(PROJECT_ROOT, "public", "images", "theme-three"),
   join(PROJECT_ROOT, "public", "theme-four"),
   join(PROJECT_ROOT, "public", "theme-four-experience"),
+  join(PROJECT_ROOT, "public", "billiards-game"),
+  join(PROJECT_ROOT, "public", "licenses"),
 ]
 
 function collectPageFiles(directory: string): string[] {

@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="light dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'none'; worker-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>XM Games · Billiards</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="game.css">
+  <script defer src="game.js"></script>
+</head>
+<body>
+  <main id="game">
+    <div id="viewP1" tabindex="0" role="application" aria-label="Billiards table">
+      <div id="snookerScoreOverlay"><div id="snookerScore" aria-live="polite"><div id="p1Score"></div><div id="p2Score"></div><div id="breakScore"></div></div></div>
+      <div id="notificationOverlay"><div id="notification" aria-live="polite"></div></div>
+      <div id="paused" hidden></div>
+    </div>
+    <div class="controls">
+      <div class="control-top">
+        <button type="button" id="camera" aria-label="Change camera">🎥</button>
+        <p id="instruction"></p>
+        <button type="button" id="cueHit">Hit</button>
+      </div>
+      <div class="control-bottom">
+        <div id="ballContainerWrapper" title="Spin"><div id="ballContainer"><div id="cueBall"><div id="objectBall"></div><div id="objectBallOverlap"></div><span id="cueTip"></span></div></div></div>
+        <label id="powerSliderContainer"><span id="powerLabel">Power</span><input type="range" id="cuePower" min="0.05" max="1" step="0.01" value="0.65" aria-label="Shot power"><output id="powerPercent">65%</output></label>
+        <button type="button" id="aimLeft" aria-label="Aim left">↶</button><button type="button" id="aimRight" aria-label="Aim right">↷</button>
+      </div>
+    </div>
+  </main>
+</body>
+</html>

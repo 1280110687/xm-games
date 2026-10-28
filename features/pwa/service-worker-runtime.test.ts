@@ -17,10 +17,10 @@ function worker(cached?: Response, network = new Response("network")) {
   runInNewContext(readFileSync("public/sw.js", "utf8"), context)
   return {
     fetch, put,
-    request(range?: string) {
+    request(range?: string, pathname = "/theme-four-experience/sounds/test.mp3") {
       let response: Promise<Response> | undefined
       handlers.fetch({
-        request: new Request("https://host.test/theme-four-experience/sounds/test.mp3", {
+        request: new Request(`https://host.test${pathname}`, {
           headers: range ? { Range: range } : {},
         }),
         respondWith(value: Promise<Response>) { response = value },
@@ -63,5 +63,21 @@ describe("PWA media range responses", () => {
     const response = await worker(new Response("abcdef")).request("bytes=0-1,4-5")
     expect(response.status).toBe(200)
     expect(await response.text()).toBe("abcdef")
+  })
+})
+
+describe("self-hosted game offline resources", () => {
+  it.each(["/billiards-game/worker.js", "/billiards-game/source.tar.gz", "/licenses/oh-hi.txt"])(
+    "serves %s from cache even when fetch() has no destination", async (pathname) => {
+      const runtime = worker(new Response("offline resource"))
+      expect(await (await runtime.request(undefined, pathname)).text()).toBe("offline resource")
+      expect(runtime.fetch).not.toHaveBeenCalled()
+    },
+  )
+
+  it("caches a first successful local game asset for later offline use", async () => {
+    const runtime = worker(undefined, new Response("game worker"))
+    expect(await (await runtime.request(undefined, "/billiards-game/worker.js")).text()).toBe("game worker")
+    expect(runtime.put).toHaveBeenCalledOnce()
   })
 })

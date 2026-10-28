@@ -11,6 +11,7 @@ import {
   Dices,
   Focus,
   Grid3X3,
+  Grid2X2,
   Layers3,
   LockKeyhole,
   QrCode,
@@ -18,6 +19,7 @@ import {
   Route,
   TextCursorInput,
   TicketCheck,
+  Target,
   Tv,
   Waypoints,
 } from "lucide-react"
@@ -105,6 +107,12 @@ const CATEGORIES: CatalogCategory[] = [
         descKey: "memoryMatchDescription",
         icon: BrainCircuit,
       },
+      {
+        href: "/oh-hi",
+        titleKey: "ohHi",
+        descKey: "ohHiDescription",
+        icon: Grid2X2,
+      },
     ],
   },
   {
@@ -127,6 +135,12 @@ const CATEGORIES: CatalogCategory[] = [
         titleKey: "neonBreaker",
         descKey: "neonBreakerDescription",
         icon: BrickWall,
+      },
+      {
+        href: "/billiards",
+        titleKey: "billiards",
+        descKey: "billiardsDescription",
+        icon: Target,
       },
     ],
   },

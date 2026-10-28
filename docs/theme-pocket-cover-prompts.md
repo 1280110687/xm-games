@@ -1,6 +1,6 @@
 # Supplementary Pocket game covers
 
-Built-in ImageGen. The original tiles.webp and gomoku.webp were supplied only as style references. Original PNGs retained locally; production WebP files are 320 × 320, quality 85.
+Built-in ImageGen. The original tiles.webp and gomoku.webp were supplied only as style references. Original PNGs retained locally; production WebP files are 320 × 320, quality 85 unless noted below.
 
 ## Shared prompt
 
@@ -65,3 +65,20 @@ Production: `public/images/theme-pocket/go.webp`
 Reversi Othello game: rich teal-green beveled square game board with fine recessed grid, glossy black and ivory white round discs in central 2x2 opening arrangement, one additional tilted two-sided disc floating just above board showing black top and white underside. Mint-green softly lit background, close-up three-quarter camera. No text.
 
 Production: `public/images/theme-pocket/reversi.webp`
+
+## 2026-10-28: oh-hi.webp and billiards.webp
+
+Built-in ImageGen, two separate generation calls. Existing `tiles.webp` and `chess.webp` were inspected as style references; the requests used textual style descriptions and generated new standalone subjects. Original PNGs remain in the tool's generated-images directory. Production files are 320 × 320 WebP, quality 60, effort 6; combined size 19,598 bytes. The reduced quality limits download cost at launcher size; both production images were visually checked at their final size.
+
+### oh-hi.webp
+
+Use case: stylized-concept. Asset type: one square mobile game launcher cover for the existing XM-Games Pocket icon set. Generate a NEW crisp square raster illustration with premium playful 3D toy rendering, rich soft colors, chunky bevelled solid objects, realistic polished ceramic and plastic materials, soft upper-left studio light and gentle contact shadows. Subject: a small thick 4x4 binary logic puzzle board, with rounded raised square tiles, half coral-red and half lake-cyan blue with a few ivory empty squares; no numbers, letters or marks. Make the blocks thick and tactile and composition easy to read at a tiny launcher size. Camera: elevated three-quarter close view of the board, slightly rotated, subject occupying 80% of the square. Background: simple warm cream tabletop with large subtle soft recessed square tiles, edge-to-edge. Match the look of a glossy golden toy 2048 tile or carved wooden chess toy game cover, not an actual screenshot. No outside rounded mask, no border, no title, no text, no UI, no buttons, no logo, no watermark, no people, no mockup device, no flat vector icon. Square image, polished friendly collectible game object.
+
+Production: `public/images/theme-pocket/oh-hi.webp` (9,600 bytes).
+
+
+### billiards.webp
+
+Use case: stylized-concept. Asset type: one square mobile game launcher cover for the existing XM-Games Pocket icon set. Generate a NEW crisp square raster illustration with premium playful 3D toy rendering, rich soft colors, bevelled solid objects, realistic glossy materials, soft upper-left studio light and gentle contact shadows. Subject: close-up miniature toy billiards pool table with rich emerald-green felt, smooth warm honey-wood rim, a prominent glossy ivory-white cue ball and one glossy black 8-ball whose small white circular inset shows exactly the digit 8; a clean warm wooden cue extends diagonally toward the white ball. Both balls large and instantly recognizable, restrained composition, no other balls. Camera: elevated three-quarter close view, table and balls occupy 80-85% of frame. Simple dark teal softly blurred tabletop backdrop, edge-to-edge. Match the look of premium glossy toy 2048 and carved wooden chess game launcher covers. No outside rounded mask, no title, no text other than the single 8 on the black ball, no UI, no buttons, no score, no logo, no watermark, no people, no mockup device, no flat vector icon. Square image, polished friendly collectible game object.
+
+Production: `public/images/theme-pocket/billiards.webp` (9,998 bytes).

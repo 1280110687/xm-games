@@ -287,7 +287,7 @@ export function PwaInstallPrompt() {
   )
 
   // Keep the install offer pending until the player leaves the real-time game.
-  if (pathname === "/neon-breaker") return null
+  if (pathname === "/neon-breaker" || pathname === "/billiards") return null
 
   return (
     <>

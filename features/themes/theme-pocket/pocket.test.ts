@@ -19,11 +19,11 @@ describe("pocket launcher", () => {
     expect(POCKET_FEATURED).toEqual(["/bingo","/2048","/snake","/gomoku","/chess","/tetris"])
     expect(POCKET_NAV_ITEMS.map(item => item.key)).toEqual(["home","games","tools"])
   })
-  it("keeps all 22 entries reachable including focus exercises and bingo", () => {
-    expect(getPocketEntries(HOME_CATEGORIES,"games","featured")).toHaveLength(16)
+  it("keeps all 24 entries reachable including focus exercises and bingo", () => {
+    expect(getPocketEntries(HOME_CATEGORIES,"games","featured")).toHaveLength(18)
     expect(getPocketEntries(HOME_CATEGORIES,"tools","featured")).toHaveLength(6)
     const filtered = ["board","puzzle","arcade"] as const
-    expect(new Set(filtered.flatMap(filter => getPocketEntries(HOME_CATEGORIES,"games",filter).map(entry => entry.href))).size).toBe(16)
+    expect(new Set(filtered.flatMap(filter => getPocketEntries(HOME_CATEGORIES,"games",filter).map(entry => entry.href))).size).toBe(18)
     for (const category of HOME_CATEGORIES) for (const entry of category.games) {
       expect(getPocketSection(`${entry.href}/`,"#pocket-tools")).toBe(category.titleKey === "categoryTools" ? "tools" : "games")
     }
@@ -68,7 +68,8 @@ describe("pocket launcher", () => {
       expect(statSync(`${dir}/${file}`).size).toBeLessThan(35_000)
     }
     const sizeOf = (names: string[]) => names.reduce((total,name) => total + statSync(`${dir}/${name}.webp`).size,0)
-    expect(sizeOf([...Object.values(POCKET_ART),"documents"])).toBeLessThan(250_000)
+    // Two additional game covers add under 20KB; featured downloads stay fixed.
+    expect(sizeOf([...Object.values(POCKET_ART),"documents"])).toBeLessThan(270_000)
     expect(sizeOf(Object.values(POCKET_TOOL_ART))).toBeLessThan(100_000)
     expect(files.reduce((total,file) => total + statSync(`${dir}/${file}`).size,0)).toBeLessThan(340_000)
     const featuredFiles = [...POCKET_FEATURED.map(href => `${POCKET_ART[href]}.webp`),"documents.webp"]
