@@ -12,3 +12,9 @@
 
 /* Let secondary controls and license links scroll clear of fixed theme docks. */
 .footer{margin-bottom:var(--billiards-reserved-space)}
+
+/* iPhone Safari uses the CSS fullscreen fallback. Raise its containing stacking
+   context above fixed theme docks without moving or reloading the live iframe. */
+.page[data-expanded='true']{z-index:100}
+/* Override the narrow-screen stage margin so controls fit the visual viewport. */
+.stage.expanded{margin:0}

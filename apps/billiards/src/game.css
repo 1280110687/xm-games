@@ -6,7 +6,7 @@
 html[data-theme="theme-retro"]{--radius:4px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}html[data-theme="theme-four"]{--radius:9px}html[data-theme="theme-three"]{--radius:18px;color-scheme:dark}
 @media(hover:hover) and (pointer:fine){button:not(:disabled):hover{background:color-mix(in srgb,var(--accent) 13%,var(--panel))}#cueHit:not(:disabled):hover{background:color-mix(in srgb,var(--accent) 80%,#000)}}
 @media(max-width:360px){.controls{gap:4px;padding-top:5px}.control-top,.control-bottom{gap:5px}.control-top p{font-size:11px}#powerLabel{display:none}#cueHit{min-width:76px;padding-inline:8px}#ballContainerWrapper,#ballContainer{width:44px;height:44px}#cueBall{width:40px;height:40px}#aimLeft,#aimRight{min-width:40px;width:40px}#snookerScoreOverlay{inset:6px 6px auto auto;padding:4px 8px}}
-@media(orientation:landscape) and (max-height:450px){.controls{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;padding-top:4px;padding-bottom:4px}.control-top p{display:none}.control-top #cueHit{flex:1}.control-top #camera{flex:none}#snookerScoreOverlay{top:6px}.control-bottom{gap:6px}}
+@media(min-width:600px) and (orientation:landscape) and (max-height:450px){.controls{grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;padding-top:4px;padding-bottom:4px}.control-top p{display:none}.control-top #cueHit{flex:1}.control-top #camera{flex:none}#snookerScoreOverlay{top:6px}.control-bottom{gap:6px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 
 /* Practice has no score HUD; avoid rendering an empty floating capsule. */

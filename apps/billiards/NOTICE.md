@@ -9,6 +9,9 @@ opponent are upstream code, maintained in `upstream/src/`.
 XM Games changes (2026-10-28): independent offline entry and touch controls;
 theme/locale/visibility bridge; procedural table materials; lifecycle pause;
 local score handling; online lobby, uploads and sharing disabled.
+Safari follow-up: viewport aspect is applied before camera pose fitting; narrow
+iframes retain two control rows; power inputs stay stable through shot feedback
+and retain their selected value without changing the original break physics.
 `src/` contains the integration source, `build.mjs` the build command.
 
 Build: install the dependencies declared in package.json, then `pnpm build`.

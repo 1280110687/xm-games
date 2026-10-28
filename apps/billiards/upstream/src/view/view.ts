@@ -97,6 +97,15 @@ export class View {
   }
 
   update(elapsed, aim: AimEvent) {
+    // Compute the pose with the new aspect before the render consumes the
+    // pending size change. An idle table may draw only this one resize frame.
+    if (this.sizeChanged()) {
+      const width = typeof ResizeObserver === "undefined"
+        ? this.element?.offsetWidth : this.cachedWidth
+      const height = typeof ResizeObserver === "undefined"
+        ? this.element?.offsetHeight : this.cachedHeight
+      if (width > 0 && height > 0) this.camera.setAspect(width / height)
+    }
     this.camera.update(elapsed, aim)
   }
 
@@ -155,7 +164,7 @@ export class View {
       this.renderer?.setScissor(0, 0, width, height)
       this.renderer?.setScissorTest(true)
 
-      cam.camera.aspect = width / height
+      cam.setAspect(width / height)
     }
 
     if (sizeChanged || cam.camera.fov !== this.lastFov) {

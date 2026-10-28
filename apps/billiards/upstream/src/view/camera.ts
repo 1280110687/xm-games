@@ -74,6 +74,15 @@ export class Camera {
   t = 0
   aimGraceStartT?: number
 
+  setAspect(aspect: number) {
+    if (!Number.isFinite(aspect) || aspect <= 0 || this.camera.aspect === aspect) {
+      return
+    }
+    this.camera.aspect = aspect
+    // The zoomed-out aim distance is fitted to the current viewport's frustum.
+    this.computedAimzDistance = undefined
+  }
+
   update(elapsed, aim: AimEvent) {
     this.elapsed = elapsed
     this.t += elapsed

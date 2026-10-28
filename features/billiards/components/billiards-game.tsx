@@ -112,7 +112,7 @@ export function BilliardsGame() {
   }
 
   return (
-    <div className={`game-page ${styles.page}`} data-page="billiards">
+    <div className={`game-page ${styles.page}`} data-page="billiards" data-expanded={expanded}>
       <GameHeader title={copy.title} homeLabel={t("appName")} layout="centered" />
       <div ref={setStageElement} className={`${styles.stage} ${expanded ? styles.expanded : ""}`}>
         <div className={styles.toolbar}>

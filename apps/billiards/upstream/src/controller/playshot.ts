@@ -17,7 +17,8 @@ export class PlayShot extends ControllerBase {
   }
 
   override onFirst() {
-    this.container.table.cue.aimInputs?.animateSliderHit()
+    // The 3D cue already animates the stroke. Keep the reusable power input
+    // stable: animating its value can overwrite the next shot's chosen power.
   }
 
   override handleStationary(_) {

@@ -111,6 +111,8 @@ export class Aim extends ControllerBase {
   }
 
   playShot() {
+    const cue = this.container.table.cue
+    const selectedPower = cue.aim.power
     this.container.inputQueue.length = 0
     this.container.view.minimap.hide()
     this.container.table.cue.aimInputs.setDisabled(true)
@@ -128,6 +130,11 @@ export class Aim extends ControllerBase {
     const hitEvent = new HitEvent(this.container.table.serialiseHit())
     this.container.sendEvent(hitEvent)
     this.container.savePendingHit()
-    return new PlayShot(this.container)
+    // PlayShot synchronously captures the boosted hit into the ball's velocity.
+    // Keep that physical stroke/record, then restore the user's reusable input.
+    const next = new PlayShot(this.container)
+    cue.aim.power = selectedPower
+    cue.updateAimInput()
+    return next
   }
 }
