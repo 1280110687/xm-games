@@ -126,7 +126,7 @@ export class Notification {
                 if (!data.subtext) return ""
                 const subtextClass =
                   data.type === "GameOver" ? " notification-subtext-light" : ""
-                return `<div class="notification-subtext${subtextClass}">${data.subtext}</div>`
+                return `<div class="notification-subtext${subtextClass}">${localizeText(data.subtext)}</div>`
               })()}
             </div>
           </div>

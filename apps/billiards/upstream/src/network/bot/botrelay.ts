@@ -16,6 +16,7 @@ export class BotRelay implements MessageRelay {
   private static readonly DEFAULT_SEQUENCE_DELAY = 300
 
   private readonly messageQueue: string[] = []
+  private readonly outgoingQueue: { event: GameEvent; delay: number }[] = []
   private queueTimeoutId: ReturnType<typeof setTimeout> | null = null
   private sequenceTimeoutId: ReturnType<typeof setTimeout> | null = null
   private callback: ((message: string) => void) | null = null
@@ -39,7 +40,10 @@ export class BotRelay implements MessageRelay {
     this.disposed = true
     if (this.queueTimeoutId !== null) clearTimeout(this.queueTimeoutId)
     if (this.sequenceTimeoutId !== null) clearTimeout(this.sequenceTimeoutId)
+    this.queueTimeoutId = null
+    this.sequenceTimeoutId = null
     this.messageQueue.length = 0
+    this.outgoingQueue.length = 0
     this.callback = null
   }
 
@@ -109,7 +113,8 @@ export class BotRelay implements MessageRelay {
       }
     }
 
-    if (this.messageQueue.length > 0) {
+    // A handler may enqueue its continuation and already schedule this timer.
+    if (this.messageQueue.length > 0 && this.queueTimeoutId === null) {
       this.queueTimeoutId = setTimeout(
         () => this.processQueue(),
         BotRelay.QUEUE_PROCESS_DELAY
@@ -128,27 +133,30 @@ export class BotRelay implements MessageRelay {
       return
     }
 
-    if (this.sequenceTimeoutId) {
-      clearTimeout(this.sequenceTimeoutId)
-    }
+    // A continued turn's WATCHAIM and its next aiming sequence arrive through
+    // different timers. Append them so pause/resume cannot cancel the control
+    // transition that must precede AIM/HIT.
+    this.outgoingQueue.push(...events.map(event => ({ event, delay })))
+    this.scheduleNextOutgoing()
+  }
 
+  private scheduleNextOutgoing(): void {
+    if (this.disposed || this.sequenceTimeoutId !== null || this.outgoingQueue.length === 0) return
+    const { delay } = this.outgoingQueue[0]
     this.sequenceTimeoutId = setTimeout(() => {
       this.sequenceTimeoutId = null
       if (this.disposed) return
       if (this.container.paused) {
-        this.publishSequenceToPlayer(events, delay)
+        this.scheduleNextOutgoing()
         return
       }
 
-      const [currentEvent, ...remainingEvents] = events
-      const message = EventUtil.serialise(currentEvent)
+      const { event } = this.outgoingQueue.shift()!
+      const message = EventUtil.serialise(event)
 
       this.logs.outgoing(message)
       this.callback?.(message)
-
-      if (remainingEvents.length > 0) {
-        this.publishSequenceToPlayer(remainingEvents, delay)
-      }
+      this.scheduleNextOutgoing()
     }, delay)
   }
 }

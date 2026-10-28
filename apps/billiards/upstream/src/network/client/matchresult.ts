@@ -141,7 +141,7 @@ export class MatchResultHelper {
     container.notifyLocal({
       type: "GameOver",
       title: t("YOU LOST"),
-      subtext: Session.isBotMode() ? "Lostber 🦞" : subtext,
+      subtext: subtext,
       highBreaks: this.getHighBreaks(container),
       icon: "🥈",
       extraClass: "is-loser",

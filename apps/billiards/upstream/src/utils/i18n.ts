@@ -141,12 +141,16 @@ function fromBrowser(): Locale | undefined {
 let xmLocale = "en"
 const xmTranslations: Record<string, Record<string, string>> = {
   zh: {
+    "You":"你", "Computer":"电脑", "Solids":"全色球", "Stripes":"花色球", "Game over":"本局结束", "Game over. Start a new game.":"本局已结束，可以开始新一局。",
+    "Cue ball potted":"白球落袋", "No ball hit":"未碰到目标球", "Wrong group hit first":"先碰到了对方球组", "No cushion after contact":"碰球后没有球进袋或碰库", "Hitting the 8-ball first is a foul":"尚未分组时不能先碰黑8", "Must hit 8-ball first":"当前必须先碰黑8", "8-ball pocketed early":"黑8提前落袋，复位后由对方自由摆球", "8-ball pocketed on foul":"黑8在犯规时落袋，本局判负",
     "Hit":"击球", "Place\nBall":"确认摆球", "Power":"力度", "Shot power":"击球力度", "Aim left":"向左微调", "Aim right":"向右微调", "Change camera":"切换视角", "Billiards table":"台球桌", "Paused":"已暂停",
     "Drag to place the cue ball, then confirm.":"拖动摆放白球，然后确认。",
     "Drag to aim. Set power, then shoot.":"左右拖动瞄准，调整力度后击球。", "Computer is playing…":"电脑正在击球…", "Balls are moving…":"球正在移动…",
     "New Game":"再来一局", "Replay":"回放", "Ball in hand":"自由球", "FOUL":"犯规", "YOU WON":"你赢了", "YOU LOST":"你输了", "GAME OVER":"本局结束", "Replay Complete":"回放结束", "Concede Game":"结束本局", "Concede":"结束", "Play on":"继续游戏", "You first":"你先开球"
   },
   th: {
+    "You":"คุณ", "Computer":"คอมพิวเตอร์", "Solids":"ลูกสีเต็ม", "Stripes":"ลูกลาย", "Game over":"จบเกม", "Game over. Start a new game.":"เกมจบแล้ว เริ่มเกมใหม่ได้",
+    "Cue ball potted":"ลูกขาวลงหลุม", "No ball hit":"ไม่โดนลูกเป้าหมาย", "Wrong group hit first":"โดนลูกของคู่ต่อสู้ก่อน", "No cushion after contact":"หลังชนลูก ไม่มีลูกลงหลุมหรือกระทบชิ่ง", "Hitting the 8-ball first is a foul":"ยังไม่ได้แบ่งกลุ่ม ห้ามโดนลูก 8 ก่อน", "Must hit 8-ball first":"ต้องโดนลูก 8 ก่อน", "8-ball pocketed early":"ลูก 8 ลงหลุมก่อนเวลา วางกลับและให้คู่ต่อสู้วางลูกขาว", "8-ball pocketed on foul":"ลูก 8 ลงหลุมขณะฟาวล์ แพ้เกมนี้",
     "Hit":"ตีลูก", "Place\nBall":"ยืนยันวางลูก", "Power":"แรง", "Shot power":"แรงตีลูก", "Aim left":"เล็งซ้าย", "Aim right":"เล็งขวา", "Change camera":"เปลี่ยนมุมมอง", "Billiards table":"โต๊ะบิลเลียด", "Paused":"หยุดชั่วคราว",
     "Drag to place the cue ball, then confirm.":"ลากเพื่อวางลูกขาว แล้วยืนยัน", "Drag to aim. Set power, then shoot.":"ลากซ้ายขวาเพื่อเล็ง ปรับแรงแล้วตี", "Computer is playing…":"คอมพิวเตอร์กำลังเล่น…", "Balls are moving…":"ลูกกำลังเคลื่อนที่…", "New Game":"เล่นใหม่", "Replay":"ดูย้อนหลัง", "Ball in hand":"วางลูกขาวได้", "FOUL":"ฟาวล์", "YOU WON":"คุณชนะ", "YOU LOST":"คุณแพ้", "GAME OVER":"จบเกม", "Replay Complete":"จบการเล่นย้อนหลัง", "Concede Game":"จบเกมนี้", "Concede":"จบเกม", "Play on":"เล่นต่อ", "You first":"คุณเริ่มก่อน"
   }

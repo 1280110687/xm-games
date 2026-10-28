@@ -21,6 +21,7 @@ import { isFirstShot } from "../../utils/utils"
 import { BotShotContext, BotStrategy } from "./botstrategy"
 import { ClawBreak } from "./strategies/clawbreak"
 import { TheFarJaw } from "./strategies/thefarjaw"
+import { EightBall } from "../../controller/rules/eightball"
 
 class BotContainer {
   table
@@ -107,6 +108,10 @@ export class BotEventHandler {
     const outcome = this.container.table.outcome
     const botType = this.botType()
     if (this.container.rules.isEndOfGame(outcome, botType)) {
+      if (this.container.rules.rulename === "eightball") {
+        this.handlePot(this.botRules.getAmountScored(outcome), outcome, true)
+        return
+      }
       const botWinsByFinalBall =
         this.container.rules.rulename === "nineball" ||
         this.container.rules.rulename === "eightball"
@@ -285,18 +290,13 @@ export class BotEventHandler {
     }
 
     const table = this.container.table
-    const cueball = table.cueball
     const eightBall = table.balls.find((b) => b.label === 8)
     if (!eightBall || !Outcome.pots(outcome).includes(eightBall)) {
       return false
     }
 
-    const session = Session.getInstance()
-    const hasObjectBallsRemaining = table.balls.some(
-      (b) => b !== cueball && b.label !== 8 && b.onTable()
-    )
-
-    if (session.p1type !== 0 && hasObjectBallsRemaining) {
+    const botType = this.botType()
+    if (botType === 0 || (this.botRules as EightBall).hasGroupBeforeShot(outcome, botType)) {
       const footSpot = new Vector3(TableGeometry.tableX / 2, 0, 0)
       Respot.respotBehind(footSpot, eightBall, table)
       eightBall.fround()
@@ -315,18 +315,13 @@ export class BotEventHandler {
     }
 
     const table = this.container.table
-    const cueball = table.cueball
     const eightBall = table.balls.find((b) => b.label === 8)
     if (!eightBall || !Outcome.pots(outcome).includes(eightBall)) {
       return false
     }
 
-    const session = Session.getInstance()
-    const hasObjectBallsRemaining = table.balls.some(
-      (b) => b !== cueball && b.label !== 8 && b.onTable()
-    )
-
-    if (session.p1type !== 0 && hasObjectBallsRemaining) {
+    const botType = this.botType()
+    if (botType === 0 || (this.botRules as EightBall).hasGroupBeforeShot(outcome, botType)) {
       const footSpot = new Vector3(TableGeometry.tableX / 2, 0, 0)
       Respot.respotBehind(footSpot, eightBall, table)
       eightBall.fround()
@@ -412,14 +407,22 @@ export class BotEventHandler {
     return (Session.getInstance().playerIndex + 1) as 1 | 2
   }
 
-  private handlePot(pots: number, outcome: Outcome[]): void {
+  private handlePot(pots: number, outcome: Outcome[], endOfEightBallGame = false): void {
     this.logs.info(
       `Bot handlePot: scored ${pots} points. Next cueball=${this.botRules.cueball?.id}`
     )
     const session = Session.getInstance()
+    const groupBefore = this.botType()
     session.addOpponentScore(pots)
     this.botRules.currentBreak += pots
     this.assignEightBallType(session, outcome)
+
+    if (endOfEightBallGame) {
+      const { p1, p2 } = session.orderedScoresForHud()
+      this.container.sendScoreUpdate(p1, p2, 0, 0)
+      this.handleGameEnd(false)
+      return
+    }
 
     if (
       (this.container.rules.rulename === "snooker" ||
@@ -439,6 +442,16 @@ export class BotEventHandler {
       0,
       this.container.inferActivePlayer()
     )
+    // Match the human turn rule: a legal first contact does not grant another
+    // shot when every potted ball belongs to the opponent's group.
+    if (
+      this.container.rules.rulename === "eightball" &&
+      groupBefore !== 0 &&
+      !Outcome.pots(outcome).some(ball => this.isEightBallType(ball, groupBefore))
+    ) {
+      this.publishSequenceToPlayer([new StartAimEvent()])
+      return
+    }
     this.publishSequenceToPlayer([
       new WatchEvent(this.container.table.serialise()),
     ])

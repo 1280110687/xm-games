@@ -36,6 +36,7 @@ export class AimInputs {
   tipRadius
   private static readonly TIP_SCALE = 1.3
   private controlsDisabled = true
+  private selectedPower = 0
   private readonly timeoutButton: TimeoutButton | undefined
   private sliderAnimId: number | null = null
 
@@ -79,8 +80,8 @@ export class AimInputs {
     this.objectBallOverlap = id("objectBallOverlap")
     this.overlap = new Overlap(this.container.table.balls)
     if (this.cuePowerElement) {
-      this.container.table.cue.aim.power =
-        Number(this.cuePowerElement.value) * maxPower
+      this.selectedPower = Number(this.cuePowerElement.value)
+      this.container.table.cue.aim.power = this.selectedPower * maxPower
       this.updatePowerProgress()
     }
     this.updateTiltSlider(this.container.table.cue.aim.elevation)
@@ -115,7 +116,14 @@ export class AimInputs {
   }
 
   setDisabled(disabled: boolean) {
+    const wasDisabled = this.controlsDisabled
     this.controlsDisabled = disabled || Session.isSpectator()
+    if (wasDisabled && !this.controlsDisabled) {
+      // Watching the computer uses the same cue and slider. Restore the local
+      // choice only when control returns, after its real strike is complete.
+      this.container.table.cue.aim.power = Math.fround(this.selectedPower * maxPower)
+      this.container.table.cue.updateAimInput()
+    }
     this.updateHitButton()
     this.updatePowerElement()
     this.updateTiltElement()
@@ -306,10 +314,15 @@ export class AimInputs {
   }
 
   updatePowerSlider(power) {
+    if (!this.controlsDisabled) this.selectedPower = power
     if (this.cuePowerElement) {
       this.cuePowerElement.value = power
       this.updatePowerProgress()
     }
+  }
+
+  rememberPower() {
+    this.selectedPower = this.container.table.cue.aim.power / maxPower
   }
 
   updateTiltSlider(elevation) {

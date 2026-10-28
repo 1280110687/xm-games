@@ -97,6 +97,9 @@ export class PlaceBall extends ControllerBase {
     if (this.container.table.overlapsAny(this.container.table.cueball.pos)) {
       return this
     }
+    // Repeated confirmations queued while this button still meant "Place Ball"
+    // must not become a shot when the first confirmation switches to Aim.
+    this.container.inputQueue = this.container.inputQueue.filter(input => input.key !== "SpaceUp")
     this.container.table.cueball.fround()
     this.container.table.cue.aimInputs.setButtonText("Hit")
     this.container.sound.playNotify()

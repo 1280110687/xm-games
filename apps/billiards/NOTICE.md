@@ -12,6 +12,10 @@ local score handling; online lobby, uploads and sharing disabled.
 Safari follow-up: viewport aspect is applied before camera pose fitting; narrow
 iframes retain two control rows; power inputs stay stable through shot feedback
 and retain their selected value without changing the original break physics.
+Computer-match follow-up: preserve local shot controls across opponent turns,
+deduplicate placement confirmation, retain ordered relay events through pauses,
+and align turn/8-ball foul decisions for both players. Localized score labels
+and foul explanations are rendered by the integration.
 `src/` contains the integration source, `build.mjs` the build command.
 
 Build: install the dependencies declared in package.json, then `pnpm build`.

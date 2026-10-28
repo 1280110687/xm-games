@@ -129,6 +129,19 @@ export class EightBall implements Rules {
     return false
   }
 
+  hasGroupBeforeShot(
+    outcome: Outcome[],
+    type = Session.getInstance().p1type
+  ): boolean {
+    const pottedThisShot = new Set(Outcome.pots(outcome))
+    return this.container.table.balls.some(
+      (ball) =>
+        ball !== this.container.table.cueball &&
+        (ball.onTable() || pottedThisShot.has(ball)) &&
+        this.isMyType(ball, type)
+    )
+  }
+
   isFoul(outcome: Outcome[]): boolean {
     return this.foulReason(outcome) !== null
   }
@@ -151,15 +164,7 @@ export class EightBall implements Rules {
     if (effectiveType === 0) {
       return hitBall.label === 8 ? "Hitting the 8-ball first is a foul" : null
     }
-    const cueball = this.container.table.cueball
-    const pottedThisShot = new Set(Outcome.pots(outcome))
-    const myGroupBefore = this.container.table.balls.filter(
-      (b) =>
-        b !== cueball &&
-        (b.onTable() || pottedThisShot.has(b)) &&
-        this.isMyType(b, effectiveType)
-    )
-    if (myGroupBefore.length > 0) {
+    if (this.hasGroupBeforeShot(outcome, effectiveType)) {
       return this.isMyType(hitBall, effectiveType)
         ? null
         : "Wrong group hit first"
@@ -236,10 +241,10 @@ export class EightBall implements Rules {
 
     if (eightBallPotted) {
       const session = Session.getInstance()
-      const hasGroupBalls = this.container.table.balls.some(
-        (b) => b !== cueball && b.label !== 8 && b.onTable()
-      )
-      if (session.p1type !== 0 && hasGroupBalls) {
+      if (
+        session.p1type === 0 ||
+        this.hasGroupBeforeShot(outcome, session.p1type)
+      ) {
         return this.respotEightBallFoul()
       }
       return this.handleGameEnd(false, "8-ball pocketed on foul")
@@ -343,24 +348,14 @@ export class EightBall implements Rules {
       return false
     }
 
-    const session = Session.getInstance()
-    if (session.p1type === 0) {
+    const effectiveType = type ?? Session.getInstance().p1type
+    if (effectiveType === 0) {
       return false
     }
 
-    const table = this.container.table
-    const cueball = table.cueball
-    const pottedThisShot = new Set(Outcome.pots(outcome))
-    const myGroup = table.balls.filter(
-      (b) =>
-        b !== cueball &&
-        b !== eightBall &&
-        b.onTable() &&
-        this.isMyType(b, type) &&
-        !pottedThisShot.has(b)
-    )
-
-    return myGroup.length === 0
+    // Clearing the final group ball and pocketing the eight in one stroke is
+    // still an early eight. Judge both sides from the same pre-stroke group.
+    return !this.hasGroupBeforeShot(outcome, effectiveType)
   }
 
   handleGameEnd(isWinner: boolean, endSubtext?: string): Controller {

@@ -51,6 +51,7 @@ import { share, shorten } from "../utils/shorten"
 import { RevealTracker } from "../utils/revealtracker"
 import { Rack } from "../utils/rack"
 import { TableGeometry } from "../view/tablegeometry"
+import { t } from "../utils/i18n"
 
 type ActivePlayer = 0 | 1 | 2
 
@@ -371,10 +372,15 @@ export class Container {
     if (this.rules.rulename !== "eightball" || session.p1type === 0) {
       return
     }
-    const typeLabel = session.p1type === 1 ? "solids" : "stripes"
+    const typeLabel = t(session.p1type === 1 ? "Solids" : "Stripes")
+    const otherTypeLabel = t(session.p1type === 1 ? "Stripes" : "Solids")
     const mySlot = session.playerIndex === 0 ? "p1Name" : "p2Name"
+    const otherSlot = session.playerIndex === 0 ? "p2Name" : "p1Name"
     if (orderedNames[mySlot]) {
       orderedNames[mySlot] = `${orderedNames[mySlot]}(${typeLabel})`
+    }
+    if (orderedNames[otherSlot]) {
+      orderedNames[otherSlot] = `${orderedNames[otherSlot]}(${otherTypeLabel})`
     }
   }
 

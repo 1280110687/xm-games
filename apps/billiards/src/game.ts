@@ -17,7 +17,7 @@ const params = new URLSearchParams(location.hash.slice(1))
 const bot = params.get('mode') === 'bot'
 // Ignore arbitrary remote/game URL options. Only the two local modes are exposed.
 history.replaceState(null, '', `${location.pathname}${bot ? '?bot=TheFarJaw' : ''}#mode=${bot ? 'bot' : 'practice'}`)
-Session.init('xm-player', '', 'xm-local-table', false, bot, false, !bot, 4, true)
+Session.init('xm-player', 'You', 'xm-local-table', false, bot, false, !bot, 4, true)
 const assets = new Assets('eightball')
 assets.createLocal(false)
 const viewport = document.getElementById('viewP1')!
@@ -42,6 +42,13 @@ function post(type: string, extra: object = {}) {
 }
 function updateCopy() {
   document.documentElement.lang = currentLocale
+  if (bot && game) {
+    const session = Session.getInstance()
+    session.playername = t('You')
+    session.opponentName = t('Computer')
+    const { p1, p2 } = session.orderedScoresForHud()
+    game.updateScoreHud(p1, p2, session.currentBreak, game.inferActivePlayer())
+  }
   document.getElementById('powerLabel')!.textContent = t('Power')
   document.getElementById('cuePower')!.setAttribute('aria-label', t('Shot power'))
   document.getElementById('aimLeft')!.setAttribute('aria-label', t('Aim left'))
@@ -50,7 +57,9 @@ function updateCopy() {
   viewport.setAttribute('aria-label', t('Billiards table'))
   document.getElementById('paused')!.textContent = t('Paused')
   const phase = game?.controller?.name
-  document.getElementById('instruction')!.textContent = phase === 'PlaceBall'
+  document.getElementById('instruction')!.textContent = phase === 'End'
+    ? t('Game over. Start a new game.')
+    : phase === 'PlaceBall'
     ? t('Drag to place the cue ball, then confirm.')
     : phase === 'WatchAim' || phase === 'WatchShot'
       ? t('Computer is playing…')
@@ -58,7 +67,7 @@ function updateCopy() {
         ? t('Balls are moving…')
         : t('Drag to aim. Set power, then shoot.')
   const hit = document.getElementById('cueHit')!
-  const label = t(phase === 'PlaceBall' ? 'Place\nBall' : 'Hit')
+  const label = t(phase === 'End' ? 'Game over' : phase === 'PlaceBall' ? 'Place\nBall' : 'Hit')
   hit.textContent = label
   hit.setAttribute('aria-label', label)
 }

@@ -70,6 +70,7 @@ export class End extends Controller {
   }
 
   override onFirst(): void {
+    this.container.table.cue.aimInputs.setDisabled(true)
     ResumeStore.clear()
     const isDiagram = this.container.id === "diagram"
     this.container.view.camera.forceMode(
