@@ -1,0 +1,19 @@
+{
+  "name": "@xm-games/arcade-bubbo-bubbo",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "pixi.js": "^8.19.0",
+    "gsap": "^3.13.0",
+    "@pixi/ui": "^2.2.7",
+    "typed-signals": "^3.0.0",
+    "pixi-filters": "^6.1.4"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

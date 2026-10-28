@@ -1,0 +1,8 @@
+import { Container, Text } from 'pixi.js';
+import { i18n } from '../upstream/src/utils/i18n';
+const en={...i18n.dict};
+const zh={pixiLogoHeader:'引擎',gameTitle:'BUBBO',gameSubtitle:'泡泡发射站',titlePlay:'开始发射',forkGithub:'源码',helperMobile:'按住瞄准\n松手发射',helperDesktop:'移动鼠标瞄准\n单击发射',paused:'已暂停',score:'当前分数',sound:'声音',resume:'继续游戏',quit:'回到菜单',resultsPlay:'再来一局',resultsTitle:'本局成绩',resultsBreakdownTitle:'泡泡统计',resultsBreakdownPopped:'消除泡泡',resultsBreakdownPowerups:'使用道具',resultsBreakdownCombo:'最佳连击',resultsScoreTitle:'总分',resultsHighscoreTitle:'最高分'};
+const th={pixiLogoHeader:'สร้างด้วย',gameTitle:'BUBBO',gameSubtitle:'สถานียิงฟอง',titlePlay:'เริ่มเล่น',forkGithub:'ซอร์สโค้ด',helperMobile:'กดค้างเพื่อเล็ง\nปล่อยเพื่อยิง',helperDesktop:'เลื่อนเมาส์เพื่อเล็ง\nคลิกเพื่อยิง',paused:'หยุดชั่วคราว',score:'คะแนน',sound:'เสียง',resume:'เล่นต่อ',quit:'เมนูหลัก',resultsPlay:'เล่นอีกครั้ง',resultsTitle:'ผลการเล่น',resultsBreakdownTitle:'สถิติฟอง',resultsBreakdownPopped:'ฟองที่แตก',resultsBreakdownPowerups:'ไอเท็มที่ใช้',resultsBreakdownCombo:'คอมโบสูงสุด',resultsScoreTitle:'คะแนนรวม',resultsHighscoreTitle:'สถิติสูงสุด'};
+export function setLocale(locale:string,root?:Container) {const before={...i18n.dict};const next=locale.startsWith('zh')?zh:locale.startsWith('th')?th:en;Object.assign(i18n.dict,next);if(root){const visit=(node:Container)=>{if(node instanceof Text){const key=(Object.keys(before) as (keyof typeof before)[]).find(k=>before[k]===node.text);if(key)node.text=next[key];}for(const child of node.children??[])visit(child as Container);};visit(root);} }
+
+export function localizeText(node:Text){const key=(Object.keys(en) as (keyof typeof en)[]).find(k=>[en[k],zh[k],th[k]].includes(node.text));if(key&&node.text!==i18n.dict[key])node.text=i18n.dict[key];}

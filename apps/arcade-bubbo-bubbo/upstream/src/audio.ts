@@ -1,0 +1,6 @@
+/** Original synthesized effects. No third party audio files are distributed. */
+type Options={volume?:number;speed?:number;[key:string]:unknown};
+let ctx:AudioContext|undefined,muted=false,suspended=false,master=.6,effects=.35;
+export const audio={muted(value:boolean){muted=value;},getMasterVolume(){return master;},setMasterVolume(v:number){master=v;},pause(value:boolean){suspended=value;if(ctx){if(value)void ctx.suspend();else void ctx.resume();}}};
+export const bgm={currentAlias:'',play(alias:string,_options?:Options){this.currentAlias=alias;},setVolume(_v:number){},getVolume(){return 0;}};
+export const sfx={setVolume(v:number){effects=v;},getVolume(){return effects;},play(alias:string,options:Options={}){if(muted||suspended||!master)return;try{ctx??=new AudioContext();void ctx.resume();const time=ctx.currentTime;const o=ctx.createOscillator(),g=ctx.createGain();const hit=alias.includes('pop')||alias.includes('hit');o.type=hit?'sine':'triangle';o.frequency.setValueAtTime(hit?600+Math.random()*350:alias.includes('shoot')?250:440,time);o.frequency.exponentialRampToValueAtTime(hit?180:330,time+.08);g.gain.setValueAtTime(Math.min(.12,effects*master*(options.volume??1)*.16),time);g.gain.exponentialRampToValueAtTime(.001,time+.1);o.connect(g).connect(ctx.destination);o.start();o.stop(time+.12);}catch{/* Audio can be unavailable on a device. */}}};

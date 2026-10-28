@@ -20,6 +20,7 @@ const OFFLINE_ASSET_DIRECTORIES = [
   join(PROJECT_ROOT, "public", "theme-four"),
   join(PROJECT_ROOT, "public", "theme-four-experience"),
   join(PROJECT_ROOT, "public", "billiards-game"),
+  join(PROJECT_ROOT, "public", "arcade-games"),
   join(PROJECT_ROOT, "public", "licenses"),
 ]
 

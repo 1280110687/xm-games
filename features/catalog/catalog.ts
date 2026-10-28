@@ -20,6 +20,12 @@ import {
   TextCursorInput,
   TicketCheck,
   Target,
+  Rocket,
+  Orbit,
+  FlaskConical,
+  Shield,
+  CircleGauge,
+  Crosshair,
   Tv,
   Waypoints,
 } from "lucide-react"
@@ -113,6 +119,7 @@ const CATEGORIES: CatalogCategory[] = [
         descKey: "ohHiDescription",
         icon: Grid2X2,
       },
+      { href: "/puzzling-potions", titleKey: "puzzlingPotions", descKey: "puzzlingPotionsDescription", icon: FlaskConical },
     ],
   },
   {
@@ -142,6 +149,11 @@ const CATEGORIES: CatalogCategory[] = [
         descKey: "billiardsDescription",
         icon: Target,
       },
+      { href: "/galaga", titleKey: "galaga", descKey: "galagaDescription", icon: Rocket },
+      { href: "/bubbo-bubbo", titleKey: "bubboBubbo", descKey: "bubboBubboDescription", icon: Orbit },
+      { href: "/deep-field", titleKey: "deepField", descKey: "deepFieldDescription", icon: Shield },
+      { href: "/pinball-schminball", titleKey: "pinballSchminball", descKey: "pinballSchminballDescription", icon: CircleGauge },
+      { href: "/radius-raid", titleKey: "radiusRaid", descKey: "radiusRaidDescription", icon: Crosshair },
     ],
   },
   {

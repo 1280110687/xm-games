@@ -67,7 +67,7 @@ describe("PWA media range responses", () => {
 })
 
 describe("self-hosted game offline resources", () => {
-  it.each(["/billiards-game/worker.js", "/billiards-game/source.tar.gz", "/licenses/oh-hi.txt"])(
+  it.each(["/billiards-game/worker.js", "/billiards-game/source.tar.gz", "/arcade-games/galaga/game.js", "/arcade-games/deep-field/index.html", "/licenses/oh-hi.txt"])(
     "serves %s from cache even when fetch() has no destination", async (pathname) => {
       const runtime = worker(new Response("offline resource"))
       expect(await (await runtime.request(undefined, pathname)).text()).toBe("offline resource")

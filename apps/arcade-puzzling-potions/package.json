@@ -1,0 +1,16 @@
+{
+  "name": "@xm-games/arcade-puzzling-potions",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs"
+  },
+  "dependencies": {
+    "pixi.js": "^8.19.0",
+    "gsap": "^3.13.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v38"
+const CACHE_VERSION = "v39"
 const SHELL_CACHE = `xm-games-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `xm-games-runtime-${CACHE_VERSION}`
 const OWNED_CACHE_PREFIX = "xm-games-"
@@ -15,6 +15,12 @@ const APP_ROUTES = [
   "/bingo",
   "/bingo-cards",
   "/billiards",
+  "/galaga",
+  "/bubbo-bubbo",
+  "/puzzling-potions",
+  "/deep-field",
+  "/pinball-schminball",
+  "/radius-raid",
   "/chess",
   "/chinese-chess",
   "/go",
@@ -484,6 +490,7 @@ self.addEventListener("fetch", (event) => {
     url.pathname.startsWith("/_next/static/") ||
     url.pathname.startsWith("/theme-four-experience/") ||
     url.pathname.startsWith("/billiards-game/") ||
+    url.pathname.startsWith("/arcade-games/") ||
     url.pathname.startsWith("/licenses/") ||
     url.pathname.startsWith("/theme-four/") ||
     ["audio", "font", "image", "script", "style", "video", "worker"].includes(

@@ -7,7 +7,7 @@ XM-Games 是一个基于 Next.js 的多语言浏览器小游戏合集，支持�
 - 棋盘游戏：中国象棋、国际象棋、围棋、五子棋、黑白棋
 - H5 联机：棋盘游戏支持双人房间；Bingo 支持 1 位发牌员与最多 8 位玩家的房间
 - 益智游戏：扫雷、2048、数独、记忆翻牌
-- 街机游戏：俄罗斯方块、贪吃蛇、霓虹打砖块（PixiJS）
+- 街机游戏：俄罗斯方块、贪吃蛇、霓虹打砖块，以及霓虹战机、泡泡星航、魔药消除、深空塔防、霓虹弹球、霓虹围攻
 - Bingo：本地号码抽取与卡片工具，以及带准备、同步抽号和发牌端验卡的局域网模式
 - 工具：追番助手、AES-GCM 文本加解密、文字二维码、JSON 格式化、UTF-8 Base64 编解码、文本整理与统计
 - 四套主题：主题二「口袋启动器」、主题三「夜色游廊」、主题四「游戏会馆」、主题五「复古掌机」
@@ -19,6 +19,7 @@ XM-Games 是一个基于 Next.js 的多语言浏览器小游戏合集，支持�
 - 主题三采用纯黑画布、银灰玻璃边缘和荧光绿状态色：桌面端使用独立固定侧栏与高密度控制台，移动端重排为单列工作台和悬浮玻璃底栏。
 - 主题切换只改变展示壳层，不会重新挂载游戏控制器，因此不会重置棋盘、分数、计时器、语音实例或 PixiJS 画布。
 - 主题四的 WebGL 场景和元素技能竞技场分别由两个独立 Vite 应用构建，通过同源 iframe 接入；主站保留主题、语言和路由控制权。
+- 新增的六款开源街机游戏采用独立同源 iframe，进入时铺满可用屏幕，只保留可拖动的退出浮窗；游戏操作区跟随当前主题和语言。切到后台时暂停运行并释放按键，退出时卸载游戏。
 - `styles/themes/theme-{pocket,three,four,retro}/` 分别维护四套视觉与布局；经典 2048 / Tetris 也拥有对应的独立主题文件，`data-page` 为每个路由提供布局接入点。
 
 ## 本地开发
@@ -34,13 +35,14 @@ pnpm install
 pnpm dev
 ```
 
-开发服务默认运行在 [http://localhost:3000](http://localhost:3000)。`pnpm dev` 同时启动 Next.js 和两个 Vite 服务（本机端口 4174、4175），通过主站代理加载最新 3D 源码，退出时一起关闭。无需先构建或手动复制文件。仅调试主站时可用 `pnpm dev:host`，但主题四需要先执行 `pnpm build:theme-four`。
+开发服务默认运行在 [http://localhost:3000](http://localhost:3000)。`pnpm dev` 先构建台球和六款街机资源，再同时启动 Next.js 和两个 Vite 服务（本机端口 4174、4175），通过主站代理加载最新 3D 源码，退出时一起关闭。修改 `apps/arcade-*` 后执行 `pnpm build:arcade` 刷新游戏资源。仅调试主站时可用 `pnpm dev:host`，但首次需要先执行 `pnpm build:theme-four`。
 
 ## 常用命令
 
 ```bash
 pnpm dev        # 启动开发服务器
 pnpm build      # 生成生产构建
+pnpm build:arcade # 构建六款街机及许可证、可下载源码
 pnpm start      # 启动生产服务器（需先 build）
 pnpm lint       # 检查主站及两个 3D 应用
 pnpm typecheck  # 主站与共享协议的 TypeScript 类型检查
@@ -58,7 +60,9 @@ features/                    游戏规则、控制器、各游戏界面、工具
 styles/themes/               四套主题的主样式及按路由拆分的样式
 apps/theme-four-world/       WebGL 世界源码及原始 public 素材
 apps/elemental-arena/        技能竞技场源码及原始 public 素材
+apps/arcade-*/               六款街机的固定版本源码、适配层与许可说明
 packages/experience-bridge/  主站与场景共用的消息协议、类型和校验
+packages/arcade-bridge/      街机主题、语言、暂停与就绪协议
 public/                     主站静态素材；3D 发布目录由构建生成
 scripts/                    开发编排、构建同步和离线清单生成
 lib/                        国际化、页面元数据与通用工具
@@ -66,6 +70,8 @@ docs/                       工程边界与维护说明
 ```
 
 详见 [工程结构与构建约定](docs/architecture.md)。`public/theme-four-experience/` 和 `public/offline-assets.json` 是忽略的生成物，不要直接修改；生产构建会从两个应用的源码与素材重新生成。
+
+六款街机的上游版本与改动记录在各应用的 `NOTICE.md`。发布资源位于生成目录 `public/arcade-games/`，包含原项目许可证、依赖许可及修改后源码归档；离线包包含运行资源，不包含源码压缩包。Deep Field 接入完整单人战役；原联网模式未接入。Bubbo、Puzzling Potions 和 Pinball 使用本项目绘制的替代图像与音效，未分发原站受限设计素材或音乐。
 
 ## H5 局域网对战
 

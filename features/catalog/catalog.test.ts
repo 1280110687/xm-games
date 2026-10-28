@@ -7,13 +7,13 @@ import { getTranslation, locales } from "../../lib/i18n"
 import { HOME_CATEGORIES } from "./catalog"
 
 describe("shared experience catalog", () => {
-  it("preserves all six categories and all 24 destinations", () => {
+  it("preserves all six categories and all 30 destinations", () => {
     expect(HOME_CATEGORIES.map((category) => category.titleKey)).toEqual(HOME_CATEGORY_ORDER)
     expect(HOME_CATEGORIES.flatMap((category) => category.games.map((game) => game.href)).sort()).toEqual([
       "/2048", "/alternating-trail", "/anime-tracker", "/base64-tool",
-      "/billiards", "/bingo", "/bingo-cards", "/chess", "/chinese-chess", "/go", "/gomoku",
-      "/json-tool", "/memory-match", "/minesweeper", "/neon-breaker", "/oh-hi", "/qr-code",
-      "/reversi", "/schulte-grid", "/snake", "/sudoku", "/tetris", "/text-crypto", "/text-tool",
+      "/billiards", "/bingo", "/bingo-cards", "/bubbo-bubbo", "/chess", "/chinese-chess", "/deep-field", "/galaga", "/go", "/gomoku",
+      "/json-tool", "/memory-match", "/minesweeper", "/neon-breaker", "/oh-hi",
+      "/pinball-schminball", "/puzzling-potions", "/qr-code", "/radius-raid", "/reversi", "/schulte-grid", "/snake", "/sudoku", "/tetris", "/text-crypto", "/text-tool",
     ])
   })
 

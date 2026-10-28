@@ -121,6 +121,12 @@ export const PAGE_METADATA_KEYS = {
     descriptionKey: "billiardsDescription",
     includeAppName: true,
   },
+  "/galaga": { titleKey: "galaga", descriptionKey: "galagaDescription", includeAppName: true },
+  "/bubbo-bubbo": { titleKey: "bubboBubbo", descriptionKey: "bubboBubboDescription", includeAppName: true },
+  "/puzzling-potions": { titleKey: "puzzlingPotions", descriptionKey: "puzzlingPotionsDescription", includeAppName: true },
+  "/deep-field": { titleKey: "deepField", descriptionKey: "deepFieldDescription", includeAppName: true },
+  "/pinball-schminball": { titleKey: "pinballSchminball", descriptionKey: "pinballSchminballDescription", includeAppName: true },
+  "/radius-raid": { titleKey: "radiusRaid", descriptionKey: "radiusRaidDescription", includeAppName: true },
   "/schulte-grid": {
     titleKey: "schulteGrid",
     descriptionKey: "schulteGridDescription",

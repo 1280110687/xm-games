@@ -1,0 +1,182 @@
+{
+  "favicon": [
+    16,
+    16
+  ],
+  "pixi-logo": [
+    213,
+    68
+  ],
+  "cannon-top": [
+    154,
+    251
+  ],
+  "bubble-yellow": [
+    142,
+    142
+  ],
+  "loading-circle": [
+    351,
+    351
+  ],
+  "cannon-arrow": [
+    150,
+    247
+  ],
+  "bubble-blue": [
+    142,
+    141
+  ],
+  "cannon-barrel": [
+    150,
+    247
+  ],
+  "bubble-shine": [
+    143,
+    143
+  ],
+  "background-tile": [
+    64,
+    64
+  ],
+  "bubble-red": [
+    142,
+    142
+  ],
+  "bubble-shadow": [
+    174,
+    174
+  ],
+  "cannon-main": [
+    150,
+    247
+  ],
+  "bubble-green": [
+    142,
+    141
+  ],
+  "bubble-bomb": [
+    282,
+    283
+  ],
+  "bubble-super": [
+    282,
+    283
+  ],
+  "button-flat-small": [
+    64,
+    64
+  ],
+  "panel-small-instructions": [
+    385,
+    141
+  ],
+  "satellite": [
+    208,
+    133
+  ],
+  "shot-visualiser": [
+    48,
+    48
+  ],
+  "info-bg": [
+    168,
+    47
+  ],
+  "bubble-reserve-base": [
+    71,
+    76
+  ],
+  "icon-pause": [
+    37,
+    40
+  ],
+  "bottom-tray": [
+    323,
+    150
+  ],
+  "laser-line-glow": [
+    849,
+    427
+  ],
+  "bubble-glow": [
+    246,
+    246
+  ],
+  "bubble-reserve-ring": [
+    70,
+    71
+  ],
+  "rounded-tray": [
+    363,
+    213
+  ],
+  "laser-line": [
+    611,
+    57
+  ],
+  "game-side-border": [
+    23,
+    83
+  ],
+  "bubble-timer": [
+    282,
+    283
+  ],
+  "button-flat": [
+    304,
+    99
+  ],
+  "top-tray": [
+    323,
+    150
+  ],
+  "pause-panel": [
+    393,
+    487
+  ],
+  "panel-end-screen-points-total": [
+    334,
+    127
+  ],
+  "icon-back": [
+    42,
+    47
+  ],
+  "panel-end-screen-points-breakdown": [
+    284,
+    181
+  ],
+  "panel-end-screen-base": [
+    428,
+    661
+  ],
+  "play-btn-down": [
+    476,
+    158
+  ],
+  "pixi-btn-down": [
+    111,
+    84
+  ],
+  "icon-sound-off": [
+    73,
+    72
+  ],
+  "icon-sound-on": [
+    73,
+    72
+  ],
+  "pixi-btn-up": [
+    111,
+    94
+  ],
+  "background-tile-space": [
+    96,
+    96
+  ],
+  "play-btn-up": [
+    476,
+    186
+  ]
+}

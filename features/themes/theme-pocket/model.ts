@@ -18,6 +18,9 @@ export const POCKET_ART: Record<string, string> = {
   "/minesweeper": "minesweeper", "/sudoku": "sudoku",
   "/memory-match": "memory-match", "/neon-breaker": "neon-breaker",
   "/oh-hi": "oh-hi", "/billiards": "billiards",
+  "/galaga": "galaga", "/bubbo-bubbo": "bubbo-bubbo",
+  "/puzzling-potions": "puzzling-potions", "/deep-field": "deep-field",
+  "/pinball-schminball": "pinball-schminball", "/radius-raid": "radius-raid",
 }
 export const POCKET_TOOL_ART: Record<string, string> = {
   "/anime-tracker": "anime-tracker", "/text-crypto": "text-crypto",

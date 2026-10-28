@@ -38,12 +38,12 @@ const messages: Record<string, string> = {
 const t = (key: string) => messages[key]
 
 describe("Theme Three sample catalog", () => {
-  it("keeps 18 games and 6 tools in separate views without losing entries", () => {
+  it("keeps 24 games and 6 tools in separate views without losing entries", () => {
     const games = getThemeThreeBrowseCategories(HOME_CATEGORIES, "games")
     const tools = getThemeThreeBrowseCategories(HOME_CATEGORIES, "tools")
-    expect(games.flatMap(category => category.games)).toHaveLength(18)
+    expect(games.flatMap(category => category.games)).toHaveLength(24)
     expect(tools.flatMap(category => category.games)).toHaveLength(6)
-    expect(new Set([...games, ...tools].flatMap(category => category.games.map(game => game.href))).size).toBe(24)
+    expect(new Set([...games, ...tools].flatMap(category => category.games.map(game => game.href))).size).toBe(30)
     for (const category of games) expect(getThemeThreeBrowseCategories(HOME_CATEGORIES, "games", category.titleKey)).toEqual([category])
     expect(getThemeThreeBrowseCategories(HOME_CATEGORIES, "tools", "categoryBoard")).toEqual(tools)
   })

@@ -1,0 +1,316 @@
+import { Application, Container } from 'pixi.js';
+import {
+  DECK_PX,
+  DECK_PX_TOUCH,
+  DECK_ROW_PX,
+  DOCK_BUILD_PX,
+  DOCK_DETAIL_PX,
+  DOCK_ERA_PX,
+  DOCK_GAP,
+  DOCK_MARGIN,
+  DOCK_SORTIE_PX,
+  isCompactViewport,
+  STRIP_PX,
+  STRIP_PX_TOUCH,
+  TOP_PX,
+  TOP_PX_TOUCH,
+  TOP_PX_VERSUS,
+} from './constants.ts';
+import type { SectorField } from './theme.ts';
+
+/**
+ * Draw layers, back to front. Keeping these as named containers means z-order is
+ * structural rather than something we re-sort every frame.
+ */
+export interface Layers {
+  map: Container;        // static board, drawn once
+  towers: Container;
+  creeps: Container;
+  projectiles: Container;
+  effects: Container;    // transient VFX
+  overlay: Container;    // placement ghost, range circles, selection
+}
+
+export interface Renderer {
+  app: Application;
+  layers: Layers;
+}
+
+/**
+ * Canvas size is dictated by the map, so it is passed in rather than assumed.
+ *
+ * `versus` decides the whole shape of the chrome, not just its height: the
+ * campaign reserves strips above and below the board, versus docks four panels
+ * around it. It is reserved space rather than a render concern, which is why it
+ * has to arrive here — board and chrome letterbox as one stack, and the stack is
+ * a different size in the two modes.
+ */
+export async function createRenderer(
+  mount: HTMLElement,
+  width: number,
+  height: number,
+  field: SectorField,
+  versus = false,
+): Promise<Renderer> {
+  const app = new Application();
+
+  // v8: init() is ASYNC. (v7's `new Application({...})` is gone — most tutorials
+  // online are still v7 and will not work.)
+  await app.init({
+    width,
+    height,
+    background: field.bg,
+
+    // Crisp on retina without changing our logical coordinate space.
+    resolution: Math.min(window.devicePixelRatio || 1, 2),
+    autoDensity: true,
+
+    antialias: true,
+
+    // We drive rendering from our own fixed-timestep loop, so Pixi must not
+    // start its own ticker. See src/app/loop.ts.
+    autoStart: false,
+
+    // WebGL rather than WebGPU: fewer driver edge cases, and nothing here needs
+    // compute. Revisit only if profiling ever says to.
+    preference: 'webgl',
+  });
+
+  // v8: `app.canvas`, not `app.view`.
+  mount.appendChild(app.canvas);
+
+  fitting = { app, versus, collapsed: false };
+  fitCanvas(app, versus, false);
+  watchViewport(() => {
+    fitCanvas(app, versus, fitting?.collapsed ?? false);
+  });
+
+  const layers: Layers = {
+    map: new Container(),
+    towers: new Container(),
+    creeps: new Container(),
+    projectiles: new Container(),
+    effects: new Container(),
+    overlay: new Container(),
+  };
+
+  app.stage.addChild(
+    layers.map,
+    layers.towers,
+    layers.creeps,
+    layers.projectiles,
+    layers.effects,
+    layers.overlay,
+  );
+
+  return { app, layers };
+}
+
+/**
+ * Letterbox the board into whatever space the window gives us, by CSS size only.
+ *
+ * The drawing buffer and the stage coordinate system stay fixed at the map's
+ * true pixel size, so nothing downstream — placement ghosts, range circles,
+ * pointer→tile mapping in M4 — has to know a scale factor exists. Pixi's event
+ * system derives pointer coords from the canvas bounding rect, so it follows the
+ * CSS size for free.
+ *
+ * Clamped to 1: past that we'd be upscaling a fixed-resolution buffer and the
+ * whole board would go soft.
+ *
+ * **Measure the viewport, never the mount.** `#game-root` is sized from
+ * `--board-w`/`--board-h`, which this function writes at the bottom — so
+ * measuring it means measuring this function's own last output. The first call
+ * read the viewport, because the variables did not exist yet, and was correct;
+ * every call after it read 1040x600 and pinned the scale at `600/796 = 0.754`
+ * however much room the window actually had. The feedback loop could only ever
+ * shrink the board, and nothing could grow it back.
+ *
+ * `body` is `overflow:hidden` and `#app` fills the viewport exactly, so the
+ * document element is the honest box — and it is the one box on the page this
+ * function cannot accidentally resize.
+ */
+/**
+ * The last scale `fitCanvas` applied.
+ *
+ * The overlay's finger callout needs it: a fingertip is ~46 CSS px whatever the
+ * device, which is 54 board px at 0.85 and 112 at 0.41, so the gap it has to
+ * clear cannot be a constant in board space. Renderer-internal — nothing about
+ * layout or CSS reads this.
+ */
+let lastScale = 1;
+export const boardScale = (): number => lastScale;
+
+type ChromeTier = 'desktop' | 'roomy' | 'compact';
+
+interface Chrome {
+  readonly top: number;
+  readonly deck: number;
+  /** Board-space px reserved left and right of the canvas. Zero unless docked. */
+  readonly left: number;
+  readonly right: number;
+  readonly tier: ChromeTier;
+  /** Four docks around the board rather than one panel beneath it. */
+  readonly docked: boolean;
+}
+
+/**
+ * How much chrome to reserve, from the raw viewport ALONE.
+ *
+ * Not from `--board-scale`: the chrome height feeds the scale, so reading the
+ * scale back here is the same feedback loop `fitCanvas` documents below, one
+ * level up.
+ *
+ * **`collapsed` is passed in, and this used to refuse it.** The old note here
+ * said reading `ui.deckOpen` would rescale the board every time Tab was
+ * pressed, moving every tile out from under a placement gesture in flight. The
+ * hazard is real; the conclusion was too strong. Rescaling on Tab is now the
+ * *point* — a collapsed deck reserves no docks, and the board takes the room —
+ * and the hazard is handled by direction rather than by refusal: this function
+ * still reads no UI state, the deck pushes the change through
+ * `setDeckCollapsed`, and Tab comes from the same hand that would be dragging,
+ * so it cannot land mid-gesture the way a window resize can.
+ *
+ * **Versus on a pointer device docks; everywhere else strips.** The four-dock
+ * layout spends 973px of width it does not have on a phone — the detail column
+ * alone is 468 — and the design says so itself: compact and touch are the one
+ * part of it left open, with the build column and era square named as the
+ * natural bottom sheet and the sortie deck explicitly undecided at phone height.
+ * Until that is decided, a touch versus board keeps the two-row deck it already
+ * had, which fits and works.
+ */
+function chromeFor(
+  touch: boolean,
+  vw: number,
+  vh: number,
+  versus: boolean,
+  collapsed: boolean,
+): Chrome {
+  const strip = { left: 0, right: 0, docked: false };
+  // Versus's second row, added to whichever tier's height would otherwise apply.
+  const extra = versus ? DECK_ROW_PX : 0;
+
+  // Collapsed, the deck is one handle and the docks are not drawn — so none of
+  // the room they need should still be reserved. The stage drops from 1685x944
+  // to 1040x702 and everything the chrome gives up goes to the board.
+  //
+  // What that is worth depends entirely on the window, which is worth stating
+  // because it is not obvious: the docked stage is 1685 wide, so on anything
+  // wider than that the board is already at 1:1 and collapsing buys *nothing*.
+  // It pays on laptops, where the fit is width-bound — 0.76 to 1.0 at 1280x800,
+  // 0.86 to 1.0 at 1440x900, 0.90 to 1.0 on a 1512-wide MacBook. Measure before
+  // changing any of these numbers; the first version of this comment claimed a
+  // gain at 1700x1000, where there is none.
+  //
+  // Only the top bar survives. It is the only place cash, lives and the send
+  // control exist now that the era rail and the deck have moved off it, and a
+  // full-screen board you cannot spend money from is a screenshot, not a mode.
+  if (collapsed) {
+    return { ...strip, top: versus ? TOP_PX_VERSUS : TOP_PX, deck: STRIP_PX, tier: 'desktop' };
+  }
+
+  if (!touch) {
+    if (!versus) return { ...strip, top: TOP_PX, deck: DECK_PX, tier: 'desktop' };
+    return {
+      top: TOP_PX_VERSUS,
+      // Under the board: the gap, the sortie deck, and the margin below it.
+      deck: DOCK_GAP + DOCK_SORTIE_PX + DOCK_MARGIN,
+      left: DOCK_MARGIN + DOCK_BUILD_PX + DOCK_GAP,
+      right: DOCK_GAP + DOCK_DETAIL_PX + DOCK_MARGIN,
+      tier: 'desktop',
+      docked: true,
+    };
+  }
+  // A phone is best-effort, and there the board size wins over the button size,
+  // because at that scale no amount of reserved chrome makes the buttons big
+  // enough anyway — so reserve the collapsed strip and give the rest to board.
+  // Compact reserves the *closed* strip and overlays when opened, so a second
+  // row costs it nothing here; `.td-compact .deck .panel.rows` gives it the
+  // height at the point it is actually shown.
+  return isCompactViewport(touch, vw, vh)
+    ? { ...strip, top: TOP_PX, deck: STRIP_PX_TOUCH, tier: 'compact' }
+    : { ...strip, top: TOP_PX_TOUCH, deck: DECK_PX_TOUCH + extra, tier: 'roomy' };
+}
+
+/**
+ * Every way the viewport can change, coalesced into one refit per frame.
+ *
+ * `resize` alone is not enough on iOS Safari: it does not fire when the toolbar
+ * collapses on scroll, and on `orientationchange` it fires *before* the new
+ * dimensions are readable — measuring there yields the pre-rotation box, which
+ * leaves the board sized for the orientation you just left.
+ *
+ * - ResizeObserver on <html> is the honest primary: it fires whenever the
+ *   initial containing block changes, whatever the cause. Safe to observe
+ *   because nothing `fitCanvas` writes can alter documentElement's own box —
+ *   body is overflow:hidden and #app is 100%/100dvh of it.
+ * - visualViewport catches Safari's toolbar transitions, which do not always
+ *   move the layout viewport in step.
+ * - orientationchange, plus a deferred second pass, covers the stale read.
+ */
+function watchViewport(refit: () => void): void {
+  let queued = false;
+  const schedule = (): void => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => {
+      queued = false;
+      refit();
+    });
+  };
+
+  window.addEventListener('resize', schedule);
+  window.visualViewport?.addEventListener('resize', schedule);
+  new ResizeObserver(schedule).observe(document.documentElement);
+
+  // The dimensions are not settled when this fires. Measuring now *and* after
+  // the rotation animation is cheaper and more reliable than guessing which of
+  // the two is the correct moment.
+  window.addEventListener('orientationchange', () => {
+    schedule();
+    setTimeout(schedule, 300);
+  });
+}
+
+/** Last (viewport, tier, collapsed) fitted, so repeat triggers cost nothing. */
+let lastFit = '';
+
+/**
+ * The live fit, so the deck can ask for a new one when it opens or closes.
+ *
+ * `chromeFor` still refuses to read `ui.deckOpen` itself — see its own note on
+ * why reading UI state inside a measurement is the wrong direction. This is the
+ * other direction: the deck *tells* the renderer, once, on the frame the state
+ * changed, and nothing in the measurement path learns what a deck is.
+ *
+ * The hazard the original comment named is real and is why this is a push
+ * rather than a poll: refitting rescales the board, which moves every tile
+ * under a placement gesture already in flight. Tab is a deliberate act by the
+ * same hand that would be dragging, so it cannot arrive mid-drag the way a
+ * window resize can — and `setDeckCollapsed` is a no-op unless the value
+ * actually changed, so an unchanged frame never refits.
+ */
+let fitting: { app: Application; versus: boolean; collapsed: boolean } | null = null;
+
+export function setDeckCollapsed(collapsed: boolean): void {
+  if (fitting === null || fitting.collapsed === collapsed) return;
+  fitting.collapsed = collapsed;
+  fitCanvas(fitting.app, fitting.versus, collapsed);
+}
+
+function fitCanvas(app: Application, _versus: boolean, collapsed = false): void {
+  const v=document.documentElement; const vw=v.clientWidth; const vh=window.visualViewport?.height??v.clientHeight;
+  const mobile=vw<950; const landscape=vw>vh;
+  const top=mobile?(landscape?58:106):64;
+  const deck=mobile?(landscape?(collapsed?54:154):(collapsed?54:Math.min(440,Math.max(320,vh*.49)))):214;
+  const available=Math.max(80,vh-top-deck);
+  const scale=Math.min((vw-12)/app.screen.width,available/app.screen.height,1.5);
+  const css=v.style;
+  css.setProperty('--board-w',app.screen.width+'px');css.setProperty('--board-h',app.screen.height+'px');
+  css.setProperty('--stage-w',app.screen.width+'px');css.setProperty('--stage-h',app.screen.height+'px');
+  css.setProperty('--board-scale',String(scale));css.setProperty('--board-x','0px');css.setProperty('--board-y','0px');
+  css.setProperty('--xm-board-top',`${top+(available-app.screen.height*scale)/2}px`);
+  css.setProperty('--xm-top',top+'px');css.setProperty('--xm-deck',deck+'px');css.setProperty('--tap','44px');
+  app.canvas.style.width=app.screen.width+'px';app.canvas.style.height=app.screen.height+'px';
+  v.classList.toggle('td-touch',matchMedia('(pointer:coarse)').matches);v.classList.toggle('td-collapsed',collapsed);v.classList.add('td-ingame');
+}

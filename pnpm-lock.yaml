@@ -133,6 +133,83 @@ importers:
         specifier: 4.123.0
         version: 4.123.0
 
+  apps/arcade-bubbo-bubbo:
+    dependencies:
+      '@pixi/ui':
+        specifier: ^2.2.7
+        version: 2.4.1(pixi.js@8.19.0)
+      gsap:
+        specifier: ^3.13.0
+        version: 3.14.2
+      pixi-filters:
+        specifier: ^6.1.4
+        version: 6.1.5(pixi.js@8.19.0)
+      pixi.js:
+        specifier: ^8.19.0
+        version: 8.19.0
+      typed-signals:
+        specifier: ^3.0.0
+        version: 3.0.0
+    devDependencies:
+      esbuild:
+        specifier: ^0.25.0
+        version: 0.25.12
+
+  apps/arcade-deep-field:
+    dependencies:
+      pixi.js:
+        specifier: 8.19.0
+        version: 8.19.0
+    devDependencies:
+      esbuild:
+        specifier: 0.25.12
+        version: 0.25.12
+
+  apps/arcade-galaga:
+    dependencies:
+      pixi.js:
+        specifier: 8.19.0
+        version: 8.19.0
+    devDependencies:
+      esbuild:
+        specifier: 0.25.12
+        version: 0.25.12
+
+  apps/arcade-pinball-schminball:
+    dependencies:
+      matter-attractors:
+        specifier: 0.1.6
+        version: 0.1.6
+      matter-js:
+        specifier: 0.19.0
+        version: 0.19.0
+      zcanvas:
+        specifier: 6.0.5
+        version: 6.0.5
+    devDependencies:
+      esbuild:
+        specifier: 0.25.12
+        version: 0.25.12
+
+  apps/arcade-puzzling-potions:
+    dependencies:
+      gsap:
+        specifier: ^3.13.0
+        version: 3.14.2
+      pixi.js:
+        specifier: ^8.19.0
+        version: 8.19.0
+    devDependencies:
+      esbuild:
+        specifier: ^0.25.0
+        version: 0.25.12
+
+  apps/arcade-radius-raid:
+    devDependencies:
+      esbuild:
+        specifier: 0.25.12
+        version: 0.25.12
+
   apps/billiards:
     dependencies:
       fflate:
@@ -201,6 +278,8 @@ importers:
       vite-plugin-compression:
         specifier: 0.5.1
         version: 0.5.1(vite@7.3.0(@types/node@22.19.11)(jiti@2.6.1)(lightningcss@1.32.0)(sass@1.97.1)(terser@5.16.9)(yaml@2.9.0))
+
+  packages/arcade-bridge: {}
 
   packages/experience-bridge: {}
 
@@ -1871,6 +1950,11 @@ packages:
   '@pixi/colord@2.9.6':
     resolution: {integrity: sha512-nezytU2pw587fQstUu1AsJZDVEynjskwOL+kibwcdxsMBFqPsFFNA7xl0ii/gXuDi6M0xj3mfRJj8pBSc2jCfA==}
 
+  '@pixi/ui@2.4.1':
+    resolution: {integrity: sha512-xA7TbeJlvY/5gA5sAgecNjHhmrREM/wPMQukTuZvN3OxU4BP6PwBGZ28PbNrbfaISxqMgmE6jOW2EPPb5qYn2Q==}
+    peerDependencies:
+      pixi.js: ^8.6.2
+
   '@poppinss/colors@4.1.6':
     resolution: {integrity: sha512-H9xkIdFswbS8n1d6vmRd8+c10t2Qe+rZITbbDHHkQixH5+2x1FDGmi/0K+WgWiqQFKPSlIYB7jlH6Kpfn6Fleg==}
 
@@ -2867,6 +2951,9 @@ packages:
   '@types/estree@1.0.9':
     resolution: {integrity: sha512-GhdPgy1el4/ImP05X05Uw4cw2/M93BCUmnEvWZNStlCzEKME4Fkk+YpoA5OiHNQmoS7Cafb8Xa3Pya8m1Qrzeg==}
 
+  '@types/gradient-parser@0.1.5':
+    resolution: {integrity: sha512-r7K3NkJz3A95WkVVmjs0NcchhHstC2C/VIYNX4JC6tieviUNo774FFeOHjThr3Vw/WCeMP9kAT77MKbIRlO/4w==}
+
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
 
@@ -3172,6 +3259,7 @@ packages:
   '@xmldom/xmldom@0.8.13':
     resolution: {integrity: sha512-KRYzxepc14G/CEpEGc3Yn+JKaAeT63smlDr+vjB8jRfgTBBI9wRj/nkQEO+ucV8p8I9bfKLWp37uHgFrbntPvw==}
     engines: {node: '>=10.0.0'}
+    deprecated: this version has critical issues, please update to the latest version
 
   abort-controller@3.0.0:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
@@ -3317,8 +3405,8 @@ packages:
     resolution: {integrity: sha512-2cGmJupaNgg+QUwVLAucDuWuoMZ6EX9iHDRswZ5lsNYEmwPaRknMPCLZz07yTzVq/83p4o/wzbDZbBrTvGGTIw==}
     engines: {node: '>=18'}
 
-  bowser@2.14.1:
-    resolution: {integrity: sha512-tzPjzCxygAKWFOJP011oxFHs57HzIhOEracIgAePE4pqB3LikALKnSzUyU4MGs9/iCEUuHlAJTjTc5M+u7YEGg==}
+  bowser@2.11.0:
+    resolution: {integrity: sha512-AlcaJBi/pqqJBIQ8U9Mcpc9i8Aqxn88Skv5d+xBX006BY5u8N3mGLHa5Lgppa7L/HfwgwLgZ6NYs+Ag6uUmJRA==}
 
   brace-expansion@1.1.16:
     resolution: {integrity: sha512-IDw48K2/2kRkg9LdJxurvq3lV3aBgq0REY89duEqFRthjlPdXHKMj7EnQOXVckxzgisinf3nHfrcE2FufFLXMw==}
@@ -4521,6 +4609,12 @@ packages:
     resolution: {integrity: sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==}
     engines: {node: '>= 0.4'}
 
+  matter-attractors@0.1.6:
+    resolution: {integrity: sha512-vGFsFHS9m0hXnaswfKXT2nKfPXJs4lwnQJwkGrs1IHrVldKAmlBKBb4OcYh0rwQga3CFWGUq3JvKpWZvZuqlDQ==}
+
+  matter-js@0.19.0:
+    resolution: {integrity: sha512-v2huwvQGOHTGOkMqtHd2hercCG3f6QAObTisPPHg8TZqq2lz7eIY/5i/5YUV8Ibf3mEioFEmwibcPUF2/fnKKQ==}
+
   media-typer@1.1.1:
     resolution: {integrity: sha512-yz3xRaG20c6/BOzvYoDaGtPmGscs7YivItZEEqe6GbwNfHuxu9YNmvnEkMzKldAGY4/80pRcQRZSEnhquk9XuQ==}
     engines: {node: '>= 0.8'}
@@ -4805,6 +4899,11 @@ packages:
   picomatch@4.0.5:
     resolution: {integrity: sha512-RvwwcruNjI1ncT5xRakeyS9Lf8lcItv34KD+aif+VH9kduAyfYBipGh12274xtenIPZ119/R9BdTBa8gAwSh0A==}
     engines: {node: '>=12'}
+
+  pixi-filters@6.1.5:
+    resolution: {integrity: sha512-Ewb/J+kxAbaNN+0/ATJbglAJG+skGJfh7BIDP3ILIDdD6wWk1p0pGa25pVf1T8hGBOQSUNVAmwwJBwkj+cyLLA==}
+    peerDependencies:
+      pixi.js: '>=8.0.0-0'
 
   pixi.js@8.19.0:
     resolution: {integrity: sha512-pq1O6emA/GFjjeF+8d3Pb5t7knD8FsnfWGqQcRjYjsqFZ7QdzG1XgjLDUu0DFJRbafjV5+g8iNLFBx0b9649lg==}
@@ -5307,6 +5406,9 @@ packages:
   tw-animate-css@1.3.3:
     resolution: {integrity: sha512-tXE2TRWrskc4TU3RDd7T8n8Np/wCfoeH9gz22c7PzYqNPQ9FBGFbWWzwL0JyHcFp+jHozmF76tbHfPAx22ua2Q==}
 
+  tweedle.js@2.1.0:
+    resolution: {integrity: sha512-0ReQgVjepoZkE6t0upWNgCRbplHkQJQYk1LStXugwSR728GLFmGDRuaQJlxeC/iBlxud6+P1RdODjaO25vHAqw==}
+
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
     engines: {node: '>= 0.8.0'}
@@ -5330,6 +5432,9 @@ packages:
   typed-array-length@1.0.8:
     resolution: {integrity: sha512-phPGCwqr2+Qo0fwniCE8e4pKnGu/yFb5nD5Y8bf0EEeiI5GklnACYA9GFy/DrAeRrKHXvHn+1SUsOWgJp6RO+g==}
     engines: {node: '>= 0.4'}
+
+  typed-signals@3.0.0:
+    resolution: {integrity: sha512-HpYkOenDGcyiNabkvJ7XC1FfTb4I/yx95GEblpXf1058C89eLBIJBlq4IMW2jFxju7NC2J5fTss2k2OPs27GiA==}
 
   typescript-eslint@8.64.0:
     resolution: {integrity: sha512-0qg+pDNMnqYzqH9AnNK+39tejHvsShUOUUoRUgtnTGE7QuMZhiFDnozq8nHJVq+Wae6NMLKNWLg5WmkcC/ndyQ==}
@@ -5680,6 +5785,10 @@ packages:
 
   youch@4.1.0-beta.10:
     resolution: {integrity: sha512-rLfVLB4FgQneDr0dv1oddCVZmKjcJ6yX6mS4pU82Mq/Dt9a3cLZQ62pDBL4AUO+uVrCvtWz3ZFUL2HFAFJ/BXQ==}
+
+  zcanvas@6.0.5:
+    resolution: {integrity: sha512-2+d80Jp0aovMjDtpRHq8xgZZ1XDdIJidBnCKtcM/F0z5zCHaBWML8qVImhg0+stmYjJlNUO39ghuVVb4zT/YeA==}
+    engines: {node: '>=14.0.0'}
 
   zod-validation-error@4.0.2:
     resolution: {integrity: sha512-Q6/nZLe6jxuU80qb/4uJ4t5v2VEZ44lzQjPDhYJNztRQ4wyWc6VF3D3Kb/fAuPetZQnhS3hnajCf9CsWesghLQ==}
@@ -6055,7 +6164,7 @@ snapshots:
       '@smithy/core': 3.33.0
       '@smithy/signature-v4': 5.7.0
       '@smithy/types': 4.17.0
-      bowser: 2.14.1
+      bowser: 2.11.0
       tslib: 2.8.1
 
   '@aws-sdk/credential-provider-env@3.972.69':
@@ -7303,6 +7412,11 @@ snapshots:
 
   '@pixi/colord@2.9.6': {}
 
+  '@pixi/ui@2.4.1(pixi.js@8.19.0)':
+    dependencies:
+      pixi.js: 8.19.0
+      tweedle.js: 2.1.0
+
   '@poppinss/colors@4.1.6':
     dependencies:
       kleur: 4.1.5
@@ -8216,6 +8330,8 @@ snapshots:
 
   '@types/estree@1.0.9': {}
 
+  '@types/gradient-parser@0.1.5': {}
+
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
@@ -8663,7 +8779,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  bowser@2.14.1: {}
+  bowser@2.11.0: {}
 
   brace-expansion@1.1.16:
     dependencies:
@@ -10059,6 +10175,10 @@ snapshots:
 
   math-intrinsics@1.1.0: {}
 
+  matter-attractors@0.1.6: {}
+
+  matter-js@0.19.0: {}
+
   media-typer@1.1.1: {}
 
   merge-descriptors@2.0.0: {}
@@ -10315,6 +10435,11 @@ snapshots:
   picomatch@2.3.2: {}
 
   picomatch@4.0.5: {}
+
+  pixi-filters@6.1.5(pixi.js@8.19.0):
+    dependencies:
+      '@types/gradient-parser': 0.1.5
+      pixi.js: 8.19.0
 
   pixi.js@8.19.0:
     dependencies:
@@ -10956,6 +11081,8 @@ snapshots:
 
   tw-animate-css@1.3.3: {}
 
+  tweedle.js@2.1.0: {}
+
   type-check@0.4.0:
     dependencies:
       prelude-ls: 1.2.1
@@ -10998,6 +11125,8 @@ snapshots:
       is-typed-array: 1.1.15
       possible-typed-array-names: 1.1.0
       reflect.getprototypeof: 1.0.10
+
+  typed-signals@3.0.0: {}
 
   typescript-eslint@8.64.0(eslint@9.39.5(jiti@2.6.1))(typescript@5.7.3):
     dependencies:
@@ -11329,6 +11458,8 @@ snapshots:
       '@speed-highlight/core': 1.2.24
       cookie: 1.1.1
       youch-core: 0.3.3
+
+  zcanvas@6.0.5: {}
 
   zod-validation-error@4.0.2(zod@3.25.76):
     dependencies:

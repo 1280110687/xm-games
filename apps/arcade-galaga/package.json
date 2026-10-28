@@ -1,0 +1,1 @@
+{"name":"@xm-games/arcade-galaga","version":"0.1.0","private":true,"type":"module","license":"MIT","scripts":{"build":"node build.mjs"},"dependencies":{"pixi.js":"8.19.0"},"devDependencies":{"esbuild":"0.25.12"}}

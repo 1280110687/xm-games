@@ -24,9 +24,9 @@ describe("retro catalog and navigation", () => {
   const { games, tools } = getRetroCatalog(HOME_CATEGORIES)
   const toolPaths = tools.map(entry => entry.href)
   it("preserves every real game and tool without duplicate entries", () => {
-    expect(games).toHaveLength(18)
+    expect(games).toHaveLength(24)
     expect(tools).toHaveLength(6)
-    expect(new Set([...games, ...tools].map(entry => entry.href)).size).toBe(24)
+    expect(new Set([...games, ...tools].map(entry => entry.href)).size).toBe(30)
     for (const path of RETRO_FEATURED) expect(games.some(entry => entry.href === path)).toBe(true)
   })
   it.each(["#retro-tools", "#pocket-tools", "#theme-three-toolbox", "#arcade-tools"])("keeps the tools destination from %s", hash => {

@@ -34,6 +34,7 @@ import {
 } from "@/features/pwa/install-prompt"
 import { prepareOfflinePackage } from "@/features/pwa/offline-package"
 import { useLocale } from "@/lib/locale-context"
+import { ARCADE_GAME_IDS } from "@/packages/arcade-bridge/src/index"
 
 type InstallChoice = {
   outcome: "accepted" | "dismissed"
@@ -287,7 +288,7 @@ export function PwaInstallPrompt() {
   )
 
   // Keep the install offer pending until the player leaves the real-time game.
-  if (pathname === "/neon-breaker" || pathname === "/billiards") return null
+  if (pathname === "/neon-breaker" || pathname === "/billiards" || ARCADE_GAME_IDS.some(id => pathname === `/${id}`)) return null
 
   return (
     <>
