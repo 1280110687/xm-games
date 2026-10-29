@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v39"
+const CACHE_VERSION = "v40"
 const SHELL_CACHE = `xm-games-shell-${CACHE_VERSION}`
 const RUNTIME_CACHE = `xm-games-runtime-${CACHE_VERSION}`
 const OWNED_CACHE_PREFIX = "xm-games-"
@@ -102,6 +102,26 @@ function extractNextStaticResources(html) {
   return resources
 }
 
+function extractNextStaticFonts(css, stylesheetUrl) {
+  const resources = new Set()
+  const urls = /url\(\s*(?:"([^"]*)"|'([^']*)'|([^\s)]+))\s*\)/gi
+
+  for (const match of css.replace(/\/\*[\s\S]*?\*\//g, "").matchAll(urls)) {
+    try {
+      const url = new URL(match[1] ?? match[2] ?? match[3], stylesheetUrl)
+      if (
+        url.origin === self.location.origin &&
+        url.pathname.startsWith("/_next/static/") &&
+        /\.(?:woff2?|ttf|otf)$/i.test(url.pathname)
+      ) {
+        resources.add(`${url.pathname}${url.search}`)
+      }
+    } catch { /* Invalid CSS URLs are not offline dependencies. */ }
+  }
+
+  return resources
+}
+
 async function fetchAndCache(cache, resource) {
   const request =
     resource instanceof Request
@@ -123,7 +143,22 @@ async function fetchAndCacheIfMissing(cache, resource) {
       ? resource
       : createSameOriginRequest(resource)
   const cached = await cache.match(request)
-  return cached ?? fetchAndCache(cache, request)
+  const response = cached ?? await fetchAndCache(cache, request)
+  const url = new URL(request.url)
+  if (
+    url.origin === self.location.origin &&
+    url.pathname.startsWith("/_next/static/") &&
+    url.pathname.endsWith(".css") &&
+    (response.headers.get("content-type") ?? "").includes("text/css")
+  ) {
+    const fonts = extractNextStaticFonts(await response.clone().text(), request.url)
+    await mapWithConcurrency(
+      [...fonts],
+      OFFLINE_WARM_CONCURRENCY,
+      (font) => fetchAndCacheIfMissing(cache, font),
+    )
+  }
+  return response
 }
 
 async function mapWithConcurrency(items, concurrency, task) {

@@ -301,7 +301,8 @@ export function setDeckCollapsed(collapsed: boolean): void {
 function fitCanvas(app: Application, _versus: boolean, collapsed = false): void {
   const v=document.documentElement; const vw=v.clientWidth; const vh=window.visualViewport?.height??v.clientHeight;
   const mobile=vw<950; const landscape=vw>vh;
-  const top=mobile?(landscape?58:106):64;
+  // Narrow portrait wraps stats, speed controls and wave status into three rows.
+  const top=mobile?(landscape?58:vw<360?126:106):64;
   const deck=mobile?(landscape?(collapsed?54:154):(collapsed?54:Math.min(440,Math.max(320,vh*.49)))):214;
   const available=Math.max(80,vh-top-deck);
   const scale=Math.min((vw-12)/app.screen.width,available/app.screen.height,1.5);

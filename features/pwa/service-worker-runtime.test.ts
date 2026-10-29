@@ -81,3 +81,75 @@ describe("self-hosted game offline resources", () => {
     expect(runtime.put).toHaveBeenCalledOnce()
   })
 })
+
+function offlinePreparation(css: string, cachedStylesheet = false, fontStatus = 200) {
+  const origin = "https://host.test"
+  const stylesheet = `${origin}/_next/static/chunks/app.css`
+  const entries = new Map<string, Response>()
+  if (cachedStylesheet) entries.set(stylesheet, new Response(css, { headers: { "Content-Type": "text/css" } }))
+  const fetch = vi.fn(async (request: Request) => {
+    const url = new URL(request.url)
+    if (url.pathname === "/offline-assets.json") return Response.json({ version: 1, assets: [] })
+    if (request.url === stylesheet) return new Response(css, { headers: { "Content-Type": "text/css" } })
+    if (url.pathname.endsWith(".woff2")) return new Response("font", { status: fontStatus })
+    return new Response('<link rel="stylesheet" href="/_next/static/chunks/app.css">', { headers: { "Content-Type": "text/html" } })
+  })
+  const handlers: Record<string, (event: unknown) => void> = {}
+  runInNewContext(readFileSync("public/sw.js", "utf8"), {
+    Request, Response, Headers, URL, Blob, AbortController, setTimeout, clearTimeout, fetch,
+    caches: { open: async () => ({
+      match: async (request: Request) => entries.get(request.url)?.clone(),
+      put: async (request: Request, response: Response) => { entries.set(request.url, response.clone()) },
+      keys: async () => [...entries.keys()].map(url => new Request(url)),
+    }) },
+    self: { location: { origin }, addEventListener: (name: string, handler: (event: unknown) => void) => { handlers[name] = handler } },
+  })
+  return {
+    entries, fetch,
+    async prepare() {
+      let completion: Promise<unknown> | undefined
+      const replies: { type: string; message?: string }[] = []
+      handlers.message({
+        data: { type: "PREPARE_OFFLINE_PACKAGE", scope: "full" },
+        ports: [{ postMessage: (reply: { type: string; message?: string }) => replies.push(reply) }],
+        waitUntil(value: Promise<unknown>) { completion = value },
+      })
+      await completion
+      return replies
+    },
+  }
+}
+
+describe("offline Next stylesheet font dependencies", () => {
+  const font = "/_next/static/media/797e433ab948586e-s.0r6juujl39pe6.woff2"
+  const css = '@font-face{font-family:Geist Mono;src:url(../media/797e433ab948586e-s.0r6juujl39pe6.woff2)format("woff2")}'
+
+  it.each([false, true])("prepares CSS-relative fonts when the stylesheet was cached: %s", async (cached) => {
+    const runtime = offlinePreparation(css, cached)
+    expect(await runtime.prepare()).toEqual([expect.objectContaining({ type: "OFFLINE_PACKAGE_READY" })])
+    expect(runtime.entries.has(`https://host.test${font}`)).toBe(true)
+    expect(runtime.fetch.mock.calls.filter(([request]) => new URL(request.url).pathname === font)).toHaveLength(1)
+  })
+
+  it("resolves quoted font URLs without fetching external or non-Next dependencies", async () => {
+    const runtime = offlinePreparation(`
+      @font-face{src:url("../media/first.woff2"),url('../media/second.woff2')}
+      @font-face{src:url(https://other.test/_next/static/media/external.woff2)}
+      @font-face{src:url(//other.test/_next/static/media/protocol-relative.woff2)}
+      @font-face{src:url(/api/private.woff2),url(../../../private.woff2),url(data:font/woff2;base64,AAAA)}
+      .icon{background:url(../media/icon.png)}
+    `)
+    await runtime.prepare()
+    expect([...runtime.entries.keys()].filter(url => url.endsWith(".woff2"))).toEqual([
+      "https://host.test/_next/static/media/first.woff2",
+      "https://host.test/_next/static/media/second.woff2",
+    ])
+    expect(runtime.fetch.mock.calls.every(([request]) => new URL(request.url).origin === "https://host.test")).toBe(true)
+  })
+
+  it("reports incomplete offline preparation if a required font cannot be cached", async () => {
+    const runtime = offlinePreparation(css, false, 404)
+    expect(await runtime.prepare()).toEqual([expect.objectContaining({ type: "OFFLINE_PACKAGE_ERROR" })])
+    expect(runtime.entries.has(`https://host.test${font}`)).toBe(false)
+  })
+})

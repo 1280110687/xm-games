@@ -17,7 +17,7 @@ let context:ArcadeContext=DEFAULT_ARCADE_CONTEXT
 let game:Game|undefined, app:Application|undefined, gameContext:GameContext|undefined, world:Container|undefined
 let phase:'menu'|'playing'|'paused'|'game-over'='menu',hostPaused=false,manualPaused=false,disposed=false
 let score=0,lives=3,waveLabel='',last=0,fireClock=0,dragPointer:number|null=null,toastTimer=0
-const held=new Set<string>(),pointers=new Map<number,string>()
+const held=new Set<string>(),keyboardHeld=new Set<string>(),pointers=new Map<number,string>()
 const events=new Map<string,Set<(action?:string)=>void>>()
 let virtualWidth=420,virtualHeight=640,scale=1,top=56
 let soundEnabled=true,audio:AudioContext|undefined
@@ -35,7 +35,8 @@ function sound(name:string){
 function unlock(){if(!audio){try{audio=new AudioContext()}catch{}}if(audio?.state==='suspended')void audio.resume().catch(()=>{})}
 function emit(name:string,action?:string){events.get(name)?.forEach(fn=>fn(action))}
 const input={targetX:null as number|null,axis:()=>({x:(held.has('right')?1:0)-(held.has('left')?1:0),y:0}),on(name:string,fn:(action?:string)=>void){const list=events.get(name)??new Set();list.add(fn);events.set(name,list);return()=>list.delete(fn)}}
-function clearInput(){held.clear();pointers.clear();dragPointer=null;input.targetX=null;fireClock=0}
+function syncHeld(){held.clear();for(const action of [...keyboardHeld,...pointers.values()])held.add(action);if(dragPointer!==null)held.add('fire')}
+function clearInput(){held.clear();keyboardHeld.clear();pointers.clear();dragPointer=null;input.targetX=null;fireClock=0}
 function copy(){
   el('title').textContent=phase==='game-over'?word('over'):manualPaused?word('paused'):word('title')
   el('description').textContent=phase==='game-over'?`${word('score')} ${score}`:word('description')
@@ -68,7 +69,7 @@ function newGame(){
   }
   game=createGame(gameContext);copy();last=performance.now()
 }
-const bridge=connectArcadeHost({gameId:'galaga',onContext(next){context=next;if(gameContext)gameContext.palette=next.palette;if(app?.renderer)app.renderer.background.color=next.palette.canvas;copy()},onPause(value){hostPaused=value;stopOrResume();last=performance.now()},getState(){return{...game?.snapshot(),phase:hostPaused?'paused':manualPaused?'paused':phase,score,lives,hostPaused,manualPaused,viewport:{width:virtualWidth,height:virtualHeight}}}})
+const bridge=connectArcadeHost({gameId:'galaga',onContext(next){context=next;if(gameContext)gameContext.palette=next.palette;if(app?.renderer)app.renderer.background.color=next.palette.canvas;copy()},onPause(value){hostPaused=value;stopOrResume();last=performance.now()},getState(){return{...game?.snapshot(),phase:hostPaused?'paused':manualPaused?'paused':phase,score,lives,hostPaused,manualPaused,controls:{left:held.has('left'),right:held.has('right'),fire:held.has('fire'),dragging:dragPointer!==null},viewport:{width:virtualWidth,height:virtualHeight}}}})
 start.addEventListener('click',()=>{if(hostPaused)return;if(manualPaused){manualPaused=false;phase='playing';overlay.hidden=true;stopOrResume();last=performance.now()}else newGame()})
 el('pause').addEventListener('click',()=>{if(phase!=='playing'&&phase!=='paused')return;manualPaused=!manualPaused;phase=manualPaused?'paused':'playing';overlay.hidden=!manualPaused;stopOrResume();copy()})
 el('sound').addEventListener('click',()=>{soundEnabled=!soundEnabled;el('sound').setAttribute('aria-pressed',String(soundEnabled));if(!soundEnabled)void audio?.suspend();else unlock()})
@@ -76,15 +77,15 @@ const controls=new AbortController(),signal=controls.signal
 for(const id of ['left','right','fire']){
   const button=el(id)
   button.addEventListener('pointerdown',event=>{if(hostPaused||phase!=='playing'||manualPaused)return;event.preventDefault();unlock();button.setPointerCapture(event.pointerId);pointers.set(event.pointerId,id);held.add(id);input.targetX=null;if(id==='fire')emit('down','a')},{signal})
-  const release=(event:PointerEvent)=>{const action=pointers.get(event.pointerId);pointers.delete(event.pointerId);if(action&&![...pointers.values()].includes(action))held.delete(action)}
+  const release=(event:PointerEvent)=>{pointers.delete(event.pointerId);syncHeld()}
   button.addEventListener('pointerup',release,{signal});button.addEventListener('pointercancel',release,{signal});button.addEventListener('lostpointercapture',release,{signal})
 }
-canvas.addEventListener('pointerdown',event=>{if(phase!=='playing'||hostPaused||manualPaused)return;unlock();event.preventDefault();dragPointer=event.pointerId;canvas.setPointerCapture(event.pointerId);input.targetX=event.clientX/scale;held.add('fire');emit('down','a')},{signal})
+canvas.addEventListener('pointerdown',event=>{if(phase!=='playing'||hostPaused||manualPaused||dragPointer!==null)return;unlock();event.preventDefault();dragPointer=event.pointerId;canvas.setPointerCapture(event.pointerId);input.targetX=event.clientX/scale;syncHeld();emit('down','a')},{signal})
 canvas.addEventListener('pointermove',event=>{if(event.pointerId===dragPointer)input.targetX=event.clientX/scale},{signal})
-const releaseDrag=(event:PointerEvent)=>{if(event.pointerId===dragPointer){dragPointer=null;input.targetX=null;held.delete('fire')}}
-canvas.addEventListener('pointerup',releaseDrag,{signal});canvas.addEventListener('pointercancel',releaseDrag,{signal})
-window.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','KeyA','KeyD','Space','KeyP'].includes(event.code))return;event.preventDefault();if(event.code==='KeyP'&&!event.repeat){el('pause').click();return}if(phase!=='playing'||hostPaused||manualPaused)return;unlock();input.targetX=null;const action=event.code==='Space'?'fire':['ArrowLeft','KeyA'].includes(event.code)?'left':'right';held.add(action);if(action==='fire'&&!event.repeat)emit('down','a')},{signal})
-window.addEventListener('keyup',event=>{held.delete(event.code==='Space'?'fire':['ArrowLeft','KeyA'].includes(event.code)?'left':'right')},{signal})
+const releaseDrag=(event:PointerEvent)=>{if(event.pointerId===dragPointer){dragPointer=null;input.targetX=null;syncHeld()}}
+canvas.addEventListener('pointerup',releaseDrag,{signal});canvas.addEventListener('pointercancel',releaseDrag,{signal});canvas.addEventListener('lostpointercapture',releaseDrag,{signal})
+window.addEventListener('keydown',event=>{if(!['ArrowLeft','ArrowRight','KeyA','KeyD','Space','KeyP'].includes(event.code))return;event.preventDefault();if(event.code==='KeyP'){if(!event.repeat)el('pause').click();return}if(phase!=='playing'||hostPaused||manualPaused)return;unlock();input.targetX=null;const action=event.code==='Space'?'fire':['ArrowLeft','KeyA'].includes(event.code)?'left':'right';keyboardHeld.add(action);syncHeld();if(action==='fire'&&!event.repeat)emit('down','a')},{signal})
+window.addEventListener('keyup',event=>{if(!['ArrowLeft','ArrowRight','KeyA','KeyD','Space'].includes(event.code))return;keyboardHeld.delete(event.code==='Space'?'fire':['ArrowLeft','KeyA'].includes(event.code)?'left':'right');syncHeld()},{signal})
 window.addEventListener('blur',clearInput,{signal});window.addEventListener('resize',resize,{signal})
 void(async()=>{
   try{

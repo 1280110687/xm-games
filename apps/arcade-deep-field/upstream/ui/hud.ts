@@ -1509,7 +1509,7 @@ function renderOverlay(
 ): string {
   if (w.phase === 'lost') return renderDefeat(w, campaign);
   if (w.phase === 'won') return renderVictory(w, campaign);
-  if (ui.paused) return renderPaused(w, ui);
+  if (ui.paused) return renderPaused(w, ui, campaign);
   // A breach outranks a clear: they can overlap when the last creep of a wave
   // is the one that got through, and the bad news is the news.
   if (breachLives !== null) return renderBreach(breachLives);
@@ -1559,7 +1559,7 @@ function renderClearToast(ev: Extract<SimEvent, { type: 'waveCleared' }>): strin
   );
 }
 
-export function renderPaused(w: World, ui: UiState): string {
+export function renderPaused(w: World, ui: UiState, campaign?: CampaignPorts): string {
   const toggle = (
     act: string,
     opts: readonly [string, string][],
@@ -1619,6 +1619,7 @@ export function renderPaused(w: World, ui: UiState): string {
     `<div class="hr"></div>` +
     `<button class="btn primary wide" data-act="pause">Resume <em>Esc</em></button>` +
     `<button class="btn wide" data-act="restart">Restart sector</button>` +
+    (campaign ? `<button class="btn wide" data-act="menu">Back to sectors</button>` : '') +
     `</div>`
   );
 }

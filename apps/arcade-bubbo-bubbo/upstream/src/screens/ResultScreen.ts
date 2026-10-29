@@ -3,6 +3,7 @@ import { Container, Graphics, Sprite, Text, Texture, TilingSprite } from 'pixi.j
 
 import { boardConfig, randomType } from '../game/boardConfig';
 import { designConfig } from '../game/designConfig';
+import { app } from '../main';
 import { AppScreen, navigation } from '../navigation';
 import { IconButton } from '../ui/buttons/IconButton';
 import { PrimaryButton } from '../ui/buttons/PrimaryButton';
@@ -388,10 +389,14 @@ export class ResultScreen extends Container implements AppScreen {
         this._porthole.view.y = 80;
 
         this._playBtn.x = w * 0.5;
-        this._playBtn.y = h - this._playBtn.height + 5;
+        // Reserve the bottom action row so the statistics card cannot cover the replay label.
+        this._playBtn.y = h - 30;
 
-        this._backBtn.x = 50;
-        this._backBtn.y = h - 50;
+        const pixelScale = app.canvas.getBoundingClientRect().height / h;
+        const backSize = 44;
+        this._backBtn.scale.set(backSize / (64 * pixelScale));
+        this._backBtn.x = (10 + backSize * 0.5) / pixelScale;
+        this._backBtn.y = h - (10 + backSize * 0.5) / pixelScale;
 
         this._resultsPanel.view.x = w * 0.5;
         this._resultsPanel.view.y = h * 0.5 - 85;

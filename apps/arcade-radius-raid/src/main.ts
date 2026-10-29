@@ -97,6 +97,9 @@ function frame(){
 }
 function resize(){
   if(!$.cmg)return
+  // Resizing a canvas clears it. Keep the frozen scene visible without running physics.
+  const frozenFrame=initialized&&(hostPaused||$.state!=='play')?document.createElement('canvas'):null
+  if(frozenFrame){frozenFrame.width=$.cmg.width;frozenFrame.height=$.cmg.height;frozenFrame.getContext('2d')!.drawImage($.cmg,0,0)}
   const mobile=Math.min(innerWidth,innerHeight)<600
   if(!autoAimTouched)autoAim=matchMedia('(pointer:coarse)').matches||mobile
   const scale=Math.max(innerWidth/1400,innerHeight/1000,Math.min(innerWidth/(mobile?480:800),innerHeight/(mobile?360:600)))
@@ -108,6 +111,7 @@ function resize(){
   const rect=$.cmg.getBoundingClientRect();$.cOffset={left:rect.left,top:rect.top}
   if($.minimap){$.minimap.width=80;$.minimap.height=60;$.minimap.scale=80/$.ww;$.minimap.x=14/scale;$.minimap.y=66/scale}
   if(initialized){$.renderBackground1();$.renderBackground2();$.renderBackground3();$.renderBackground4();if($.hero)$.updateScreen();copy()}
+  if(frozenFrame)$.cmg.getContext('2d')!.drawImage(frozenFrame,0,0,$.cw,$.ch)
 }
 $.resizecb=resize
 $.renderInterface=updateHud

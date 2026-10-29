@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent } from "react"
 import { createPortal } from "react-dom"
-import { useRouter } from "next/navigation"
 import { ArrowLeft, LoaderCircle } from "lucide-react"
 import { useTheme } from "@/features/themes/shared/theme-provider"
 import { useLocale } from "@/lib/locale-context"
@@ -18,7 +17,6 @@ const COPY = {
 }
 
 export function ImmersiveGame({ gameId }: { gameId: ArcadeGameId }) {
-  const router = useRouter()
   const { theme, isResolved } = useTheme()
   const { locale, t } = useLocale()
   const frameRef = useRef<HTMLIFrameElement>(null)
@@ -30,6 +28,7 @@ export function ImmersiveGame({ gameId }: { gameId: ArcadeGameId }) {
   const [position, setPosition] = useState<{ x: number; y: number } | null>(null)
   const drag = useRef<{ id: number; x: number; y: number; left: number; top: number } | null>(null)
   const blockClick = useRef(false)
+  const exiting = useRef(false)
   const copy = COPY[locale]
   const title = t(IMMERSIVE_GAMES[gameId].titleKey)
 
@@ -45,7 +44,7 @@ export function ImmersiveGame({ gameId }: { gameId: ArcadeGameId }) {
       onAccent: parseGameRenderColor(css.getPropertyValue("--game-on-accent"), palette.light),
     } })
   }, [theme, locale, send])
-  const sendPause = useCallback(() => send({ type: "pause", paused: document.hidden }), [send])
+  const sendPause = useCallback(() => send({ type: "pause", paused: exiting.current || document.hidden }), [send])
   const loaded = useCallback(() => { sendContext(); sendPause(); send({ type: "ping" }) }, [send, sendContext, sendPause])
 
   useEffect(() => { setMounted(true) }, [])
@@ -119,8 +118,12 @@ export function ImmersiveGame({ gameId }: { gameId: ArcadeGameId }) {
     setPosition(clampExitPosition({ x: start.left + dx, y: start.top + dy }, bounds))
   }
   const exit = () => {
+    if (exiting.current) return
+    exiting.current = true
     send({ type: "pause", paused: true })
-    router.replace(immersiveGameExitHref(theme))
+    // A cached Next.js home route can append its old fragment to this one.
+    // Document navigation also gives Safari a single history replacement.
+    window.location.replace(immersiveGameExitHref(theme))
   }
 
   if (!mounted) return null
@@ -135,6 +138,11 @@ export function ImmersiveGame({ gameId }: { gameId: ArcadeGameId }) {
       style={position ? { left: position.x, top: position.y, right: "auto" } : undefined}
       onPointerDown={pointerDown} onPointerMove={pointerMove}
       onPointerUp={() => { drag.current = null }} onPointerCancel={() => { drag.current = null; blockClick.current = true }}
+      onLostPointerCapture={event => {
+        if (drag.current?.id !== event.pointerId) return
+        drag.current = null
+        blockClick.current = true
+      }}
       onClick={event => { if (blockClick.current && event.detail !== 0) { blockClick.current = false; return } exit() }}>
       <ArrowLeft aria-hidden="true" />
     </button>

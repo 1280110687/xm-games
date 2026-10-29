@@ -86,6 +86,7 @@ export class Stats {
 
     /** Resets the player stats. The stats reset every game. */
     public reset() {
-        this._stats = { ...DEFAULT_STATS };
+        const highscore = Math.max(this._stats.highscore, storage.getStorageItem('highscore'));
+        this._stats = { ...DEFAULT_STATS, highscore };
     }
 }

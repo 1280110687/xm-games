@@ -2,6 +2,7 @@ import gsap from 'gsap';
 import { Container, Graphics, NineSliceSprite, Sprite, Texture } from 'pixi.js';
 
 import { IconButton } from '../../ui/buttons/IconButton';
+import { app } from '../../main';
 import { HelperPanel } from '../../ui/HelperPanel';
 import { LaserLine } from '../../ui/LaserLine';
 import { PointToaster } from '../../ui/PointToaster';
@@ -276,8 +277,11 @@ export class HudSystem implements System {
         this.view.y = h;
 
         this._height = h;
-        this._pauseButton.y = -h + 42;
-        this._pauseButton.scale.set(Math.max(1,44/(64*(window.innerHeight/h))));
+        const pixelScale = app.canvas.getBoundingClientRect().height / h;
+        const pauseSize = Math.max(44, 64 * pixelScale);
+        this._pauseButton.scale.set(pauseSize / (64 * pixelScale));
+        // The 44px minimum also needs an 8px physical top inset after landscape scaling.
+        this._pauseButton.y = -h + (8 + pauseSize * 0.5) / pixelScale;
 
         // Force the top tray position to be relative to the animation ratio
         this._updateTopTrayHeight();

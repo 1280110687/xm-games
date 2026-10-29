@@ -87,8 +87,9 @@ export default function Clubhouse() {
 
     useEffect(() => {
         if (!ready) return;
-        const frame = requestAnimationFrame(() => window.parent.postMessage({ type: EXPERIENCE_MESSAGES.ready }, window.location.origin));
-        return () => cancelAnimationFrame(frame);
+        // Controller already confirmed a rendered frame. A second rAF can be
+        // throttled while the host's opaque loading cover still hides the scene.
+        window.parent.postMessage({ type: EXPERIENCE_MESSAGES.ready }, window.location.origin);
     }, [ready]);
     useEffect(() => {
         setHint(true);
